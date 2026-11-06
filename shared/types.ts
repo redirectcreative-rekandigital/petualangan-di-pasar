@@ -164,6 +164,12 @@ export interface Progress {
   playerName: string;
   /** Jenis kelamin karakter yang dipilih pemain. */
   gender: PlayerGender;
+  /** Warna pakaian/kemeja (hex). Bila kosong, memakai warna bawaan gender. */
+  warnaBaju?: number;
+  /** Warna celana/rok/gamis (hex). Bila kosong, memakai warna bawaan gender. */
+  warnaBawahan?: number;
+  /** Warna hijab (hex, khusus perempuan). Bila kosong, memakai warna bawaan. */
+  warnaHijab?: number;
   /** Apakah pemain sudah melewati layar pembuka (cover, karakter, nama). */
   introDone: boolean;
   coins: number;

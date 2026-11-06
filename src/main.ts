@@ -60,6 +60,9 @@ function aktifkanKlien(): void {
     token,
     nama: progress.playerName || 'Siswa',
     gender: progress.gender,
+    warnaBaju: progress.warnaBaju,
+    warnaBawahan: progress.warnaBawahan,
+    warnaHijab: progress.gender === 'perempuan' ? progress.warnaHijab : undefined,
     onPemain: (daftar) => {
       if (session) {
         session.world.setPemainLain(daftar);
@@ -275,7 +278,9 @@ async function buildPeta(): Promise<void> {
     },
     penampilanPemain: {
       gender: progress.gender,
-      warnaHijab: progress.gender === 'perempuan' ? 0xf4a3c8 : undefined,
+      warnaPakaian: progress.warnaBaju,
+      warnaBawahan: progress.warnaBawahan,
+      warnaHijab: progress.gender === 'perempuan' ? progress.warnaHijab : undefined,
     },
   });
 

@@ -154,6 +154,9 @@ function mergeProgress(partial: Partial<Progress>): Progress {
     answers: Array.isArray(partial.answers) ? partial.answers : [],
     puncakLulus: Boolean(partial.puncakLulus),
     completedAt: partial.completedAt,
+    warnaBaju: typeof partial.warnaBaju === 'number' ? partial.warnaBaju : undefined,
+    warnaBawahan: typeof partial.warnaBawahan === 'number' ? partial.warnaBawahan : undefined,
+    warnaHijab: typeof partial.warnaHijab === 'number' ? partial.warnaHijab : undefined,
     token: typeof partial.token === 'string' && partial.token ? partial.token : undefined,
   };
 }

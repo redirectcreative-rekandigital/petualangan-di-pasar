@@ -39,8 +39,22 @@ try {
   await page.waitForSelector('text=Pilih Karakter', { timeout: 5000 });
   log('layar pilih karakter tampil');
 
-  // Langkah 2: pilih perempuan lalu lanjut.
+  // Langkah 2: pilih perempuan lalu lanjut ke atur pakaian.
   await page.locator('.pilih-karakter', { hasText: 'Perempuan' }).click();
+  await page.locator('button', { hasText: 'Lanjut' }).click();
+  await page.waitForSelector('text=Atur Pakaian', { timeout: 5000 });
+  log('layar atur pakaian tampil');
+
+  // Pilih warna terakhir pada tiap baris (preview 3D harus tetap jalan).
+  const jumlahBaris = await page.locator('.warna-baris').count();
+  log(`jumlah baris warna: ${jumlahBaris}`);
+  for (let i = 0; i < jumlahBaris; i++) {
+    const opsi = page.locator('.warna-baris').nth(i).locator('.warna-tombol');
+    await opsi.last().click();
+    await page.waitForTimeout(150);
+  }
+  log('warna dipilih');
+
   await page.locator('button', { hasText: 'Lanjut' }).click();
   await page.waitForSelector('text=Nama & Mode Bermain', { timeout: 5000 });
   log('layar nama & mode tampil');

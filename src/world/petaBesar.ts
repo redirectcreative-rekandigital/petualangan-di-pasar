@@ -28,7 +28,12 @@ export interface PetaBesarOptions {
    */
   getPosisiPemain: () => NoktahId | null;
   /** Penampilan ikon pemain di peta (mengikuti pilihan karakter). */
-  penampilanPemain?: { gender: 'laki-laki' | 'perempuan'; warnaPakaian?: number; warnaHijab?: number };
+  penampilanPemain?: {
+    gender: 'laki-laki' | 'perempuan';
+    warnaPakaian?: number;
+    warnaBawahan?: number;
+    warnaHijab?: number;
+  };
   /** Batas devicePixelRatio. */
   pixelRatioCap?: number;
 }
@@ -159,7 +164,12 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   scene.add(mercusuar);
 
   // --- Ikon pemain: karakter kecil berdiri di noktah tempat ia berada. ---
-  type PenampilanPemain = { gender: 'laki-laki' | 'perempuan'; warnaPakaian?: number; warnaHijab?: number };
+  type PenampilanPemain = {
+    gender: 'laki-laki' | 'perempuan';
+    warnaPakaian?: number;
+    warnaBawahan?: number;
+    warnaHijab?: number;
+  };
   let pemainRig: KarakterRig | null = null;
   let pemainRing: THREE.Mesh | null = null;
   const pemainGroup = new THREE.Group();
@@ -176,6 +186,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
       const rig = buatKarakter({
         gender: tampilan.gender,
         warnaPakaian: tampilan.warnaPakaian,
+        warnaBawahan: tampilan.warnaBawahan,
         warnaHijab: tampilan.warnaHijab,
         pakaiMarker: false,
         skala: 1.15,

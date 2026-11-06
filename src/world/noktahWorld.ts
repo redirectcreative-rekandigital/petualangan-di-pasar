@@ -165,7 +165,13 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   ];
 
   // --- Pemain ---
-  const player: PlayerBundle = createPlayer(options.getProgress().gender);
+  const _prog = options.getProgress();
+  const player: PlayerBundle = createPlayer({
+    gender: _prog.gender,
+    warnaPakaian: _prog.warnaBaju,
+    warnaBawahan: _prog.warnaBawahan,
+    warnaHijab: _prog.warnaHijab,
+  });
   player.setPosition(0, SETENGAH - 6);
   scene.add(player.group);
   const camCtrl: CameraController = createCameraController(camera);
@@ -342,6 +348,10 @@ function buildBalaiKecil(
 
   // Bangunan kios (bentuk prosedural di kios.ts).
   const kios = buatKios({ warna }, track);
+  kios.group.traverse((o) => {
+    o.castShadow = true;
+    o.receiveShadow = true;
+  });
   g.add(kios.group);
 
   const sign = buildSign(meta.nama, warna, track);
@@ -358,6 +368,9 @@ function buildBalaiKecil(
   npcRig.geometri.forEach((x) => track(x));
   npcRig.material.forEach((x) => track(x));
   npcRig.group.position.copy(kios.titikNpc);
+  npcRig.group.traverse((o) => {
+    o.castShadow = true;
+  });
   g.add(npcRig.group);
 
   const markerMat = track(new THREE.MeshBasicMaterial({ color: 0xf59e0b }));

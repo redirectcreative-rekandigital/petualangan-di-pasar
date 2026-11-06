@@ -33,9 +33,9 @@ pemain **pernah mengunjungi seluruh 16 noktah** (aturan A(ii), tanpa syarat bint
 **30 soal** campuran pilihan ganda, pilihan ganda kompleks, dan penalaran HOTS. Lulus
 Pasar Ramai membuka **sertifikat digital**.
 
-Alur pembuka: **cover → pilih karakter (laki-laki/perempuan) → isi nama panggilan →
-loading singkat → peta**. Setiap perpindahan ke peta atau balai disertai **loading spinner**
-singkat.
+Alur pembuka: **cover → pilih karakter (laki-laki/perempuan) → atur pakaian (warna baju,
+celana/gamis, dan hijab) → isi nama panggilan → loading singkat → peta**. Setiap perpindahan
+ke peta atau balai disertai **loading spinner** singkat.
 
 Nilai karakter: **amanah dan jujur dalam berdagang**, muncul sebagai dialog penjaga.
 
@@ -44,6 +44,10 @@ Nilai karakter: **amanah dan jujur dalam berdagang**, muncul sebagai dialog penj
 - Peta besar 3D yang bisa diklik (peta harta karun) + dunia noktah 3D jelajah
 - Tiga tata letak dunia (per zona) dengan nama & warna balai menyesuaikan noktahnya
 - Karakter pemain low-poly, kamera orang ketiga, collision lingkaran-vs-kotak
+- **Kustomisasi pakaian**: 3 pilihan warna untuk baju, 3 untuk celana/gamis, dan 3 untuk
+  hijab (khusus perempuan), dengan pratinjau 3D langsung di layar
+- **Material PBR (MeshStandard) + bayangan lembut (PCFSoft)** untuk kesan lebih halus dan
+  nyata; otomatis dimatikan di perangkat kelas bawah agar tetap lancar
 - Kontrol sentuh (joystick + geser kamera + tombol A/B) dan desktop (WASD + mouse + E)
 - 78 soal: 48 soal balai (3 × 16) + 30 soal Pasar Ramai, semua dengan pembahasan
 - Metadata TKA pada tiap soal (kode materi, indikator, level kognitif, tingkat kesulitan)

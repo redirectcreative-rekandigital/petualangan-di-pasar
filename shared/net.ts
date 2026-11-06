@@ -71,6 +71,12 @@ export interface PosisiPemain {
   id: string;
   nama: string;
   gender: PlayerGender;
+  /** Warna pakaian pilihan (hex), bila ada. */
+  warnaBaju?: number;
+  /** Warna bawahan (celana/rok/gamis), bila ada. */
+  warnaBawahan?: number;
+  /** Warna hijab (khusus perempuan), bila ada. */
+  warnaHijab?: number;
   noktah: NoktahId | null;
   /** Posisi di dalam dunia noktah (satuan dunia). */
   x: number;
@@ -87,7 +93,15 @@ export interface PosisiPemain {
 
 /** Pesan dari KLIEN ke SERVER. */
 export type PesanKlien =
-  | { t: 'join'; token: string; nama: string; gender: PlayerGender }
+  | {
+      t: 'join';
+      token: string;
+      nama: string;
+      gender: PlayerGender;
+      warnaBaju?: number;
+      warnaBawahan?: number;
+      warnaHijab?: number;
+    }
   | { t: 'pos'; noktah: NoktahId | null; x: number; z: number; rot: number }
   | { t: 'sapa'; emoji: string }
   | { t: 'progres'; progress: ProgresSiswa };

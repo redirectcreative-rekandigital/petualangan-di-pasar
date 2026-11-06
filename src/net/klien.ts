@@ -23,6 +23,10 @@ export interface OpsiKlien {
   token: string;
   nama: string;
   gender: PlayerGender;
+  /** Warna pakaian pilihan (dikirim saat join agar teman melihat tampilan sama). */
+  warnaBaju?: number;
+  warnaBawahan?: number;
+  warnaHijab?: number;
   onPemain: (daftar: PosisiPemain[]) => void;
   onKabar?: (teks: string) => void;
   onStatus?: (status: StatusKlien) => void;
@@ -116,7 +120,15 @@ export class KlienMultiplayer {
 
     ws.addEventListener('open', () => {
       this.opsi.onStatus?.('tersambung');
-      this.kirim({ t: 'join', token: this.opsi.token, nama: this.opsi.nama, gender: this.opsi.gender });
+      this.kirim({
+        t: 'join',
+        token: this.opsi.token,
+        nama: this.opsi.nama,
+        gender: this.opsi.gender,
+        warnaBaju: this.opsi.warnaBaju,
+        warnaBawahan: this.opsi.warnaBawahan,
+        warnaHijab: this.opsi.warnaHijab,
+      });
       for (const teks of this.antre) ws.send(teks);
       this.antre = [];
     });

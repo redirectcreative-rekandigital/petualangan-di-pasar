@@ -99,6 +99,10 @@ berupa number, tidak ada id duplikat, dan tepat 3 soal tiap balai.
    (:5173) yang tidak punya route API, sehingga muncul **404**. **Diperbaiki** dengan
    mendeteksi halaman yang disajikan Vite dan mengarahkan API/WebSocket ke server
    multiplayer (:8787); `npm run dev` kini sekaligus menyalakan kedua proses.
+11. Karakter terasa "kurang smooth dan nyata" karena material Lambert tanpa bayangan.
+   **Diperbaiki** dengan material PBR, pencahayaan berlapis, bayangan lembut, dan geometri
+   lebih halus. Sekaligus ditambahkan **pilihan warna baju/celana/hijab** setelah memilih
+   karakter (lihat bagian berikut).
 
 ## Fitur Mode Multiplayer & Mode Guru
 
@@ -115,6 +119,34 @@ yang dipilih **server Node ringan** (`http` + `ws`), bukan layanan pihak ketiga:
 Pengujian: `tests/net.test.ts` (ringkasan progres & token), `tests/screens.test.ts`
 (alur pilih mode + validasi token), `scripts/smoke-multiplayer.mjs` (guru + 2 siswa
 saling melihat dan tampil di dasbor).
+
+## Peningkatan Visual & Kustomisasi Pakaian
+
+Umpan balik pengguna: tampilan 3D terasa **kurang halus dan kurang "nyata"**, serta
+diinginkan **pilihan warna** setelah memilih karakter. Perbaikan yang dilakukan:
+
+1. **Material diubah dari Lambert ke MeshStandard (PBR)** untuk karakter, tanah, dan
+   plaza. Lambert tidak memantulkan cahaya dari arah tertentu sehingga bentuk terlihat
+   datar; PBR memberi gradasi terang-gelap yang membuat volume tubuh terbaca.
+2. **Pencahayaan ditata ulang**: ambient dikurangi (x0,72) agar bayangan berperan, matahari
+   diperkuat (2,1) dan memberi bayangan, ditambah **cahaya isi** dari arah berlawanan agar
+   sisi gelap tidak pekat, serta hemisphere dipertegas.
+3. **Bayangan lembut (PCFSoft)**: karakter, kios, dan penjaga kini melempar bayangan ke
+   tanah; peta bayangan 1024 dengan `bias`/`normalBias` dihaluskan agar tidak bergaris.
+   Bayangan hanya aktif bila kualitas cukup tinggi (`pixelRatioCap > 1.2`) supaya HP kelas
+   bawah tetap lancar; status ini diekspos lewat `SceneBundle.pakaiBayangan`.
+4. **Geometri dihaluskan**: segmen silinder/kapsul dinaikkan (12A-*18, 8A-*14), bola kepala
+   24x20, mata diberi **sklera putih + pupil** agar ekspresi lebih hidup. Gamis perempuan
+   dipecah menjadi **rok** (bawahan) dan **atasan** agar warna bawah dapat dipilih terpisah.
+5. **Kustomisasi warna**: layar baru **"Atur Pakaian"** antara pemilihan karakter dan nama.
+   Tersedia **3 warna baju**, **3 warna celana/gamis**, dan **3 warna hijab** (hanya tampil
+   untuk karakter perempuan), dengan pratinjau 3D yang langsung berubah. Pilihan disimpan di
+   `Progress` (`warnaBaju`, `warnaBawahan`, `warnaHijab`), dipakai di peta besar, dunia noktah,
+   dan **dikirim ke server** agar teman di multiplayer melihat pakaian yang sama.
+
+Pengujian: `tests/screens.test.ts` (alur 4 langkah, penyimpanan warna perempuan, pria tanpa
+baris hijab), `scripts/smoke.mjs` (memilih warna di browser sungguhan), dan
+`scripts/smoke-multiplayer.mjs` (warna ikut tersinkron).
 
 ## Catatan Etika
 

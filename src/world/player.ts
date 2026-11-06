@@ -22,9 +22,28 @@ export interface PlayerBundle {
   dispose: () => void;
 }
 
-export function createPlayer(gender: PlayerGender = 'laki-laki'): PlayerBundle {
-  const rig: KarakterRig = buatKarakter({ gender, pakaiMarker: true });
+/** Penampilan pemain (gender + warna pakaian pilihan). */
+export interface Penampilan {
+  gender: PlayerGender;
+  warnaPakaian?: number;
+  warnaBawahan?: number;
+  warnaHijab?: number;
+}
+
+export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'): PlayerBundle {
+  const opsi: Penampilan = typeof penampilan === 'string' ? { gender: penampilan } : penampilan;
+  const rig: KarakterRig = buatKarakter({
+    gender: opsi.gender,
+    warnaPakaian: opsi.warnaPakaian,
+    warnaBawahan: opsi.warnaBawahan,
+    warnaHijab: opsi.warnaHijab,
+    pakaiMarker: true,
+  });
   const group = rig.group;
+  // Pemain adalah satu-satunya objek yang memberi bayangan "tokoh".
+  group.traverse((o) => {
+    o.castShadow = true;
+  });
 
   const position = new THREE.Vector3(0, 0, 0);
   let facing = 0;

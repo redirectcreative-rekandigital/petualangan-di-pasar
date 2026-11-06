@@ -108,11 +108,21 @@ export function createPengelolaPemainLain(scene: THREE.Scene): PengelolaPemainLa
   }
 
   function tambah(p: PosisiPemain, indeks: number): Ghost {
-    const rig = buatKarakter({ gender: p.gender, pakaiMarker: false, skala: 1 });
+    const rig = buatKarakter({
+      gender: p.gender,
+      warnaPakaian: p.warnaBaju,
+      warnaBawahan: p.warnaBawahan,
+      warnaHijab: p.warnaHijab,
+      pakaiMarker: false,
+      skala: 1,
+    });
     rig.geometri.forEach((g) => disposables.push(g));
     rig.material.forEach((m) => disposables.push(m));
     const group = rig.group;
     group.position.set(p.x, 0, p.z);
+    group.traverse((o) => {
+      o.castShadow = true;
+    });
 
     const { sprite: label, mat: labelMat } = buatLabel(p.nama);
     label.position.y = 3.3;

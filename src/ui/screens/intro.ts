@@ -3,23 +3,49 @@ import { sfx } from '../../core/sound';
 import { APP_INFO, KARAKTER, adaProgresTersimpan } from '../../core/state';
 import { showDialog } from '../dialog';
 import { createKarakterPreview, type KarakterPreview } from '../components/karakterPreview';
+import {
+  PALET_PILIHAN,
+  warnaBawaan,
+  type BagianWarna,
+  type PilihanWarna,
+} from '../../world/karakter';
 import type { PlayerGender } from '../../../shared/types';
 import type { ScreenContext } from './context';
 
 /**
- * Layar pembuka: cover, pilih karakter (laki-laki/perempuan), lalu isi nama
- * panggilan. Setelah selesai, konteks dipanggil untuk lanjut ke peta + loading.
+ * Layar pembuka: cover → pilih karakter → pilih warna pakaian → isi nama.
+ * Setelah selesai, konteks dipanggil untuk lanjut ke peta + loading.
  */
 export function renderIntro(ctx: ScreenContext): HTMLElement {
   const progress = ctx.getProgress();
   let gender: PlayerGender = progress.gender;
-  let langkah: 'cover' | 'karakter' | 'nama' = 'cover';
+  let langkah: 'cover' | 'karakter' | 'warna' | 'nama' = 'cover';
   // Mode bermain dipilih di langkah nama; disimpan di sini agar tidak tereset
   // ketika layar digambar ulang saat siswa menekan pilihan mode.
   let mode: 'single' | 'multi' = progress.token ? 'multi' : 'single';
   // Draf nama & token agar tidak hilang saat layar digambar ulang.
   let namaDraft = progress.playerName;
   let tokenDraft = progress.token ?? '';
+
+  // Warna pilihan per gender. Disimpan terpisah agar berganti karakter tidak
+  // menghapus warna yang sudah dipilih untuk karakter lain.
+  const warnaBajuDraft: Record<PlayerGender, number> = {
+    'laki-laki': progress.warnaBaju ?? warnaBawaan('laki-laki', 'baju'),
+    perempuan: progress.gender === 'perempuan' && progress.warnaBaju
+      ? progress.warnaBaju
+      : warnaBawaan('perempuan', 'baju'),
+  };
+  const warnaBawahanDraft: Record<PlayerGender, number> = {
+    'laki-laki': progress.gender === 'laki-laki' && progress.warnaBawahan
+      ? progress.warnaBawahan
+      : warnaBawaan('laki-laki', 'bawahan'),
+    perempuan: progress.gender === 'perempuan' && progress.warnaBawahan
+      ? progress.warnaBawahan
+      : warnaBawaan('perempuan', 'bawahan'),
+  };
+  let warnaHijabDraft = progress.gender === 'perempuan' && progress.warnaHijab
+    ? progress.warnaHijab
+    : warnaBawaan('perempuan', 'hijab');
 
   // Pratinjau 3D aktif (dibuang sebelum kartu dibangun ulang / layar berganti).
   let preview: KarakterPreview | null = null;
@@ -142,11 +168,19 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
   function renderKarakter(): void {
     lepasPreview();
     // Dua pratinjau 3D: satu untuk tiap pilihan.
-    const previewL = createKarakterPreview('laki-laki');
-    const previewP = createKarakterPreview('perempuan');
+    const previewL = createKarakterPreview('laki-laki', {
+      warnaPakaian: warnaBajuDraft['laki-laki'],
+      warnaBawahan: warnaBawahanDraft['laki-laki'],
+    });
+    const previewP = createKarakterPreview('perempuan', {
+      warnaPakaian: warnaBajuDraft.perempuan,
+      warnaBawahan: warnaBawahanDraft.perempuan,
+      warnaHijab: warnaHijabDraft,
+    });
     preview = {
       canvas: previewL.canvas,
       setGender: () => {},
+      setWarna: () => {},
       dispose: () => {
         previewL.dispose();
         previewP.dispose();
@@ -180,7 +214,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       on: {
         click: () => {
           sfx.click();
-          langkah = 'nama';
+          langkah = 'warna';
           renderLangkah();
         },
       },
@@ -192,6 +226,141 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       el('div', { class: 'pilih-karakter-row', children: [kartu('laki-laki', previewL), kartu('perempuan', previewP)] }),
       el('div', { class: 'stack', children: [lanjut] }),
     ]);
+  }
+
+  /** Langkah kustomisasi warna: baju, bawahan (celana/rok), dan hijab. */
+  function renderWarna(): void {
+    lepasPreview();
+    const previewSatu = createKarakterPreview(gender, {
+      warnaPakaian: warnaBajuDraft[gender],
+      warnaBawahan: warnaBawahanDraft[gender],
+      warnaHijab: gender === 'perempuan' ? warnaHijabDraft : undefined,
+    });
+    preview = {
+      canvas: previewSatu.canvas,
+      setGender: () => {},
+      setWarna: (w) => previewSatu.setWarna(w),
+      dispose: () => previewSatu.dispose(),
+    };
+    previewSatu.canvas.classList.add('preview-besar');
+
+    const segarkanPreview = (): void => {
+      previewSatu.setWarna({
+        warnaPakaian: warnaBajuDraft[gender],
+        warnaBawahan: warnaBawahanDraft[gender],
+        warnaHijab: gender === 'perempuan' ? warnaHijabDraft : undefined,
+      });
+    };
+
+    /** Baris pilihan warna untuk satu bagian. */
+    const barisWarna = (
+      label: string,
+      bagian: BagianWarna,
+      ambil: () => number,
+      pasang: (nilai: number) => void,
+      daftar: PilihanWarna[],
+    ): HTMLElement => {
+      const tombol: HTMLElement[] = daftar.map((p) => {
+        const aktif = ambil() === p.nilai;
+        const b = el('button', {
+          class: `warna-tombol ${aktif ? 'dipilih' : ''}`,
+          attrs: {
+            type: 'button',
+            'aria-pressed': aktif ? 'true' : 'false',
+            'aria-label': `${label}: ${p.nama}`,
+            title: p.nama,
+            'data-bagian': bagian,
+          },
+        });
+        const bulatan = el('span', {
+          class: 'warna-bulatan',
+          attrs: { style: `background:#${p.nilai.toString(16).padStart(6, '0')}` },
+        });
+        b.append(bulatan, el('span', { class: 'warna-nama', text: p.nama }));
+        b.addEventListener('click', () => {
+          sfx.click();
+          pasang(p.nilai);
+          sfx.click();
+          renderLangkah();
+        });
+        return b;
+      });
+
+      return el('div', {
+        class: 'warna-baris',
+        children: [el('div', { class: 'warna-label', text: label }), el('div', { class: 'warna-opsi', children: tombol })],
+      });
+    };
+
+    const baju = barisWarna(
+      '👕 Warna Baju',
+      'baju',
+      () => warnaBajuDraft[gender],
+      (n) => {
+        warnaBajuDraft[gender] = n;
+      },
+      PALET_PILIHAN[gender].baju,
+    );
+
+    const bawahan = barisWarna(
+      gender === 'perempuan' ? '👗 Warna Gamis/Rok' : '👖 Warna Celana',
+      'bawahan',
+      () => warnaBawahanDraft[gender],
+      (n) => {
+        warnaBawahanDraft[gender] = n;
+      },
+      PALET_PILIHAN[gender].bawahan,
+    );
+
+    const hijab =
+      gender === 'perempuan'
+        ? barisWarna(
+            '🧕 Warna Hijab',
+            'hijab',
+            () => warnaHijabDraft,
+            (n) => {
+              warnaHijabDraft = n;
+            },
+            PALET_PILIHAN.perempuan.hijab,
+          )
+        : null;
+
+    const lanjut = el('button', {
+      class: 'btn block',
+      text: 'Lanjut →',
+      attrs: { type: 'button' },
+      on: {
+        click: () => {
+          sfx.click();
+          langkah = 'nama';
+          renderLangkah();
+        },
+      },
+    });
+
+    const kembali = el('button', {
+      class: 'btn ghost block',
+      text: '← Ganti Karakter',
+      attrs: { type: 'button' },
+      on: {
+        click: () => {
+          sfx.click();
+          langkah = 'karakter';
+          renderLangkah();
+        },
+      },
+    });
+
+    replace([
+      el('div', { class: 'topbar', children: [el('h2', { text: 'Atur Pakaian' })] }),
+      el('p', { class: 'muted center-text', text: 'Pilih warna baju, bawahan, dan hijab kesukaanmu.' }),
+      el('div', { class: 'warna-panggung', children: [previewSatu.canvas] }),
+      baju,
+      bawahan,
+      hijab,
+      el('div', { class: 'stack', children: [lanjut, kembali] }),
+    ]);
+    segarkanPreview();
   }
 
   function renderNama(): void {
@@ -277,7 +446,16 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
             }
           }
           sfx.click();
-          const next = { ...ctx.getProgress(), playerName: nama, gender, introDone: true, token: token || undefined };
+          const next = {
+            ...ctx.getProgress(),
+            playerName: nama,
+            gender,
+            warnaBaju: warnaBajuDraft[gender],
+            warnaBawahan: warnaBawahanDraft[gender],
+            warnaHijab: gender === 'perempuan' ? warnaHijabDraft : undefined,
+            introDone: true,
+            token: token || undefined,
+          };
           ctx.setProgress(next);
           ctx.persist();
           ctx.navigate('map', { dariIntro: true });
@@ -329,9 +507,10 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
   }
 
   function renderLangkah(): void {
-    if (langkah !== 'karakter') lepasPreview();
+    if (langkah !== 'karakter' && langkah !== 'warna') lepasPreview();
     if (langkah === 'cover') renderCover();
     else if (langkah === 'karakter') renderKarakter();
+    else if (langkah === 'warna') renderWarna();
     else renderNama();
   }
 

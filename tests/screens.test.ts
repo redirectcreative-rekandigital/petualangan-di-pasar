@@ -73,9 +73,15 @@ describe('layar pembuka (intro)', () => {
     expect(node.textContent).toContain('Pilih Karakter');
     expect(node.querySelectorAll('.pilih-karakter').length).toBe(2);
 
-    // Karakter -> nama.
+    // Karakter -> atur pakaian.
     const lanjut = Array.from(node.querySelectorAll('button')).find((b) => b.textContent?.includes('Lanjut'));
     lanjut?.dispatchEvent(new MouseEvent('click'));
+    expect(node.textContent).toContain('Atur Pakaian');
+    expect(node.querySelectorAll('.warna-baris').length).toBe(2); // pria: baju + celana
+
+    // Atur pakaian -> nama.
+    const lanjut2 = Array.from(node.querySelectorAll('button')).find((b) => b.textContent?.includes('Lanjut'));
+    lanjut2?.dispatchEvent(new MouseEvent('click'));
     expect(node.textContent).toContain('Nama & Mode Bermain');
 
     // Isi nama -> memulai ke peta dengan penanda dariIntro.
@@ -90,9 +96,12 @@ describe('layar pembuka (intro)', () => {
     const progress = createDefaultProgress();
     const { ctx, nav } = makeCtx(progress);
     const node = renderIntro(ctx);
-    // Masuk ke langkah nama lewat cover -> karakter -> lanjut.
+    // Masuk ke langkah nama lewat cover -> karakter -> atur pakaian -> nama.
     Array.from(node.querySelectorAll('button'))
       .find((b) => b.textContent?.includes('Mulai Petualangan'))
+      ?.dispatchEvent(new MouseEvent('click'));
+    Array.from(node.querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('Lanjut'))
       ?.dispatchEvent(new MouseEvent('click'));
     Array.from(node.querySelectorAll('button'))
       .find((b) => b.textContent?.includes('Lanjut'))
@@ -132,6 +141,9 @@ describe('layar pembuka (intro)', () => {
     Array.from(node.querySelectorAll('button'))
       .find((b) => b.textContent?.includes('Lanjut'))
       ?.dispatchEvent(new MouseEvent('click'));
+    Array.from(node.querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('Lanjut'))
+      ?.dispatchEvent(new MouseEvent('click'));
     Array.from(node.querySelectorAll('.mode-kartu'))[1]?.dispatchEvent(new MouseEvent('click'));
 
     const nama = node.querySelector<HTMLInputElement>('input.isian[aria-label="Nama panggilan"]');
@@ -142,7 +154,63 @@ describe('layar pembuka (intro)', () => {
       .find((b) => b.textContent?.includes('Mulai Berpetualang'))
       ?.dispatchEvent(new MouseEvent('click'));
     expect(nav).not.toHaveBeenCalled();
-    expect(token?.classList.contains('salah')).toBe(true);
+    expect(node.querySelector<HTMLInputElement>('.token-input')?.classList.contains('salah')).toBe(true);
+  });
+
+  it('menyimpan warna baju, celana, dan hijab yang dipilih', () => {
+    const progress = createDefaultProgress();
+    const { ctx, nav } = makeCtx(progress);
+    const node = renderIntro(ctx);
+    // Cover -> karakter perempuan.
+    Array.from(node.querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('Mulai Petualangan'))
+      ?.dispatchEvent(new MouseEvent('click'));
+    Array.from(node.querySelectorAll('.pilih-karakter'))[1]?.dispatchEvent(new MouseEvent('click'));
+    Array.from(node.querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('Lanjut'))
+      ?.dispatchEvent(new MouseEvent('click'));
+
+    // Langkah warna: perempuan punya 3 baris (baju, gamis, hijab).
+    expect(node.textContent).toContain('Atur Pakaian');
+    expect(node.querySelectorAll('.warna-baris').length).toBe(3);
+    expect(node.querySelectorAll('.warna-baris')[2]?.textContent).toContain('Hijab');
+
+    // Pilih warna terakhir pada tiap baris agar berbeda dari bawaan.
+    for (const baris of Array.from(node.querySelectorAll('.warna-baris'))) {
+      const opsi = Array.from(baris.querySelectorAll('.warna-tombol'));
+      opsi[opsi.length - 1]?.dispatchEvent(new MouseEvent('click'));
+    }
+
+    Array.from(node.querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('Lanjut'))
+      ?.dispatchEvent(new MouseEvent('click'));
+    const nama = node.querySelector<HTMLInputElement>('input.isian[aria-label="Nama panggilan"]');
+    if (nama) nama.value = 'Ani';
+    Array.from(node.querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('Mulai Berpetualang'))
+      ?.dispatchEvent(new MouseEvent('click'));
+
+    expect(nav).toHaveBeenCalledWith('map', { dariIntro: true });
+    const p = ctx.getProgress();
+    expect(p.gender).toBe('perempuan');
+    expect(p.warnaBaju).toBe(0x3fbfa0);
+    expect(p.warnaBawahan).toBe(0x6b4f3a);
+    expect(p.warnaHijab).toBe(0x9b6bd6);
+  });
+
+  it('pria tidak menampilkan pilihan hijab', () => {
+    const progress = createDefaultProgress();
+    const { ctx } = makeCtx(progress);
+    const node = renderIntro(ctx);
+    Array.from(node.querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('Mulai Petualangan'))
+      ?.dispatchEvent(new MouseEvent('click'));
+    Array.from(node.querySelectorAll('button'))
+      .find((b) => b.textContent?.includes('Lanjut'))
+      ?.dispatchEvent(new MouseEvent('click'));
+    expect(node.querySelectorAll('.warna-baris').length).toBe(2);
+    expect(node.textContent).toContain('Warna Celana');
+    expect(node.textContent).not.toContain('Warna Hijab');
   });
 });
 

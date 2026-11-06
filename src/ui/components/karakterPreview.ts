@@ -15,7 +15,16 @@ export interface KarakterPreview {
   canvas: HTMLCanvasElement;
   /** Mengganti model (mis. saat pemain beralih pilihan). */
   setGender: (gender: PlayerGender) => void;
+  /** Mengganti warna pakaian tanpa membangun ulang model. */
+  setWarna: (warna: WarnaPenampilan) => void;
   dispose: () => void;
+}
+
+/** Warna pakaian yang bisa dipratinjau. */
+export interface WarnaPenampilan {
+  warnaPakaian?: number;
+  warnaBawahan?: number;
+  warnaHijab?: number;
 }
 
 const UKURAN = 160;
@@ -27,10 +36,15 @@ function previewKosong(): KarakterPreview {
   canvas.height = UKURAN;
   canvas.className = 'karakter-preview';
   canvas.setAttribute('aria-hidden', 'true');
-  return { canvas, setGender: () => {}, dispose: () => {} };
+  return {
+    canvas,
+    setGender: () => {},
+    setWarna: () => {},
+    dispose: () => {},
+  };
 }
 
-export function createKarakterPreview(gender: PlayerGender): KarakterPreview {
+export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPenampilan = {}): KarakterPreview {
   const canvas = document.createElement('canvas');
   canvas.width = UKURAN;
   canvas.height = UKURAN;
@@ -68,14 +82,31 @@ export function createKarakterPreview(gender: PlayerGender): KarakterPreview {
   scene.add(hemi);
 
   let rig: KarakterRig | null = null;
+  let genderKini: PlayerGender = gender;
+  let warnaKini: WarnaPenampilan = {
+    warnaPakaian: warnaAwal.warnaPakaian,
+    warnaBawahan: warnaAwal.warnaBawahan,
+    warnaHijab: warnaAwal.warnaHijab,
+  };
+
+  function buangRig(): void {
+    if (!rig) return;
+    scene.remove(rig.group);
+    rig.geometri.forEach((x) => x.dispose());
+    rig.material.forEach((x) => x.dispose());
+    rig = null;
+  }
 
   function pasang(g: PlayerGender): void {
-    if (rig) {
-      scene.remove(rig.group);
-      rig.geometri.forEach((x) => x.dispose());
-      rig.material.forEach((x) => x.dispose());
-    }
-    rig = buatKarakter({ gender: g, pakaiMarker: false });
+    genderKini = g;
+    buangRig();
+    rig = buatKarakter({
+      gender: g,
+      warnaPakaian: warnaKini.warnaPakaian,
+      warnaBawahan: warnaKini.warnaBawahan,
+      warnaHijab: warnaKini.warnaHijab,
+      pakaiMarker: false,
+    });
     rig.group.position.y = 0.1;
     scene.add(rig.group);
   }
@@ -107,6 +138,25 @@ export function createKarakterPreview(gender: PlayerGender): KarakterPreview {
     canvas,
     setGender: (g) => {
       pasang(g);
+      mulai = performance.now();
+    },
+    setWarna: (warna) => {
+      warnaKini = {
+        warnaPakaian: warna.warnaPakaian,
+        warnaBawahan: warna.warnaBawahan,
+        warnaHijab: warna.warnaHijab,
+      };
+      // Bangun ulang model: ukurannya kecil, jadi biayanya sepele dan pasti benar.
+      buangRig();
+      rig = buatKarakter({
+        gender: genderKini,
+        warnaPakaian: warnaKini.warnaPakaian,
+        warnaBawahan: warnaKini.warnaBawahan,
+        warnaHijab: warnaKini.warnaHijab,
+        pakaiMarker: false,
+      });
+      rig.group.position.y = 0.1;
+      scene.add(rig.group);
       mulai = performance.now();
     },
     dispose: () => {

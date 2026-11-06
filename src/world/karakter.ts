@@ -16,8 +16,10 @@ import type { PlayerGender } from '../../shared/types';
 export interface KarakterOpsi {
   /** Jenis kelamin menentukan bentuk pakaian (celana panjang / hijab-gamis). */
   gender?: PlayerGender;
-  /** Warna pakaian (mengalahkan warna bawaan gender bila diisi). */
+  /** Warna pakaian atas/kemeja (mengalahkan warna bawaan gender bila diisi). */
   warnaPakaian?: number;
+  /** Warna bawahan: celana panjang (pria) atau gamis (perempuan). */
+  warnaBawahan?: number;
   /** Warna kulit. */
   warnaKulit?: number;
   /** Warna rambut (khusus laki-laki). */
@@ -74,6 +76,63 @@ const PALET: Record<PlayerGender, { pakaian: number; bawahan: number; rambut: nu
   perempuan: { pakaian: 0xf26fa3, bawahan: 0x7c3aed, rambut: 0x3a2416, hijab: 0xf4a3c8, sepatu: 0x4a2f2f },
 };
 
+/** Satu pilihan warna pada layar kustomisasi. */
+export interface PilihanWarna {
+  /** Nama yang ditampilkan ke anak. */
+  nama: string;
+  /** Nilai warna hex. */
+  nilai: number;
+}
+
+export type BagianWarna = 'baju' | 'bawahan' | 'hijab';
+
+/**
+ * Tiga pilihan warna untuk tiap bagian pakaian.
+ * Warna dipilih agar kontras dan tetap cerah di tema "Sore Hangat".
+ */
+export const PALET_PILIHAN: Record<PlayerGender, Record<BagianWarna, PilihanWarna[]>> = {
+  'laki-laki': {
+    baju: [
+      { nama: 'Hijau Pasar', nilai: 0x2f9e6b },
+      { nama: 'Biru Langit', nilai: 0x2563eb },
+      { nama: 'Oranye Madu', nilai: 0xf08c3a },
+    ],
+    bawahan: [
+      { nama: 'Biru Tua', nilai: 0x2c3e6b },
+      { nama: 'Cokelat Kayu', nilai: 0x6b4f3a },
+      { nama: 'Abu Arang', nilai: 0x4b5563 },
+    ],
+    hijab: [
+      { nama: 'Putih Bersih', nilai: 0xffffff },
+      { nama: 'Hijau Daun', nilai: 0x2f9e6b },
+      { nama: 'Biru Langit', nilai: 0x2563eb },
+    ],
+  },
+  perempuan: {
+    baju: [
+      { nama: 'Merah Jambu', nilai: 0xf26fa3 },
+      { nama: 'Ungu Lembut', nilai: 0x9b6bd6 },
+      { nama: 'Hijau Mint', nilai: 0x3fbfa0 },
+    ],
+    bawahan: [
+      { nama: 'Ungu Tua', nilai: 0x7c3aed },
+      { nama: 'Biru Tua', nilai: 0x2c3e6b },
+      { nama: 'Cokelat Kayu', nilai: 0x6b4f3a },
+    ],
+    hijab: [
+      { nama: 'Merah Jambu', nilai: 0xf4a3c8 },
+      { nama: 'Putih Bersih', nilai: 0xffffff },
+      { nama: 'Ungu Lembut', nilai: 0x9b6bd6 },
+    ],
+  },
+};
+
+/** Warna bawaan per bagian untuk sebuah gender. */
+export function warnaBawaan(gender: PlayerGender, bagian: BagianWarna): number {
+  const p = PALET_PILIHAN[gender][bagian];
+  return p[0]?.nilai ?? 0xffffff;
+}
+
 /**
  * Membangun karakter lengkap. Tinggi total sekitar 2.6 satuan (setara manusia
  * dewasa kecil), dengan kaki sebagai titik origin (y = 0).
@@ -94,13 +153,36 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
     return m;
   };
 
-  const mKulit = mat(new THREE.MeshLambertMaterial({ color: warnaKulit }));
-  const mPakaian = mat(new THREE.MeshLambertMaterial({ color: opsi.warnaPakaian ?? palet.pakaian }));
-  const mBawahan = mat(new THREE.MeshLambertMaterial({ color: palet.bawahan }));
-  const mRambut = mat(new THREE.MeshLambertMaterial({ color: opsi.warnaRambut ?? palet.rambut }));
-  const mHijab = mat(new THREE.MeshLambertMaterial({ color: opsi.warnaHijab ?? palet.hijab }));
-  const mSepatu = mat(new THREE.MeshLambertMaterial({ color: palet.sepatu }));
+  const mKulit = mat(new THREE.MeshStandardMaterial({ color: warnaKulit, roughness: 0.72, metalness: 0 }));
+  const mPakaian = mat(
+    new THREE.MeshStandardMaterial({
+      color: opsi.warnaPakaian ?? palet.pakaian,
+      roughness: 0.78,
+      metalness: 0,
+    }),
+  );
+  const mBawahan = mat(
+    new THREE.MeshStandardMaterial({
+      color: opsi.warnaBawahan ?? palet.bawahan,
+      roughness: 0.82,
+      metalness: 0,
+    }),
+  );
+  const mRambut = mat(
+    new THREE.MeshStandardMaterial({ color: opsi.warnaRambut ?? palet.rambut, roughness: 0.55, metalness: 0 }),
+  );
+  const mHijab = mat(
+    new THREE.MeshStandardMaterial({
+      color: opsi.warnaHijab ?? palet.hijab,
+      roughness: 0.62,
+      metalness: 0,
+    }),
+  );
+  const mSepatu = mat(new THREE.MeshStandardMaterial({ color: palet.sepatu, roughness: 0.5, metalness: 0.05 }));
   const mMata = mat(new THREE.MeshBasicMaterial({ color: 0x241b12 }));
+
+  const segBulat = 18; // segmen keliling untuk bagian badan (halus)
+  const segLingkar = 14; // segmen vertikal
 
   const group = new THREE.Group();
   const perempuan = gender === 'perempuan';
@@ -112,32 +194,45 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
   /* ---------------- Badan ---------------- */
 
   if (perempuan) {
-    // Gamis/rok panjang: satu silinder lebar yang mengerucut dari pundak
-    // sampai mata kaki, menutup pinggul (aurat terjaga).
-    const gamisGeo = geo(new THREE.CylinderGeometry(0.34, 0.52, 1.5, 12));
-    const gamis = new THREE.Mesh(gamisGeo, mPakaian);
-    gamis.position.y = 0.95;
-    badan.add(gamis);
+    // Gamis panjang: badan atas + rok yang mengembang ke bawah.
+    // Warna gamis memakai `mBawahan` agar bisa dipadukan terpisah dari atasan.
+    const rokGeo = geo(new THREE.CylinderGeometry(0.36, 0.56, 1.05, segBulat, 1, true));
+    const rok = new THREE.Mesh(rokGeo, mBawahan);
+    rok.position.y = 0.62;
+    badan.add(rok);
+
+    // Tutup bawah rok (supaya tidak tembus pandang dari sudut rendah).
+    const rokTutupGeo = geo(new THREE.RingGeometry(0.01, 0.56, segBulat));
+    const rokTutup = new THREE.Mesh(rokTutupGeo, mBawahan);
+    rokTutup.rotation.x = -Math.PI / 2;
+    rokTutup.position.y = 0.1;
+    badan.add(rokTutup);
+
+    // Atasan gamis (dari pinggang ke pundak).
+    const atasanGeo = geo(new THREE.CylinderGeometry(0.34, 0.37, 0.72, segBulat));
+    const atasan = new THREE.Mesh(atasanGeo, mPakaian);
+    atasan.position.y = 1.42;
+    badan.add(atasan);
 
     // Pundak — bola pipih agar sambungan lengan halus.
-    const pundakGeo = geo(new THREE.SphereGeometry(0.33, 12, 8));
+    const pundakGeo = geo(new THREE.SphereGeometry(0.33, segBulat, segLingkar));
     const pundak = new THREE.Mesh(pundakGeo, mPakaian);
     pundak.scale.set(1, 0.55, 1);
-    pundak.position.y = 1.72;
+    pundak.position.y = 1.78;
     badan.add(pundak);
   } else {
-    // Pinggul (celana) — kubus rendah, lalu dada kemeja di atasnya.
-    const pinggulGeo = geo(new THREE.CylinderGeometry(0.3, 0.34, 0.5, 10));
+    // Pinggul (celana) — silinder membulat, lalu dada kemeja di atasnya.
+    const pinggulGeo = geo(new THREE.CylinderGeometry(0.3, 0.34, 0.52, segBulat));
     const pinggul = new THREE.Mesh(pinggulGeo, mBawahan);
     pinggul.position.y = 0.86;
     badan.add(pinggul);
 
-    const dadaGeo = geo(new THREE.CylinderGeometry(0.34, 0.3, 0.75, 10));
+    const dadaGeo = geo(new THREE.CylinderGeometry(0.34, 0.3, 0.76, segBulat));
     const dada = new THREE.Mesh(dadaGeo, mPakaian);
     dada.position.y = 1.45;
     badan.add(dada);
 
-    const pundakGeo = geo(new THREE.SphereGeometry(0.33, 12, 8));
+    const pundakGeo = geo(new THREE.SphereGeometry(0.33, segBulat, segLingkar));
     const pundak = new THREE.Mesh(pundakGeo, mPakaian);
     pundak.scale.set(1, 0.55, 1);
     pundak.position.y = 1.82;
@@ -145,25 +240,32 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
   }
 
   // Leher.
-  const leherGeo = geo(new THREE.CylinderGeometry(0.12, 0.13, 0.16, 10));
+  const leherGeo = geo(new THREE.CylinderGeometry(0.12, 0.13, 0.16, segBulat));
   const leher = new THREE.Mesh(leherGeo, mKulit);
   leher.position.y = 1.94;
   badan.add(leher);
 
   /* ---------------- Kepala ---------------- */
 
-  const kepalaGeo = geo(new THREE.SphereGeometry(0.3, 18, 14));
+  const kepalaGeo = geo(new THREE.SphereGeometry(0.3, 24, 20));
   const kepala = new THREE.Mesh(kepalaGeo, mKulit);
   kepala.scale.set(1, 1.08, 0.95);
   kepala.position.y = 2.24;
   badan.add(kepala);
 
   // Mata (dua bola kecil di muka, arah +Z).
-  const mataGeo = geo(new THREE.SphereGeometry(0.04, 8, 8));
+  const mataGeo = geo(new THREE.SphereGeometry(0.042, 12, 10));
+  const mMataPutih = mat(new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.35 }));
   for (const x of [-0.1, 0.1]) {
-    const mata = new THREE.Mesh(mataGeo, mMata);
-    mata.position.set(x, 2.26, 0.275);
-    badan.add(mata);
+    const putih = new THREE.Mesh(mataGeo, mMataPutih);
+    putih.position.set(x, 2.26, 0.268);
+    putih.scale.set(1, 1.15, 0.7);
+    badan.add(putih);
+
+    const pupil = new THREE.Mesh(mataGeo, mMata);
+    pupil.position.set(x, 2.26, 0.29);
+    pupil.scale.set(0.62, 0.72, 0.6);
+    badan.add(pupil);
   }
 
   if (perempuan) {
@@ -171,7 +273,7 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
     // Bentuk: bola tertutup yang lebih besar dari kepala, dibuka di bagian
     // muka (bidang ±0.72π) supaya wajah tetap tampak.
     const hijabGeo = geo(
-      new THREE.SphereGeometry(0.37, 20, 16, Math.PI / 2 + 0.15, Math.PI * 2 - 0.3, 0, Math.PI * 0.72),
+      new THREE.SphereGeometry(0.37, 24, 20, Math.PI / 2 + 0.15, Math.PI * 2 - 0.3, 0, Math.PI * 0.72),
     );
     const hijab = new THREE.Mesh(hijabGeo, mHijab);
     hijab.scale.set(1, 1.12, 1.06);
@@ -179,26 +281,26 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
     badan.add(hijab);
 
     // Bagian hijab yang menutupi dada/bahu.
-    const selendangGeo = geo(new THREE.CylinderGeometry(0.4, 0.52, 0.5, 14));
+    const selendangGeo = geo(new THREE.CylinderGeometry(0.4, 0.52, 0.5, segBulat));
     const selendang = new THREE.Mesh(selendangGeo, mHijab);
     selendang.position.y = 1.72;
     badan.add(selendang);
 
     // Ikat pinggir depan hijab (lingkaran pipih) agar bentuk muka tegas.
-    const bingkaiGeo = geo(new THREE.TorusGeometry(0.31, 0.05, 8, 18));
+    const bingkaiGeo = geo(new THREE.TorusGeometry(0.31, 0.05, 10, 26));
     const bingkai = new THREE.Mesh(bingkaiGeo, mHijab);
     bingkai.position.set(0, 2.24, 0.06);
     bingkai.scale.set(1, 1.15, 1);
     badan.add(bingkai);
   } else {
     // Rambut pendek pria + jambul kecil di atas.
-    const rambutGeo = geo(new THREE.SphereGeometry(0.315, 16, 12, 0, Math.PI * 2, 0, Math.PI / 1.7));
+    const rambutGeo = geo(new THREE.SphereGeometry(0.315, 24, 18, 0, Math.PI * 2, 0, Math.PI / 1.7));
     const rambut = new THREE.Mesh(rambutGeo, mRambut);
     rambut.scale.set(1, 1.05, 1);
     rambut.position.y = 2.27;
     badan.add(rambut);
 
-    const jambulGeo = geo(new THREE.ConeGeometry(0.14, 0.22, 8));
+    const jambulGeo = geo(new THREE.ConeGeometry(0.14, 0.22, 14));
     const jambul = new THREE.Mesh(jambulGeo, mRambut);
     jambul.position.set(0, 2.46, 0.02);
     jambul.rotation.z = 0.4;
@@ -207,8 +309,8 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
 
   /* ---------------- Lengan (bersendi di pundak) ---------------- */
 
-  const lenganAtasGeo = geo(new THREE.CapsuleGeometry(0.095, 0.42, 4, 8));
-  const tanganGeo = geo(new THREE.SphereGeometry(0.1, 10, 8));
+  const lenganAtasGeo = geo(new THREE.CapsuleGeometry(0.095, 0.42, 6, 14));
+  const tanganGeo = geo(new THREE.SphereGeometry(0.1, 12, 10));
 
   const buatLengan = (sisi: -1 | 1): THREE.Object3D => {
     const pivot = new THREE.Group();
@@ -231,7 +333,7 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
 
   /* ---------------- Kaki (bersendi di pinggul) ---------------- */
 
-  const kakiGeo = geo(new THREE.CapsuleGeometry(0.12, 0.55, 4, 8));
+  const kakiGeo = geo(new THREE.CapsuleGeometry(0.12, 0.55, 6, 14));
   const sepatuGeo = geo(new THREE.BoxGeometry(0.24, 0.14, 0.36));
 
   const buatKaki = (sisi: -1 | 1): THREE.Object3D => {

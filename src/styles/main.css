@@ -1490,4 +1490,85 @@ body.world-mode #app {
   background: var(--hijau-100);
 }
 
+/* ==================== ATUR PAKAIAN (PILIH WARNA) ==================== */
+.warna-panggung {
+  display: flex;
+  justify-content: center;
+  background: radial-gradient(circle at 50% 30%, var(--hijau-100) 0%, var(--putih) 70%);
+  border-radius: var(--radius);
+  box-shadow: var(--bayangan);
+  padding: 8px;
+}
+
+.karakter-preview.preview-besar {
+  width: 200px;
+  height: 200px;
+  max-width: 100%;
+}
+
+.warna-baris {
+  background: var(--putih);
+  border-radius: var(--radius);
+  box-shadow: var(--bayangan);
+  padding: 10px 12px;
+}
+
+.warna-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+  margin-bottom: 8px;
+  color: var(--hijau-900);
+}
+
+.warna-opsi {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.warna-tombol {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 4px;
+  background: var(--krem-50);
+  border: 3px solid var(--garis);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font: inherit;
+}
+
+.warna-tombol.dipilih {
+  border-color: var(--hijau-500);
+  background: var(--hijau-100);
+}
+
+.warna-tombol:active {
+  transform: scale(0.97);
+}
+
+.warna-bulatan {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.15);
+  box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.12);
+}
+
+.warna-tombol.dipilih .warna-bulatan {
+  box-shadow:
+    inset 0 -3px 6px rgba(0, 0, 0, 0.12),
+    0 0 0 3px var(--putih),
+    0 0 0 5px var(--hijau-500);
+}
+
+.warna-nama {
+  font-size: 0.68rem;
+  color: var(--teks-lemah);
+  text-align: center;
+  line-height: 1.15;
+}
+
+
 

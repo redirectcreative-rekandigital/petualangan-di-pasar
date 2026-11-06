@@ -1,0 +1,80 @@
+[
+  {
+    "id": "b09-s01",
+    "balai": "E01",
+    "type": "mcq",
+    "prompt": "Lapisan batuan yang menyusun kulit bumi disebut ....",
+    "options": [
+      "hidrosfer",
+      "litosfer",
+      "atmosfer",
+      "biosfer"
+    ],
+    "answer": "litosfer",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"litosfer\".",
+    "explanation": [
+      "Kunci: litosfer.",
+      "Ini sesuai materi Kenampakan bumi (materi E01)."
+    ],
+    "meta": {
+      "kodeMateri": "E01",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Mengenal konsep dasar: Lapisan batuan yang menyusun kulit bumi disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b09-s02",
+    "balai": "E01",
+    "type": "mcq",
+    "prompt": "Berikut ini yang termasuk contoh litosfer adalah ....",
+    "options": [
+      "sungai",
+      "awan",
+      "danau",
+      "gunung"
+    ],
+    "answer": "gunung",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"gunung\".",
+    "explanation": [
+      "Kunci: gunung.",
+      "Ini sesuai materi Kenampakan bumi (materi E01)."
+    ],
+    "meta": {
+      "kodeMateri": "E01",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Mengenal konsep dasar: Berikut ini yang termasuk contoh litosfer adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b09-s03",
+    "balai": "E01",
+    "type": "mcq",
+    "prompt": "Seluruh air yang ada di bumi disebut ....",
+    "options": [
+      "hidrosfer",
+      "litosfer",
+      "atmosfer",
+      "troposfer"
+    ],
+    "answer": "hidrosfer",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"hidrosfer\".",
+    "explanation": [
+      "Kunci: hidrosfer.",
+      "Ini sesuai materi Kenampakan bumi (materi E01)."
+    ],
+    "meta": {
+      "kodeMateri": "E01",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Mengenal konsep dasar: Seluruh air yang ada di bumi disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  }
+]

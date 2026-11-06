@@ -1,0 +1,262 @@
+[
+  {
+    "id": "b02-s01",
+    "balai": "F02",
+    "type": "mcq",
+    "prompt": "Bunyi dihasilkan oleh benda yang ....",
+    "options": [
+      "diam",
+      "bergetar",
+      "panas",
+      "basah"
+    ],
+    "answer": "bergetar",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"bergetar\".",
+    "explanation": [
+      "Kunci: bergetar.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Mengenal konsep dasar: Bunyi dihasilkan oleh benda yang",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b02-s02",
+    "balai": "F02",
+    "type": "mcq",
+    "prompt": "Bunyi tidak dapat merambat melalui ....",
+    "options": [
+      "udara",
+      "air",
+      "besi",
+      "ruang hampa"
+    ],
+    "answer": "ruang hampa",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"ruang hampa\".",
+    "explanation": [
+      "Kunci: ruang hampa.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Mengenal konsep dasar: Bunyi tidak dapat merambat melalui",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b02-s03",
+    "balai": "F02",
+    "type": "mcq",
+    "prompt": "Bunyi merambat paling cepat pada ....",
+    "options": [
+      "udara",
+      "air",
+      "logam (besi)",
+      "ruang hampa"
+    ],
+    "answer": "logam (besi)",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"logam (besi)\".",
+    "explanation": [
+      "Kunci: logam (besi).",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Mengenal konsep dasar: Bunyi merambat paling cepat pada",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b02-s04",
+    "balai": "F02",
+    "type": "mcq",
+    "prompt": "Bunyi pantul yang terdengar jelas setelah bunyi asli, misalnya di lembah, disebut ....",
+    "options": [
+      "gaung",
+      "gema",
+      "dengung",
+      "nada"
+    ],
+    "answer": "gema",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"gema\".",
+    "explanation": [
+      "Kunci: gema.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Menerapkan konsep pada situasi: Bunyi pantul yang terdengar jelas setelah bunyi asli, misalnya di lembah, disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b02-s05",
+    "balai": "F02",
+    "type": "mcq",
+    "prompt": "Bunyi dengan frekuensi di atas 20.000 Hz disebut ....",
+    "options": [
+      "infrasonik",
+      "audiosonik",
+      "ultrasonik",
+      "sonar"
+    ],
+    "answer": "ultrasonik",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"ultrasonik\".",
+    "explanation": [
+      "Kunci: ultrasonik.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Menerapkan konsep pada situasi: Bunyi dengan frekuensi di atas 20.000 Hz disebut",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b02-s06",
+    "balai": "F02",
+    "type": "mcq",
+    "prompt": "Bagian telinga berupa selaput tipis yang bergetar ketika bunyi datang adalah ....",
+    "options": [
+      "gendang telinga",
+      "rumah siput",
+      "martil",
+      "tuba eustachius"
+    ],
+    "answer": "gendang telinga",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"gendang telinga\".",
+    "explanation": [
+      "Kunci: gendang telinga.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Menerapkan konsep pada situasi: Bagian telinga berupa selaput tipis yang bergetar ketika bunyi datang adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b02-s07",
+    "balai": "F02",
+    "type": "mcq",
+    "prompt": "Tiga tulang pendengaran pada telinga tengah adalah ....",
+    "options": [
+      "tulang paha, betis, dan lengan",
+      "tulang rusuk, dada, dan punggung",
+      "tulang tengkorak, rahang, dan hidung",
+      "martil, landasan, dan sanggurdi"
+    ],
+    "answer": "martil, landasan, dan sanggurdi",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"martil, landasan, dan sanggurdi\".",
+    "explanation": [
+      "Kunci: martil, landasan, dan sanggurdi.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Menerapkan konsep pada situasi: Tiga tulang pendengaran pada telinga tengah adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b02-s08",
+    "balai": "F02",
+    "type": "mcq",
+    "prompt": "Penyakit telinga yang ditandai keluarnya cairan atau nanah dari telinga disebut ....",
+    "options": [
+      "tuli",
+      "congek",
+      "katarak",
+      "konjungtivitis"
+    ],
+    "answer": "congek",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"congek\".",
+    "explanation": [
+      "Kunci: congek.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Menganalisis/menyimpulkan: Penyakit telinga yang ditandai keluarnya cairan atau nanah dari telinga disebut",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b02-s09",
+    "balai": "F02",
+    "type": "mcq",
+    "prompt": "Rumah siput (koklea) berfungsi untuk ....",
+    "options": [
+      "menangkap bunyi dari luar",
+      "menyeimbangkan tekanan udara",
+      "mengubah getaran menjadi sinyal saraf yang dikirim ke otak",
+      "melindungi telinga dari debu"
+    ],
+    "answer": "mengubah getaran menjadi sinyal saraf yang dikirim ke otak",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"mengubah getaran menjadi sinyal saraf yang dikirim ke otak\".",
+    "explanation": [
+      "Kunci: mengubah getaran menjadi sinyal saraf yang dikirim ke otak.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Menganalisis/menyimpulkan: Rumah siput (koklea) berfungsi untuk",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b02-s10",
+    "balai": "F02",
+    "type": "mcq",
+    "prompt": "Cara menjaga kesehatan telinga yang benar adalah ....",
+    "options": [
+      "mengorek telinga dengan peniti",
+      "memakai headset dengan volume sedang dan membersihkan telinga dengan lembut",
+      "mendengarkan musik keras setiap hari",
+      "menyiram telinga dengan air panas"
+    ],
+    "answer": "memakai headset dengan volume sedang dan membersihkan telinga dengan lembut",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"memakai headset dengan volume sedang dan membersihkan telinga dengan lembut\".",
+    "explanation": [
+      "Kunci: memakai headset dengan volume sedang dan membersihkan telinga dengan lembut.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Menganalisis/menyimpulkan: Cara menjaga kesehatan telinga yang benar adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

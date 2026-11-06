@@ -1,5 +1,5 @@
 /**
- * Server "Petualangan di Pasar" — mode multiplayer + dasbor guru.
+ * Server "Survival Sains" — mode multiplayer + dasbor guru.
  *
  * Fungsi:
  *  1. Menyajikan aplikasi hasil build (folder `dist/`) sebagai berkas statis.
@@ -327,6 +327,6 @@ server.on('upgrade', (req, socket, head) => {
 });
 
 server.listen(PORT, () => {
-  console.log(`[server] Petualangan di Pasar berjalan di http://localhost:${PORT}`);
+  console.log(`[server] Survival Sains berjalan di http://localhost:${PORT}`);
   console.log(`[server] REST: POST /api/sesi, GET /api/sesi/:token | WS: /ws`);
 });

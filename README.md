@@ -1,180 +1,107 @@
-# Petualangan di Pasar
+# Survival Sains
 
-Game edukasi matematika 3D untuk kelas 6 SD/MI, disiapkan untuk **Lomba Pembuatan Game
-Edukasi Berbasis AI - Guru Muhammadiyah se-Cabang Blimbing 2026**.
+Game petualangan IPA 3D untuk kelas 5 SD/MI, disiapkan untuk **Lomba Pembuatan Game Edukasi
+Berbasis AI - Guru Muhammadiyah se-Cabang Blimbing 2026**.
 
 - **Pembuat:** Rosyitania Yudha Astari, S.Pd
-- **Sekolah:** Guru SD Muhammadiyah Wonorejo Polokarto
-- **Jenjang:** Kelas 6 SD/MI
-- **Konteks:** Persiapan Tes Kemampuan Akademik (TKA) - Numerasi
+- **Sekolah:** SD Muhammadiyah Wonorejo Polokarto
+- **Jenjang:** Kelas 5 SD/MI
+- **Mapel:** IPA (9 bab: cahaya, bunyi, ekosistem, rantai makanan, simbiosis, kelestarian, magnet, listrik, bumi)
+- **Platform AI:** Claude (Anthropic) untuk ide, naskah, kode, dan pengujian
 
-## Konsep
+## Cerita
 
-Petualangan di Pasar adalah permainan **dua lapis**:
+Pemain adalah anggota termuda Kapal Ekspedisi Sains yang terdampar di **Pulau Nusa Kawruh**
+setelah badai. Untuk pulang, ia harus menyalakan **Mercusuar Tua** di puncak pulau. Sembilan
+Penjaga pulau masing-masing menyimpan bekal ilmu dan satu **alat survival**. Setiap materi IPA
+langsung dipakai untuk bertahan hidup: cahaya untuk keluar dari goa dan membuat sinyal, bunyi
+untuk memanggil bantuan, magnet untuk membuat kompas, listrik untuk menyalakan lampu mercusuar.
 
-1. **Peta besar 3D** bergaya peta harta karun. Peta berisi **16 noktah** (titik materi),
-   satu noktah untuk setiap kode materi TKA Matematika SD/MI. Pemain cukup **mengetuk
-   noktah** untuk memasukinya.
-2. **Dunia noktah 3D**. Di dalam tiap noktah, pemain **berjalan-jalan** (kamera orang
-   ketiga) menuju **balai** — rumah sub-materi. Mendekati balai lalu menekan A membuka
-   **bacaan materi 1 halaman ringkas** dan latihan soal.
+Naskah lengkap: [`docs/naskah-survival-sains.md`](docs/naskah-survival-sains.md) (dibuat otomatis
+dari data game dengan `npm run naskah`).
 
-Noktah dikelompokkan ke **3 zona**:
+## Alur bermain
 
-| Zona | Elemen | Noktah |
-| --- | --- | --- |
-| Perkampungan Tukang Hitung (hijau) | Bilangan | B01–B06 |
-| Alun-Alun Bentuk (biru) | Geometri | G01–G08 |
-| Lorong Catatan (oranye) | Data | D01–D02 |
+1. **Sampul → cutscene badai → Kartu Anggota Ekspedisi** (pilih karakter, warna pakaian, nama,
+   mode sendiri/kelas).
+2. **Prolog di Goa Sinar.** Pemain terbangun di dalam balai pertama; Mbok Sinar langsung menyapa.
+   Balai pertama sekaligus tutorial.
+3. **11 balai berurutan sesuai bab buku** di satu jalur keliling pulau. Balai berikutnya terbuka
+   (kabut tersibak) setelah balai sebelumnya lulus.
+4. **Pola 6 tahap di setiap balai:** tiba → misi dari Penjaga (percakapan + pilihan balasan) →
+   **Halaman Cerita** bersama Cantrik (4 adegan animasi + interaksi) → **Tempat Uji** (terbuka
+   setelah cerita dibaca; Penjaga berjalan ke sana) → hadiah alat survival → **gerbang ke peta**.
+   Letak penjaga, ruang cerita, tempat uji, dan gerbang berbeda di tiap balai.
+5. **Final: Malam Badai di Mercusuar Tua.** 30 soal dalam 4 lantai; lulus bila ≥ 21 benar (70%).
+   Bila belum lulus, cukup mengulang lantai yang belum tuntas. Epilog → sertifikat
+   **"Penyintas Sains"**.
 
-Semua noktah **bebas dipilih sejak awal** (tidak ada penguncian progresif). Setiap noktah
-saat ini berisi **1 balai** dengan **3 soal**. Babak puncak **"Pasar Ramai"** terbuka setelah
-pemain **pernah mengunjungi seluruh 16 noktah** (aturan A(ii), tanpa syarat bintang):
-**30 soal** campuran pilihan ganda, pilihan ganda kompleks, dan penalaran HOTS. Lulus
-Pasar Ramai membuka **sertifikat digital**.
+## Fitur utama
 
-Alur pembuka: **cover → pilih karakter (laki-laki/perempuan) → atur pakaian (warna baju,
-celana/gamis, dan hijab) → isi nama panggilan → loading singkat → peta**. Setiap perpindahan
-ke peta atau balai disertai **loading spinner** singkat.
-
-Nilai karakter: **amanah dan jujur dalam berdagang**, muncul sebagai dialog penjaga.
-
-## Fitur
-
-- Peta besar 3D yang bisa diklik (peta harta karun) + dunia noktah 3D jelajah
-- Tiga tata letak dunia (per zona) dengan nama & warna balai menyesuaikan noktahnya
-- Karakter pemain low-poly, kamera orang ketiga, collision lingkaran-vs-kotak
-- **Kustomisasi pakaian**: 3 pilihan warna untuk baju, 3 untuk celana/gamis, dan 3 untuk
-  hijab (khusus perempuan), dengan pratinjau 3D langsung di layar
-- **Material PBR (MeshStandard) + bayangan lembut (PCFSoft)** untuk kesan lebih halus dan
-  nyata; otomatis dimatikan di perangkat kelas bawah agar tetap lancar
-- Kontrol sentuh (joystick + geser kamera + tombol A/B) dan desktop (WASD + mouse + E)
-- 78 soal: 48 soal balai (3 × 16) + 30 soal Pasar Ramai, semua dengan pembahasan
-- Metadata TKA pada tiap soal (kode materi, indikator, level kognitif, tingkat kesulitan)
-- Tipe soal **pilihan ganda kompleks** (pilih semua jawaban benar)
-- **3 kesempatan menjawab per soal**; habis 3× berarti soal dianggap gagal
-- Bintang per balai (3/2/1 benar), koin, dan sertifikat digital
-- PWA: bisa dipasang dan jalan offline
-- Efek suara sederhana (Web Audio API) dengan tombol bisu
-- **Instancing + LOD** untuk penghias dunia (pohon, semak, batu, peti, lampu) agar ringan
-- **Tone mapping filmik** & suasana "sore hangat" untuk kesan visual yang lebih hidup
-- **Fondasi pipeline aset glTF** dengan DRACO + KTX2/Basis + Meshopt (lihat `docs/pipeline-aset-3d.md`)
-- Font display ramah anak (Baloo 2) yang di-host sendiri agar tetap jalan offline
-- Layar darurat ramah hanya bila perangkat benar-benar tanpa WebGL
-
-## Mode Multiplayer & Mode Guru (opsional)
-
-Selain **singleplayer** (bawaan, tanpa internet), game bisa dijalankan **multiplayer satu kelas**
-bila server online dinyalakan. Cukup mendukung satu kelas (≤40 siswa) dengan satu guru.
-
-- **Guru**: di halaman depan klik **👩‍🏫 Mode Guru** → **Buat Sesi Kelas** → muncul **token 4 digit**
-  (hanya angka, mis. `5274`) untuk dibagikan ke siswa. Dasbor guru menampilkan daftar siswa yang
-  join beserta **progress live** (noktah sekarang, bintang, persen benar, jumlah soal salah,
-  lulus Pasar Ramai) dan tombol **Ekspor CSV** untuk analisa lanjutan.
-- **Siswa**: saat mengisi nama, pilih **👥 Multiplayer Kelas** lalu masukkan **token** dari guru.
-  Siswa yang berada di **noktah yang sama** akan **saling melihat** karakter temannya berjalan,
-  lengkap dengan nama dan tombol **sapa** (emoji `👋 👍 😀 🎉 ❤️ 🙌`).
-- **Tanpa server**: semua fitur game tetap berjalan sebagai singleplayer; multiplayer hanya aktif
-  bila server online dikonfigurasi.
-
-### Menjalankan server online
-
-Saat **pengembangan**, cukup satu perintah:
-
-```bash
-npm run dev        # menyalakan Vite (:5173) + server multiplayer (:8787) sekaligus
-```
-
-Buka **http://localhost:5173/**. Aplikasi mendeteksi bahwa ia disajikan Vite dan otomatis
-mengarahkan permintaan `/api/*` serta WebSocket ke server multiplayer di port **8787**.
-
-Untuk **produksi** (satu server menyajikan semuanya):
-
-```bash
-npm run build      # sekali saja (server menyajikan dist/)
-npm run serve      # atau: npm run serve:dev (build + jalankan)
-# Buka http://localhost:8787/
-```
-
-Setelan server:
-
-- **Alamat server** ditentukan otomatis dari origin halaman (bila disajikan oleh server itu sendiri).
-  Untuk hosting terpisah, isi `VITE_PASAR_SERVER` saat build atau tanam `window.__PASAR_SERVER__`
-  di `index.html`.
-- **Port** server default **8787** (ubah dengan variabel lingkungan `PORT`).
-- Data ruang disimpan **di memori server** (cukup untuk satu sesi pembelajaran). Tidak ada
-  basis data atau pengumpulan data pribadi.
-- Cocok di-hosting gratis (Render/Railway/Fly.io) karena hanya butuh Node + WebSocket.
-
-## Struktur Proyek
-
-```
-src/
-├─ main.ts                 # titik masuk, alur intro/loading, peta 3D, dunia noktah 3D, jaringan
-├─ core/                   # state (noktah/balai), engine soal, scoring, sound
-├─ net/                    # klien.ts (WebSocket + REST), ringkas.ts (ringkasan progres)
-├─ world/                  # scene, player, camera, collision, market, mapConfig,
-│                          # petaBesar.ts (peta 3D), noktahWorld.ts (dunia per noktah),
-│                          # karakter.ts/kios.ts (aset prosedural), pemainLain.ts (pemain lain),
-│                          # instancing.ts (InstancedMesh + LOD), loaders.ts (glTF+DRACO+KTX2)
-├─ input/                  # joystick, geser kamera, keyboard
-├─ ui/                     # HUD, loading, panel balai/soal, layar hasil, sertifikat, guru.ts
-├─ data/                   # schema.ts, balai.ts (NOKTAH), questions/*.json
-├─ assets/fonts/           # font display (Baloo 2)
-└─ styles/
-server/                    # server Node: index.mjs (REST + WebSocket), rooms.mjs
-shared/                    # types.ts, net.ts (tipe protokol bersama)
-public/assets/
-├─ models/                 # aset glTF/GLB (opsional; lihat docs/pipeline-aset-3d.md)
-└─ libs/{draco,basis}/     # decoder kompresi geometri & tekstur
-tests/                     # Vitest
-docs/                      # jurnal AI, deskripsi karya, atribusi, pipeline aset 3D
-scripts/                   # gen-icons, verify-bank, smoke, smoke-multiplayer
-```
+- **Kuis pilihan ganda di dalam percakapan:** Penjaga mengajukan soal, 3 obor = 3 kesempatan,
+  jawaban salah memberi petunjuk yang merujuk adegan cerita (tombol "Ingat cerita"), jawaban benar
+  diberi penjelasan dari cerita.
+- **Halaman Cerita** untuk 11 materi (44 adegan SVG beranimasi), ditutup Kunci Ingat, diagram
+  interaktif, ringkasan materi lengkap, dan hikmah.
+- **Narasi suara (TTS) bahasa Indonesia** bawaan HP, dengan nada & kecepatan berbeda per tokoh.
+  Teks tetap tampil walau suara mati.
+- **Nilai keislaman & kemuhammadiyahan:** salam di setiap pertemuan, basmalah sebelum tantangan,
+  hamdalah setelah lulus, tadabbur alam, manusia sebagai khalifah penjaga bumi, ilmu untuk menolong
+  sesama.
+- **Tas Survival** (11 alat), bintang per balai, peta pulau 3D berkabut.
+- **Mode kelas (multiplayer)** dengan token 4 digit: siswa menjelajah sesuai kecepatan masing-masing
+  dan saling melihat di balai yang sama (sapaan emoji, tanpa obrolan bebas).
+- **Dasbor guru** 3 tab: *Kelas* (matriks siswa × 11 balai + persen benar per bab), *Soal* (soal
+  tersulit + pilihan salah terbanyak/miskonsepsi), *Siswa* (detail, lama membaca, rekomendasi).
+  Ekspor **CSV Kelas** dan **CSV Jawaban** (satu baris per jawaban, untuk analisis butir soal).
+- PWA (bisa dipasang & offline untuk mode sendiri), kontrol sentuh untuk HP.
 
 ## Menjalankan
 
 ```bash
 npm install
-npm run dev        # Vite (:5173) + server multiplayer (:8787) sekaligus
-npm run dev:vite   # hanya Vite (singleplayer / tanpa fitur online)
-npm run dev:server # hanya server multiplayer
+npm run dev        # Vite (:5173) + server multiplayer (:8787)
 npm run build      # build produksi (dist/)
-npm run preview    # pratinjau hasil build
+npm run serve      # satu server menyajikan game + multiplayer + dasbor guru (:8787)
 npm test           # uji unit Vitest
-npm run verify:bank # periksa validitas & kunci bank soal
-npm run lint       # ESLint
-npm run serve      # server online (multiplayer + dasbor guru) dari dist/
+npm run verify:bank
+npm run lint
+npm run smoke      # uji asap 1 balai penuh di layar HP (butuh server berjalan)
+node scripts/smoke-multiplayer.mjs   # uji guru + 2 siswa (butuh `npm run serve`)
 ```
 
-## Uji
+Port bisa diganti: `PORT=9000 npm run serve` atau `npx vite --port 5180`.
 
-- `npm test` - 89 uji: logika skor, kesempatan menjawab, collision, integritas bank soal,
-  alur layar (termasuk intro, pilih karakter/mode, dan aturan A(ii)), fondasi loader aset 3D,
-  dan putaran penuh balai.
-- `npm run verify:bank` - memvalidasi 78 soal terhadap skema dan menyilang-cek tiap kunci.
-- `npm run smoke` - uji asap Playwright (singleplayer): pembuka → peta 3D → masuk noktah →
-  dialog → panel bacaan → panel soal, tanpa error console.
-- `node scripts/smoke-multiplayer.mjs` - uji asap multiplayer: guru buat sesi, dua siswa join
-  dengan token, masuk noktah yang sama, saling melihat, dan tampil di dasbor guru.
-  (Perlu server berjalan: `npm run serve`.)
-- `node scripts/smoke-dev-arah.mjs` - memastikan saat `npm run dev`, Mode Guru memanggil API
-  ke server multiplayer (:8787), bukan ke dev server Vite (:5173).
+## Hosting untuk juri
 
-Uji asap memerlukan server berjalan (`npm run dev`, `npm run preview`, atau `npm run serve`).
+Server hanya butuh Node + WebSocket, jadi bisa di-hosting gratis (mis. Render): build command
+`npm install && npm run build`, start command `npm run serve`. Tanpa server, game tetap berjalan
+penuh sebagai mode sendiri.
+
+## Struktur proyek
+
+```
+src/
+├─ main.ts               # alur utama: peta, dunia balai, misi, hadiah, tas
+├─ data/cerita.ts        # naskah: 9 penjaga, cantrik, alat, dialog, Final, epilog
+├─ data/adegan.ts        # Halaman Cerita: 44 adegan + interaksi
+├─ data/balai.ts         # materi, diagram, urutan jalur
+├─ core/                 # state (misi, kunci berurutan), engine soal, suara (TTS), analisis guru
+├─ ui/percakapan.ts      # kotak percakapan bergaya visual novel
+├─ ui/tantangan.ts       # kuis di dalam percakapan (obor, petunjuk, catatan jawaban)
+├─ ui/halamanCerita.ts   # buku cerita bergerak
+├─ ui/cutscene.ts        # cutscene badai & epilog
+├─ ui/screens/           # intro, final, guru, hasil, petunjuk, tentang
+└─ world/                # peta pulau 3D, dunia balai 3D, karakter
+server/ shared/ tests/ scripts/ docs/
+```
 
 ## Privasi
 
-Tidak ada pengumpulan data pribadi untuk singleplayer: nama pemain hanya dipakai untuk sertifikat
-digital dan disimpan di perangkat sendiri (localStorage). Nama boleh berupa panggilan atau inisial.
+Mode sendiri tidak mengirim data ke mana pun; progres disimpan di perangkat. Mode kelas mengirim
+nama panggilan, posisi, dan ringkasan belajar ke server kelas selama sesi (disimpan di memori,
+tidak dibagikan ke pihak ketiga). Guru dianjurkan meminta siswa memakai nama panggilan.
 
-Pada **mode multiplayer**, nama panggilan, pilihan karakter, posisi di dunia, dan ringkasan
-progres dikirim ke server kelas **hanya selama sesi berlangsung** (disimpan di memori server,
-untuk dipantau guru) dan tidak dibagikan ke pihak ketiga. Guru sebaiknya meminta siswa memakai
-nama panggilan atau inisial.
+## Lisensi & atribusi
 
-## Lisensi & Atribusi
-
-Seluruh soal, dunia 3D, dan aset dibuat sendiri oleh penulis. Pustaka pihak ketiga:
-Three.js (MIT), zod (MIT), Vite (MIT), Vitest (MIT), vite-plugin-pwa (MIT),
-`ws` (MIT, server multiplayer), Playwright (Apache-2.0, pengembangan).
+Lihat [`docs/atribusi.md`](docs/atribusi.md).

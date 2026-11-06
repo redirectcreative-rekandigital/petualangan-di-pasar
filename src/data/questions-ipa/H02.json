@@ -1,0 +1,262 @@
+[
+  {
+    "id": "b04-s01",
+    "balai": "H02",
+    "type": "mcq",
+    "prompt": "Rantai makanan adalah peristiwa ....",
+    "options": [
+      "tumbuhan menyerap air dari tanah",
+      "makan dan dimakan secara berurutan sehingga energi berpindah",
+      "hewan berpindah tempat",
+      "makhluk hidup tumbuh dan berkembang"
+    ],
+    "answer": "makan dan dimakan secara berurutan sehingga energi berpindah",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"makan dan dimakan secara berurutan sehingga energi berpindah\".",
+    "explanation": [
+      "Kunci: makan dan dimakan secara berurutan sehingga energi berpindah.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Mengenal konsep dasar: Rantai makanan adalah peristiwa",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b04-s02",
+    "balai": "H02",
+    "type": "mcq",
+    "prompt": "Sumber energi utama dalam rantai makanan berasal dari ....",
+    "options": [
+      "air",
+      "tanah",
+      "tumbuhan",
+      "matahari"
+    ],
+    "answer": "matahari",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"matahari\".",
+    "explanation": [
+      "Kunci: matahari.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Mengenal konsep dasar: Sumber energi utama dalam rantai makanan berasal dari",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b04-s03",
+    "balai": "H02",
+    "type": "mcq",
+    "prompt": "Makhluk hidup yang selalu berada di awal rantai makanan adalah ....",
+    "options": [
+      "produsen",
+      "konsumen tingkat I",
+      "konsumen tingkat II",
+      "pengurai"
+    ],
+    "answer": "produsen",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"produsen\".",
+    "explanation": [
+      "Kunci: produsen.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Mengenal konsep dasar: Makhluk hidup yang selalu berada di awal rantai makanan adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b04-s04",
+    "balai": "H02",
+    "type": "mcq",
+    "prompt": "Perhatikan rantai makanan: padi → tikus → ular → elang. Konsumen tingkat II dalam rantai tersebut adalah ....",
+    "options": [
+      "padi",
+      "tikus",
+      "ular",
+      "elang"
+    ],
+    "answer": "ular",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"ular\".",
+    "explanation": [
+      "Kunci: ular.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Menerapkan konsep pada situasi: Perhatikan rantai makanan: padi → tikus → ular → elang. Konsumen tingkat II dalam rantai tersebut adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b04-s05",
+    "balai": "H02",
+    "type": "mcq",
+    "prompt": "Tanda panah pada rantai makanan menunjukkan ....",
+    "options": [
+      "memakan",
+      "dimakan oleh dan arah perpindahan energi",
+      "sama dengan",
+      "melahirkan"
+    ],
+    "answer": "dimakan oleh dan arah perpindahan energi",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"dimakan oleh dan arah perpindahan energi\".",
+    "explanation": [
+      "Kunci: dimakan oleh dan arah perpindahan energi.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Menerapkan konsep pada situasi: Tanda panah pada rantai makanan menunjukkan",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b04-s06",
+    "balai": "H02",
+    "type": "mcq",
+    "prompt": "Jika ular dalam rantai makanan padi → tikus → ular → elang banyak diburu manusia, maka yang terjadi adalah ....",
+    "options": [
+      "jumlah padi bertambah banyak",
+      "jumlah elang bertambah",
+      "jumlah tikus berkurang",
+      "jumlah tikus meningkat tajam"
+    ],
+    "answer": "jumlah tikus meningkat tajam",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"jumlah tikus meningkat tajam\".",
+    "explanation": [
+      "Kunci: jumlah tikus meningkat tajam.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Menerapkan konsep pada situasi: Jika ular dalam rantai makanan padi → tikus → ular → elang banyak diburu manusia, maka yang terjadi adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b04-s07",
+    "balai": "H02",
+    "type": "mcq",
+    "prompt": "Gabungan beberapa rantai makanan yang saling berhubungan disebut ....",
+    "options": [
+      "jaring-jaring makanan",
+      "piramida makanan",
+      "rantai energi",
+      "siklus makanan"
+    ],
+    "answer": "jaring-jaring makanan",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"jaring-jaring makanan\".",
+    "explanation": [
+      "Kunci: jaring-jaring makanan.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Menerapkan konsep pada situasi: Gabungan beberapa rantai makanan yang saling berhubungan disebut",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b04-s08",
+    "balai": "H02",
+    "type": "mcq",
+    "prompt": "Rantai makanan yang benar adalah ....",
+    "options": [
+      "elang → ular → katak → belalang → rumput",
+      "rumput → katak → belalang → ular",
+      "rumput → belalang → katak → ular",
+      "belalang → rumput → katak → ular"
+    ],
+    "answer": "rumput → belalang → katak → ular",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"rumput → belalang → katak → ular\".",
+    "explanation": [
+      "Kunci: rumput → belalang → katak → ular.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Menganalisis/menyimpulkan: Rantai makanan yang benar adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b04-s09",
+    "balai": "H02",
+    "type": "mcq",
+    "prompt": "Peran jamur dan bakteri dalam rantai makanan adalah ....",
+    "options": [
+      "membuat makanan sendiri",
+      "menguraikan sisa makhluk hidup yang mati",
+      "memakan tumbuhan hijau",
+      "memangsa hewan kecil"
+    ],
+    "answer": "menguraikan sisa makhluk hidup yang mati",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"menguraikan sisa makhluk hidup yang mati\".",
+    "explanation": [
+      "Kunci: menguraikan sisa makhluk hidup yang mati.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Menganalisis/menyimpulkan: Peran jamur dan bakteri dalam rantai makanan adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b04-s10",
+    "balai": "H02",
+    "type": "mcq",
+    "prompt": "Dalam rantai makanan, jumlah energi paling besar dimiliki oleh ....",
+    "options": [
+      "produsen",
+      "konsumen tingkat I",
+      "konsumen tingkat II",
+      "konsumen tingkat III"
+    ],
+    "answer": "produsen",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"produsen\".",
+    "explanation": [
+      "Kunci: produsen.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Menganalisis/menyimpulkan: Dalam rantai makanan, jumlah energi paling besar dimiliki oleh",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

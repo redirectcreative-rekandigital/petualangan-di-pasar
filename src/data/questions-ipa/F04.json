@@ -1,0 +1,262 @@
+[
+  {
+    "id": "b08-s01",
+    "balai": "F04",
+    "type": "mcq",
+    "prompt": "Arus listrik adalah aliran ....",
+    "options": [
+      "air dalam kabel",
+      "udara dalam kabel",
+      "muatan listrik (elektron)",
+      "cahaya dalam kabel"
+    ],
+    "answer": "muatan listrik (elektron)",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"muatan listrik (elektron)\".",
+    "explanation": [
+      "Kunci: muatan listrik (elektron).",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Mengenal konsep dasar: Arus listrik adalah aliran",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b08-s02",
+    "balai": "F04",
+    "type": "mcq",
+    "prompt": "Agar lampu pada rangkaian dapat menyala, rangkaian listrik harus ....",
+    "options": [
+      "tertutup",
+      "terbuka",
+      "terputus",
+      "dibasahi"
+    ],
+    "answer": "tertutup",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"tertutup\".",
+    "explanation": [
+      "Kunci: tertutup.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Mengenal konsep dasar: Agar lampu pada rangkaian dapat menyala, rangkaian listrik harus",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b08-s03",
+    "balai": "F04",
+    "type": "mcq",
+    "prompt": "Bahan yang termasuk isolator adalah ....",
+    "options": [
+      "tembaga",
+      "besi",
+      "aluminium",
+      "karet"
+    ],
+    "answer": "karet",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"karet\".",
+    "explanation": [
+      "Kunci: karet.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Mengenal konsep dasar: Bahan yang termasuk isolator adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b08-s04",
+    "balai": "F04",
+    "type": "mcq",
+    "prompt": "Pembangkit listrik yang memanfaatkan energi aliran air adalah ....",
+    "options": [
+      "PLTS",
+      "PLTA",
+      "PLTU",
+      "PLTD"
+    ],
+    "answer": "PLTA",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"PLTA\".",
+    "explanation": [
+      "Kunci: PLTA.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Menerapkan konsep pada situasi: Pembangkit listrik yang memanfaatkan energi aliran air adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b08-s05",
+    "balai": "F04",
+    "type": "mcq",
+    "prompt": "Pembangkit listrik yang memanfaatkan sinar matahari adalah ....",
+    "options": [
+      "PLTB",
+      "PLTP",
+      "PLTS",
+      "PLTN"
+    ],
+    "answer": "PLTS",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"PLTS\".",
+    "explanation": [
+      "Kunci: PLTS.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Menerapkan konsep pada situasi: Pembangkit listrik yang memanfaatkan sinar matahari adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b08-s06",
+    "balai": "F04",
+    "type": "mcq",
+    "prompt": "Pada rangkaian seri, jika salah satu lampu putus, maka ....",
+    "options": [
+      "semua lampu padam",
+      "lampu lain makin terang",
+      "hanya lampu itu yang padam",
+      "lampu lain tetap menyala"
+    ],
+    "answer": "semua lampu padam",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"semua lampu padam\".",
+    "explanation": [
+      "Kunci: semua lampu padam.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Menerapkan konsep pada situasi: Pada rangkaian seri, jika salah satu lampu putus, maka",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b08-s07",
+    "balai": "F04",
+    "type": "mcq",
+    "prompt": "Ciri rangkaian paralel yang benar adalah ....",
+    "options": [
+      "hanya memiliki satu jalur arus",
+      "semua lampu padam jika satu lampu putus",
+      "nyala lampu makin redup jika lampu ditambah",
+      "jika satu lampu mati, lampu yang lain tetap menyala"
+    ],
+    "answer": "jika satu lampu mati, lampu yang lain tetap menyala",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"jika satu lampu mati, lampu yang lain tetap menyala\".",
+    "explanation": [
+      "Kunci: jika satu lampu mati, lampu yang lain tetap menyala.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Menerapkan konsep pada situasi: Ciri rangkaian paralel yang benar adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b08-s08",
+    "balai": "F04",
+    "type": "mcq",
+    "prompt": "Contoh upaya menghemat listrik adalah ....",
+    "options": [
+      "membiarkan lampu menyala siang hari",
+      "mematikan lampu bila tidak digunakan",
+      "membiarkan TV menyala tanpa ditonton",
+      "membuka pintu kulkas lama-lama"
+    ],
+    "answer": "mematikan lampu bila tidak digunakan",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"mematikan lampu bila tidak digunakan\".",
+    "explanation": [
+      "Kunci: mematikan lampu bila tidak digunakan.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Menganalisis/menyimpulkan: Contoh upaya menghemat listrik adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b08-s09",
+    "balai": "F04",
+    "type": "mcq",
+    "prompt": "Alat yang digunakan PLN untuk mengukur banyaknya pemakaian listrik di rumah adalah ....",
+    "options": [
+      "voltmeter",
+      "amperemeter",
+      "kWh meter",
+      "termometer"
+    ],
+    "answer": "kWh meter",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"kWh meter\".",
+    "explanation": [
+      "Kunci: kWh meter.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Menganalisis/menyimpulkan: Alat yang digunakan PLN untuk mengukur banyaknya pemakaian listrik di rumah adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b08-s10",
+    "balai": "F04",
+    "type": "mcq",
+    "prompt": "Urutan distribusi listrik yang benar adalah ....",
+    "options": [
+      "pembangkit → trafo step-up → transmisi tegangan tinggi → gardu induk (step-down) → distribusi → rumah",
+      "rumah → gardu distribusi → gardu induk → pembangkit",
+      "pembangkit → rumah → gardu induk → transmisi",
+      "gardu induk → rumah → pembangkit → transmisi"
+    ],
+    "answer": "pembangkit → trafo step-up → transmisi tegangan tinggi → gardu induk (step-down) → distribusi → rumah",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"pembangkit → trafo step-up → transmisi tegangan tinggi → gardu induk (step-down) → distribusi → rumah\".",
+    "explanation": [
+      "Kunci: pembangkit → trafo step-up → transmisi tegangan tinggi → gardu induk (step-down) → distribusi → rumah.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Menganalisis/menyimpulkan: Urutan distribusi listrik yang benar adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

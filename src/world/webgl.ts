@@ -15,20 +15,3 @@ export function isWebGLAvailable(): boolean {
   }
 }
 
-/** Mengukur fps rata-rata selama durasi tertentu memakai requestAnimationFrame. */
-export function measureFps(durationMs: number): Promise<number> {
-  return new Promise((resolve) => {
-    let frames = 0;
-    const start = performance.now();
-    const tick = (): void => {
-      frames += 1;
-      const now = performance.now();
-      if (now - start >= durationMs) {
-        resolve((frames / (now - start)) * 1000);
-        return;
-      }
-      requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
-  });
-}

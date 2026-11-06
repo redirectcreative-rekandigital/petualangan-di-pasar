@@ -1,5 +1,5 @@
 // Uji asap multiplayer (Playwright): guru buat sesi, dua siswa join,
-// masuk noktah yang sama, dan dasbor guru menampilkan keduanya.
+// masuk balai yang sama, dan dasbor guru (matriks, soal, rekomendasi) terisi.
 //
 // Prasyarat: server berjalan (node server/index.mjs) pada BASE.
 import { chromium } from 'playwright';
@@ -29,9 +29,15 @@ try {
   // --- 2. Dua siswa join dengan token yang sama ---
   const rahasia = (nama) =>
     `(async () => {
-       localStorage.setItem('petualangan-di-pasar:progress:v2', JSON.stringify({
-         playerName: '${nama}', gender: 'laki-laki', introDone: true, coins: 0,
-         visitedNoktah: [], unlocked: [], balai: {}, answers: [], puncakLulus: false, token: '${token}'
+       localStorage.setItem('survival-sains:progress:v1', JSON.stringify({
+         playerName: '${nama}', gender: 'laki-laki', introDone: true, prologSelesai: true, coins: 0,
+         visitedNoktah: [], unlocked: [], answers: [], puncakLulus: false, token: '${token}',
+         misi: { F01: 3 }, alat: ['F01'], bacaan: { F01: { detik: 25, ulang: 0 } }, finalBagian: [0,0,0,0],
+         balai: { F01: { stars: 2, bestScore: 20, correct: 2, total: 3, unlocked: true } },
+         answers: [
+           { questionId: 'b01-s01', balai: 'F01', kodeMateri: 'F01', correct: true, usedHint: false, pilihan: ['zig-zag', 'lurus'], percobaan: 2 },
+           { questionId: 'b01-s02', balai: 'F01', kodeMateri: 'F01', correct: false, usedHint: false, pilihan: ['a', 'b', 'c'], percobaan: 3 }
+         ]
        }));
      })()`;
 
@@ -47,11 +53,11 @@ try {
     await p.waitForSelector('canvas.world-canvas', { timeout: 20000 });
     // Tunggu status online tersambung.
     for (let i = 0; i < 30; i++) {
-      const st = await p.evaluate(() => window.__petualanganDiPasar?.online?.());
+      const st = await p.evaluate(() => window.__survivalSains?.online?.());
       if (st && st.status === 'tersambung') return { c, p, st };
       await p.waitForTimeout(300);
     }
-    return { c, p, st: await p.evaluate(() => window.__petualanganDiPasar?.online?.()) };
+    return { c, p, st: await p.evaluate(() => window.__survivalSains?.online?.()) };
   }
 
   const a = await siswa('Ani');
@@ -59,23 +65,30 @@ try {
   const b = await siswa('Budi');
   log(`Budi online: ${JSON.stringify(b.st)}`);
 
-  // --- 3. Keduanya masuk noktah B01 dan saling lihat ---
-  await a.p.evaluate(() => window.__petualanganDiPasar?.masukNoktah?.('B01'));
-  await b.p.evaluate(() => window.__petualanganDiPasar?.masukNoktah?.('B01'));
+  // --- 3. Keduanya masuk Lembah Gema (F02) dan saling lihat ---
+  await a.p.evaluate(() => window.__survivalSains?.masukBalai?.('F02'));
+  await b.p.evaluate(() => window.__survivalSains?.masukBalai?.('F02'));
   await a.p.waitForTimeout(2500);
 
-  const temanA = await a.p.evaluate(() => window.__petualanganDiPasar?.online?.());
-  const temanB = await b.p.evaluate(() => window.__petualanganDiPasar?.online?.());
+  const temanA = await a.p.evaluate(() => window.__survivalSains?.online?.());
+  const temanB = await b.p.evaluate(() => window.__survivalSains?.online?.());
   log(`teman Ani: ${JSON.stringify(temanA)} | teman Budi: ${JSON.stringify(temanB)}`);
   if (!temanA || temanA.teman < 1) throw new Error('Ani tidak melihat Budi');
   if (!temanB || temanB.teman < 1) throw new Error('Budi tidak melihat Ani');
 
   // --- 4. Dasbor guru menampilkan 2 siswa ---
   await guru.waitForTimeout(3500);
-  const kartu = await guru.locator('.kartu-siswa').count();
-  const namaKelas = await guru.locator('.kartu-siswa .nama-siswa').allTextContents();
-  log(`dasbor: ${kartu} siswa -> ${namaKelas.join(', ')}`);
-  if (kartu < 2) throw new Error('Dasbor guru tidak menampilkan 2 siswa');
+  const matriks = await guru.locator('.matriks tbody tr').count();
+  log(`dasbor: matriks kelas ${matriks} baris`);
+  if (matriks < 2) throw new Error('Dasbor guru tidak menampilkan 2 siswa');
+  await guru.locator('.guru-tab', { hasText: 'Soal' }).click();
+  await guru.waitForSelector('.soal-guru', { timeout: 5000 });
+  const mis = await guru.locator('.miskonsepsi').first().textContent();
+  log(`tab soal: ${mis}`);
+  await guru.locator('.guru-tab', { hasText: 'Siswa' }).click();
+  await guru.locator('.kartu-siswa').first().click();
+  const rek = await guru.locator('.tujuan li').first().textContent();
+  log(`rekomendasi: ${rek}`);
 
   await a.c.close();
   await b.c.close();

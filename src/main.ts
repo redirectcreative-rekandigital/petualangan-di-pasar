@@ -1,60 +1,68 @@
 import './styles/main.css';
+import './styles/cerita.css';
 import { el, mount } from './ui/components/dom';
 import {
   loadProgress,
   saveProgress,
   resetProgress,
   isPuncakUnlocked,
+  isBalaiUnlocked,
   balaiKey,
+  balaiTujuan,
   tandaiNoktahDikunjungi,
+  tahapMisi,
+  setTahapMisi,
+  tambahAlat,
+  catatBaca,
+  applyBalaiResult,
+  KARAKTER,
 } from './core/state';
-import { getNoktah } from './data/balai';
-import { getQuestionBank } from './data/bank';
+import { getNoktah, getBalai } from './data/balai';
+import { getCerita, balaiSesudah, isiNama, CERITA, URUTAN_BALAI, type CeritaBalai } from './data/cerita';
+import { getQuestionBank, getQuestionsByBalai } from './data/bank';
 import { createInputManager, type InputManager } from './input/controls';
 import { isWebGLAvailable } from './world/webgl';
 import type { SceneQuality } from './world/scene';
-import type { NoktahWorldHandle } from './world/noktahWorld';
+import type { NoktahWorldHandle, PeranTitik } from './world/noktahWorld';
 import { createHud, type Hud } from './ui/hud';
-import { showDialog, showToast } from './ui/dialog';
+import { showToast } from './ui/dialog';
+import { pasangGambar, muatAwal } from './core/gambar';
 import { showLoading } from './ui/loading';
+import { bukaPercakapan, type Percakapan } from './ui/percakapan';
+import { bukaHalamanCerita } from './ui/halamanCerita';
+import { jalankanTantangan } from './ui/tantangan';
 import { KlienMultiplayer, onlineTersedia, type StatusKlien } from './net/klien';
 import { ringkasProgres } from './net/ringkas';
 import { renderIntro } from './ui/screens/intro';
 import { renderHowto } from './ui/screens/howto';
 import { renderMap } from './ui/screens/map';
-import { renderBalai } from './ui/screens/balai';
-import { renderQuiz } from './ui/screens/quiz';
-import { renderBalaiResult } from './ui/screens/balaiResult';
 import { renderResult } from './ui/screens/result';
 import { renderAbout } from './ui/screens/about';
 import { renderGuru } from './ui/screens/guru';
+import { renderFinal } from './ui/screens/final';
 import { toggleMuted, isMuted, sfx } from './core/sound';
+import { starsForCorrect } from './core/scoring';
 import type { ScreenContext, ScreenName } from './ui/screens/context';
-import type { BalaiId, NoktahId, Progress } from '../shared/types';
+import type { NoktahId, Progress, TahapMisi } from '../shared/types';
 
 const appRoot = document.getElementById('app');
 if (!appRoot) throw new Error('Elemen #app tidak ditemukan di index.html');
 const app: HTMLElement = appRoot;
 
 let progress: Progress = loadProgress();
-let currentOptions: Record<string, unknown> = {};
 
 /* ---------- Klien multiplayer (aktif bila ada token kelas) ---------- */
 let klien: KlienMultiplayer | null = null;
 let statusKlien: StatusKlien = 'terputus';
 let timerPosisi = 0;
 
-/** Menyalakan klien multiplayer berdasarkan token pada progres. */
 function aktifkanKlien(): void {
   const token = progress.token;
   if (!token || !onlineTersedia()) {
     tutupKlien();
     return;
   }
-  // Sudah tersambung dengan token yang sama: pakai ulang.
-  if (klien && statusKlien !== 'galat' && klien.tokenSaya === token) {
-    return;
-  }
+  if (klien && statusKlien !== 'galat' && klien.tokenSaya === token) return;
   tutupKlien();
   klien = new KlienMultiplayer({
     token,
@@ -71,9 +79,8 @@ function aktifkanKlien(): void {
     },
     onStatus: (status) => {
       statusKlien = status;
-      if (status === 'terputus' && progress.token) {
-        showToast('Koneksi kelas terputus. Coba muat ulang halaman, ya.');
-      }
+      if (status === 'terputus' && progress.token) showToast('Koneksi kelas terputus. Coba muat ulang halaman, ya.');
+      if (status === 'tersambung') kirimProgresKeServer();
     },
     onKabar: (teks) => showToast(teks),
   });
@@ -88,10 +95,15 @@ function tutupKlien(): void {
   klien = null;
 }
 
-/** Kirim ringkasan progres ke server (untuk dasbor guru). */
 function kirimProgresKeServer(): void {
   if (!klien) return;
   klien.kirimProgres(ringkasProgres(progress, session?.kode ?? null));
+}
+
+function simpan(next: Progress): void {
+  progress = next;
+  saveProgress(progress);
+  kirimProgresKeServer();
 }
 
 /* ---------- Ketersediaan bank soal ---------- */
@@ -109,11 +121,7 @@ function bankReady(): boolean {
 const ctx: ScreenContext = {
   navigate: (screen, options) => navigate(screen, options ?? {}),
   getProgress: () => progress,
-  setProgress: (next) => {
-    progress = next;
-    saveProgress(progress);
-    kirimProgresKeServer();
-  },
+  setProgress: (next) => simpan(next),
   persist: () => saveProgress(progress),
   reset: () => {
     progress = resetProgress();
@@ -123,10 +131,7 @@ const ctx: ScreenContext = {
 };
 
 function navigate(screen: ScreenName, options: Record<string, unknown> = {}): void {
-  currentOptions = options;
   stopNoktahWorld();
-
-  // Layar yang memicu 3D: peta besar & dunia noktah.
   if (screen === 'map') {
     bukaPeta(options);
     return;
@@ -135,7 +140,6 @@ function navigate(screen: ScreenName, options: Record<string, unknown> = {}): vo
     bukaNoktah(options);
     return;
   }
-
   document.body.classList.remove('world-mode');
   const view = buildScreen(screen);
   if (view) {
@@ -155,23 +159,13 @@ function buildScreen(screen: ScreenName): HTMLElement | null {
       return renderAbout(ctx);
     case 'guru':
       return renderGuru(ctx);
-    case 'balai':
-      return renderBalai(ctx, currentOptions);
-    case 'quiz':
-      return renderQuiz(ctx, { balai: normalizeBalaiId(currentOptions.balai) }).root;
-    case 'balaiResult':
-      return renderBalaiResult(ctx, currentOptions);
+    case 'final':
+      return renderFinal(ctx);
     case 'result':
       return renderResult(ctx);
     default:
       return renderIntro(ctx);
   }
-}
-
-/** Mengubah opsi balai apa pun menjadi BalaiId yang valid (fallback 'B01'). */
-function normalizeBalaiId(value: unknown): BalaiId {
-  const kode = typeof value === 'string' ? value : '';
-  return kode || 'B01';
 }
 
 function renderFatal(message: string): void {
@@ -184,7 +178,7 @@ function renderFatal(message: string): void {
           class: 'card',
           children: [
             el('h2', { text: '⚠️ Bank soal tidak valid' }),
-            el('p', { class: 'muted', text: 'Periksa berkas di src/data/questions/' }),
+            el('p', { class: 'muted', text: 'Periksa berkas di src/data/questions-ipa/' }),
             el('pre', { text: message, attrs: { style: 'white-space:pre-wrap;font-size:0.85rem' } }),
           ],
         }),
@@ -193,13 +187,13 @@ function renderFatal(message: string): void {
   );
 }
 
-/* ---------- Tombol bisu global ---------- */
+/* ---------- Tombol bisu efek suara ---------- */
 let muteButton: HTMLButtonElement | null = null;
 function updateMuteButton(): void {
   if (!muteButton) {
     muteButton = el('button', {
       class: 'mute-btn',
-      attrs: { type: 'button', 'aria-label': 'Bisukan atau nyalakan suara' },
+      attrs: { type: 'button', 'aria-label': 'Bisukan atau nyalakan efek suara' },
       on: {
         click: () => {
           const nowMuted = toggleMuted();
@@ -214,50 +208,35 @@ function updateMuteButton(): void {
 }
 
 /* ================================================================== */
-/* LAPIS 1: PETA BESAR 3D (klik noktah)                                */
+/* LAPIS 1: PETA PULAU 3D                                              */
 /* ================================================================== */
 
 interface PetaSession {
   handle: import('./world/petaBesar').PetaBesarHandle;
-  canvas: HTMLCanvasElement;
   cleanup: () => void;
 }
-
 let petaSession: PetaSession | null = null;
 
-async function bukaPeta(options: Record<string, unknown> = {}): Promise<void> {
+function bukaPeta(options: Record<string, unknown> = {}): void {
   if (!bankReady()) return;
-  stopNoktahWorld();
-  // Mode online: pastikan klien kelas menyala (terdaftar di dasbor guru).
   aktifkanKlien();
-  if (petaSession) {
-    // Peta sudah hidup: cukup render ulang warnanya.
-    petaSession.handle.render();
-    document.body.classList.add('world-mode');
-    return;
-  }
-
-  const mulaiPeta = (): void => {
+  const mulai = (): void => {
     if (!isWebGLAvailable()) {
       renderEmergencyScreen();
       return;
     }
-    void buildPeta();
+    void buildPeta(options);
   };
-
-  if (options.dariIntro) {
-    showLoading(app, { pesan: 'Menyiapkan peta petualangan...' }, mulaiPeta);
-  } else {
-    mulaiPeta();
-  }
+  if (options.dariIntro) showLoading(app, { pesan: 'Membuka peta Pulau Nusa Kawruh...' }, mulai);
+  else mulai();
 }
 
-async function buildPeta(): Promise<void> {
+async function buildPeta(options: Record<string, unknown>): Promise<void> {
   app.innerHTML = '';
   document.body.classList.add('world-mode');
   const canvas = document.createElement('canvas');
   canvas.className = 'world-canvas';
-  canvas.setAttribute('aria-label', 'Peta petualangan 3D');
+  canvas.setAttribute('aria-label', 'Peta Pulau Nusa Kawruh 3D');
   app.append(canvas);
 
   const { createPetaBesar } = await import('./world/petaBesar');
@@ -267,15 +246,11 @@ async function buildPeta(): Promise<void> {
       petaKeNoktah(kode);
     },
     getStatus: (kode) => ({
-      terkunci: kode === 'FINAL' && !isPuncakUnlocked(progress),
-      stars: starsFor(kode),
-      dikunjungi: progress.visitedNoktah.includes(kode),
+      terkunci: !isBalaiUnlocked(progress, kode),
+      stars: progress.balai[balaiKey(kode)]?.stars ?? 0,
+      dikunjungi: tahapMisi(progress, kode) >= 3,
     }),
-    getPosisiPemain: () => {
-      const terakhir = progress.visitedNoktah[progress.visitedNoktah.length - 1];
-      // Pemain yang baru mulai tetap punya posisi: berdiri di noktah pertama.
-      return terakhir ?? 'B01';
-    },
+    getPosisiPemain: () => (options.dari as NoktahId | undefined) ?? balaiTujuan(progress),
     penampilanPemain: {
       gender: progress.gender,
       warnaPakaian: progress.warnaBaju,
@@ -283,94 +258,98 @@ async function buildPeta(): Promise<void> {
       warnaHijab: progress.gender === 'perempuan' ? progress.warnaHijab : undefined,
     },
   });
-
   petaSession = {
     handle,
-    canvas,
     cleanup: () => {
       handle.dispose();
       canvas.remove();
     },
   };
-
-  tambahkanTombolPeta(canvas);
+  tambahkanBarPeta();
   updateMuteButton();
+
+  const tujuan = balaiTujuan(progress);
+  const namaTujuan = tujuan === 'FINAL' ? 'Mercusuar Tua' : (getCerita(tujuan)?.tempat ?? tujuan);
+  if (options.pesan) showToast(String(options.pesan), 3600);
+  else showToast(`Tujuan berikutnya: ${namaTujuan}. Ketuk penandanya!`, 3200);
 }
 
-/** Tombol melayang di atas peta: petunjuk, hasil, tentang. */
-function tambahkanTombolPeta(canvas: HTMLCanvasElement): void {
-  void canvas;
+function tambahkanBarPeta(): void {
+  const tujuan = balaiTujuan(progress);
+  const namaTujuan = tujuan === 'FINAL' ? '🗼 Mercusuar Tua' : `📍 ${getCerita(tujuan)?.tempat ?? tujuan}`;
   const bar = el('div', {
     class: 'peta-bar',
     children: [
-      el('span', {
-        class: 'chip progress',
-        text: `📍 ${progress.visitedNoktah.filter((k) => k !== 'FINAL').length}/16 noktah`,
+      el('button', {
+        class: 'chip tas',
+        text: `🎒 ${progress.alat.length}/11`,
+        attrs: { type: 'button', 'aria-label': 'Buka tas survival' },
+        on: { click: () => bukaTas() },
       }),
       el('button', {
-        class: 'btn kecil secondary',
-        text: '🎓 Hasil',
+        class: 'btn kecil',
+        text: `▶ ${namaTujuan}`,
         attrs: { type: 'button' },
+        on: { click: () => { sfx.click(); petaKeNoktah(tujuan); } },
+      }),
+      el('button', {
+        class: 'btn kecil ghost',
+        text: '🎓',
+        attrs: { type: 'button', 'aria-label': 'Hasil belajar' },
         on: { click: () => { sfx.click(); navigate('result'); } },
       }),
       el('button', {
         class: 'btn kecil ghost',
-        text: '📖',
-        attrs: { type: 'button', 'aria-label': 'Petunjuk bermain' },
-        on: { click: () => { sfx.click(); navigate('howto'); } },
-      }),
-      el('button', {
-        class: 'btn kecil ghost',
-        text: '🚪',
-        attrs: { type: 'button', 'aria-label': 'Keluar ke halaman depan' },
-        on: { click: () => { sfx.click(); konfirmasiKeluar(); } },
+        text: '☰',
+        attrs: { type: 'button', 'aria-label': 'Menu' },
+        on: { click: () => { sfx.click(); menuPeta(); } },
       }),
     ],
   });
   app.append(bar);
 }
 
-/** Konfirmasi keluar dari peta menuju halaman pembuka (progres tetap tersimpan). */
-function konfirmasiKeluar(): void {
-  const dlg = showDialog({
-    penjual: 'Pasar Amanah',
-    teks: 'Mau keluar ke halaman depan? Progres belajar kamu sudah tersimpan dan bisa dilanjutkan nanti.',
-    aksi: '🚪 Ya, keluar',
-    onAksi: () => {
-      navigate('intro');
-    },
-  });
-  app.append(dlg.root);
+function menuPeta(): void {
+  const menu = el('div', { class: 'overlay dialog-overlay' });
+  const tutup = (): void => menu.remove();
+  const tombol = (teks: string, aksi: () => void, kelas = 'btn block'): HTMLElement =>
+    el('button', { class: kelas, text: teks, attrs: { type: 'button' }, on: { click: () => { sfx.click(); tutup(); aksi(); } } });
+  menu.append(
+    el('div', {
+      class: 'dialog-panel',
+      children: [
+        el('h3', { text: '🏝️ Pulau Nusa Kawruh' }),
+        tombol('📖 Petunjuk Bermain', () => navigate('howto')),
+        tombol('🎓 Hasil Belajar', () => navigate('result'), 'btn secondary block'),
+        tombol('🚪 Keluar ke Sampul', () => navigate('intro'), 'btn secondary block'),
+        tombol('✖️ Tutup', () => {}, 'btn ghost block'),
+      ],
+    }),
+  );
+  app.append(menu);
 }
 
-function starsFor(kode: NoktahId): number {
-  const noktah = getNoktah(kode);
-  const first = noktah?.balai[0];
-  return first ? (progress.balai[balaiKey(first.kode)]?.stars ?? 0) : 0;
-}
-
-/** Dari peta besar: masuk ke sebuah noktah lewat loading singkat. */
 function petaKeNoktah(kode: NoktahId): void {
-  const noktah = getNoktah(kode);
-  if (!noktah) return;
-
-  if (kode === 'FINAL' && !isPuncakUnlocked(progress)) {
-    showToast('Pasar Ramai terbuka setelah kamu mengunjungi semua 16 noktah.');
+  if (!isBalaiUnlocked(progress, kode)) {
+    if (kode === 'FINAL') showToast('Mercusuar Tua terbuka setelah 11 alat survival terkumpul.');
+    else showToast('Jalan ke sana masih tertutup kabut. Selesaikan balai sebelumnya dulu.');
     return;
   }
-
+  const noktah = getNoktah(kode);
+  if (!noktah) return;
   if (petaSession) {
     petaSession.cleanup();
     petaSession = null;
   }
-
-  showLoading(app, { pesan: `Memasuki noktah ${noktah.nama}...` }, () => {
-    navigate('noktah', { noktah: kode });
-  });
+  if (kode === 'FINAL') {
+    showLoading(app, { pesan: 'Mendaki Mercusuar Tua...' }, () => navigate('final'));
+    return;
+  }
+  showLoading(app, { pesan: `Menuju ${noktah.nama}...` }, () => navigate('noktah', { noktah: kode }));
 }
 
 /* ================================================================== */
-/* LAPIS 2: DUNIA NOKTAH 3D (jalan-jalan ke balai)                     */
+/* LAPIS 2: DUNIA BALAI 3D                                             */
 /* ================================================================== */
 
 interface NoktahSession {
@@ -378,89 +357,74 @@ interface NoktahSession {
   hud: Hud;
   input: InputManager;
   raf: number;
-  canvas: HTMLCanvasElement;
   kode: NoktahId;
+  cerita: CeritaBalai;
+  sibuk: boolean;
   cleanup: () => void;
 }
-
 let session: NoktahSession | null = null;
 
-async function bukaNoktah(options: Record<string, unknown>): Promise<void> {
+function bukaNoktah(options: Record<string, unknown>): void {
   if (!bankReady()) return;
-  const kode = (options.noktah as NoktahId | undefined) ?? 'B01';
-  const noktah = getNoktah(kode);
-  if (!noktah) {
+  const kode = (options.noktah as NoktahId | undefined) ?? 'F01';
+  const meta = getBalai(kode);
+  const cerita = getCerita(kode);
+  if (!meta || !cerita) {
     navigate('map');
     return;
   }
-
-  // Tandai noktah sudah dikunjungi (kunci pembuka Pasar Ramai, aturan A(ii)).
-  const withVisit = tandaiNoktahDikunjungi(progress, kode);
-  if (withVisit !== progress) {
-    progress = withVisit;
-    saveProgress(progress);
-  }
-
-  // Pasar Ramai: langsung masuk babak puncak (tanpa dunia jalan-jalan).
-  if (kode === 'FINAL') {
-    stopNoktahWorld();
-    navigate('balai', { balai: 'FINAL' });
+  if (!isBalaiUnlocked(progress, kode)) {
+    navigate('map', { pesan: 'Balai itu masih tertutup kabut.' });
     return;
   }
-
+  simpan(tandaiNoktahDikunjungi(progress, kode));
   if (!isWebGLAvailable()) {
     renderEmergencyScreen();
     return;
   }
-
-  void buildNoktahWorld(noktah.balai, noktah.elemen, kode);
+  void buildNoktahWorld(kode, Boolean(options.prolog));
 }
 
-async function buildNoktahWorld(
-  balai: import('../shared/types').BalaiMeta[],
-  elemen: import('../shared/types').Elemen,
-  kode: NoktahId,
-): Promise<void> {
+async function buildNoktahWorld(kode: NoktahId, prolog: boolean): Promise<void> {
+  const meta = getBalai(kode);
+  const cerita = getCerita(kode);
+  if (!meta || !cerita) return;
   stopNoktahWorld();
   app.innerHTML = '';
   document.body.classList.add('world-mode');
   const canvas = document.createElement('canvas');
   canvas.className = 'world-canvas';
-  canvas.setAttribute('aria-label', 'Dunia noktah 3D');
+  canvas.setAttribute('aria-label', `Dunia 3D ${cerita.tempat}`);
   app.append(canvas);
 
-  const quality: SceneQuality = { pixelRatioCap: 1.5, fogNear: 26, fogFar: 70 };
-  // Pintasan diagnostik: `?tanpaBayangan=1` mematikan shadow map untuk
-  // membandingkan performa. Tidak dipakai pemain biasa.
-  if (new URLSearchParams(window.location.search).get('tanpaBayangan') === '1') {
-    quality.pixelRatioCap = 1.1;
-  }
+  const quality: SceneQuality = { pixelRatioCap: 1.5, fogNear: 30, fogFar: 80 };
+  if (new URLSearchParams(window.location.search).get('tanpaBayangan') === '1') quality.pixelRatioCap = 1.1;
   const { createNoktahWorld } = await import('./world/noktahWorld');
 
   const input = createInputManager();
   const world = createNoktahWorld({
     canvas,
     input,
-    balai,
-    elemen,
+    balai: meta,
+    cerita,
+    tahap: tahapMisi(progress, kode),
+    prolog,
     getProgress: () => progress,
     quality,
   });
   const hud = createHud({
-    onInteract: handleInteract,
+    onInteract: () => void handleInteract(),
     onMenu: openMenu,
+    onTas: () => bukaTas(),
     onSapa: (emoji) => {
       sfx.click();
       klien?.kirimSapa(emoji);
     },
   });
-
   app.append(hud.root);
   input.mountJoystick(hud.root.querySelector('.joystick-host') as HTMLElement);
   hud.updateStats(progress);
-  tambahkanTombolPetaKecil();
 
-  // Mode online: nyalakan klien (bila ada token) & mulai kirim posisi.
   const online = Boolean(progress.token) && onlineTersedia();
   hud.setOnline(online);
   if (online) {
@@ -472,36 +436,26 @@ async function buildNoktahWorld(
     }, 130);
     kirimProgresKeServer();
   }
-
-  for (const b of balai) world.setBalaiStars(b.kode, progress.balai[balaiKey(b.kode)]?.stars ?? 0);
+  world.setBalaiStars(kode, progress.balai[balaiKey(kode)]?.stars ?? 0);
 
   let last = performance.now();
   let elapsed = 0;
-  let statTerakhir = '';
-
+  let tandaStat = '';
   const loop = (now: number): void => {
     if (!session) return;
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     elapsed += dt;
     input.endFrame();
-
-    const panelOpen = document.body.querySelector('.panel-overlay, .dialog-overlay') !== null;
-    if (!panelOpen) {
-      if (input.state.interactPressed) handleInteract();
-      else if (input.state.menuPressed) openMenu();
-    }
-
+    const sibuk = session.sibuk || document.body.querySelector('.dialog-overlay, .vn-overlay, .cerita-overlay, .hadiah-overlay') !== null;
+    if (!sibuk && input.state.interactPressed) void handleInteract();
+    world.setPaused(sibuk);
     world.update(dt, elapsed);
-
     const near = world.getNearby();
-    if (near) hud.setInteractVisible(true, '🅰️ Bicara');
-    else hud.setInteractVisible(false);
-
-    // HUD menampilkan statistik bila berubah (bukan setiap frame).
-    const tanda = `${progress.coins}|${progress.answers.length}|${progress.puncakLulus}`;
-    if (tanda !== statTerakhir) {
-      statTerakhir = tanda;
+    hud.setInteractVisible(near !== null && !sibuk, labelInteraksi(near?.peran));
+    const tanda = `${progress.alat.length}|${progress.answers.length}`;
+    if (tanda !== tandaStat) {
+      tandaStat = tanda;
       hud.updateStats(progress);
     }
     session.raf = requestAnimationFrame(loop);
@@ -512,8 +466,9 @@ async function buildNoktahWorld(
     hud,
     input,
     raf: 0,
-    canvas,
     kode,
+    cerita,
+    sibuk: false,
     cleanup: () => {
       cancelAnimationFrame(session?.raf ?? 0);
       input.destroy();
@@ -521,24 +476,316 @@ async function buildNoktahWorld(
       hud.destroy();
     },
   };
+  perbaruiMisi();
+  muatAwal([cerita.penjaga.gambar, cerita.cantrik.gambar]);
   session.raf = requestAnimationFrame(loop);
   updateMuteButton();
+
+  // Prolog: percakapan pertama dimulai otomatis begitu pemain terbangun.
+  if (prolog && tahapMisi(progress, kode) === 0) {
+    window.setTimeout(() => void percakapanMisi(), 700);
+  } else if (tahapMisi(progress, kode) === 0) {
+    showToast(`Selamat datang di ${cerita.tempat}! Temui ${cerita.penjaga.nama}.`, 3000);
+  }
 }
 
-function tambahkanTombolPetaKecil(): void {
-  const btn = el('button', {
-    class: 'btn kecil ghost noktah-back',
-    text: '🗺️ Peta',
-    attrs: { type: 'button' },
-    on: { click: () => { sfx.click(); navigate('map'); } },
+function labelInteraksi(peran: PeranTitik | undefined): string {
+  if (!session || !peran) return '🅰️';
+  const tahap = tahapMisi(progress, session.kode);
+  if (peran === 'penjaga') return '💬 Bicara';
+  if (peran === 'cantrik') return '📖 Baca Cerita';
+  if (peran === 'uji') return tahap >= 2 ? '🔥 Tantangan' : '🔒 Tempat Uji';
+  return '🗺️ Ke Peta';
+}
+
+function teksMisi(c: CeritaBalai, tahap: TahapMisi): string {
+  if (tahap === 0) return `Temui ${c.penjaga.nama} untuk menerima misi.`;
+  if (tahap === 1) return `Baca Halaman Cerita bersama ${c.cantrik.nama}.`;
+  if (tahap === 2) return `Jawab tantangan ${c.penjaga.nama} di Tempat Uji.`;
+  return `Misi selesai! Lewati gerbang untuk kembali ke peta.`;
+}
+
+function perbaruiMisi(): void {
+  if (!session) return;
+  const t = tahapMisi(progress, session.kode);
+  session.hud.setMisi(`${session.cerita.alat.emoji} ${teksMisi(session.cerita, t)}`, t);
+  session.world.setTahap(t);
+}
+
+function infoPemain(): { nama: string; gender: Progress['gender'] } {
+  return { nama: progress.playerName || 'Penjelajah', gender: progress.gender };
+}
+
+/** Menjalankan satu percakapan dengan penanda sibuk (dunia dijeda). */
+async function denganPercakapan(fn: (p: Percakapan) => Promise<void>): Promise<void> {
+  if (!session || session.sibuk) return;
+  session.sibuk = true;
+  const p = bukaPercakapan(app, infoPemain());
+  try {
+    await fn(p);
+  } finally {
+    p.tutup();
+    if (session) session.sibuk = false;
+    perbaruiMisi();
+  }
+}
+
+async function handleInteract(): Promise<void> {
+  if (!session || session.sibuk) return;
+  const near = session.world.getNearby();
+  if (!near) return;
+  const tahap = tahapMisi(progress, session.kode);
+  if (near.peran === 'penjaga') {
+    if (tahap === 0) await percakapanMisi();
+    else await percakapanPengingat();
+  } else if (near.peran === 'cantrik') {
+    await bacaCerita();
+  } else if (near.peran === 'uji') {
+    await tantanganBalai();
+  } else {
+    await keluarLewatGerbang();
+  }
+}
+
+/** Tahap 1: Penjaga menjelaskan misi; siswa memilih balasan. */
+async function percakapanMisi(): Promise<void> {
+  if (!session) return;
+  const c = session.cerita;
+  await denganPercakapan(async (p) => {
+    for (const b of c.misi) {
+      if (p.tertutup()) return;
+      const teks = isiNama(b.teks, progress.playerName);
+      await p.bicara(b.siapa === 'pemain' ? 'pemain' : b.siapa === 'cantrik' ? c.cantrik : c.penjaga, teks);
+    }
+    const i = await p.pilih('pemain', c.pilihan.map((x) => x.teks), { teks: 'Apa yang ingin kamu katakan?' });
+    const pilihan = c.pilihan[i];
+    if (pilihan) await p.bicara(c.penjaga, pilihan.balasan);
+    await p.bicara(c.penjaga, c.tugas, { labelLanjut: 'Siap! ▶' });
+    simpan(setTahapMisi(progress, c.kode, 1));
   });
-  app.append(btn);
+  if (session) showToast(`📖 Cari ${session.cerita.cantrik.nama}. Ikuti panah kuning!`, 3000);
+}
+
+async function percakapanPengingat(): Promise<void> {
+  if (!session) return;
+  const c = session.cerita;
+  const tahap = tahapMisi(progress, c.kode);
+  await denganPercakapan(async (p) => {
+    if (tahap === 1) await p.bicara(c.penjaga, c.tugas);
+    else await p.bicara(c.penjaga, `Alhamdulillah, ${progress.playerName}. Perjalananmu masih panjang. Semangat!`);
+  });
+}
+
+/** Tahap 2: Halaman Cerita bersama Cantrik. */
+async function bacaCerita(): Promise<void> {
+  if (!session || session.sibuk) return;
+  const c = session.cerita;
+  const meta = getBalai(c.kode);
+  if (!meta) return;
+  const tahap = tahapMisi(progress, c.kode);
+  if (tahap === 0) {
+    await denganPercakapan(async (p) => {
+      await p.bicara(c.cantrik, `Halo! Temui ${c.penjaga.nama} dulu, ya. Beliau punya misi penting untukmu.`);
+    });
+    return;
+  }
+  await denganPercakapan(async (p) => {
+    await p.bicara(c.cantrik, c.cantrikSapa, { labelLanjut: '📖 Buka Halaman Cerita' });
+  });
+  if (!session) return;
+  session.sibuk = true;
+  const hasil = await bukaHalamanCerita(app, { cerita: c, meta });
+  if (!session) return;
+  session.sibuk = false;
+  let next = catatBaca(progress, c.kode, hasil.detik);
+  if (hasil.tamat) next = setTahapMisi(next, c.kode, 2);
+  simpan(next);
+  perbaruiMisi();
+  if (hasil.tamat && tahap < 2) {
+    await denganPercakapan(async (p) => {
+      await p.bicara(c.cantrik, c.cantrikTutup);
+    });
+    showToast(`🔥 Tempat Uji terbuka! ${c.penjaga.nama} menunggumu.`, 3000);
+  } else if (!hasil.tamat) {
+    showToast('Selesaikan Halaman Cerita sampai akhir untuk membuka Tempat Uji.', 3000);
+  }
+}
+
+/** Tahap 3: tantangan soal bersama Penjaga di Tempat Uji. */
+async function tantanganBalai(): Promise<void> {
+  if (!session) return;
+  const c = session.cerita;
+  const meta = getBalai(c.kode);
+  if (!meta) return;
+  const tahap = tahapMisi(progress, c.kode);
+  if (tahap < 2) {
+    await denganPercakapan(async (p) => {
+      await p.bicara(c.penjaga, c.ujiTerkunci);
+    });
+    return;
+  }
+
+  let hasilBenar = -1;
+  let jawaban: import('../shared/types').AnswerRecord[] = [];
+  await denganPercakapan(async (p) => {
+    if (tahap === 3) {
+      const i = await p.pilih(c.penjaga, ['🔥 Ya, latihan lagi', 'Nanti saja'], {
+        teks: 'Kamu sudah lulus di sini. Mau berlatih lagi untuk menambah bintang?',
+      });
+      if (i !== 0) return;
+    }
+    await p.bicara(c.penjaga, c.ujiBuka, { labelLanjut: 'Bismillah ▶' });
+    session?.world.setOborUji(0);
+    let benarSejauh = 0;
+    const hasil = await jalankanTantangan(p, {
+      balai: c.kode,
+      pool: getQuestionsByBalai(c.kode),
+      jumlah: meta.soalPerMain,
+      penjaga: c.penjaga,
+      pembuka: c.pembukaSoal,
+      ingatCerita: async (kodeMateri, adegan) => {
+        const cr = getCerita(kodeMateri) ?? c;
+        const m = getBalai(cr.kode) ?? meta;
+        p.root.classList.add('tersembunyi');
+        await bukaHalamanCerita(app, { cerita: cr, meta: m, mulaiDari: adegan, modeIngat: true });
+        p.root.classList.remove('tersembunyi');
+      },
+      onSoalSelesai: (benar) => {
+        if (benar) benarSejauh++;
+        session?.world.setOborUji(benarSejauh);
+      },
+    });
+    hasilBenar = hasil.benar;
+    jawaban = hasil.jawaban;
+    if (p.tertutup()) return;
+    const bintang = starsForCorrect(hasil.benar);
+    if (bintang >= 1) {
+      for (const b of c.lulus) await p.bicara(b.siapa === 'pemain' ? 'pemain' : c.penjaga, isiNama(b.teks, progress.playerName));
+    } else {
+      await p.bicara(c.penjaga, c.gagal);
+    }
+  });
+  if (hasilBenar < 0 || !session) return;
+
+  const sebelumLulus = tahap === 3;
+  let next = applyBalaiResult(progress, c.kode, hasilBenar, meta.soalPerMain, jawaban);
+  const bintang = starsForCorrect(hasilBenar);
+  if (bintang >= 1) {
+    next = setTahapMisi(tambahAlat(next, c.kode), c.kode, 3);
+    if (c.kode === URUTAN_BALAI[0]) next = { ...next, prologSelesai: true };
+  }
+  simpan(next);
+  session.world.setBalaiStars(c.kode, progress.balai[balaiKey(c.kode)]?.stars ?? 0);
+  perbaruiMisi();
+  if (bintang >= 1) {
+    sfx.win();
+    await tampilkanHadiah(c, bintang, !sebelumLulus);
+  } else {
+    sfx.lose();
+  }
+}
+
+/** Kartu hadiah: alat survival baru + bintang + hikmah. */
+function tampilkanHadiah(c: CeritaBalai, bintang: number, alatBaru: boolean): Promise<void> {
+  return new Promise((resolve) => {
+    if (session) session.sibuk = true;
+    const berikut = balaiSesudah(c.kode);
+    const teksBerikut = berikut
+      ? `Jalan menuju ${getCerita(berikut)?.tempat ?? berikut} sudah terbuka!`
+      : progress.alat.length >= URUTAN_BALAI.length
+        ? 'Semua alat terkumpul! Mercusuar Tua sudah terbuka.'
+        : 'Kumpulkan semua alat untuk membuka Mercusuar Tua.';
+    const ok = el('button', { class: 'btn block', text: 'Alhamdulillah ✨', attrs: { type: 'button' } });
+    const overlay = el('div', {
+      class: 'overlay hadiah-overlay',
+      children: [
+        el('div', {
+          class: 'hadiah-kartu',
+          children: [
+            potretHadiah(c),
+            el('div', { class: 'hadiah-label', text: alatBaru ? '🎒 Alat survival baru!' : '⭐ Latihan selesai!' }),
+            el('div', { class: 'hadiah-emoji', text: c.alat.emoji }),
+            el('h2', { text: c.alat.nama }),
+            el('p', { class: 'muted', text: c.alat.guna }),
+            el('div', { class: 'hadiah-bintang', text: `${'⭐'.repeat(bintang)}${'☆'.repeat(3 - bintang)}` }),
+            el('div', { class: 'card jujur', children: [el('span', { class: 'label-kecil', text: '🤲 Hikmah' }), el('p', { text: c.hikmah })] }),
+            el('p', { class: 'hadiah-berikut', text: teksBerikut }),
+            ok,
+          ],
+        }),
+      ],
+    });
+    ok.addEventListener('click', () => {
+      sfx.click();
+      overlay.remove();
+      if (session) session.sibuk = false;
+      showToast('🗺️ Ikuti panah ke gerbang untuk kembali ke peta.', 3000);
+      resolve();
+    });
+    app.append(overlay);
+  });
+}
+
+function potretHadiah(c: CeritaBalai): HTMLElement {
+  const p = el('div', { class: 'hadiah-potret', attrs: { 'aria-hidden': 'true' } });
+  pasangGambar(p, c.penjaga.gambar);
+  return p;
+}
+
+async function keluarLewatGerbang(): Promise<void> {
+  if (!session) return;
+  const c = session.cerita;
+  const tahap = tahapMisi(progress, c.kode);
+  let ke = false;
+  await denganPercakapan(async (p) => {
+    const teks = tahap === 3 ? 'Gerbang menuju peta pulau. Lanjutkan perjalanan?' : 'Misimu di sini belum selesai. Tetap ingin kembali ke peta? Kemajuanmu tersimpan.';
+    const i = await p.pilih('pemain', ['🗺️ Ya, ke peta', 'Belum, tetap di sini'], { teks });
+    ke = i === 0;
+  });
+  if (!ke) return;
+  const dari = session.kode;
+  const berikut = balaiSesudah(dari);
+  const pesan = tahap === 3 && berikut ? `Kabut tersibak! Jalan ke ${getCerita(berikut)?.tempat} terbuka.` : undefined;
+  showLoading(app, { pesan: 'Kembali ke peta pulau...' }, () => navigate('map', { pesan }));
+}
+
+/* ---------- Tas survival ---------- */
+function bukaTas(): void {
+  if (session) session.sibuk = true;
+  const daftar = el('div', { class: 'tas-grid' });
+  for (const c of [...CERITA].sort((a, b) => a.urutan - b.urutan)) {
+    const punya = progress.alat.includes(c.kode);
+    daftar.append(
+      el('div', {
+        class: `tas-item ${punya ? 'punya' : ''}`,
+        children: [
+          el('div', { class: 'tas-emoji', text: punya ? c.alat.emoji : '❔' }),
+          el('div', { class: 'tas-nama', text: punya ? c.alat.nama : c.tempat }),
+          el('div', { class: 'tas-ket', text: punya ? c.alat.guna : `${c.bab}: ${c.judulBab}` }),
+        ],
+      }),
+    );
+  }
+  const tutup = el('button', { class: 'btn block', text: 'Tutup', attrs: { type: 'button' } });
+  const overlay = el('div', {
+    class: 'overlay dialog-overlay',
+    children: [
+      el('div', {
+        class: 'dialog-panel tas-panel',
+        children: [el('h3', { text: `🎒 Tas Survival (${progress.alat.length}/11)` }), el('p', { class: 'muted', text: 'Kumpulkan 11 alat untuk membuka Mercusuar Tua.' }), daftar, tutup],
+      }),
+    ],
+  });
+  tutup.addEventListener('click', () => {
+    sfx.click();
+    overlay.remove();
+    if (session) session.sibuk = false;
+  });
+  app.append(overlay);
 }
 
 function stopNoktahWorld(): void {
-  document.querySelectorAll('.noktah-back').forEach((n) => n.remove());
   if (session) {
-    // Beri tahu server bahwa kita keluar dari noktah (teman tak lagi melihat kita).
     klien?.kirimPosisi(null, 0, 0, 0);
     session.cleanup();
     session = null;
@@ -547,143 +794,32 @@ function stopNoktahWorld(): void {
     petaSession.cleanup();
     petaSession = null;
   }
+  app.querySelectorAll('.vn-overlay, .cerita-overlay, .hadiah-overlay, .dialog-overlay').forEach((n) => n.remove());
   document.body.classList.remove('world-mode');
 }
 
-function handleInteract(): void {
-  if (!session) return;
-  const near = session.world.getNearby();
-  if (!near) return;
-
-  session.world.setPaused(true);
-  const dlg = showDialog({
-    penjual: 'Penjaga Balai',
-    teks: `Ayo baca materi dan berlatih di ${near.nama}!`,
-    aksi: '📘 Buka Balai',
-    onAksi: () => openBalaiPanel(near.kode),
-    onBatal: () => session?.world.setPaused(false),
-  });
-  app.append(dlg.root);
-}
-
-function openBalaiPanel(kode: BalaiId): void {
-  if (!session) return;
-  session.world.setPaused(true);
-  closePanel();
-
-  const vctx: ScreenContext = {
-    ...ctx,
-    navigate: (screen, options) => {
-      closePanel();
-      session?.world.setPaused(false);
-      syncWorldStars();
-      if (screen === 'quiz' || screen === 'balaiResult') {
-        showInWorldScreen(screen, options ?? {});
-      } else if (screen === 'map' || screen === 'result') {
-        navigate(screen, options ?? {});
-      } else if (screen === 'balai') {
-        showInWorldScreen('balai', options ?? {});
-      }
-    },
-  };
-
-  const view = renderBalai(vctx, { balai: kode });
-  const panel = el('div', { class: 'overlay panel-overlay' });
-  panel.append(view);
-  app.append(panel);
-}
-
-function syncWorldStars(): void {
-  if (!session) return;
-  // Setelah kuis, perbarui bintang tiap balai di dunia noktah ini.
-  const noktah = getNoktah(session.kode);
-  if (!noktah) return;
-  for (const b of noktah.balai) {
-    session.world.setBalaiStars(b.kode, progress.balai[balaiKey(b.kode)]?.stars ?? 0);
-  }
-}
-
-/** Menampilkan layar balai/kuis/hasil sebagai panel di atas dunia 3D. */
-function showInWorldScreen(screen: ScreenName, options: Record<string, unknown>): void {
-  if (!session) {
-    navigate(screen, options);
-    return;
-  }
-  session.world.setPaused(true);
-  closePanel();
-
-  if (screen === 'result' || screen === 'map') {
-    navigate(screen, options);
-    return;
-  }
-
-  const vctx: ScreenContext = {
-    ...ctx,
-    navigate: (next, opts) => {
-      closePanel();
-      session?.world.setPaused(false);
-      syncWorldStars();
-      if (next === 'quiz' || next === 'balaiResult' || next === 'balai') {
-        showInWorldScreen(next, opts ?? {});
-      } else if (next === 'result' || next === 'map') {
-        navigate(next, opts ?? {});
-      }
-    },
-  };
-
-  let root: HTMLElement | null = null;
-  if (screen === 'balai') root = renderBalai(vctx, options);
-  else if (screen === 'quiz') root = renderQuiz(vctx, { balai: normalizeBalaiId(options.balai) }).root;
-  else if (screen === 'balaiResult') root = renderBalaiResult(vctx, options);
-
-  if (!root) return;
-  const panel = el('div', { class: 'overlay panel-overlay' });
-  panel.append(root);
-  app.append(panel);
-}
-
-function closePanel(): void {
-  app.querySelectorAll('.panel-overlay, .dialog-overlay').forEach((n) => n.remove());
-}
-
-/* ---------- Menu dari HUD dunia noktah ---------- */
 function openMenu(): void {
-  if (!session) return;
-  session.world.setPaused(true);
+  if (!session || session.sibuk) return;
+  session.sibuk = true;
   const menu = el('div', { class: 'overlay dialog-overlay' });
   const close = (): void => {
     menu.remove();
-    session?.world.setPaused(false);
+    if (session) session.sibuk = false;
   };
-  const noktah = getNoktah(session.kode);
-  const buttons = [
-    el('button', {
-      class: 'btn block',
-      text: '📖 Petunjuk Kontrol',
-      attrs: { type: 'button' },
-      on: { click: () => { close(); navigate('howto'); } },
-    }),
-    el('button', {
-      class: 'btn secondary block',
-      text: '🗺️ Kembali ke Peta',
-      attrs: { type: 'button' },
-      on: { click: () => { close(); navigate('map'); } },
-    }),
-    el('button', {
-      class: 'btn secondary block',
-      text: '🎓 Lihat Hasil Akhir',
-      attrs: { type: 'button' },
-      on: { click: () => { close(); navigate('result'); } },
-    }),
-    el('button', { class: 'btn ghost block', text: '✖️ Tutup', attrs: { type: 'button' }, on: { click: close } }),
-  ];
+  const c = session.cerita;
+  const tombol = (teks: string, aksi: () => void, kelas = 'btn block'): HTMLElement =>
+    el('button', { class: kelas, text: teks, attrs: { type: 'button' }, on: { click: () => { sfx.click(); close(); aksi(); } } });
   menu.append(
     el('div', {
       class: 'dialog-panel',
       children: [
-        el('h3', { text: noktah ? `Noktah: ${noktah.nama}` : 'Menu' }),
-        el('p', { class: 'muted', text: 'Dekati balai lalu tekan A untuk membaca materi dan berlatih.' }),
-        ...buttons,
+        el('h3', { text: `${c.alat.emoji} ${c.tempat}` }),
+        el('p', { class: 'muted', text: `${c.bab} · ${c.judulBab}` }),
+        el('p', { text: teksMisi(c, tahapMisi(progress, c.kode)) }),
+        tombol('📖 Petunjuk Kontrol', () => navigate('howto')),
+        tombol('🗺️ Kembali ke Peta', () => navigate('map'), 'btn secondary block'),
+        tombol('🎓 Hasil Belajar', () => navigate('result'), 'btn secondary block'),
+        tombol('✖️ Tutup', () => {}, 'btn ghost block'),
       ],
     }),
   );
@@ -702,27 +838,15 @@ function renderEmergencyScreen(): void {
           class: 'card',
           children: [
             el('div', { class: 'hero', children: [el('div', { class: 'emoji', text: '🖥️' }), el('h1', { text: 'Perangkat Belum Mendukung 3D' })] }),
-            el('p', {
-              text: 'Petualangan di Pasar dimainkan dalam tampilan 3D. Peramban di perangkat ini belum mengaktifkan WebGL, sehingga dunia 3D tidak dapat ditampilkan.',
-            }),
-            el('p', { class: 'muted', text: 'Saran: coba peramban terbaru (Chrome/Edge), aktifkan akselerasi perangkat keras, atau gunakan perangkat lain.' }),
+            el('p', { text: 'Survival Sains dimainkan dalam tampilan 3D. Peramban di perangkat ini belum mengaktifkan WebGL.' }),
+            el('p', { class: 'muted', text: 'Saran: coba Chrome terbaru, aktifkan akselerasi perangkat keras, atau gunakan perangkat lain.' }),
           ],
         }),
         el('div', {
           class: 'stack',
           children: [
-            el('button', {
-              class: 'btn block',
-              text: '🔄 Coba Lagi',
-              attrs: { type: 'button' },
-              on: { click: () => { sfx.click(); navigate('map'); } },
-            }),
-            el('button', {
-              class: 'btn ghost block',
-              text: '🗺️ Daftar Noktah (tanpa 3D)',
-              attrs: { type: 'button' },
-              on: { click: () => { sfx.click(); mount(app, renderMap(ctx)); } },
-            }),
+            el('button', { class: 'btn block', text: '🔄 Coba Lagi', attrs: { type: 'button' }, on: { click: () => navigate('map') } }),
+            el('button', { class: 'btn ghost block', text: '🗺️ Daftar Balai (tanpa 3D)', attrs: { type: 'button' }, on: { click: () => mount(app, renderMap(ctx)) } }),
           ],
         }),
       ],
@@ -735,24 +859,32 @@ function renderEmergencyScreen(): void {
 function boot(): void {
   if (!bankReady()) return;
   updateMuteButton();
-  // Selalu mulai dari cover: pemain memilih "Lanjutkan" atau "Mulai dari awal".
   navigate('intro');
 }
-
 boot();
 
-// Ekspos util debugging ringan.
-(window as unknown as { __petualanganDiPasar?: unknown }).__petualanganDiPasar = {
+// Util debug & pintasan uji otomatis.
+(window as unknown as { __survivalSains?: unknown }).__survivalSains = {
   bank: () => getQuestionBank(),
-  mode: () => (session ? 'noktah-3d' : petaSession ? 'peta-3d' : 'ui'),
+  mode: () => (session ? 'balai-3d' : petaSession ? 'peta-3d' : 'ui'),
   debug: () => session?.world.debugState() ?? null,
   progress: () => progress,
-  /** Pintasan uji: masuk ke noktah tertentu tanpa mengetuk penanda 3D. */
-  masukNoktah: (kode: NoktahId) => navigate('noktah', { noktah: kode }),
-  /** Pintasan uji: kembali ke peta. */
+  karakter: () => KARAKTER[progress.gender],
+  masukBalai: (kode: NoktahId, prolog = false) => navigate('noktah', { noktah: kode, prolog }),
+  pindahKe: (peran: PeranTitik) => session?.world.pindahKe(peran) ?? false,
+  interaksi: () => handleInteract(),
   kePeta: () => navigate('map'),
-  /** Status klien multiplayer untuk uji/debug. */
+  keFinal: () => navigate('final'),
+  isPuncakUnlocked: () => isPuncakUnlocked(progress),
   online: () => ({ status: statusKlien, teman: klien ? klien.terakhirPosisi.length : 0 }),
-  /** Sapa manual (untuk uji). */
   sapa: (emoji: string) => klien?.kirimSapa(emoji),
+  /** Pintasan uji: luluskan semua balai (untuk menguji Final). */
+  luluskanSemua: () => {
+    let next = progress;
+    for (const k of URUTAN_BALAI) {
+      next = applyBalaiResult(next, k, 3, 3, []);
+      next = setTahapMisi(tambahAlat(next, k), k, 3);
+    }
+    simpan({ ...next, prologSelesai: true, introDone: true });
+  },
 };

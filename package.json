@@ -1,9 +1,9 @@
 {
-  "name": "petualangan-di-pasar",
+  "name": "survival-sains",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Petualangan di Pasar - Game edukasi matematika kelas 6 SD/MI: jelajahi 16 balai TKA di pasar 3D dan taklukkan babak puncak Pasar Ramai",
+  "description": "Survival Sains - game petualangan IPA kelas 5 SD/MI: terdampar di Pulau Nusa Kawruh, pelajari 9 bab IPA bersama 9 penjaga, lalu nyalakan Mercusuar Tua.",
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:vite": "vite",
@@ -16,8 +16,10 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "smoke": "node scripts/smoke.mjs",
+    "build:avatar": "node scripts/build-avatar.mjs",
     "serve": "node server/index.mjs",
-    "serve:dev": "npm run build && node server/index.mjs"
+    "serve:dev": "npm run build && node server/index.mjs",
+    "naskah": "tsx scripts/gen-naskah.ts"
   },
   "dependencies": {
     "three": "^0.182.0",

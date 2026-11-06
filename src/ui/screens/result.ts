@@ -8,7 +8,8 @@ import {
   balaiSelesaiCount,
   isPuncakUnlocked,
 } from '../../core/state';
-import { BAHAI_TKA } from '../../data/balai';
+import { getBalai } from '../../data/balai';
+import { CERITA, URUTAN_BALAI } from '../../data/cerita';
 import type { ScreenContext } from './context';
 
 function bintangKecil(stars: number): string {
@@ -19,21 +20,24 @@ function bintangKecil(stars: number): string {
 export function renderResult(ctx: ScreenContext): HTMLElement {
   const progress = ctx.getProgress();
 
-  const ringkas = BAHAI_TKA.map((meta) => {
-    const bp = progress.balai[balaiKey(meta.kode)];
+  const ringkas = URUTAN_BALAI.map((kode) => {
+    const meta = getBalai(kode);
+    const c = CERITA.find((x) => x.kode === kode);
+    const bp = progress.balai[balaiKey(kode)];
     const stars = bp?.stars ?? 0;
     const correct = bp?.correct ?? 0;
-    const total = bp?.total ?? meta.soalPerMain;
+    const total = bp?.total ?? meta?.soalPerMain ?? 3;
     return el('div', {
       class: 'ringkas-baris',
       children: [
-        el('span', { text: `${meta.kode} ${meta.nama}` }),
+        el('span', { text: `${progress.alat.includes(kode) ? c?.alat.emoji ?? '✅' : '❔'} ${c?.bab ?? ''} ${c?.judulBab ?? kode}` }),
         el('span', { class: 'muted', text: `${correct}/${total} benar` }),
         el('span', { class: 'bintang', text: bintangKecil(stars) }),
       ],
     });
   });
 
+  const totalFinal = progress.finalBagian.reduce((a, b) => a + b, 0);
   const totalBenar = progress.answers.filter((a) => a.correct).length;
   const totalSoal = progress.answers.length;
   const akurasi = totalSoal > 0 ? Math.round((totalBenar / totalSoal) * 100) : 0;
@@ -65,10 +69,10 @@ export function renderResult(ctx: ScreenContext): HTMLElement {
         children: [
           el('p', { class: 'label-kecil', text: '🎓 Sertifikat Digital' }),
           el('h2', { text: APP_INFO.judul }),
-          el('p', { class: 'muted', text: 'Diberikan kepada Penjelajah Pasar Terbaik' }),
+          el('p', { class: 'muted', text: 'Sertifikat "Penyintas Sains" diberikan kepada' }),
           namaPreview,
-          el('div', { class: 'hasil-bintang', children: [el('span', { text: `🪙 ${progress.coins} koin` })] }),
-          el('p', { class: 'muted', text: `Total bintang: ${totalStars(progress)} dari ${maxStars()}` }),
+          el('p', { class: 'muted', text: `atas keberhasilan menyalakan Mercusuar Tua dengan 11 bekal ilmu IPA.` }),
+          el('p', { class: 'muted', text: `Total bintang: ${totalStars(progress)} dari ${maxStars()} · Final: ${totalFinal}/30` }),
           el('p', { class: 'muted', text: `Akurasi jawaban: ${akurasi}% (${totalBenar}/${totalSoal})` }),
           el('p', {
             class: 'muted',
@@ -83,7 +87,7 @@ export function renderResult(ctx: ScreenContext): HTMLElement {
         children: [
           el('span', { class: 'label-kecil', text: 'Sertifikat Terkunci' }),
           el('p', {
-            text: `Lulus babak Pasar Ramai untuk membuka sertifikat digitalmu! Selesaikan semua balai (${balaiSelesaiCount(progress)}/16 selesai)${isPuncakUnlocked(progress) ? ', lalu tuntaskan Pasar Ramai' : ''}.`,
+            text: `Nyalakan Mercusuar Tua untuk membuka sertifikat "Penyintas Sains"! Alat terkumpul: ${balaiSelesaiCount(progress)}/11${isPuncakUnlocked(progress) ? '. Mercusuar sudah terbuka, ayo tuntaskan Final!' : '.'}`,
           }),
         ],
       });
@@ -117,12 +121,12 @@ export function renderResult(ctx: ScreenContext): HTMLElement {
     children: [
       el('div', {
         class: 'topbar',
-        children: [el('h2', { text: '🏁 Hasil Akhir' }), el('span', { class: 'chip coin', text: `🪙 ${progress.coins}` })],
+        children: [el('h2', { text: '🏁 Hasil Akhir' })],
       }),
       el('div', {
         class: 'card',
         children: [
-          el('span', { class: 'label-kecil', text: 'Ringkasan Jawaban per Balai' }),
+          el('span', { class: 'label-kecil', text: 'Ringkasan per Bab' }),
           el('div', { class: 'ringkas-level', attrs: { style: 'margin-top:10px' }, children: ringkas }),
         ],
       }),

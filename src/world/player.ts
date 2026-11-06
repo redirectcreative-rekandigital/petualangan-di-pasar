@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { buatKarakter, type KarakterRig } from './karakter';
+import { cobaAvatarGlb } from './avatarModel';
 import type { PlayerGender } from '../../shared/types';
 
 /**
@@ -19,6 +20,11 @@ export interface PlayerBundle {
   faceDirection: (dx: number, dz: number, dt: number) => void;
   /** Animasi jalan sederhana (ayun kaki) berdasarkan kecepatan. */
   animate: (speed: number, elapsed: number) => void;
+  /**
+   * Coba ganti model dengan avatar GLB bila tersedia di `public/assets/models/`.
+   * Bila berkas tidak ada, pemain tetap memakai karakter prosedural.
+   */
+  cobaPakaiGlb: (renderer?: THREE.WebGLRenderer) => Promise<boolean>;
   dispose: () => void;
 }
 
@@ -40,17 +46,24 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
     pakaiMarker: true,
   });
   const group = rig.group;
+  // Gabungkan: wadah luar (posisi & rotasi) berisi karakter prosedural + model GLB.
+  // `rig.group` dipakai sebagai anak, bukan sebagai akar, supaya menyembunyikan
+  // karakter prosedural tidak ikut menyembunyikan model GLB.
+  const akar = new THREE.Group();
+  akar.add(group);
   // Pemain adalah satu-satunya objek yang memberi bayangan "tokoh".
-  group.traverse((o) => {
+  akar.traverse((o) => {
     o.castShadow = true;
   });
 
   const position = new THREE.Vector3(0, 0, 0);
   let facing = 0;
+  // Bila model GLB berhasil dimuat, `glb` menggantikan animasi prosedural.
+  let glb: Awaited<ReturnType<typeof cobaAvatarGlb>> = null;
 
   const setPosition = (x: number, z: number): void => {
     position.set(x, 0, z);
-    group.position.set(x, 0, z);
+    akar.position.set(x, 0, z);
   };
 
   const faceDirection = (dx: number, dz: number, dt: number): void => {
@@ -61,17 +74,39 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
     while (diff > Math.PI) diff -= Math.PI * 2;
     while (diff < -Math.PI) diff += Math.PI * 2;
     facing += diff * Math.min(1, dt * 12);
-    group.rotation.y = facing;
+    akar.rotation.y = facing;
   };
 
+  let waktuTerakhir = 0;
   const animate = (speed: number, elapsed: number): void => {
+    // Model GLB diayunkan lewat klip animasinya sendiri (bila ada).
+    const dt = Math.max(0, Math.min(0.1, elapsed - waktuTerakhir));
+    waktuTerakhir = elapsed;
+    if (glb) {
+      glb.update(speed, dt);
+      return;
+    }
     rig.langkah(speed, elapsed);
   };
 
+  const cobaPakaiGlb = async (renderer?: THREE.WebGLRenderer): Promise<boolean> => {
+    const model = await cobaAvatarGlb(opsi.gender, renderer);
+    if (!model) return false;
+    glb = model;
+    // Sembunyikan karakter prosedural, tampilkan model GLB di grup yang sama.
+    group.visible = false;
+    akar.add(model.group);
+    akar.traverse((o) => {
+      o.castShadow = true;
+    });
+    return true;
+  };
+
   const dispose = (): void => {
+    glb?.dispose();
     rig.geometri.forEach((g) => g.dispose());
     rig.material.forEach((m) => m.dispose());
   };
 
-  return { group, position, setPosition, faceDirection, animate, dispose };
+  return { group: akar, position, setPosition, faceDirection, animate, cobaPakaiGlb, dispose };
 }

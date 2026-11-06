@@ -10,34 +10,34 @@ interface Langkah {
 
 const LANGKAH: Langkah[] = [
   {
-    ikon: '🗺️',
-    judul: '1. Pilih noktah di peta',
-    isi: 'Petualangan dimulai dari peta harta karun 3D. Ketuk salah satu noktah (titik materi) untuk memasukinya.',
+    ikon: '🌊',
+    judul: '1. Terdampar di pulau',
+    isi: 'Badai membawamu ke Pulau Nusa Kawruh. Untuk pulang, nyalakan Mercusuar Tua di puncak pulau.',
   },
   {
     ikon: '🕹️',
-    judul: '2. Jelajahi noktahnya',
-    isi: 'Di HP, geser joystick kiri untuk berjalan. Di laptop, pakai tombol W A S D atau panah.',
+    judul: '2. Berjalan dan melihat',
+    isi: 'Di HP, geser joystick kiri untuk berjalan dan geser jari di sisi kanan untuk memutar kamera. Di laptop pakai W A S D dan mouse.',
   },
   {
-    ikon: '🎥',
-    judul: '3. Putar kamera',
-    isi: 'Geser jari di sisi kanan layar (HP) atau seret mouse (laptop) untuk melihat sekeliling noktah.',
+    ikon: '💬',
+    judul: '3. Terima misi dari Penjaga',
+    isi: 'Ikuti panah kuning. Dekati Penjaga lalu tekan tombol A (atau E) untuk bercakap dan menerima misi.',
   },
   {
-    ikon: '🏛️',
-    judul: '4. Datangi balai',
-    isi: 'Tiap noktah berisi balai (rumah sub-materi). Dekati balai lalu tekan A (atau E).',
+    ikon: '📖',
+    judul: '4. Baca Halaman Cerita',
+    isi: 'Cantrik akan membacakan cerita bergambar tentang materi IPA. Selesaikan tantangan kecil di akhir cerita.',
   },
   {
-    ikon: '📘',
-    judul: '5. Baca materi (opsional)',
-    isi: 'Tiap balai punya bacaan satu halaman ringkas. Boleh dibaca dulu, boleh langsung berlatih.',
+    ikon: '🔥',
+    judul: '5. Jawab tantangan di Tempat Uji',
+    isi: 'Penjaga memberi 3 soal pilihan ganda. Setiap soal punya 3 obor (kesempatan). Bila salah, tekan "Ingat cerita" untuk melihat petunjuk.',
   },
   {
-    ikon: '👑',
-    judul: '6. Hadapi Pasar Ramai',
-    isi: 'Setelah kamu pernah mengunjungi seluruh 16 noktah, babak puncak 30 soal terbuka. Lulus berarti sertifikatmu terbuka!',
+    ikon: '🗼',
+    judul: '6. Kumpulkan 11 alat, nyalakan mercusuar',
+    isi: 'Setiap balai memberi satu alat survival dan membuka jalan ke balai berikutnya. Dengan 11 alat, Mercusuar Tua terbuka untuk Final (30 soal).',
   },
 ];
 
@@ -45,7 +45,8 @@ const KONTROL: Array<[string, string, string]> = [
   ['Jalan', 'Joystick kiri', 'W A S D / panah'],
   ['Putar kamera', 'Geser jari kanan', 'Seret mouse'],
   ['Interaksi / bicara', 'Tombol A', 'E'],
-  ['Menu', 'Tombol B', 'H / Esc'],
+  ['Menu', 'Tombol ☰', 'H / Esc'],
+  ['Tas survival', 'Tombol 🎒', '-'],
 ];
 
 /** Petunjuk bermain dan kontrol versi balai. */
@@ -130,11 +131,11 @@ export function renderHowto(ctx: ScreenContext): HTMLElement {
           el('ul', {
             class: 'tujuan',
             children: [
-              el('li', { text: 'Setiap noktah pada peta berisi balai (rumah sub-materi).' }),
-              el('li', { text: 'Tiap balai berisi 3 soal. Tiap soal punya 3 kesempatan menjawab. Habis 3x salah = soal gagal, lanjut soal berikutnya.' }),
-              el('li', { text: '3 benar = ⭐⭐⭐, 2 benar = ⭐⭐, 1 benar = ⭐. Minimal 1 bintang untuk lulus balai.' }),
-              el('li', { text: 'Semua noktah bebas dipilih sejak awal — tidak perlu berurutan.' }),
-              el('li', { text: 'Babak puncak "Pasar Ramai" (30 soal) terbuka setelah semua 16 noktah pernah dikunjungi.' }),
+              el('li', { text: 'Balai dibuka berurutan mengikuti bab buku IPA kelas 5 (Bab 1 Cahaya sampai Bab 9 Bumi).' }),
+              el('li', { text: 'Setiap balai: misi dari Penjaga → Halaman Cerita → tantangan di Tempat Uji → pulang lewat gerbang.' }),
+              el('li', { text: 'Tempat Uji terbuka setelah Halaman Cerita selesai dibaca.' }),
+              el('li', { text: '3 soal per balai, 3 obor per soal. 3 benar = ⭐⭐⭐, 2 = ⭐⭐, 1 = ⭐. Minimal 1 bintang untuk lulus.' }),
+              el('li', { text: 'Final di Mercusuar Tua: 30 soal dalam 4 lantai. Lulus bila minimal 21 benar (70%).' }),
             ],
           }),
         ],
@@ -145,7 +146,7 @@ export function renderHowto(ctx: ScreenContext): HTMLElement {
           el('span', { class: 'label-kecil', text: '💡 Tips' }),
           el('p', {
             text:
-              'Pasar seluruhnya 3D. Jika perangkatmu sangat tua dan belum mendukung 3D, aplikasi akan menampilkan layar darurat yang ramah. Untuk perangkat modern, grafik 3D akan berjalan lancar.',
+              'Nyalakan suara agar para tokoh membacakan dialog dan cerita. Bila suara bahasa Indonesia belum ada di HP, pasang paket suara Google bahasa Indonesia di Setelan HP. Teks tetap tampil walau suara mati.',
           }),
         ],
       }),

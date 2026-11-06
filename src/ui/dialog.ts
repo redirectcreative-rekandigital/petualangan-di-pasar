@@ -1,12 +1,14 @@
 import { el } from './components/dom';
 
 /**
- * Kotak dialog penjual (HTML overlay di atas scene 3D).
+ * Kotak dialog tokoh (HTML overlay di atas scene 3D).
  * Pemain membaca dialog singkat lalu menekan tombol untuk memulai misi.
  */
 export interface DialogOptions {
-  penjual: string;
+  tokoh: string;
   teks: string;
+  /** Ikon kecil di kepala dialog (🛡️ Penjaga, 📘 Tokoh Materi). */
+  ikon?: string;
   /** Label tombol aksi utama. */
   aksi: string;
   onAksi: () => void;
@@ -47,7 +49,7 @@ export function showDialog(options: DialogOptions): { root: HTMLElement; close: 
     children: [
       el('div', {
         class: 'dialog-head',
-        children: [el('span', { class: 'dialog-avatar', text: '🧑‍🍳' }), el('strong', { text: options.penjual })],
+        children: [el('span', { class: 'dialog-avatar', text: options.ikon ?? '🛡️' }), el('strong', { text: options.tokoh })],
       }),
       el('p', { class: 'dialog-text', text: options.teks }),
       el('div', { class: 'stack', children: [aksiBtn, ...(batalBtn ? [batalBtn] : [])] }),

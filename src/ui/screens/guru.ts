@@ -3,6 +3,17 @@ import { sfx } from '../../core/sound';
 import { APP_INFO } from '../../core/state';
 import { showToast } from '../dialog';
 import { ambilSesiGuru, buatSesiGuru, onlineTersedia, type RosterSiswa } from '../../net/klien';
+import { getQuestionBank } from '../../data/bank';
+import { CERITA, URUTAN_BALAI } from '../../data/cerita';
+import {
+  statusBalai,
+  statistikSoal,
+  statistikMateri,
+  rekomendasi,
+  barisCsvSiswa,
+  kepalaCsvBalai,
+  LABEL_STATUS,
+} from '../../core/analisis';
 import type { ScreenContext } from './context';
 
 /**
@@ -13,7 +24,7 @@ import type { ScreenContext } from './context';
  * ditampilkan petunjuk singkat.
  */
 
-const KUNCI_TOKEN = 'petualangan-di-pasar:token-guru';
+const KUNCI_TOKEN = 'survival-sains:token-guru';
 
 interface StateGuru {
   token: string | null;
@@ -22,6 +33,8 @@ interface StateGuru {
   pesan: string | null;
   timer: number;
   jalan: boolean;
+  tab: 'kelas' | 'soal' | 'siswa';
+  dipilih: string | null;
 }
 
 export function renderGuru(ctx: ScreenContext): HTMLElement {
@@ -32,6 +45,8 @@ export function renderGuru(ctx: ScreenContext): HTMLElement {
     pesan: null,
     timer: 0,
     jalan: true,
+    tab: 'kelas',
+    dipilih: null,
   };
 
   const root = el('section', { class: 'screen' });
@@ -204,16 +219,22 @@ export function renderGuru(ctx: ScreenContext): HTMLElement {
     );
 
     anak.push(
-      el('button', {
-        class: 'btn kecil secondary',
-        text: '⬇️ Ekspor CSV',
-        attrs: { type: 'button' },
-        on: {
-          click: () => {
-            sfx.click();
-            eksporCsv(st.siswa, st.token ?? '');
-          },
-        },
+      el('div', {
+        class: 'row-tombol',
+        children: [
+          el('button', {
+            class: 'btn kecil secondary',
+            text: '⬇️ CSV Kelas',
+            attrs: { type: 'button' },
+            on: { click: () => { sfx.click(); eksporCsv(st.siswa, st.token ?? ''); } },
+          }),
+          el('button', {
+            class: 'btn kecil secondary',
+            text: '⬇️ CSV Jawaban',
+            attrs: { type: 'button' },
+            on: { click: () => { sfx.click(); eksporCsvJawaban(st.siswa, st.token ?? ''); } },
+          }),
+        ],
       }),
     );
 
@@ -225,9 +246,35 @@ export function renderGuru(ctx: ScreenContext): HTMLElement {
         }),
       );
     } else {
-      const daftar = el('div', { class: 'daftar-siswa' });
-      for (const s of st.siswa) daftar.append(kartuSiswa(s));
-      anak.push(daftar);
+      const tabTombol = (id: StateGuru['tab'], label: string): HTMLElement =>
+        el('button', {
+          class: `guru-tab ${st.tab === id ? 'aktif' : ''}`,
+          text: label,
+          attrs: { type: 'button', 'aria-pressed': st.tab === id ? 'true' : 'false' },
+          on: { click: () => { sfx.click(); st.tab = id; gambar(); } },
+        });
+      anak.push(el('div', { class: 'guru-tabs', children: [tabTombol('kelas', '📊 Kelas'), tabTombol('soal', '❓ Soal'), tabTombol('siswa', '🧒 Siswa')] }));
+      if (st.tab === 'kelas') anak.push(...tabKelas(st.siswa));
+      else if (st.tab === 'soal') anak.push(...tabSoal(st.siswa));
+      else {
+        const pilih = st.siswa.find((x) => x.id === st.dipilih);
+        if (pilih) {
+          anak.push(
+            el('button', { class: 'btn kecil ghost', text: '← Semua siswa', attrs: { type: 'button' }, on: { click: () => { st.dipilih = null; gambar(); } } }),
+            detailSiswa(pilih),
+          );
+        } else {
+          const daftar = el('div', { class: 'daftar-siswa' });
+          for (const s of st.siswa) {
+            const k = kartuSiswa(s);
+            k.setAttribute('role', 'button');
+            k.setAttribute('tabindex', '0');
+            k.addEventListener('click', () => { st.dipilih = s.id; gambar(); });
+            daftar.append(k);
+          }
+          anak.push(el('p', { class: 'muted kecil-teks', text: 'Ketuk nama siswa untuk melihat detail dan rekomendasi.' }), daftar);
+        }
+      }
     }
 
     anak.push(el('div', { class: 'stack', children: [kembali] }));
@@ -249,7 +296,7 @@ function headerGuru(): HTMLElement {
     children: [
       el('div', { class: 'emoji', text: '👩‍🏫' }),
       el('h1', { class: 'cover-judul', text: 'Mode Guru' }),
-      el('p', { class: 'subjudul', text: 'Pantau progres siswa di kelasmu' }),
+      el('p', { class: 'subjudul', text: 'Pantau hasil belajar siswa di Survival Sains' }),
     ],
   });
 }
@@ -281,7 +328,8 @@ function kartuSiswa(s: RosterSiswa): HTMLElement {
       el('div', {
         class: 'baris-stat',
         children: [
-          el('span', { text: `📍 ${p.noktah ?? 'peta'}` }),
+          el('span', { text: `📍 ${p.noktah ? (CERITA.find((c) => c.kode === p.noktah)?.tempat ?? p.noktah) : 'peta'}` }),
+          el('span', { text: `🎒 ${p.alat ?? 0}/11` }),
           el('span', { text: `⭐ ${bintang}` }),
           el('span', { text: `🎯 ${persen}%` }),
           el('span', { text: `❌ ${salah}` }),
@@ -301,6 +349,116 @@ function ringkasKelas(siswa: RosterSiswa[]): { totalBintang: number; persenBenar
     soal += s.progress.totalSoal ?? 0;
   }
   return { totalBintang, persenBenar: soal > 0 ? Math.round((benar / soal) * 100) : 0 };
+}
+
+/* ------------------------------------------------------------------ */
+/* Tab analisis                                                        */
+/* ------------------------------------------------------------------ */
+
+function tabKelas(siswa: RosterSiswa[]): HTMLElement[] {
+  const kepala = el('tr', {
+    children: [el('th', { text: 'Siswa' }), ...URUTAN_BALAI.map((k) => el('th', { text: String(CERITA.find((c) => c.kode === k)?.urutan ?? k), attrs: { title: k } }))],
+  });
+  const baris = siswa.map((s) =>
+    el('tr', {
+      children: [
+        el('td', { class: 'nama-sel', text: s.nama }),
+        ...URUTAN_BALAI.map((k) => {
+          const st = statusBalai(s.progress, k);
+          return el('td', { class: `sel-${st}`, text: LABEL_STATUS[st].ikon, attrs: { title: `${k}: ${LABEL_STATUS[st].teks}` } });
+        }),
+      ],
+    }),
+  );
+  const tabel = el('div', { class: 'tabel-gulir', children: [el('table', { class: 'matriks', children: [el('thead', { children: [kepala] }), el('tbody', { children: baris })] })] });
+  const legenda = el('p', {
+    class: 'muted kecil-teks',
+    text: Object.values(LABEL_STATUS).map((l) => `${l.ikon} ${l.teks}`).join(' · '),
+  });
+  const materi = statistikMateri(siswa).map((m) =>
+    el('div', {
+      class: 'bar-materi',
+      children: [
+        el('span', { class: 'bar-label', text: m.judul }),
+        el('span', { class: 'bar-isi', children: [el('span', { attrs: { style: `width:${m.persenBenar}%` } })] }),
+        el('span', { class: 'bar-nilai', text: m.dijawab > 0 ? `${m.persenBenar}% · ${m.lulus} lulus` : '-' }),
+      ],
+    }),
+  );
+  return [
+    el('div', { class: 'card', children: [el('span', { class: 'label-kecil', text: 'Kemajuan siswa per balai (urut bab)' }), tabel, legenda] }),
+    el('div', { class: 'card', children: [el('span', { class: 'label-kecil', text: 'Persen benar kelas per bab' }), ...materi] }),
+  ];
+}
+
+function tabSoal(siswa: RosterSiswa[]): HTMLElement[] {
+  const daftar = statistikSoal(siswa, getQuestionBank()).slice(0, 15);
+  if (daftar.length === 0) return [el('p', { class: 'muted center-text', text: 'Belum ada jawaban masuk.' })];
+  return [
+    el('p', { class: 'muted kecil-teks', text: 'Diurutkan dari soal yang paling jarang dijawab benar pada percobaan pertama.' }),
+    ...daftar.map((q) =>
+      el('div', {
+        class: 'card soal-guru',
+        children: [
+          el('div', {
+            class: 'baris-stat',
+            children: [
+              el('span', { class: 'chip', text: q.kode }),
+              el('span', { text: `🎯 ${q.persenBenarPertama}% benar langsung` }),
+              el('span', { text: `🔥 ${q.rataPercobaan} percobaan` }),
+              el('span', { text: `👥 ${q.dijawab}` }),
+            ],
+          }),
+          el('p', { text: q.prompt }),
+          q.salahTerbanyak
+            ? el('p', { class: 'miskonsepsi', text: `⚠️ ${q.salahTerbanyak.persen}% sempat memilih "${q.salahTerbanyak.teks}"` })
+            : el('p', { class: 'muted kecil-teks', text: 'Tidak ada pilihan salah yang menonjol.' }),
+          el('p', { class: 'muted kecil-teks', text: `Indikator: ${q.indikator}` }),
+        ],
+      }),
+    ),
+  ];
+}
+
+function detailSiswa(s: RosterSiswa): HTMLElement {
+  const p = s.progress;
+  const baris = URUTAN_BALAI.map((k) => {
+    const c = CERITA.find((x) => x.kode === k);
+    const jawab = (p.jawaban ?? []).filter((j) => j.k === k && !j.q.startsWith('final'));
+    const st = statusBalai(p, k);
+    return el('tr', {
+      children: [
+        el('td', { text: `${c?.urutan}. ${c?.judulBab ?? k}` }),
+        el('td', { text: LABEL_STATUS[st].ikon }),
+        el('td', { text: '⭐'.repeat(p.bintang?.[k] ?? 0) || '-' }),
+        el('td', { text: p.bacaan?.[k] ? `${Math.round(p.bacaan[k]?.detik ?? 0)} dtk` : '-' }),
+        el('td', { text: jawab.length ? `${jawab.filter((j) => j.b).length}/${jawab.length}` : '-' }),
+      ],
+    });
+  });
+  const tabel = el('div', {
+    class: 'tabel-gulir',
+    children: [
+      el('table', {
+        class: 'matriks detail',
+        children: [
+          el('thead', { children: [el('tr', { children: ['Bab', 'Status', 'Bintang', 'Baca', 'Benar'].map((h) => el('th', { text: h })) })] }),
+          el('tbody', { children: baris }),
+        ],
+      }),
+    ],
+  });
+  const final = (p.finalBagian ?? []).reduce((a, b) => a + b, 0);
+  return el('div', {
+    class: 'card',
+    children: [
+      el('h3', { text: `${s.gender === 'perempuan' ? '👧' : '👦'} ${s.nama}` }),
+      el('p', { class: 'muted', text: `Alat ${p.alat ?? 0}/11 · Final ${final}/30 · ${p.puncakLulus ? 'Mercusuar menyala ✅' : 'Belum lulus Final'}` }),
+      tabel,
+      el('span', { class: 'label-kecil', text: '💡 Rekomendasi' }),
+      el('ul', { class: 'tujuan', children: rekomendasi(p).map((r) => el('li', { text: r })) }),
+    ],
+  });
 }
 
 /* ------------------------------------------------------------------ */
@@ -336,7 +494,7 @@ function hapusTokenGuru(): void {
 /* ------------------------------------------------------------------ */
 
 function eksporCsv(siswa: RosterSiswa[], token: string): void {
-  const kepala = ['nama', 'gender', 'online', 'noktah', 'total_bintang', 'total_benar', 'total_soal', 'persen_benar', 'jumlah_salah', 'puncak_lulus', 'terakhir_dilihat'];
+  const kepala = ['nama', 'gender', 'online', 'posisi', 'alat', 'total_bintang', 'total_benar', 'total_soal', 'persen_benar', 'jumlah_salah', 'final_benar', 'final_lulus', 'terakhir_dilihat', ...kepalaCsvBalai()];
   const baris = siswa.map((s) => {
     const p = s.progress;
     const bintang = Object.values(p.bintang ?? {}).reduce<number>((a, b) => a + b, 0);
@@ -346,21 +504,42 @@ function eksporCsv(siswa: RosterSiswa[], token: string): void {
       s.gender,
       s.online ? 'ya' : 'tidak',
       p.noktah ?? 'peta',
+      String(p.alat ?? 0),
       String(bintang),
       String(p.totalBenar ?? 0),
       String(p.totalSoal ?? 0),
       String(persen),
       String(p.soalSalah?.length ?? 0),
+      String((p.finalBagian ?? []).reduce((a, b) => a + b, 0)),
       p.puncakLulus ? 'ya' : 'tidak',
       s.lastSeen,
+      ...barisCsvSiswa(s),
     ];
   });
-  const csv = [kepala, ...baris].map((r) => r.map(selCsv).join(',')).join('\r\n');
+  unduhCsv([kepala, ...baris], `progres-kelas-${token}-${new Date().toISOString().slice(0, 10)}.csv`);
+}
+
+/** Satu baris per jawaban siswa: cocok untuk analisis butir soal. */
+function eksporCsvJawaban(siswa: RosterSiswa[], token: string): void {
+  const bank = getQuestionBank();
+  const kepala = ['nama', 'id_soal', 'kode_materi', 'indikator', 'level_kognitif', 'benar', 'percobaan', 'pilihan_berurutan', 'kunci'];
+  const baris: string[][] = [];
+  for (const s of siswa) {
+    for (const j of s.progress.jawaban ?? []) {
+      const q = bank.find((x) => x.id === j.q);
+      baris.push([s.nama, j.q, j.k, q?.meta.indikator ?? '', q?.meta.levelKognitif ?? '', j.b ? 'ya' : 'tidak', String(j.n), j.p.join(' | '), String(q?.answer ?? '')]);
+    }
+  }
+  unduhCsv([kepala, ...baris], `jawaban-kelas-${token}-${new Date().toISOString().slice(0, 10)}.csv`);
+}
+
+function unduhCsv(data: string[][], namaBerkas: string): void {
+  const csv = data.map((r) => r.map(selCsv).join(',')).join('\r\n');
   const blob = new Blob([`\uFEFF${csv}`], { type: 'text/csv;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `progres-kelas-${token}-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.download = namaBerkas;
   document.body.append(a);
   a.click();
   a.remove();

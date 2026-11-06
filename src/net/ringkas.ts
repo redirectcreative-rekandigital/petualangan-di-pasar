@@ -44,5 +44,19 @@ export function ringkasProgres(progress: Progress, noktah: NoktahId | null = nul
     puncakLulus: progress.puncakLulus,
     soalSalah,
     diubahPada: new Date().toISOString(),
+    tahap: Object.fromEntries(
+      Object.keys(progress.balai).map((k) => [k, progress.balai[k] && progress.balai[k].stars > 0 ? 3 : (progress.misi?.[k] ?? 0)]),
+    ),
+    alat: progress.alat?.length ?? 0,
+    bacaan: progress.bacaan ?? {},
+    // Batasi 400 jawaban terakhir agar pesan tetap kecil.
+    jawaban: progress.answers.slice(-400).map((a) => ({
+      q: a.questionId,
+      k: a.kodeMateri,
+      b: a.correct,
+      p: a.pilihan ?? [],
+      n: a.percobaan ?? (a.correct ? 1 : 3),
+    })),
+    finalBagian: progress.finalBagian ?? [],
   };
 }

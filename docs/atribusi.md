@@ -1,20 +1,23 @@
 # Daftar Atribusi Aset
 
-Seluruh aset dan soal pada **Petualangan di Pasar** dibuat sendiri oleh penulis. Tidak ada
+Seluruh aset dan soal pada **Survival Sains** dibuat sendiri oleh penulis. Tidak ada
 aset gambar, model 3D, atau suara yang diunduh dari pihak ketiga.
 
 ## Aset Buatan Sendiri
 
 | Aset | Cara dibuat |
 | --- | --- |
-| Peta besar 3D & dunia noktah 3D (16 noktah, balai, atap zona, papan nama, pagar, pohon, peti, lantai zona) | Kode Three.js memakai bentuk dasar (kubus, kapsul, bola, kerucut, silinder) |
-| Karakter pemain & NPC penjaga balai | Bentuk dasar Three.js |
-| Papan nama balai & lencana kode TKA | Tekstur digambar di kanvas (`CanvasTexture`) |
-| Diagram batang & tabel | SVG dan HTML/CSS buatan sendiri |
-| Ikon aplikasi (favicon, PWA) | SVG ditulis sendiri dan PNG dibuat lewat skrip `scripts/gen-icons.mjs` |
+| Peta pulau 3D & dunia 11 balai (rumah, tempat uji, obor, gapura, jalan setapak, kabut) | Kode Three.js memakai bentuk dasar (kubus, kapsul, bola, kerucut, silinder) |
+| Ilustrasi Halaman Cerita (44 adegan) & cutscene | SVG/CSS ditulis sendiri dengan emoji bawaan sistem |
+| Naskah cerita, dialog 9 penjaga & cantrik | Ditulis bersama AI, diperiksa dan disetujui penulis |
+| Narasi suara | Suara TTS bawaan perangkat (Web Speech API), tanpa berkas audio |
+| Karakter pemain, 9 penjaga, dan cantrik | Bentuk dasar Three.js |
+| Papan nama balai & lencana kode materi | Tekstur digambar di kanvas (`CanvasTexture`) |
+| Diagram materi interaktif (mata, telinga, magnet, siklus air, dll.) | HTML/CSS buatan sendiri dengan ikon emoji |
+| Sampul, ikon aplikasi, latar cutscene, potret 9 penjaga & 11 cantrik | Dibuat penulis dengan Gemini (AI) memakai prompt sendiri, lalu dikecilkan untuk HP |
 | Efek suara | Disintesis langsung dengan Web Audio API (tanpa berkas audio) |
 | Ikon emoji pada antarmuka | Emoji bawaan sistem operasi/peramban |
-| Soal, bacaan materi, dan pembahasan | Ditulis sendiri, semua kunci diverifikasi manual |
+| Soal, materi, diagram, dan pembahasan | Ditulis sendiri, semua kunci diverifikasi manual |
 
 ## Pustaka Pihak Ketiga (perangkat lunak, bukan aset seni)
 

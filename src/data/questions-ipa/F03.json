@@ -1,0 +1,262 @@
+[
+  {
+    "id": "b07-s01",
+    "balai": "F03",
+    "type": "mcq",
+    "prompt": "Benda berikut yang dapat ditarik oleh magnet adalah ....",
+    "options": [
+      "penghapus karet",
+      "paku besi",
+      "kertas",
+      "gelas kaca"
+    ],
+    "answer": "paku besi",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"paku besi\".",
+    "explanation": [
+      "Kunci: paku besi.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Mengenal konsep dasar: Benda berikut yang dapat ditarik oleh magnet adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b07-s02",
+    "balai": "F03",
+    "type": "mcq",
+    "prompt": "Bagian magnet yang memiliki gaya tarik paling kuat adalah ....",
+    "options": [
+      "tengah magnet",
+      "samping magnet",
+      "seluruh bagian sama kuat",
+      "kutub-kutub magnet"
+    ],
+    "answer": "kutub-kutub magnet",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"kutub-kutub magnet\".",
+    "explanation": [
+      "Kunci: kutub-kutub magnet.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Mengenal konsep dasar: Bagian magnet yang memiliki gaya tarik paling kuat adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b07-s03",
+    "balai": "F03",
+    "type": "mcq",
+    "prompt": "Jika dua kutub magnet yang sama (senama) didekatkan, maka keduanya akan ....",
+    "options": [
+      "tolak-menolak",
+      "tarik-menarik",
+      "diam saja",
+      "menyatu"
+    ],
+    "answer": "tolak-menolak",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"tolak-menolak\".",
+    "explanation": [
+      "Kunci: tolak-menolak.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Mengenal konsep dasar: Jika dua kutub magnet yang sama (senama) didekatkan, maka keduanya akan",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b07-s04",
+    "balai": "F03",
+    "type": "mcq",
+    "prompt": "Kutub utara magnet A didekatkan ke kutub selatan magnet B. Maka kedua magnet akan ....",
+    "options": [
+      "saling menjauh",
+      "tidak terjadi apa-apa",
+      "saling tarik-menarik",
+      "terbelah"
+    ],
+    "answer": "saling tarik-menarik",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"saling tarik-menarik\".",
+    "explanation": [
+      "Kunci: saling tarik-menarik.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Menerapkan konsep pada situasi: Kutub utara magnet A didekatkan ke kutub selatan magnet B. Maka kedua magnet akan",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b07-s05",
+    "balai": "F03",
+    "type": "mcq",
+    "prompt": "Batu magnet (magnetit) termasuk jenis magnet ....",
+    "options": [
+      "buatan",
+      "alam",
+      "listrik",
+      "sementara"
+    ],
+    "answer": "alam",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"alam\".",
+    "explanation": [
+      "Kunci: alam.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Menerapkan konsep pada situasi: Batu magnet (magnetit) termasuk jenis magnet",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b07-s06",
+    "balai": "F03",
+    "type": "mcq",
+    "prompt": "Kompas memanfaatkan sifat magnet yang dapat ....",
+    "options": [
+      "menunjuk arah utara–selatan",
+      "menarik semua logam",
+      "menyala dalam gelap",
+      "menghantarkan listrik"
+    ],
+    "answer": "menunjuk arah utara–selatan",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"menunjuk arah utara–selatan\".",
+    "explanation": [
+      "Kunci: menunjuk arah utara–selatan.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Menerapkan konsep pada situasi: Kompas memanfaatkan sifat magnet yang dapat",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b07-s07",
+    "balai": "F03",
+    "type": "mcq",
+    "prompt": "Benda yang memanfaatkan magnet adalah ....",
+    "options": [
+      "sendok kayu",
+      "payung",
+      "gunting kain",
+      "pintu kulkas"
+    ],
+    "answer": "pintu kulkas",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"pintu kulkas\".",
+    "explanation": [
+      "Kunci: pintu kulkas.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Menerapkan konsep pada situasi: Benda yang memanfaatkan magnet adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b07-s08",
+    "balai": "F03",
+    "type": "mcq",
+    "prompt": "Membuat magnet dengan cara mendekatkan atau menempelkan besi pada magnet kuat tanpa digosok disebut ....",
+    "options": [
+      "menggosok",
+      "elektromagnetik",
+      "induksi",
+      "pemanasan"
+    ],
+    "answer": "induksi",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"induksi\".",
+    "explanation": [
+      "Kunci: induksi.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Menganalisis/menyimpulkan: Membuat magnet dengan cara mendekatkan atau menempelkan besi pada magnet kuat tanpa digosok disebut",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b07-s09",
+    "balai": "F03",
+    "type": "mcq",
+    "prompt": "Kawat tembaga berisolasi dililitkan pada paku besi lalu dihubungkan dengan baterai sehingga paku dapat menarik klip kertas. Cara membuat magnet seperti ini disebut ....",
+    "options": [
+      "induksi",
+      "elektromagnetik",
+      "menggosok",
+      "pemanasan"
+    ],
+    "answer": "elektromagnetik",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"elektromagnetik\".",
+    "explanation": [
+      "Kunci: elektromagnetik.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Menganalisis/menyimpulkan: Kawat tembaga berisolasi dililitkan pada paku besi lalu dihubungkan dengan baterai sehingga paku dapat menarik klip kertas. Cara membuat magnet seperti ini disebut",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b07-s10",
+    "balai": "F03",
+    "type": "mcq",
+    "prompt": "Agar jarum baja menjadi magnet dengan cara menggosok, magnet harus digosokkan ....",
+    "options": [
+      "ke satu arah secara berulang-ulang",
+      "bolak-balik dengan cepat",
+      "dengan cara memutar",
+      "sambil dipukul-pukul"
+    ],
+    "answer": "ke satu arah secara berulang-ulang",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"ke satu arah secara berulang-ulang\".",
+    "explanation": [
+      "Kunci: ke satu arah secara berulang-ulang.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Menganalisis/menyimpulkan: Agar jarum baja menjadi magnet dengan cara menggosok, magnet harus digosokkan",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

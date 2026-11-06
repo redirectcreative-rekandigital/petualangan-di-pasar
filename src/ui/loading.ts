@@ -14,13 +14,15 @@ export interface LoadingOptions {
 }
 
 const TIPS: string[] = [
-  'Tahukah kamu? FPB dipakai untuk membagi barang sama rata.',
-  'Tahukah kamu? Luas persegi panjang = panjang × lebar.',
-  'Tahukah kamu? 1 liter sama dengan 1.000 mililiter.',
-  'Tahukah kamu? Persen artinya "per seratus".',
-  'Tahukah kamu? Kecepatan = jarak ÷ waktu.',
-  'Tahukah kamu? Diagram batang memudahkan membandingkan data.',
-];
+  'Tahukah kamu? Cahaya merambat lurus dan bisa dipantulkan cermin.',
+  'Tahukah kamu? Bunyi tidak dapat merambat di ruang hampa.',
+  'Tahukah kamu? Semua energi dalam rantai makanan berawal dari matahari.',
+  'Tahukah kamu? Lebah dan bunga saling menguntungkan (mutualisme).',
+  'Tahukah kamu? Kutub magnet yang sama saling tolak-menolak.',
+  'Tahukah kamu? Pada rangkaian paralel, satu lampu putus yang lain tetap menyala.',
+  'Tahukah kamu? Awan dan hujan terjadi di lapisan troposfer.',
+  'Saat gempa, lindungi kepala dan berlindunglah di bawah meja yang kuat.',
+]; 
 
 /** Menampilkan overlay loading singkat lalu memanggil `onSelesai`. */
 export function showLoading(root: HTMLElement, options: LoadingOptions, onSelesai: () => void): void {
@@ -34,7 +36,7 @@ export function showLoading(root: HTMLElement, options: LoadingOptions, onSelesa
       el('div', {
         class: 'loading-box',
         children: [
-          el('div', { class: 'loading-logo', text: '🏘️', attrs: { 'aria-hidden': 'true' } }),
+          el('div', { class: 'loading-logo', text: '🏝️', attrs: { 'aria-hidden': 'true' } }),
           el('div', { class: 'spinner', attrs: { 'aria-hidden': 'true' } }),
           el('p', { class: 'loading-pesan', text: options.pesan }),
           el('p', { class: 'loading-tip muted', text: tip }),

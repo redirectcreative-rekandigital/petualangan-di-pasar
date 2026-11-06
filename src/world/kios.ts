@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 
 /**
- * Kios pasar low-poly prosedural (tanpa model unduhan).
+ * Kios peta low-poly prosedural (tanpa model unduhan).
  *
  * Bentuknya dibuat lebih hidup daripada sekadar kotak + kerucut:
  *   - lantai batu bata,
@@ -18,16 +18,20 @@ import * as THREE from 'three';
 export interface KiosOpsi {
   /** Warna elemen (atap, lis, bendera). */
   warna: number;
-  /** Kios Pasar Ramai: lebih besar, ada gapura & lampu lebih banyak. */
+  /** Kios Menara Kitab: lebih besar, ada gapura & lampu lebih banyak. */
   meriah?: boolean;
   /** Skala seragam tambahan. */
   skala?: number;
+  /** Tanpa palang/counter depan (dipakai balai di dalam noktah). */
+  tanpaPalang?: boolean;
 }
 
 export interface KiosBundle {
   group: THREE.Group;
   /** Titik tempat NPC berdiri (di belakang counter). */
   titikNpc: THREE.Vector3;
+  /** Setengah kedalaman kios (untuk memasang papan nama di dinding depan). */
+  dalam: number;
   /** Y puncak atap, untuk memasang papan nama/lencana. */
   tinggiAtap: number;
 }
@@ -63,15 +67,17 @@ export function buatKios(opsi: KiosOpsi, track: Track): KiosBundle {
   g.add(lantai);
 
   // --- Counter depan + papan bergaris ---
-  const counterGeo = track(new THREE.BoxGeometry(L, 0.95, 0.7));
-  const counter = new THREE.Mesh(counterGeo, mKayu);
-  counter.position.set(0, 0.62, D / 2 - 0.3);
-  g.add(counter);
+  if (!opsi.tanpaPalang) {
+    const counterGeo = track(new THREE.BoxGeometry(L, 0.95, 0.7));
+    const counter = new THREE.Mesh(counterGeo, mKayu);
+    counter.position.set(0, 0.62, D / 2 - 0.3);
+    g.add(counter);
 
-  const papanGeo = track(new THREE.BoxGeometry(L - 0.2, 0.5, 0.06));
-  const papan = new THREE.Mesh(papanGeo, mKayuMuda);
-  papan.position.set(0, 0.55, D / 2 + 0.07);
-  g.add(papan);
+    const papanGeo = track(new THREE.BoxGeometry(L - 0.2, 0.5, 0.06));
+    const papan = new THREE.Mesh(papanGeo, mKayuMuda);
+    papan.position.set(0, 0.55, D / 2 + 0.07);
+    g.add(papan);
+  }
 
   // --- Tiang sudut ---
   const tiangGeo = track(new THREE.BoxGeometry(0.2, tiangTinggi, 0.2));
@@ -184,6 +190,7 @@ export function buatKios(opsi: KiosOpsi, track: Track): KiosBundle {
   return {
     group: g,
     titikNpc: new THREE.Vector3(0, 0, D / 2 - 1.4).multiplyScalar(skala),
+    dalam: D / 2,
     tinggiAtap: (yAtap + 1.9) * skala,
   };
 }

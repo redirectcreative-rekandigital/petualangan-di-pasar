@@ -1,0 +1,262 @@
+[
+  {
+    "id": "b03-s01",
+    "balai": "H01",
+    "type": "mcq",
+    "prompt": "Hubungan timbal balik antara makhluk hidup dan lingkungannya disebut ....",
+    "options": [
+      "populasi",
+      "komunitas",
+      "ekosistem",
+      "habitat"
+    ],
+    "answer": "ekosistem",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"ekosistem\".",
+    "explanation": [
+      "Kunci: ekosistem.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Mengenal konsep dasar: Hubungan timbal balik antara makhluk hidup dan lingkungannya disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b03-s02",
+    "balai": "H01",
+    "type": "mcq",
+    "prompt": "Berikut ini yang termasuk komponen biotik adalah ....",
+    "options": [
+      "tanah",
+      "cahaya matahari",
+      "udara",
+      "jamur"
+    ],
+    "answer": "jamur",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"jamur\".",
+    "explanation": [
+      "Kunci: jamur.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Mengenal konsep dasar: Berikut ini yang termasuk komponen biotik adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b03-s03",
+    "balai": "H01",
+    "type": "mcq",
+    "prompt": "Berikut ini yang termasuk komponen abiotik adalah ....",
+    "options": [
+      "suhu",
+      "bakteri",
+      "rumput",
+      "cacing"
+    ],
+    "answer": "suhu",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"suhu\".",
+    "explanation": [
+      "Kunci: suhu.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Mengenal konsep dasar: Berikut ini yang termasuk komponen abiotik adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b03-s04",
+    "balai": "H01",
+    "type": "mcq",
+    "prompt": "Tumbuhan hijau disebut produsen karena dapat membuat makanan sendiri melalui proses ....",
+    "options": [
+      "pernapasan",
+      "fotosintesis",
+      "penguapan",
+      "pencernaan"
+    ],
+    "answer": "fotosintesis",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"fotosintesis\".",
+    "explanation": [
+      "Kunci: fotosintesis.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Menerapkan konsep pada situasi: Tumbuhan hijau disebut produsen karena dapat membuat makanan sendiri melalui proses",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b03-s05",
+    "balai": "H01",
+    "type": "mcq",
+    "prompt": "Makhluk hidup yang bertugas menguraikan sisa makhluk hidup yang telah mati adalah ....",
+    "options": [
+      "produsen",
+      "konsumen",
+      "pengurai",
+      "herbivora"
+    ],
+    "answer": "pengurai",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"pengurai\".",
+    "explanation": [
+      "Kunci: pengurai.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Menerapkan konsep pada situasi: Makhluk hidup yang bertugas menguraikan sisa makhluk hidup yang telah mati adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b03-s06",
+    "balai": "H01",
+    "type": "mcq",
+    "prompt": "Hewan berikut yang termasuk herbivora adalah ....",
+    "options": [
+      "kelinci",
+      "harimau",
+      "elang",
+      "ular"
+    ],
+    "answer": "kelinci",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"kelinci\".",
+    "explanation": [
+      "Kunci: kelinci.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Menerapkan konsep pada situasi: Hewan berikut yang termasuk herbivora adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b03-s07",
+    "balai": "H01",
+    "type": "mcq",
+    "prompt": "Kelompok hewan yang semuanya karnivora adalah ....",
+    "options": [
+      "sapi, kambing, dan kelinci",
+      "singa, harimau, dan elang",
+      "ayam, bebek, dan tikus",
+      "kerbau, kuda, dan zebra"
+    ],
+    "answer": "singa, harimau, dan elang",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"singa, harimau, dan elang\".",
+    "explanation": [
+      "Kunci: singa, harimau, dan elang.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Menerapkan konsep pada situasi: Kelompok hewan yang semuanya karnivora adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b03-s08",
+    "balai": "H01",
+    "type": "mcq",
+    "prompt": "Ayam dan bebek termasuk omnivora karena ....",
+    "options": [
+      "hanya makan daging",
+      "hanya makan rumput",
+      "makan biji-bijian dan serangga atau cacing",
+      "hanya makan serangga"
+    ],
+    "answer": "makan biji-bijian dan serangga atau cacing",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"makan biji-bijian dan serangga atau cacing\".",
+    "explanation": [
+      "Kunci: makan biji-bijian dan serangga atau cacing.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Menganalisis/menyimpulkan: Ayam dan bebek termasuk omnivora karena",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b03-s09",
+    "balai": "H01",
+    "type": "mcq",
+    "prompt": "Hewan pemakan serangga disebut insektivora. Contohnya adalah ....",
+    "options": [
+      "sapi",
+      "singa",
+      "kambing",
+      "katak"
+    ],
+    "answer": "katak",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"katak\".",
+    "explanation": [
+      "Kunci: katak.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Menganalisis/menyimpulkan: Hewan pemakan serangga disebut insektivora. Contohnya adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b03-s10",
+    "balai": "H01",
+    "type": "mcq",
+    "prompt": "Contoh ekosistem buatan adalah ....",
+    "options": [
+      "akuarium",
+      "hutan",
+      "danau",
+      "laut"
+    ],
+    "answer": "akuarium",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"akuarium\".",
+    "explanation": [
+      "Kunci: akuarium.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Menganalisis/menyimpulkan: Contoh ekosistem buatan adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

@@ -9,6 +9,8 @@ export interface CameraController {
   camera: THREE.PerspectiveCamera;
   /** Menggeser kamera (orbit) dari input drag. */
   orbit: (deltaYaw: number, deltaPitch: number) => void;
+  /** Menghadapkan kamera ke suatu arah (radian). */
+  setYaw: (yaw: number) => void;
   /** Memperbarui posisi kamera mengikuti target tiap frame. */
   update: (target: THREE.Vector3, dt: number) => void;
   /** Mengatur sudut awal. */
@@ -20,15 +22,19 @@ const MIN_PITCH = -0.15;
 const MAX_PITCH = 0.95;
 
 export function createCameraController(camera: THREE.PerspectiveCamera): CameraController {
-  let yaw = Math.PI; // menghadap dari selatan ke tengah pasar
-  let pitch = 0.5;
-  const distance = 9;
-  const height = 3.4;
+  let yaw = 0; // kamera di utara pemain, menghadap balai di selatan
+  let pitch = 0.42;
+  const distance = 12.5;
+  const height = 3.2;
   const current = new THREE.Vector3(0, 8, 16);
 
   const orbit = (deltaYaw: number, deltaPitch: number): void => {
     yaw -= deltaYaw;
     pitch = Math.max(MIN_PITCH, Math.min(MAX_PITCH, pitch + deltaPitch));
+  };
+
+  const setYaw = (nilai: number): void => {
+    yaw = nilai;
   };
 
   const update = (target: THREE.Vector3, dt: number): void => {
@@ -51,13 +57,13 @@ export function createCameraController(camera: THREE.PerspectiveCamera): CameraC
   };
 
   const reset = (): void => {
-    yaw = Math.PI;
-    pitch = 0.5;
+    yaw = 0;
+    pitch = 0.3;
   };
 
   const dispose = (): void => {
     /* tidak ada sumber daya GPU yang perlu dibersihkan */
   };
 
-  return { camera, orbit, update, reset, dispose };
+  return { camera, orbit, setYaw, update, reset, dispose };
 }

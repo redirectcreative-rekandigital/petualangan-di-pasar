@@ -1,85 +1,41 @@
 import { describe, it, expect } from 'vitest';
-import { checkAnswer, checkReason, parseNumber, starsForCorrect, shuffle, pickQuestions } from '../src/core/scoring';
+import { checkAnswer, starsForCorrect, shuffle, pickQuestions } from '../src/core/scoring';
 import type { Question } from '../shared/types';
 
 const meta = {
-  kodeMateri: 'B02' as const,
-  elemen: 'Bilangan' as const,
-  submateri: 'Operasi bilangan cacah',
-  indikator: 'Menghitung',
-  levelKognitif: 'Penerapan' as const,
-  tingkatKesulitan: 'Sedang' as const,
+  kodeMateri: 'F01' as const,
+  elemen: 'Fisika' as const,
+  submateri: 'Sifat cahaya',
+  indikator: 'Mengenal sifat cahaya',
+  levelKognitif: 'Pemahaman' as const,
+  tingkatKesulitan: 'Mudah' as const,
 };
 
 const q = (partial: Partial<Question>): Question => ({
   id: 'X',
-  balai: 'B01',
-  type: 'number',
+  balai: 'F01',
+  type: 'mcq',
   prompt: 'p',
-  answer: 0,
+  options: ['a', 'b'],
+  answer: 'a',
   hint: 'h',
   explanation: ['e'],
   meta,
   ...partial,
 });
 
-describe('checkAnswer - number', () => {
-  it('menerima angka yang tepat', () => {
-    expect(checkAnswer(q({ type: 'number', answer: 6500 }), 6500)).toBe(true);
+describe('checkAnswer (pilihan ganda)', () => {
+  it('menerima kunci yang tepat', () => {
+    expect(checkAnswer(q({ answer: 'lurus' }), 'lurus')).toBe(true);
   });
-  it('menerima teks angka dengan titik ribuan', () => {
-    expect(checkAnswer(q({ type: 'number', answer: 6500 }), '6.500')).toBe(true);
+  it('cocok tanpa peduli besar/kecil huruf dan spasi', () => {
+    expect(checkAnswer(q({ answer: 'Kamis' }), ' kamis ')).toBe(true);
   });
   it('menolak jawaban salah', () => {
-    expect(checkAnswer(q({ type: 'number', answer: 6500 }), 6000)).toBe(false);
+    expect(checkAnswer(q({ answer: 'lurus' }), 'lengkung')).toBe(false);
   });
 });
 
-describe('checkAnswer - mcq', () => {
-  it('cocok tanpa peduli besar/kecil huruf dan spasi', () => {
-    expect(checkAnswer(q({ type: 'mcq', answer: 'Kamis', options: ['Senin', 'Kamis'] }), ' kamis ')).toBe(true);
-  });
-});
-
-describe('checkAnswer - mcq-complex', () => {
-  const kompleks = q({ type: 'mcq-complex', answer: ['2/4', '3/6'], options: ['2/4', '3/6', '4/6'] });
-
-  it('benar bila semua kunci dipilih, tanpa pilihan salah', () => {
-    expect(checkAnswer(kompleks, ['2/4', '3/6'])).toBe(true);
-    expect(checkAnswer(kompleks, ['3/6', '2/4'])).toBe(true);
-  });
-  it('salah bila ada kunci yang belum dipilih', () => {
-    expect(checkAnswer(kompleks, ['2/4'])).toBe(false);
-  });
-  it('salah bila memilih opsi yang salah', () => {
-    expect(checkAnswer(kompleks, ['2/4', '3/6', '4/6'])).toBe(false);
-  });
-});
-
-describe('checkAnswer - money-drag', () => {
-  it('benar jika total uang sama dengan target', () => {
-    expect(checkAnswer(q({ type: 'money-drag', answer: 4500, moneyTarget: 4500 }), [2000, 2000, 500])).toBe(true);
-  });
-  it('salah jika total tidak sama', () => {
-    expect(checkAnswer(q({ type: 'money-drag', answer: 4500, moneyTarget: 4500 }), [2000, 2000])).toBe(false);
-  });
-});
-
-describe('checkReason', () => {
-  it('mencocokkan alasan yang sama', () => {
-    const question = q({ type: 'tf-reason', answer: 'Salah', reasonAnswer: 'Karena harga akhir lebih murah' });
-    expect(checkReason(question, 'karena harga akhir lebih murah')).toBe(true);
-  });
-});
-
-describe('parseNumber', () => {
-  it('membersihkan awalan Rp dan titik', () => {
-    expect(parseNumber('Rp13.500')).toBe(13500);
-  });
-  it('mengembalikan null untuk teks kosong', () => {
-    expect(parseNumber('   ')).toBeNull();
-  });
-});
 
 describe('starsForCorrect (per balai: 3 soal)', () => {
   it('3 benar = 3 bintang', () => expect(starsForCorrect(3)).toBe(3));
@@ -93,11 +49,11 @@ describe('shuffle & pickQuestions', () => {
     expect(shuffle([1, 2, 3, 4])).toHaveLength(4);
   });
   it('pickQuestions mengambil sejumlah yang diminta', () => {
-    const pool = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => q({ id: `B01-0${n}` }));
+    const pool = [1, 2, 3, 4, 5, 6, 7, 8].map((n) => q({ id: `F01-0${n}` }));
     expect(pickQuestions(pool, 3)).toHaveLength(3);
   });
   it('pickQuestions tidak melebihi isi pool', () => {
-    const pool = [1, 2].map((n) => q({ id: `B01-0${n}` }));
+    const pool = [1, 2].map((n) => q({ id: `F01-0${n}` }));
     expect(pickQuestions(pool, 5)).toHaveLength(2);
   });
 });

@@ -2,38 +2,36 @@
  * Tipe bersama (dipakai engine, layar, dan bank soal).
  * Salinan TS dari skema zod di src/data/schema.ts.
  *
- * Versi 4: struktur "peta noktah + balai".
+ * Versi 5: struktur "kitab noktah + balai" untuk game IPA Kelas 5 SD/MI
+ * "Survival Sains".
  *
- * - Peta besar menampilkan N-OKTAH: satu noktah per kode materi TKA (B01..D02).
- * - Tiap noktah punya 1..beberapa BALAI (sub-materi/rumah) di dalamnya. Setiap
- *   balai berisi soal-soal. Untuk saat ini tiap noktah berisi 1 balai.
- * - Satu noktah khusus (`FINAL`) untuk babak puncak "Pasar Ramai".
+ * - Peta besar berbentuk kitab berisi 11 NOKTAH materi IPA, dikelompokkan ke
+ *   3 zona (Makhluk Hidup `H`, Fisika `F`, Bumi `E`).
+ * - Tiap noktah punya 1 BALAI (rumah penjaga) di dalamnya. Setiap balai
+ *   memiliki 2 tokoh: Penjaga (misi/dialog) dan Tokoh Materi (membawakan
+ *   materi utuh) serta sebuah diagram interaktif.
+ * - Satu noktah khusus (`FINAL`) untuk babak puncak "Menara Kitab".
  */
 
-/** Kode materi pada peta TKA. */
+/** Kode materi pada peta: 11 noktah IPA (H=Makhluk Hidup, F=Fisika, E=Bumi). */
 export type MateriKode =
-  | 'B01'
-  | 'B02'
-  | 'B03'
-  | 'B04'
-  | 'B05'
-  | 'B06'
-  | 'G01'
-  | 'G02'
-  | 'G03'
-  | 'G04'
-  | 'G05'
-  | 'G06'
-  | 'G07'
-  | 'G08'
-  | 'D01'
-  | 'D02';
+  | 'H01'
+  | 'H02'
+  | 'H03'
+  | 'H04'
+  | 'F01'
+  | 'F02'
+  | 'F03'
+  | 'F04'
+  | 'E01'
+  | 'E02'
+  | 'E03';
 
 /** Jenis kelamin karakter yang dipilih pemain. */
 export type PlayerGender = 'laki-laki' | 'perempuan';
 
-/** Elemen peta TKA. */
-export type Elemen = 'Bilangan' | 'Geometri' | 'Data';
+/** Elemen (kelompok materi) pada peta kitab. */
+export type Elemen = 'Makhluk Hidup' | 'Fisika' | 'Bumi';
 
 /** Level kognitif untuk penyusunan soal. */
 export type LevelKognitif = 'Pemahaman' | 'Penerapan' | 'Penalaran';
@@ -42,18 +40,18 @@ export type TingkatKesulitan = 'Mudah' | 'Sedang' | 'Sulit';
 
 /**
  * Identitas belajar.
- * - `MateriKode`: satu noktah pada peta besar (materi TKA).
- * - `FINAL`: babak puncak "Pasar Ramai".
+ * - `MateriKode`: satu noktah pada peta besar.
+ * - `FINAL`: babak puncak "Menara Kitab".
  *
- * `BalaiId` kini menunjuk pada **satu balai (sub-materi)** di dalam sebuah
- * noktah. Karena untuk saat ini satu noktah berisi satu balai, id balai sama
- * dengan kode materinya (mis. 'B02'). Bila nanti satu noktah berisi beberapa
- * balai, id balai memakai pola `KODE-1`, `KODE-2`, dst.
+ * `BalaiId` menunjuk pada **satu balai (rumah penjaga)** di dalam sebuah
+ * noktah. Karena satu noktah berisi satu balai, id balai sama dengan kode
+ * materinya (mis. 'F01').
  */
 export type NoktahId = MateriKode | 'FINAL';
 export type BalaiId = NoktahId | string;
 
-export type QuestionType = 'mcq' | 'mcq-complex' | 'number' | 'tf-reason' | 'money-drag';
+/** Semua soal berjenis pilihan ganda (A–D). */
+export type QuestionType = 'mcq';
 
 export interface QuestionData {
   kind: 'table' | 'bar' | 'picture';
@@ -80,48 +78,74 @@ export interface Question {
   prompt: string;
   /** Data tabel/diagram/piktogram pendukung. */
   data?: QuestionData;
-  /** Pilihan untuk tipe mcq / mcq-complex. */
+  /** Pilihan untuk tipe mcq (A–D). */
   options?: string[];
-  /**
-   * Kunci jawaban utama:
-   * - mcq: string (teks opsi benar)
-   * - mcq-complex: string[] (semua teks opsi benar)
-   * - number: number
-   * - tf-reason: 'Benar' | 'Salah'
-   * - money-drag: number (total kembalian)
-   */
+  /** Kunci jawaban: teks opsi benar. */
   answer: number | string | string[];
-  /** Untuk money-drag: nilai total kembalian yang harus disusun. */
-  moneyTarget?: number;
-  /** Tahap alasan pada tipe tf-reason. */
-  reasonOptions?: string[];
-  reasonAnswer?: string;
   hint: string;
   explanation: string[];
-  /** Satuan jawaban angka, mis. 'Rp' atau 'kg'. */
-  unit?: string;
   meta: QuestionMeta;
 }
 
-/** Definisi satu balai (rumah/sub-materi) di dalam sebuah noktah. */
+/** Satu poin materi berjudul (mis. "Merambat lurus" + penjelasan). */
+export interface MateriPoin {
+  /** Judul poin (mis. "Merambat lurus"). */
+  judul: string;
+  /** Penjelasan poin. */
+  teks: string;
+}
+
+/** Satu bagian pada diagram interaktif (mis. "Kornea"). */
+export interface DiagramBagian {
+  /** Nama bagian (label pada diagram). */
+  nama: string;
+  /** Fungsi bagian tersebut. */
+  fungsi: string;
+  /** Penanda posisi pada gambar SVG (opsional, dipakai komponen diagram). */
+  posisi?: { x: number; y: number };
+}
+
+/** Diagram materi interaktif milik sebuah balai. */
+export interface DiagramMateri {
+  /** Judul diagram (mis. "Bagian Mata dan Fungsinya"). */
+  judul: string;
+  /** Bentuk dasar diagram yang digambar secara prosedural. */
+  bentuk: string;
+  /** Bagian-bagian yang bisa diklik beserta fungsinya. */
+  bagian: DiagramBagian[];
+}
+
+/** Tokoh materi: NPC kedua yang membawakan materi utuh di balai. */
+export interface TokohMateri {
+  /** Nama tokoh (mis. "Profesor Prisma"). */
+  nama: string;
+  /** Kalimat pengantar sebelum materi ditampilkan. */
+  pengantar: string;
+}
+
+/** Definisi satu balai (rumah penjaga) di dalam sebuah noktah. */
 export interface BalaiMeta {
-  /** id balai; untuk saat ini sama dengan kode noktah (mis. 'B02'). */
+  /** id balai; sama dengan kode noktah (mis. 'F01'). */
   kode: BalaiId;
   /** Noktah induk tempat balai ini berada. */
   noktah: NoktahId;
-  /** Nama halus bergaya game (mis. "Balai Berbagi Adil"). */
+  /** Nama halus bergaya game (mis. "Balai Cahaya"). */
   nama: string;
-  /** Nama penjaga balai (mis. "Bu Jumlah"); menentukan sosok NPC. */
+  /** Nama penjaga (mis. "Bu Cahaya"); menentukan sosok NPC pertama. */
   penjaga: string;
-  /** Judul materi asli TKA (untuk bacaan & laporan guru). */
+  /** Kalimat dialog penjaga saat pemain mendekat. */
+  dialogPenjaga: string;
+  /** Tokoh materi (NPC kedua) pembawa materi utuh. */
+  tokohMateri: TokohMateri;
+  /** Judul materi asli (untuk bacaan & laporan guru). */
   materi: string;
   elemen: Elemen;
   /** Urutan di dalam noktahnya (0-based). */
   urutan: number;
-  /** Ringkasan bacaan 1 halaman ringkas (paragraf). */
-  bacaan: string[];
-  /** Contoh singkat yang dibahas di bacaan. */
-  contoh: string;
+  /** Poin-poin materi berjudul (diringkas dari materi MD). */
+  materiPoin: MateriPoin[];
+  /** Diagram interaktif balai ini. */
+  diagram: DiagramMateri;
   /** Pelajaran/mini-tips di akhir bacaan. */
   kunciJawab: string;
   soalPerMain: number;
@@ -158,6 +182,27 @@ export interface AnswerRecord {
   kodeMateri: MateriKode;
   correct: boolean;
   usedHint: boolean;
+  /** Urutan pilihan yang ditekan siswa untuk soal ini (salah dulu, lalu benar). */
+  pilihan?: string[];
+  /** Jumlah percobaan (obor) yang terpakai: 1..3. */
+  percobaan?: number;
+  /** Waktu menjawab (ISO). */
+  waktu?: string;
+}
+
+/**
+ * Tahap misi di sebuah balai:
+ * 0 = belum mulai, 1 = misi diterima dari Penjaga, 2 = Halaman Cerita selesai
+ * dibaca (Tempat Uji terbuka), 3 = tantangan lulus (alat survival didapat).
+ */
+export type TahapMisi = 0 | 1 | 2 | 3;
+
+/** Catatan membaca Halaman Cerita (untuk dasbor guru). */
+export interface CatatanBaca {
+  /** Total detik membaca. */
+  detik: number;
+  /** Berapa kali cerita dibuka ulang. */
+  ulang: number;
 }
 
 export interface Progress {
@@ -183,4 +228,14 @@ export interface Progress {
   completedAt?: string;
   /** Token kelas untuk mode multiplayer (kosong = singleplayer). */
   token?: string;
+  /** Prolog di balai pertama sudah ditonton. */
+  prologSelesai: boolean;
+  /** Tahap misi per kode balai. */
+  misi: Record<string, TahapMisi>;
+  /** Alat survival yang sudah didapat (kode balai asal). */
+  alat: string[];
+  /** Catatan membaca Halaman Cerita per kode balai. */
+  bacaan: Record<string, CatatanBaca>;
+  /** Jumlah benar terbaik per bagian Final (4 bagian). */
+  finalBagian: number[];
 }

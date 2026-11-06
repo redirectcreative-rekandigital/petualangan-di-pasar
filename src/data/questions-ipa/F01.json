@@ -1,0 +1,262 @@
+[
+  {
+    "id": "b01-s01",
+    "balai": "F01",
+    "type": "mcq",
+    "prompt": "Cahaya merambat dalam garis ....",
+    "options": [
+      "lengkung",
+      "lurus",
+      "zig-zag",
+      "melingkar"
+    ],
+    "answer": "lurus",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"lurus\".",
+    "explanation": [
+      "Kunci: lurus.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Mengenal konsep dasar: Cahaya merambat dalam garis",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b01-s02",
+    "balai": "F01",
+    "type": "mcq",
+    "prompt": "Benda yang sama sekali tidak dapat ditembus cahaya disebut benda ....",
+    "options": [
+      "transparan",
+      "translusen",
+      "opak",
+      "bening"
+    ],
+    "answer": "opak",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"opak\".",
+    "explanation": [
+      "Kunci: opak.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Mengenal konsep dasar: Benda yang sama sekali tidak dapat ditembus cahaya disebut benda",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b01-s03",
+    "balai": "F01",
+    "type": "mcq",
+    "prompt": "Pensil tampak patah ketika dimasukkan ke gelas berisi air. Peristiwa ini terjadi karena cahaya mengalami ....",
+    "options": [
+      "pemantulan",
+      "pembiasan",
+      "penyerapan",
+      "perambatan lurus"
+    ],
+    "answer": "pembiasan",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"pembiasan\".",
+    "explanation": [
+      "Kunci: pembiasan.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Mengenal konsep dasar: Pensil tampak patah ketika dimasukkan ke gelas berisi air. Peristiwa ini terjadi karena cahaya mengalami",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b01-s04",
+    "balai": "F01",
+    "type": "mcq",
+    "prompt": "Cermin yang digunakan sebagai spion kendaraan adalah cermin ....",
+    "options": [
+      "datar",
+      "cembung",
+      "cekung",
+      "kombinasi"
+    ],
+    "answer": "cembung",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"cembung\".",
+    "explanation": [
+      "Kunci: cembung.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Menerapkan konsep pada situasi: Cermin yang digunakan sebagai spion kendaraan adalah cermin",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b01-s05",
+    "balai": "F01",
+    "type": "mcq",
+    "prompt": "Lubang kecil di tengah iris yang mengatur banyak sedikitnya cahaya yang masuk ke mata disebut ....",
+    "options": [
+      "kornea",
+      "retina",
+      "pupil",
+      "saraf optik"
+    ],
+    "answer": "pupil",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"pupil\".",
+    "explanation": [
+      "Kunci: pupil.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Menerapkan konsep pada situasi: Lubang kecil di tengah iris yang mengatur banyak sedikitnya cahaya yang masuk ke mata disebut",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b01-s06",
+    "balai": "F01",
+    "type": "mcq",
+    "prompt": "Bayangan benda yang kita lihat jatuh pada ....",
+    "options": [
+      "retina",
+      "kornea",
+      "lensa",
+      "iris"
+    ],
+    "answer": "retina",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"retina\".",
+    "explanation": [
+      "Kunci: retina.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Menerapkan konsep pada situasi: Bayangan benda yang kita lihat jatuh pada",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b01-s07",
+    "balai": "F01",
+    "type": "mcq",
+    "prompt": "Penderita rabun jauh (miopi) dapat dibantu dengan kacamata berlensa ....",
+    "options": [
+      "cembung",
+      "datar",
+      "silinder",
+      "cekung"
+    ],
+    "answer": "cekung",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"cekung\".",
+    "explanation": [
+      "Kunci: cekung.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Menerapkan konsep pada situasi: Penderita rabun jauh (miopi) dapat dibantu dengan kacamata berlensa",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b01-s08",
+    "balai": "F01",
+    "type": "mcq",
+    "prompt": "Pelangi terjadi karena cahaya matahari mengalami ....",
+    "options": [
+      "pemantulan",
+      "penguraian",
+      "penyerapan",
+      "perambatan lurus"
+    ],
+    "answer": "penguraian",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"penguraian\".",
+    "explanation": [
+      "Kunci: penguraian.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Menganalisis/menyimpulkan: Pelangi terjadi karena cahaya matahari mengalami",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b01-s09",
+    "balai": "F01",
+    "type": "mcq",
+    "prompt": "Penyakit katarak terjadi karena kerusakan pada bagian mata yang disebut ....",
+    "options": [
+      "kornea",
+      "pupil",
+      "lensa",
+      "retina"
+    ],
+    "answer": "lensa",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"lensa\".",
+    "explanation": [
+      "Kunci: lensa.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Menganalisis/menyimpulkan: Penyakit katarak terjadi karena kerusakan pada bagian mata yang disebut",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b01-s10",
+    "balai": "F01",
+    "type": "mcq",
+    "prompt": "Kebiasaan yang baik untuk menjaga kesehatan mata adalah ....",
+    "options": [
+      "membaca sambil tiduran",
+      "menonton TV dari jarak sangat dekat",
+      "mengucek mata dengan tangan",
+      "memeriksakan mata rutin dan makan makanan kaya vitamin A"
+    ],
+    "answer": "memeriksakan mata rutin dan makan makanan kaya vitamin A",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"memeriksakan mata rutin dan makan makanan kaya vitamin A\".",
+    "explanation": [
+      "Kunci: memeriksakan mata rutin dan makan makanan kaya vitamin A.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Menganalisis/menyimpulkan: Kebiasaan yang baik untuk menjaga kesehatan mata adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

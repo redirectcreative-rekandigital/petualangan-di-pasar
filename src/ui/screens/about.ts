@@ -64,7 +64,7 @@ export function renderAbout(ctx: ScreenContext): HTMLElement {
             children: [
               el('li', {
                 text:
-                  'Peta 3D, 16 noktah, balai, penjaga, dan karakter dibuat sendiri dari bentuk dasar Three.js (tanpa model atau tekstur unduhan).',
+                  'Peta pulau 3D, 11 balai, 9 penjaga, cantrik, ilustrasi Halaman Cerita, dan karakter dibuat sendiri dari kode (Three.js & SVG), tanpa gambar unduhan.',
               }),
               el('li', {
                 text:

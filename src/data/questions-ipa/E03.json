@@ -1,0 +1,106 @@
+[
+  {
+    "id": "b09-s07",
+    "balai": "E03",
+    "type": "mcq",
+    "prompt": "Proses penguapan air laut akibat panas matahari disebut ....",
+    "options": [
+      "evaporasi",
+      "kondensasi",
+      "presipitasi",
+      "infiltrasi"
+    ],
+    "answer": "evaporasi",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"evaporasi\".",
+    "explanation": [
+      "Kunci: evaporasi.",
+      "Ini sesuai materi Kenampakan bumi (materi E03)."
+    ],
+    "meta": {
+      "kodeMateri": "E03",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menerapkan konsep pada situasi: Proses penguapan air laut akibat panas matahari disebut",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b09-s08",
+    "balai": "E03",
+    "type": "mcq",
+    "prompt": "Urutan siklus air yang benar adalah ....",
+    "options": [
+      "presipitasi → evaporasi → kondensasi",
+      "kondensasi → presipitasi → evaporasi",
+      "evaporasi → kondensasi → presipitasi",
+      "evaporasi → presipitasi → kondensasi"
+    ],
+    "answer": "evaporasi → kondensasi → presipitasi",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"evaporasi → kondensasi → presipitasi\".",
+    "explanation": [
+      "Kunci: evaporasi → kondensasi → presipitasi.",
+      "Ini sesuai materi Kenampakan bumi (materi E03)."
+    ],
+    "meta": {
+      "kodeMateri": "E03",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menganalisis/menyimpulkan: Urutan siklus air yang benar adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b09-s09",
+    "balai": "E03",
+    "type": "mcq",
+    "prompt": "Gempa bumi tektonik terjadi karena ....",
+    "options": [
+      "hujan deras",
+      "pergeseran lempeng bumi",
+      "angin kencang",
+      "air laut pasang"
+    ],
+    "answer": "pergeseran lempeng bumi",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"pergeseran lempeng bumi\".",
+    "explanation": [
+      "Kunci: pergeseran lempeng bumi.",
+      "Ini sesuai materi Kenampakan bumi (materi E03)."
+    ],
+    "meta": {
+      "kodeMateri": "E03",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menganalisis/menyimpulkan: Gempa bumi tektonik terjadi karena",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b09-s10",
+    "balai": "E03",
+    "type": "mcq",
+    "prompt": "Tsunami adalah ....",
+    "options": [
+      "hujan yang sangat deras",
+      "angin puting beliung",
+      "banjir sungai",
+      "gelombang laut besar akibat gempa di dasar laut"
+    ],
+    "answer": "gelombang laut besar akibat gempa di dasar laut",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"gelombang laut besar akibat gempa di dasar laut\".",
+    "explanation": [
+      "Kunci: gelombang laut besar akibat gempa di dasar laut.",
+      "Ini sesuai materi Kenampakan bumi (materi E03)."
+    ],
+    "meta": {
+      "kodeMateri": "E03",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menganalisis/menyimpulkan: Tsunami adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

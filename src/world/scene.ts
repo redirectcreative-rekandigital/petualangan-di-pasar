@@ -29,7 +29,6 @@ export interface SceneQuality {
 }
 
 export const QUALITY_HIGH: SceneQuality = { pixelRatioCap: 1.75, fogNear: 26, fogFar: 58 };
-export const QUALITY_LOW: SceneQuality = { pixelRatioCap: 1, fogNear: 18, fogFar: 42 };
 
 /** Palet suasana "Sore Hangat" (langit, kabut, cahaya, rumput). */
 export interface SceneTheme {
@@ -52,6 +51,37 @@ export const THEME_SORE_HANGAT: SceneTheme = {
   grass: 0x9ccf7a,
   ambient: 0.7,
 };
+
+/**
+ * Suasana khas per zona noktah.
+ *
+ * Zona hijau (makhluk hidup) tetap memakai langit sore keemasan karena paling
+ * ramah untuk membaca; zona fisika memakai langit senja ungu-kebiruan agar
+ * terasa "laboratorium"; zona bumi memakai langit hangat berdebu seperti
+ * padang gersang. Nilai `grass`, `fog`, dan `sun` diubah bersama-sama supaya
+ * tanah dan kabut tidak tampak bertabrakan.
+ */
+export const THEME_ZONA = {
+  'Makhluk Hidup': THEME_SORE_HANGAT,
+  Fisika: {
+    sky: 0xc7d7f2,
+    fog: 0xc7d7f2,
+    sun: 0xfff0d0,
+    hemiSky: 0xdbe7ff,
+    hemiGround: 0x42556b,
+    grass: 0x9aa8ae,
+    ambient: 0.78,
+  },
+  Bumi: {
+    sky: 0xf3dcc0,
+    fog: 0xf3dcc0,
+    sun: 0xffd9a8,
+    hemiSky: 0xffe9cc,
+    hemiGround: 0x8a6a4a,
+    grass: 0xd2b98a,
+    ambient: 0.72,
+  },
+} satisfies Record<string, unknown> as Record<'Makhluk Hidup' | 'Fisika' | 'Bumi', SceneTheme>;
 
 export interface SceneOptions {
   quality?: SceneQuality;
@@ -183,9 +213,25 @@ export function createScene(canvas: HTMLCanvasElement, options: SceneOptions = {
   // bidang cukup disamarkan oleh kabut.
   const groundGeo = new THREE.PlaneGeometry(groundSize, groundSize);
   const texRumput = teksturRumput();
+  // Tekstur dijadikan abu-abu terang lalu diberi warna tema, supaya tanah goa,
+  // tebing, atau ladang benar-benar berbeda warna (bukan hijau tertimpa).
+  const kanvasRumput = texRumput?.image as HTMLCanvasElement | undefined;
+  const g2 = kanvasRumput?.getContext?.('2d');
+  if (kanvasRumput && g2) {
+    const data = g2.getImageData(0, 0, kanvasRumput.width, kanvasRumput.height);
+    for (let i = 0; i < data.data.length; i += 4) {
+      const l = 0.3 * (data.data[i] ?? 0) + 0.59 * (data.data[i + 1] ?? 0) + 0.11 * (data.data[i + 2] ?? 0);
+      const v = Math.min(255, l * 1.55);
+      data.data[i] = v;
+      data.data[i + 1] = v;
+      data.data[i + 2] = v;
+    }
+    g2.putImageData(data, 0, 0);
+    if (texRumput) texRumput.needsUpdate = true;
+  }
   ulangi(texRumput, Math.max(4, Math.round(groundSize / 6)));
   const groundMat = new THREE.MeshStandardMaterial({
-    color: texRumput ? 0xffffff : theme.grass,
+    color: theme.grass,
     map: texRumput ?? null,
     roughness: 0.95,
     metalness: 0,

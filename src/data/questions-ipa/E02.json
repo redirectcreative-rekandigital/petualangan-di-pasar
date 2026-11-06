@@ -1,0 +1,80 @@
+[
+  {
+    "id": "b09-s04",
+    "balai": "E02",
+    "type": "mcq",
+    "prompt": "Berikut ini yang termasuk contoh hidrosfer adalah ....",
+    "options": [
+      "pegunungan",
+      "tanah",
+      "danau",
+      "batuan"
+    ],
+    "answer": "danau",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"danau\".",
+    "explanation": [
+      "Kunci: danau.",
+      "Ini sesuai materi Kenampakan bumi (materi E02)."
+    ],
+    "meta": {
+      "kodeMateri": "E02",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menerapkan konsep pada situasi: Berikut ini yang termasuk contoh hidrosfer adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b09-s05",
+    "balai": "E02",
+    "type": "mcq",
+    "prompt": "Atmosfer adalah ....",
+    "options": [
+      "lapisan batuan kulit bumi",
+      "lapisan udara yang menyelubungi bumi",
+      "lapisan air di bumi",
+      "lapisan es di kutub"
+    ],
+    "answer": "lapisan udara yang menyelubungi bumi",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"lapisan udara yang menyelubungi bumi\".",
+    "explanation": [
+      "Kunci: lapisan udara yang menyelubungi bumi.",
+      "Ini sesuai materi Kenampakan bumi (materi E02)."
+    ],
+    "meta": {
+      "kodeMateri": "E02",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menerapkan konsep pada situasi: Atmosfer adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b09-s06",
+    "balai": "E02",
+    "type": "mcq",
+    "prompt": "Lapisan atmosfer tempat terjadinya cuaca seperti hujan dan angin adalah ....",
+    "options": [
+      "stratosfer",
+      "mesosfer",
+      "termosfer",
+      "troposfer"
+    ],
+    "answer": "troposfer",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"troposfer\".",
+    "explanation": [
+      "Kunci: troposfer.",
+      "Ini sesuai materi Kenampakan bumi (materi E02)."
+    ],
+    "meta": {
+      "kodeMateri": "E02",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menerapkan konsep pada situasi: Lapisan atmosfer tempat terjadinya cuaca seperti hujan dan angin adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  }
+]

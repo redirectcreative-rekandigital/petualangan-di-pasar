@@ -1,6 +1,6 @@
 import type { Progress } from '../../../shared/types';
 
-export type ScreenName = 'title' | 'howto' | 'map' | 'noktah' | 'balai' | 'quiz' | 'result' | 'balaiResult' | 'about' | 'intro' | 'guru';
+export type ScreenName = 'title' | 'howto' | 'map' | 'noktah' | 'balai' | 'quiz' | 'result' | 'balaiResult' | 'about' | 'intro' | 'guru' | 'final' | 'tutupPanel';
 
 /**
  * Konteks yang dibagikan ke semua layar. Router disediakan sebagai callback

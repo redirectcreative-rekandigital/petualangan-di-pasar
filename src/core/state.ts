@@ -1,31 +1,33 @@
-import type { BalaiId, NoktahId, Progress, BalaiProgress, AnswerRecord, Stars, PlayerGender } from '../../shared/types';
-import { BAHAI_TKA, NOKTAH, noktahMateri, getNoktah } from '../data/balai';
+import type { BalaiId, NoktahId, Progress, BalaiProgress, AnswerRecord, Stars, PlayerGender, TahapMisi, CatatanBaca } from '../../shared/types';
+import { URUTAN_BALAI, balaiSebelum, FINAL_BAGIAN } from '../data/cerita';
+import { SEMUA_BALAI, NOKTAH, noktahMateri, getNoktah } from '../data/balai';
 import { isBalaiPassed, starsForCorrect } from './scoring';
 
-const STORAGE_KEY = 'petualangan-di-pasar:progress:v2';
+const STORAGE_KEY = 'survival-sains:progress:v1';
 
 export const APP_INFO = {
-  judul: 'Petualangan di Pasar',
-  judulLama: 'Pasar Amanah 3D',
-  subjudul: 'Petualangan Jelajah Pasar 3D untuk Siap TKA Matematika',
+  judul: 'Survival Sains',
+  subjudul: 'Petualangan bertahan hidup dengan ilmu IPA untuk Kelas 5 SD/MI',
   pembuat: 'Rosyitania Yudha Astari, S.Pd',
   sekolah: 'Guru SD Muhammadiyah Wonorejo Polokarto',
-  jenjang: 'Kelas 6 SD/MI',
-  konteks: 'Persiapan Tes Kemampuan Akademik (TKA) - Numerasi Matematika',
+  jenjang: 'Kelas 5 SD/MI',
+  mapel: 'IPA (Ilmu Pengetahuan Alam)',
+  platformAi: 'Claude (Anthropic) untuk ide, naskah, kode, dan pengujian',
+  konteks: 'Penguatan materi IPA kelas 5: cahaya, bunyi, ekosistem, rantai makanan, simbiosis, kelestarian, magnet, listrik, dan bumi',
   nilaiKarakter:
-    'Kejujuran dan amanah dalam berdagang: tidak mengurangi timbangan dan menghitung kembalian dengan jujur.',
+    'Rasa ingin tahu yang santun dan sayang pada alam. Alam adalah tanda kebesaran Allah, dan manusia adalah khalifah penjaga bumi.',
   tujuan: [
-    'Menjelajahi 16 noktah materi TKA pada peta petualangan: Bilangan, Geometri, dan Data.',
-    'Memasuki noktah lalu belajar di balai (sub-materi) dengan bacaan ringkas dan 3 soal.',
-    'Menyelesaikan babak puncak "Pasar Ramai" berisi 30 soal campuran.',
-    'Melatih penalaran lewat soal cerita dan pengambilan kesimpulan berbasis data.',
+    'Memahami 9 bab IPA kelas 5 lewat 11 Halaman Cerita bergambar dan interaktif.',
+    'Menerapkan konsep IPA untuk memecahkan masalah bertahan hidup di setiap balai.',
+    'Menjawab soal pilihan ganda dengan umpan balik dan petunjuk yang merujuk ke cerita.',
+    'Menyelesaikan Final di Mercusuar Tua (30 soal) dengan batas lulus 70%.',
   ],
 } as const;
 
 /** Seluruh balai yang bisa dimainkan (untuk pencarian & statistik). */
-export const BALAI_LIST = BAHAI_TKA;
+export const BALAI_LIST = SEMUA_BALAI;
 
-/** Seluruh noktah (16 materi + FINAL). */
+/** Seluruh noktah (11 balai materi + FINAL). */
 export const NOKTAH_LIST = NOKTAH;
 
 /** Nama karakter pemain berdasarkan pilihan jenis kelamin. */
@@ -43,28 +45,72 @@ function emptyBalaiProgress(): BalaiProgress {
 }
 
 /**
- * Semua noktah & balai terbuka sejak awal (bebas dipilih).
- * Tidak ada penguncian progresif seperti versi sebelumnya.
+ * Balai dibuka BERURUTAN mengikuti bab buku: balai pertama (Goa Sinar) selalu
+ * terbuka; balai berikutnya terbuka setelah balai sebelumnya lulus (≥1 bintang).
+ * Berlaku sama untuk mode sendiri dan mode kelas.
  */
-export function isNoktahUnlocked(_progress: Progress, _kode: NoktahId): boolean {
-  return true;
+export function isBalaiUnlocked(progress: Progress, kode: BalaiId): boolean {
+  if (kode === 'FINAL') return isPuncakUnlocked(progress);
+  const sebelum = balaiSebelum(String(kode));
+  if (!URUTAN_BALAI.includes(kode as (typeof URUTAN_BALAI)[number])) return false;
+  return sebelum === null || isBalaiPassedIn(progress, sebelum);
 }
 
-export function isBalaiUnlocked(_progress: Progress, _kode: BalaiId): boolean {
-  return true;
-}
 
-/**
- * Pasar Ramai (FINAL) terbuka setelah semua 16 noktah materi PERNAH dimasuki,
- * tanpa memandang bintang atau benar/salah (aturan A(ii)).
- */
+/** Mercusuar Tua (FINAL) terbuka setelah ke-11 balai lulus (11 alat di tas). */
 export function isPuncakUnlocked(progress: Progress): boolean {
-  return noktahMateri().every((n) => progress.visitedNoktah.includes(n.kode));
+  return URUTAN_BALAI.every((k) => isBalaiPassedIn(progress, k));
 }
 
-export function sudahKunjungiNoktah(progress: Progress, kode: NoktahId): boolean {
-  return progress.visitedNoktah.includes(kode);
+/** Balai terbuka berikutnya yang belum lulus (tujuan pemain), atau FINAL. */
+export function balaiTujuan(progress: Progress): NoktahId {
+  const belum = URUTAN_BALAI.find((k) => !isBalaiPassedIn(progress, k));
+  return belum ?? 'FINAL';
 }
+
+/* ---------------- Misi per balai ---------------- */
+
+export function tahapMisi(progress: Progress, kode: BalaiId): TahapMisi {
+  if (isBalaiPassedIn(progress, kode)) return 3;
+  return (progress.misi[balaiKey(kode)] ?? 0) as TahapMisi;
+}
+
+/** Menaikkan tahap misi (tidak pernah turun). */
+export function setTahapMisi(progress: Progress, kode: BalaiId, tahap: TahapMisi): Progress {
+  const kini = progress.misi[balaiKey(kode)] ?? 0;
+  if (tahap <= kini) return progress;
+  return { ...progress, misi: { ...progress.misi, [balaiKey(kode)]: tahap } };
+}
+
+/** Menambah alat survival dari balai ke tas. */
+export function tambahAlat(progress: Progress, kode: BalaiId): Progress {
+  const k = balaiKey(kode);
+  if (progress.alat.includes(k)) return progress;
+  return { ...progress, alat: [...progress.alat, k] };
+}
+
+/** Mencatat lama membaca Halaman Cerita. */
+export function catatBaca(progress: Progress, kode: BalaiId, detik: number): Progress {
+  const k = balaiKey(kode);
+  const lama: CatatanBaca = progress.bacaan[k] ?? { detik: 0, ulang: 0 };
+  const sudahPernah = lama.detik > 0;
+  return {
+    ...progress,
+    bacaan: {
+      ...progress.bacaan,
+      [k]: { detik: Math.round(lama.detik + Math.max(0, detik)), ulang: lama.ulang + (sudahPernah ? 1 : 0) },
+    },
+  };
+}
+
+/** Menyimpan hasil terbaik per bagian Final. */
+export function catatFinalBagian(progress: Progress, bagian: number, benar: number): Progress {
+  const arr = [...progress.finalBagian];
+  while (arr.length < FINAL_BAGIAN.length) arr.push(0);
+  arr[bagian] = Math.max(arr[bagian] ?? 0, benar);
+  return { ...progress, finalBagian: arr };
+}
+
 
 export function isBalaiPassedIn(progress: Progress, kode: BalaiId): boolean {
   const prog = progress.balai[balaiKey(kode)];
@@ -87,6 +133,11 @@ export function createDefaultProgress(playerName = '', gender: PlayerGender = 'l
     balai,
     answers: [],
     puncakLulus: false,
+    prologSelesai: false,
+    misi: {},
+    alat: [],
+    bacaan: {},
+    finalBagian: [0, 0, 0, 0],
   };
 }
 
@@ -158,6 +209,11 @@ function mergeProgress(partial: Partial<Progress>): Progress {
     warnaBawahan: typeof partial.warnaBawahan === 'number' ? partial.warnaBawahan : undefined,
     warnaHijab: typeof partial.warnaHijab === 'number' ? partial.warnaHijab : undefined,
     token: typeof partial.token === 'string' && partial.token ? partial.token : undefined,
+    prologSelesai: Boolean(partial.prologSelesai),
+    misi: partial.misi && typeof partial.misi === 'object' ? { ...partial.misi } : {},
+    alat: Array.isArray(partial.alat) ? partial.alat.filter((k) => typeof k === 'string') : [],
+    bacaan: partial.bacaan && typeof partial.bacaan === 'object' ? { ...partial.bacaan } : {},
+    finalBagian: Array.isArray(partial.finalBagian) ? partial.finalBagian.map((n) => Number(n) || 0) : [0, 0, 0, 0],
   };
 }
 
@@ -176,7 +232,7 @@ export function tandaiNoktahDikunjungi(progress: Progress, kode: NoktahId): Prog
 }
 
 /**
- * Menerapkan hasil sesi balai ke progres: bintang terbaik, koin, dan menandai
+ * Menerapkan hasil sesi balai ke progres: bintang terbaik, nilai, dan menandai
  * noktah induk sudah dikunjungi.
  */
 export function applyBalaiResult(
@@ -197,7 +253,7 @@ export function applyBalaiResult(
     unlocked: true,
   };
   const balai = { ...progress.balai, [key]: updated };
-  const noktahInduk = BAHAI_TKA.find((b) => b.kode === kode)?.noktah;
+  const noktahInduk = SEMUA_BALAI.find((b) => b.kode === kode)?.noktah;
   const withVisit = noktahInduk ? tandaiNoktahDikunjungi(progress, noktahInduk) : progress;
   return {
     ...withVisit,
@@ -206,7 +262,7 @@ export function applyBalaiResult(
   };
 }
 
-/** Menandai lulus/tidak lulusnya Pasar Ramai. */
+/** Menandai lulus/tidak lulusnya Menara Kitab. */
 export function applyPuncakResult(progress: Progress, lulus: boolean, answers: AnswerRecord[]): Progress {
   const withVisit = tandaiNoktahDikunjungi(progress, 'FINAL');
   return {
@@ -228,6 +284,7 @@ export function totalStars(progress: Progress): number {
 export function adaProgresTersimpan(progress: Progress): boolean {
   return (
     progress.introDone ||
+    progress.prologSelesai ||
     progress.visitedNoktah.length > 0 ||
     totalStars(progress) > 0 ||
     progress.puncakLulus
@@ -238,20 +295,8 @@ export function maxStars(): number {
   return noktahMateri().length * 3;
 }
 
-/** Jumlah noktah materi yang pernah dikunjungi. */
-export function noktahDikunjungiCount(progress: Progress): number {
-  return noktahMateri().filter((n) => progress.visitedNoktah.includes(n.kode)).length;
-}
 
 export function balaiSelesaiCount(progress: Progress): number {
   return BALAI_LIST.filter((b) => isBalaiPassedIn(progress, b.kode)).length;
 }
 
-/** Rata-rata bintang per noktah (dipakai untuk ringkasan/diagnostik guru). */
-export function ringkasanNoktah(progress: Progress): Array<{ kode: NoktahId; nama: string; stars: number }> {
-  return noktahMateri().map((n) => {
-    const balai = n.balai[0];
-    const stars = balai ? (progress.balai[balaiKey(balai.kode)]?.stars ?? 0) : 0;
-    return { kode: n.kode, nama: n.nama, stars };
-  });
-}

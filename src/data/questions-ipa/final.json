@@ -1,0 +1,782 @@
+[
+  {
+    "id": "final-b01-s01",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Cahaya merambat dalam garis ....",
+    "options": [
+      "lengkung",
+      "lurus",
+      "zig-zag",
+      "melingkar"
+    ],
+    "answer": "lurus",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"lurus\".",
+    "explanation": [
+      "Kunci: lurus.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Mengenal konsep dasar: Cahaya merambat dalam garis",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b02-s01",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Bunyi dihasilkan oleh benda yang ....",
+    "options": [
+      "diam",
+      "bergetar",
+      "panas",
+      "basah"
+    ],
+    "answer": "bergetar",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"bergetar\".",
+    "explanation": [
+      "Kunci: bergetar.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Mengenal konsep dasar: Bunyi dihasilkan oleh benda yang",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b03-s01",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Hubungan timbal balik antara makhluk hidup dan lingkungannya disebut ....",
+    "options": [
+      "populasi",
+      "komunitas",
+      "ekosistem",
+      "habitat"
+    ],
+    "answer": "ekosistem",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"ekosistem\".",
+    "explanation": [
+      "Kunci: ekosistem.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Mengenal konsep dasar: Hubungan timbal balik antara makhluk hidup dan lingkungannya disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b04-s01",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Rantai makanan adalah peristiwa ....",
+    "options": [
+      "tumbuhan menyerap air dari tanah",
+      "makan dan dimakan secara berurutan sehingga energi berpindah",
+      "hewan berpindah tempat",
+      "makhluk hidup tumbuh dan berkembang"
+    ],
+    "answer": "makan dan dimakan secara berurutan sehingga energi berpindah",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"makan dan dimakan secara berurutan sehingga energi berpindah\".",
+    "explanation": [
+      "Kunci: makan dan dimakan secara berurutan sehingga energi berpindah.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Mengenal konsep dasar: Rantai makanan adalah peristiwa",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b05-s01",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Hubungan antara dua makhluk hidup yang keduanya saling menguntungkan disebut ....",
+    "options": [
+      "parasitisme",
+      "komensalisme",
+      "mutualisme",
+      "predasi"
+    ],
+    "answer": "mutualisme",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"mutualisme\".",
+    "explanation": [
+      "Kunci: mutualisme.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Mengenal konsep dasar: Hubungan antara dua makhluk hidup yang keduanya saling menguntungkan disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b06-s01",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Menjaga kelestarian ekosistem berarti ....",
+    "options": [
+      "menjaga agar ekosistem tetap seimbang dan tidak rusak",
+      "mengubah hutan menjadi pabrik",
+      "memburu semua hewan liar",
+      "menebang semua pohon"
+    ],
+    "answer": "menjaga agar ekosistem tetap seimbang dan tidak rusak",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"menjaga agar ekosistem tetap seimbang dan tidak rusak\".",
+    "explanation": [
+      "Kunci: menjaga agar ekosistem tetap seimbang dan tidak rusak.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Mengenal konsep dasar: Menjaga kelestarian ekosistem berarti",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b07-s01",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Benda berikut yang dapat ditarik oleh magnet adalah ....",
+    "options": [
+      "penghapus karet",
+      "paku besi",
+      "kertas",
+      "gelas kaca"
+    ],
+    "answer": "paku besi",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"paku besi\".",
+    "explanation": [
+      "Kunci: paku besi.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Mengenal konsep dasar: Benda berikut yang dapat ditarik oleh magnet adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b08-s01",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Arus listrik adalah aliran ....",
+    "options": [
+      "air dalam kabel",
+      "udara dalam kabel",
+      "muatan listrik (elektron)",
+      "cahaya dalam kabel"
+    ],
+    "answer": "muatan listrik (elektron)",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"muatan listrik (elektron)\".",
+    "explanation": [
+      "Kunci: muatan listrik (elektron).",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Mengenal konsep dasar: Arus listrik adalah aliran",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b09-s01",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Lapisan batuan yang menyusun kulit bumi disebut ....",
+    "options": [
+      "hidrosfer",
+      "litosfer",
+      "atmosfer",
+      "biosfer"
+    ],
+    "answer": "litosfer",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"litosfer\".",
+    "explanation": [
+      "Kunci: litosfer.",
+      "Ini sesuai materi Kenampakan bumi (materi E01)."
+    ],
+    "meta": {
+      "kodeMateri": "E01",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Mengenal konsep dasar: Lapisan batuan yang menyusun kulit bumi disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b09-s04",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Berikut ini yang termasuk contoh hidrosfer adalah ....",
+    "options": [
+      "pegunungan",
+      "tanah",
+      "danau",
+      "batuan"
+    ],
+    "answer": "danau",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"danau\".",
+    "explanation": [
+      "Kunci: danau.",
+      "Ini sesuai materi Kenampakan bumi (materi E02)."
+    ],
+    "meta": {
+      "kodeMateri": "E02",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menerapkan konsep pada situasi: Berikut ini yang termasuk contoh hidrosfer adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "final-b09-s07",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Proses penguapan air laut akibat panas matahari disebut ....",
+    "options": [
+      "evaporasi",
+      "kondensasi",
+      "presipitasi",
+      "infiltrasi"
+    ],
+    "answer": "evaporasi",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"evaporasi\".",
+    "explanation": [
+      "Kunci: evaporasi.",
+      "Ini sesuai materi Kenampakan bumi (materi E03)."
+    ],
+    "meta": {
+      "kodeMateri": "E03",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menerapkan konsep pada situasi: Proses penguapan air laut akibat panas matahari disebut",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "final-b01-s02",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Benda yang sama sekali tidak dapat ditembus cahaya disebut benda ....",
+    "options": [
+      "transparan",
+      "translusen",
+      "opak",
+      "bening"
+    ],
+    "answer": "opak",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"opak\".",
+    "explanation": [
+      "Kunci: opak.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Mengenal konsep dasar: Benda yang sama sekali tidak dapat ditembus cahaya disebut benda",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b02-s02",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Bunyi tidak dapat merambat melalui ....",
+    "options": [
+      "udara",
+      "air",
+      "besi",
+      "ruang hampa"
+    ],
+    "answer": "ruang hampa",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"ruang hampa\".",
+    "explanation": [
+      "Kunci: ruang hampa.",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Mengenal konsep dasar: Bunyi tidak dapat merambat melalui",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b03-s02",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Berikut ini yang termasuk komponen biotik adalah ....",
+    "options": [
+      "tanah",
+      "cahaya matahari",
+      "udara",
+      "jamur"
+    ],
+    "answer": "jamur",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"jamur\".",
+    "explanation": [
+      "Kunci: jamur.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Mengenal konsep dasar: Berikut ini yang termasuk komponen biotik adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b04-s02",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Sumber energi utama dalam rantai makanan berasal dari ....",
+    "options": [
+      "air",
+      "tanah",
+      "tumbuhan",
+      "matahari"
+    ],
+    "answer": "matahari",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"matahari\".",
+    "explanation": [
+      "Kunci: matahari.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Mengenal konsep dasar: Sumber energi utama dalam rantai makanan berasal dari",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b05-s02",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Contoh hubungan mutualisme adalah ....",
+    "options": [
+      "lebah dan bunga",
+      "benalu dan pohon mangga",
+      "singa dan zebra",
+      "cacing pita dan manusia"
+    ],
+    "answer": "lebah dan bunga",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"lebah dan bunga\".",
+    "explanation": [
+      "Kunci: lebah dan bunga.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Mengenal konsep dasar: Contoh hubungan mutualisme adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b06-s02",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Berikut ini yang merupakan penyebab rusaknya ekosistem adalah ....",
+    "options": [
+      "reboisasi",
+      "membuang sampah pada tempatnya",
+      "penebangan hutan secara liar",
+      "membuat taman nasional"
+    ],
+    "answer": "penebangan hutan secara liar",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"penebangan hutan secara liar\".",
+    "explanation": [
+      "Kunci: penebangan hutan secara liar.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Mengenal konsep dasar: Berikut ini yang merupakan penyebab rusaknya ekosistem adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b07-s02",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Bagian magnet yang memiliki gaya tarik paling kuat adalah ....",
+    "options": [
+      "tengah magnet",
+      "samping magnet",
+      "seluruh bagian sama kuat",
+      "kutub-kutub magnet"
+    ],
+    "answer": "kutub-kutub magnet",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"kutub-kutub magnet\".",
+    "explanation": [
+      "Kunci: kutub-kutub magnet.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Mengenal konsep dasar: Bagian magnet yang memiliki gaya tarik paling kuat adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b08-s02",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Agar lampu pada rangkaian dapat menyala, rangkaian listrik harus ....",
+    "options": [
+      "tertutup",
+      "terbuka",
+      "terputus",
+      "dibasahi"
+    ],
+    "answer": "tertutup",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"tertutup\".",
+    "explanation": [
+      "Kunci: tertutup.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Mengenal konsep dasar: Agar lampu pada rangkaian dapat menyala, rangkaian listrik harus",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b09-s02",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Berikut ini yang termasuk contoh litosfer adalah ....",
+    "options": [
+      "sungai",
+      "awan",
+      "danau",
+      "gunung"
+    ],
+    "answer": "gunung",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"gunung\".",
+    "explanation": [
+      "Kunci: gunung.",
+      "Ini sesuai materi Kenampakan bumi (materi E01)."
+    ],
+    "meta": {
+      "kodeMateri": "E01",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Mengenal konsep dasar: Berikut ini yang termasuk contoh litosfer adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b09-s05",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Atmosfer adalah ....",
+    "options": [
+      "lapisan batuan kulit bumi",
+      "lapisan udara yang menyelubungi bumi",
+      "lapisan air di bumi",
+      "lapisan es di kutub"
+    ],
+    "answer": "lapisan udara yang menyelubungi bumi",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"lapisan udara yang menyelubungi bumi\".",
+    "explanation": [
+      "Kunci: lapisan udara yang menyelubungi bumi.",
+      "Ini sesuai materi Kenampakan bumi (materi E02)."
+    ],
+    "meta": {
+      "kodeMateri": "E02",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menerapkan konsep pada situasi: Atmosfer adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "final-b09-s08",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Urutan siklus air yang benar adalah ....",
+    "options": [
+      "presipitasi → evaporasi → kondensasi",
+      "kondensasi → presipitasi → evaporasi",
+      "evaporasi → kondensasi → presipitasi",
+      "evaporasi → presipitasi → kondensasi"
+    ],
+    "answer": "evaporasi → kondensasi → presipitasi",
+    "hint": "Ingat kembali materi \"Kenampakan bumi\"; jawaban yang paling tepat adalah \"evaporasi → kondensasi → presipitasi\".",
+    "explanation": [
+      "Kunci: evaporasi → kondensasi → presipitasi.",
+      "Ini sesuai materi Kenampakan bumi (materi E03)."
+    ],
+    "meta": {
+      "kodeMateri": "E03",
+      "elemen": "Bumi",
+      "submateri": "Kenampakan bumi",
+      "indikator": "Menganalisis/menyimpulkan: Urutan siklus air yang benar adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "final-b01-s03",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Pensil tampak patah ketika dimasukkan ke gelas berisi air. Peristiwa ini terjadi karena cahaya mengalami ....",
+    "options": [
+      "pemantulan",
+      "pembiasan",
+      "penyerapan",
+      "perambatan lurus"
+    ],
+    "answer": "pembiasan",
+    "hint": "Ingat kembali materi \"Sifat cahaya & organ mata\"; jawaban yang paling tepat adalah \"pembiasan\".",
+    "explanation": [
+      "Kunci: pembiasan.",
+      "Ini sesuai materi Sifat cahaya & organ mata (materi F01)."
+    ],
+    "meta": {
+      "kodeMateri": "F01",
+      "elemen": "Fisika",
+      "submateri": "Sifat cahaya & organ mata",
+      "indikator": "Mengenal konsep dasar: Pensil tampak patah ketika dimasukkan ke gelas berisi air. Peristiwa ini terjadi karena cahaya mengalami",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b02-s03",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Bunyi merambat paling cepat pada ....",
+    "options": [
+      "udara",
+      "air",
+      "logam (besi)",
+      "ruang hampa"
+    ],
+    "answer": "logam (besi)",
+    "hint": "Ingat kembali materi \"Sifat bunyi & organ telinga\"; jawaban yang paling tepat adalah \"logam (besi)\".",
+    "explanation": [
+      "Kunci: logam (besi).",
+      "Ini sesuai materi Sifat bunyi & organ telinga (materi F02)."
+    ],
+    "meta": {
+      "kodeMateri": "F02",
+      "elemen": "Fisika",
+      "submateri": "Sifat bunyi & organ telinga",
+      "indikator": "Mengenal konsep dasar: Bunyi merambat paling cepat pada",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b03-s03",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Berikut ini yang termasuk komponen abiotik adalah ....",
+    "options": [
+      "suhu",
+      "bakteri",
+      "rumput",
+      "cacing"
+    ],
+    "answer": "suhu",
+    "hint": "Ingat kembali materi \"Ekosistem\"; jawaban yang paling tepat adalah \"suhu\".",
+    "explanation": [
+      "Kunci: suhu.",
+      "Ini sesuai materi Ekosistem (materi H01)."
+    ],
+    "meta": {
+      "kodeMateri": "H01",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Ekosistem",
+      "indikator": "Mengenal konsep dasar: Berikut ini yang termasuk komponen abiotik adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b04-s03",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Makhluk hidup yang selalu berada di awal rantai makanan adalah ....",
+    "options": [
+      "produsen",
+      "konsumen tingkat I",
+      "konsumen tingkat II",
+      "pengurai"
+    ],
+    "answer": "produsen",
+    "hint": "Ingat kembali materi \"Rantai makanan & jaring-jaring makanan\"; jawaban yang paling tepat adalah \"produsen\".",
+    "explanation": [
+      "Kunci: produsen.",
+      "Ini sesuai materi Rantai makanan & jaring-jaring makanan (materi H02)."
+    ],
+    "meta": {
+      "kodeMateri": "H02",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Rantai makanan & jaring-jaring makanan",
+      "indikator": "Mengenal konsep dasar: Makhluk hidup yang selalu berada di awal rantai makanan adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b05-s03",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Anggrek menempel pada batang pohon mangga. Pohon tidak diuntungkan maupun dirugikan. Hubungan ini disebut ....",
+    "options": [
+      "mutualisme",
+      "parasitisme",
+      "predasi",
+      "komensalisme"
+    ],
+    "answer": "komensalisme",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"komensalisme\".",
+    "explanation": [
+      "Kunci: komensalisme.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Mengenal konsep dasar: Anggrek menempel pada batang pohon mangga. Pohon tidak diuntungkan maupun dirugikan. Hubungan ini disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b06-s03",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Penebangan hutan secara liar dapat menyebabkan ....",
+    "options": [
+      "udara menjadi lebih bersih",
+      "banjir dan tanah longsor",
+      "jumlah hewan bertambah",
+      "air sungai menjadi jernih"
+    ],
+    "answer": "banjir dan tanah longsor",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"banjir dan tanah longsor\".",
+    "explanation": [
+      "Kunci: banjir dan tanah longsor.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Mengenal konsep dasar: Penebangan hutan secara liar dapat menyebabkan",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b07-s03",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Jika dua kutub magnet yang sama (senama) didekatkan, maka keduanya akan ....",
+    "options": [
+      "tolak-menolak",
+      "tarik-menarik",
+      "diam saja",
+      "menyatu"
+    ],
+    "answer": "tolak-menolak",
+    "hint": "Ingat kembali materi \"Magnet\"; jawaban yang paling tepat adalah \"tolak-menolak\".",
+    "explanation": [
+      "Kunci: tolak-menolak.",
+      "Ini sesuai materi Magnet (materi F03)."
+    ],
+    "meta": {
+      "kodeMateri": "F03",
+      "elemen": "Fisika",
+      "submateri": "Magnet",
+      "indikator": "Mengenal konsep dasar: Jika dua kutub magnet yang sama (senama) didekatkan, maka keduanya akan",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "final-b08-s03",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Bahan yang termasuk isolator adalah ....",
+    "options": [
+      "tembaga",
+      "besi",
+      "aluminium",
+      "karet"
+    ],
+    "answer": "karet",
+    "hint": "Ingat kembali materi \"Listrik\"; jawaban yang paling tepat adalah \"karet\".",
+    "explanation": [
+      "Kunci: karet.",
+      "Ini sesuai materi Listrik (materi F04)."
+    ],
+    "meta": {
+      "kodeMateri": "F04",
+      "elemen": "Fisika",
+      "submateri": "Listrik",
+      "indikator": "Mengenal konsep dasar: Bahan yang termasuk isolator adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  }
+]

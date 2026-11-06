@@ -1,139 +1,126 @@
-// Uji asap dengan Playwright: memuat game di Chromium (WebGL via SwiftShader),
-// memeriksa tidak ada error console, lalu menelusuri alur baru:
-//   pembuka (cover -> karakter -> nama) -> loading -> peta 3D
-//   -> masuk noktah (dunia 3D) -> dialog balai -> panel balai -> panel soal.
+// Uji asap (Playwright, layar HP): menelusuri satu balai penuh tanpa error.
+//   sampul → cutscene badai → kartu anggota → prolog di Goa Sinar
+//   → misi Penjaga → Halaman Cerita (4 adegan + interaksi) → Tempat Uji
+//   (1 salah lalu benar) → kartu hadiah → gerbang → peta pulau.
+//
+// Prasyarat: server berjalan (npm run dev / preview / serve) pada BASE.
 import { chromium } from 'playwright';
 
 const BASE = process.env.SMOKE_URL ?? 'http://localhost:5173/';
-
 const errors = [];
+const log = (m) => console.log(`[smoke] ${m}`);
 
-function log(msg) {
-  console.log(`[smoke] ${msg}`);
+const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
+const page = await browser.newPage({ viewport: { width: 412, height: 915 }, hasTouch: true });
+page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
+page.on('console', (m) => {
+  if (m.type() === 'error') errors.push(`console: ${m.text()}`);
+});
+const t = (ms) => page.waitForTimeout(ms);
+const api = (fn) => page.evaluate(fn);
+
+/** Tekan "Lanjut" di kotak percakapan sampai tidak ada lagi. */
+async function lanjutSemua(maks = 12) {
+  for (let i = 0; i < maks; i++) {
+    await page.locator('.vn-teks').click().catch(() => {});
+    await t(120);
+    const l = page.locator('.vn-lanjut');
+    if (!(await l.count())) return;
+    await l.first().click();
+    await t(220);
+  }
 }
-
-const browser = await chromium.launch({
-  args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'],
-});
-const page = await browser.newPage({ viewport: { width: 412, height: 915 } });
-
-// Uji harus mulai dari kondisi bersih (progres, posisi tersimpan, dan WebAudio
-// bisa berbeda di perangkat pengembang). Konteks baru menjamin itu.
-await page.context().clearCookies();
-await page.addInitScript(() => {
-  try {
-    localStorage.clear();
-  } catch {
-    /* abaikan */
-  }
-});
-
-page.on('console', (msg) => {
-  if (msg.type() === 'error') {
-    errors.push(`console.error: ${msg.text()}`);
-  }
-});
-page.on('pageerror', (err) => {
-  errors.push(`pageerror: ${err.message}`);
-});
 
 try {
   await page.goto(BASE, { waitUntil: 'networkidle' });
-  log('halaman dimuat');
-
-  // Layar pembuka (cover) menampilkan judul baru.
-  await page.waitForSelector('text=Petualangan di Pasar', { timeout: 10000 });
-  log('layar pembuka tampil');
-
-  // Langkah 1: cover -> pilih karakter.
-  await page.locator('button', { hasText: 'Mulai Petualangan' }).click();
-  await page.waitForSelector('text=Pilih Karakter', { timeout: 5000 });
-  log('layar pilih karakter tampil');
-
-  // Langkah 2: pilih perempuan lalu lanjut ke atur pakaian.
-  await page.locator('.pilih-karakter', { hasText: 'Perempuan' }).click();
-  await page.locator('button', { hasText: 'Lanjut' }).click();
-  await page.waitForSelector('text=Atur Pakaian', { timeout: 5000 });
-  log('layar atur pakaian tampil');
-
-  // Pilih warna terakhir pada tiap baris (preview 3D harus tetap jalan).
-  const jumlahBaris = await page.locator('.warna-baris').count();
-  log(`jumlah baris warna: ${jumlahBaris}`);
-  for (let i = 0; i < jumlahBaris; i++) {
-    const opsi = page.locator('.warna-baris').nth(i).locator('.warna-tombol');
-    await opsi.last().click();
-    await page.waitForTimeout(150);
-  }
-  log('warna dipilih');
-
-  await page.locator('button', { hasText: 'Lanjut' }).click();
-  await page.waitForSelector('text=Nama & Mode Bermain', { timeout: 5000 });
-  log('layar nama & mode tampil');
-
-  // Langkah 3: pilih mode singleplayer (bawaan), isi nama lalu mulai.
-  await page.locator('input.isian[aria-label="Nama panggilan"]').fill('Sari');
-  await page.locator('button', { hasText: 'Mulai Berpetualang' }).click();
-  log('menekan Mulai Berpetualang');
-
-  // Loading singkat, lalu kanvas peta 3D muncul.
+  await page.getByRole('button', { name: /Mulai Petualangan/ }).click();
+  await page.waitForSelector('.cut-overlay');
+  log('cutscene badai tampil');
+  await page.getByRole('button', { name: /Lewati/ }).click();
+  await page.getByRole('button', { name: /Lanjut/ }).click();
+  await page.getByRole('button', { name: /Lanjut/ }).first().click();
+  await page.fill('input.isian', 'Uji');
+  await page.getByRole('button', { name: /Mulai Bertahan/ }).click();
   await page.waitForSelector('canvas.world-canvas', { timeout: 20000 });
-  log('kanvas peta 3D muncul');
+  await page.waitForSelector('.vn-overlay', { timeout: 8000 });
+  log('prolog: terbangun di Goa Sinar, Mbok Sinar menyapa');
 
-  await page.waitForTimeout(1500);
-  const modePeta = await page.evaluate(() => window.__petualanganDiPasar?.mode?.() ?? null);
-  log(`mode setelah pembuka: ${modePeta}`);
+  await lanjutSemua();
+  await page.locator('.vn-teks').click().catch(() => {});
+  await page.locator('.vn-pilihan.balas').first().click();
+  await lanjutSemua();
+  let d = await api(() => window.__survivalSains.debug());
+  if (d.tahap !== 1) throw new Error(`tahap setelah misi = ${d.tahap}`);
+  log('misi diterima (tahap 1)');
 
-  // Masuk ke noktah B01 lewat pintasan uji (raycast 3D sulit di otomasi).
-  await page.evaluate(() => window.__petualanganDiPasar?.masukNoktah?.('B01'));
-  await page.waitForSelector('canvas.world-canvas', { timeout: 20000 });
-  await page.waitForTimeout(2000);
-  const modeNoktah = await page.evaluate(() => window.__petualanganDiPasar?.mode?.() ?? null);
-  log(`mode setelah masuk noktah: ${modeNoktah}`);
+  await api(() => { window.__survivalSains.pindahKe('uji'); window.__survivalSains.interaksi(); });
+  await t(400);
+  const terkunci = await page.locator('.vn-teks').innerText();
+  await lanjutSemua(1);
+  log(`Tempat Uji masih terkunci: "${terkunci.slice(0, 40)}..."`);
 
-  // Berjalan ke depan agar mendekati balai (balai pertama di z ≈ -9).
-  await page.keyboard.down('w');
-  await page.waitForTimeout(3600);
-  await page.keyboard.up('w');
-  // Renderer perangkat lunak (SwiftShader) bisa jauh lebih lambat daripada
-  // perangkat asli, jadi tambah langkah berjalan terbatas sampai balai terdeteksi.
-  for (let i = 0; i < 6; i++) {
-    const d = await page.evaluate(() => window.__petualanganDiPasar?.debug?.() ?? null);
-    if (d && d.nearby) break;
-    await page.keyboard.down('w');
-    await page.waitForTimeout(1500);
-    await page.keyboard.up('w');
+  await api(() => { window.__survivalSains.pindahKe('cantrik'); window.__survivalSains.interaksi(); });
+  await t(400);
+  await lanjutSemua(1);
+  await page.waitForSelector('.cerita-overlay');
+  for (let i = 0; i < 3; i++) {
+    await page.getByRole('button', { name: 'Lanjut ▶' }).click();
+    await t(300);
   }
+  await page.locator('.cerita-pilih button', { hasText: 'terang' }).click();
+  await page.getByRole('button', { name: 'Lanjut ▶' }).click();
+  await page.getByRole('button', { name: /Selesai membaca/ }).click();
+  await lanjutSemua();
+  d = await api(() => window.__survivalSains.debug());
+  if (d.tahap !== 2) throw new Error(`tahap setelah cerita = ${d.tahap}`);
+  log('Halaman Cerita tamat (tahap 2)');
 
-  const dbg = await page.evaluate(() => window.__petualanganDiPasar?.debug?.() ?? null);
-  log(`posisi pemain: ${JSON.stringify(dbg)}`);
+  await t(1500);
+  await api(() => { window.__survivalSains.pindahKe('uji'); window.__survivalSains.interaksi(); });
+  await t(400);
+  await lanjutSemua(1);
+  const bank = await api(() => window.__survivalSains.bank());
+  for (let s = 0; s < 3; s++) {
+    await page.locator('.vn-teks').click().catch(() => {});
+    await page.waitForSelector('.vn-pilihan.jawab');
+    const teks = await page.locator('.vn-teks').innerText();
+    const q = bank.find((x) => x.balai === 'F01' && teks.includes(x.prompt));
+    if (!q) throw new Error(`soal tak dikenali: ${teks}`);
+    if (s === 0) {
+      await page.locator('.vn-pilihan', { hasText: q.options.find((o) => o !== q.answer) }).first().click();
+      await page.locator('.vn-teks').click().catch(() => {});
+      await page.locator('.vn-pilihan', { hasText: 'Coba lagi' }).click();
+      await page.locator('.vn-teks').click().catch(() => {});
+      await page.waitForSelector('.vn-pilihan.jawab');
+    }
+    await page.locator('.vn-pilihan', { hasText: q.answer }).first().click();
+    await lanjutSemua(1);
+  }
+  await lanjutSemua();
+  await page.waitForSelector('.hadiah-overlay', { timeout: 5000 });
+  log('hadiah: Cermin Sinyal');
+  await page.getByRole('button', { name: /Alhamdulillah/ }).click();
+  const prog = await api(() => window.__survivalSains.progress());
+  if (!prog.alat.includes('F01') || !prog.prologSelesai) throw new Error('alat/prolog tidak tersimpan');
+  if (prog.answers[0].percobaan !== 2) throw new Error('percobaan tidak tercatat');
 
-  // Interaksi (tombol A) -> dialog balai.
-  const interact = page.locator('.btn-action.interact');
-  await interact.waitFor({ state: 'visible', timeout: 8000 });
-  await interact.click();
-  log('menekan tombol A');
+  await api(() => { window.__survivalSains.pindahKe('gerbang'); window.__survivalSains.interaksi(); });
+  await t(400);
+  await page.locator('.vn-teks').click().catch(() => {});
+  await page.locator('.vn-pilihan', { hasText: 'Ya, ke peta' }).click();
+  let mode = '';
+  for (let i = 0; i < 30 && mode !== 'peta-3d'; i++) {
+    await t(500);
+    mode = await api(() => window.__survivalSains.mode());
+  }
+  if (mode !== 'peta-3d') throw new Error(`mode akhir ${mode}`);
+  log('kembali ke peta pulau; Lembah Gema terbuka');
 
-  // Dialog penjaga -> buka balai.
-  await page.locator('button', { hasText: 'Buka Balai' }).click();
-  log('membuka balai dari dialog');
-
-  // Panel balai harus muncul (bacaan + tombol mulai).
-  await page.waitForSelector('.panel-overlay', { timeout: 5000 });
-  await page.waitForSelector('text=Materi', { timeout: 5000 });
-  log('panel balai (bacaan) terbuka');
-
-  // Mulai berlatih -> panel soal.
-  await page.locator('button', { hasText: 'Mulai Berlatih' }).click();
-  await page.waitForSelector('.panel-overlay .soal-box', { timeout: 5000 });
-  log('panel soal terbuka');
-
-  if (errors.length > 0) {
-    console.error('[smoke] ERROR TERDETEKSI:');
+  if (errors.length) {
+    console.error('[smoke] ERROR:');
     errors.forEach((e) => console.error('  - ' + e));
     process.exitCode = 1;
-  } else {
-    log('SEMUA LANGKAH LULUS TANPA ERROR');
-  }
+  } else log('SMOKE LULUS TANPA ERROR');
 } catch (err) {
   console.error('[smoke] GAGAL:', err.message);
   errors.forEach((e) => console.error('  - ' + e));

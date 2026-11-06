@@ -2,6 +2,11 @@ import { el } from '../components/dom';
 import { sfx } from '../../core/sound';
 import { APP_INFO, KARAKTER, adaProgresTersimpan } from '../../core/state';
 import { showDialog } from '../dialog';
+import { putarCutscene } from '../cutscene';
+import { CUTSCENE_BADAI } from '../../data/cerita';
+import { bukaKunciSuara } from '../../core/suara';
+import { showLoading } from '../loading';
+import { urlGambar } from '../../core/gambar';
 import { createKarakterPreview, type KarakterPreview } from '../components/karakterPreview';
 import {
   PALET_PILIHAN,
@@ -67,16 +72,19 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       on: {
         click: () => {
           sfx.click();
+          bukaKunciSuara();
           if (adaProgres) {
-            // Lanjutkan: langsung ke peta tanpa mengulang isi nama.
+            // Lanjutkan: langsung ke peta (atau ke prolog bila belum selesai).
             const next = { ...ctx.getProgress(), introDone: true };
             ctx.setProgress(next);
             ctx.persist();
-            ctx.navigate('map');
+            masukPermainan();
             return;
           }
-          langkah = 'karakter';
-          renderLangkah();
+          void putarCutscene(document.body, CUTSCENE_BADAI).then(() => {
+            langkah = 'karakter';
+            renderLangkah();
+          });
         },
       },
     });
@@ -90,14 +98,17 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
             click: () => {
               sfx.click();
               const dlg = showDialog({
-                penjual: 'Pasar Amanah',
-                teks: 'Mulai dari awal akan menghapus semua bintang dan catatan belajarmu. Yakin mau mulai baru?',
+                tokoh: 'Kapten Bahari',
+                teks: 'Mulai dari awal akan menghapus semua bintang, alat, dan catatan belajarmu. Yakin mau mulai baru?',
                 aksi: 'Ya, mulai dari awal',
                 onBatal: () => {},
                 onAksi: () => {
                   ctx.reset();
-                  langkah = 'karakter';
-                  renderLangkah();
+                  bukaKunciSuara();
+                  void putarCutscene(document.body, CUTSCENE_BADAI).then(() => {
+                    langkah = 'karakter';
+                    renderLangkah();
+                  });
                 },
               });
               document.body.append(dlg.root);
@@ -149,11 +160,21 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
           })
         : null;
 
+    const sampul = el('div', { class: 'sampul' });
+    const emojiSampul = el('div', { class: 'emoji cover-emoji', text: '🏝️' });
+    void urlGambar('sampul').then((url) => {
+      if (!url) return;
+      const img = el('img', { class: 'sampul-gambar', attrs: { src: url, alt: 'Pulau Nusa Kawruh dengan Mercusuar Tua di puncaknya' } });
+      sampul.replaceChildren(img);
+      sampul.classList.add('dengan-gambar');
+      emojiSampul.remove();
+    });
     replace([
+      sampul,
       el('header', {
         class: 'hero cover-hero',
         children: [
-          el('div', { class: 'emoji cover-emoji', text: '🗺️' }),
+          emojiSampul,
           el('h1', { class: 'cover-judul', text: APP_INFO.judul }),
           el('p', { class: 'subjudul', text: APP_INFO.subjudul }),
           el('p', { class: 'muted', text: `${APP_INFO.pembuat} · ${APP_INFO.sekolah}` }),
@@ -161,7 +182,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       }),
       sapaan,
       el('div', { class: 'stack', children: [mulai, mulaiBaru, petunjuk, tentang, guru] }),
-      el('p', { class: 'footer-note', text: 'Lomba Game Edukasi Berbasis AI - Guru Muhammadiyah se-Cabang Blimbing 2026' }),
+      el('p', { class: 'footer-note', text: 'Lomba Game Edukasi Berbasis AI · Guru Muhammadiyah se-Cabang Blimbing 2026' }),
     ]);
   }
 
@@ -221,8 +242,8 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
     });
 
     replace([
-      el('div', { class: 'topbar', children: [el('h2', { text: 'Pilih Karakter' })] }),
-      el('p', { class: 'muted center-text', text: 'Pilih penjelajah yang akan kamu mainkan.' }),
+      el('div', { class: 'topbar', children: [el('h2', { text: 'Kartu Anggota Ekspedisi' })] }),
+      el('p', { class: 'muted center-text', text: 'Siapa penjelajah termuda Kapal Ekspedisi Sains? Pilih karaktermu.' }),
       el('div', { class: 'pilih-karakter-row', children: [kartu('laki-laki', previewL), kartu('perempuan', previewP)] }),
       el('div', { class: 'stack', children: [lanjut] }),
     ]);
@@ -353,7 +374,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
     replace([
       el('div', { class: 'topbar', children: [el('h2', { text: 'Atur Pakaian' })] }),
-      el('p', { class: 'muted center-text', text: 'Pilih warna baju, bawahan, dan hijab kesukaanmu.' }),
+      el('p', { class: 'muted center-text', text: 'Pilih warna pakaian penjelajahmu.' }),
       el('div', { class: 'warna-panggung', children: [previewSatu.canvas] }),
       baju,
       bawahan,
@@ -426,7 +447,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
     const mulai = el('button', {
       class: 'btn block',
-      text: '🚀 Mulai Berpetualang',
+      text: '🌊 Mulai Bertahan Hidup',
       attrs: { type: 'button' },
       on: {
         click: () => {
@@ -458,7 +479,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
           };
           ctx.setProgress(next);
           ctx.persist();
-          ctx.navigate('map', { dariIntro: true });
+          masukPermainan();
         },
       },
     });
@@ -504,6 +525,19 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       el('div', { class: 'stack', children: [mulai, kembali] }),
     ]);
     input.focus();
+  }
+
+  /** Masuk ke permainan: prolog di Goa Sinar bila belum, peta bila sudah. */
+  function masukPermainan(): void {
+    lepasPreview();
+    const p = ctx.getProgress();
+    if (!p.prologSelesai) {
+      showLoading(document.getElementById('app') ?? document.body, { pesan: 'Kamu mulai sadar...', tip: 'Gelap... ada cahaya tipis dari atas.' }, () => {
+        ctx.navigate('noktah', { noktah: 'F01', prolog: true });
+      });
+      return;
+    }
+    ctx.navigate('map', { dariIntro: true });
   }
 
   function renderLangkah(): void {

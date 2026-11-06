@@ -17,12 +17,12 @@ export default defineConfig({
   plugins: [
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.svg', 'icon-192.png', 'icon-512.png'],
+      includeAssets: ['favicon.png', 'icon-192.png', 'icon-512.png'],
       manifest: {
-        name: 'Petualangan di Pasar',
-        short_name: 'Petualangan Pasar',
+        name: 'Survival Sains',
+        short_name: 'Survival Sains',
         description:
-          'Game edukasi matematika kelas 6 SD/MI: jelajahi 16 noktah materi TKA (Bilangan, Geometri, Data) di peta 3D dan taklukkan babak puncak Pasar Ramai.',
+          'Survival Sains - game petualangan IPA kelas 5 SD/MI: terdampar di Pulau Nusa Kawruh, pelajari 9 bab IPA bersama 9 penjaga, lalu nyalakan Mercusuar Tua.',
         theme_color: '#1f6f4a',
         background_color: '#fff7e6',
         display: 'standalone',
@@ -37,7 +37,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,json,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,json,woff2}', 'assets/gambar-hp/*.webp'],
         // Decoder DRACO/KTX2 dan model 3D tidak diprecache (berat, jarang dipakai
         // saat kunjungan pertama) — cukup di-cache saat benar-benar diminta.
         globIgnores: ['assets/libs/**', 'assets/models/**'],

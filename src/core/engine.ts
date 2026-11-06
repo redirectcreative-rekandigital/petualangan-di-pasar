@@ -1,9 +1,9 @@
 import type { BalaiId, Question, AnswerRecord } from '../../shared/types';
-import { RULES, checkAnswer, checkReason, pickQuestions } from './scoring';
+import { RULES, checkAnswer, pickQuestions } from './scoring';
 
 /**
  * Satu sesi bermain: baik sesi balai (3 soal) maupun sesi puncak
- * "Pasar Ramai" (30 soal). Aturan kesempatan menjawab sama:
+ * "Menara Kitab" (30 soal). Aturan kesempatan menjawab sama:
  * tiap soal punya 3 kesempatan; habis 3x salah, soal dianggap gagal.
  */
 export interface SessionState {
@@ -15,8 +15,6 @@ export interface SessionState {
   coins: number;
   correctCount: number;
   answered: AnswerRecord[];
-  /** Soal tf-reason: jawaban utama sudah benar, menunggu alasan. */
-  awaitingReason: boolean;
 }
 
 function shuffleOptions(options: string[] | undefined, rng: () => number): string[] | undefined {
@@ -36,7 +34,6 @@ export function startSession(balai: BalaiId, pool: Question[], rng: () => number
   const questions = pickQuestions(pool, count, rng).map((q) => ({
     ...q,
     options: shuffleOptions(q.options, rng),
-    reasonOptions: shuffleOptions(q.reasonOptions, rng),
   }));
   return {
     balai,
@@ -46,7 +43,6 @@ export function startSession(balai: BalaiId, pool: Question[], rng: () => number
     coins: 0,
     correctCount: 0,
     answered: [],
-    awaitingReason: false,
   };
 }
 
@@ -62,7 +58,6 @@ export interface SubmitResult {
   isLast: boolean;
   /** Seluruh sesi selesai. */
   finished: boolean;
-  awaitingReason: boolean;
 }
 
 /** Menyelesaikan soal saat ini (benar atau gagal) dan pindah ke soal berikutnya. */
@@ -88,18 +83,16 @@ function advance(session: SessionState, question: Question, correct: boolean): S
       answered,
       index: nextIndex,
       attemptsLeft: RULES.attemptsPerQuestion,
-      awaitingReason: false,
     },
     correct,
     advanced: true,
     isLast,
     finished: isLast,
-    awaitingReason: false,
   };
 }
 
 /**
- * Tahap 1: memeriksa jawaban utama. Bila salah, kesempatan berkurang tetapi
+ * Memeriksa jawaban pilihan ganda. Bila salah, kesempatan berkurang tetapi
  * pemain tetap di soal yang sama sampai kesempatan habis atau menjawab benar.
  */
 export function submitAnswer(
@@ -108,21 +101,9 @@ export function submitAnswer(
 ): SubmitResult {
   const question = currentQuestion(session);
   if (!question) {
-    return { session, correct: false, advanced: true, isLast: true, finished: true, awaitingReason: false };
+    return { session, correct: false, advanced: true, isLast: true, finished: true };
   }
   const correct = checkAnswer(question, response);
-
-  if (question.type === 'tf-reason' && correct) {
-    // Lanjut ke tahap alasan, bukan menyelesaikan soal.
-    return {
-      session: { ...session, awaitingReason: true },
-      correct: true,
-      advanced: false,
-      isLast: false,
-      finished: false,
-      awaitingReason: true,
-    };
-  }
 
   if (correct) return advance(session, question, true);
 
@@ -134,27 +115,5 @@ export function submitAnswer(
     advanced: false,
     isLast: false,
     finished: false,
-    awaitingReason: false,
-  };
-}
-
-/** Tahap 2 soal tf-reason: memeriksa alasan. */
-export function submitReason(session: SessionState, reason: string): SubmitResult {
-  const question = currentQuestion(session);
-  if (!question) {
-    return { session, correct: false, advanced: true, isLast: true, finished: true, awaitingReason: false };
-  }
-  if (checkReason(question, reason)) {
-    return advance(session, question, true);
-  }
-  const attemptsLeft = session.attemptsLeft - 1;
-  if (attemptsLeft <= 0) return advance(session, question, false);
-  return {
-    session: { ...session, attemptsLeft, awaitingReason: false },
-    correct: false,
-    advanced: false,
-    isLast: false,
-    finished: false,
-    awaitingReason: false,
   };
 }

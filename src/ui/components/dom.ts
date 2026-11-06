@@ -54,13 +54,4 @@ export function mount(root: HTMLElement, ...nodes: Child[]): void {
   }
 }
 
-/** Format rupiah tanpa Intl agar konsisten: Rp13.500. */
-export function rupiah(value: number): string {
-  const rounded = Math.round(value);
-  const str = String(Math.abs(rounded)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-  return `${rounded < 0 ? '-' : ''}Rp${str}`;
-}
 
-export function formatNumber(value: number): string {
-  return String(value).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
-}

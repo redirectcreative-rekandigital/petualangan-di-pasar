@@ -53,6 +53,16 @@ export interface ProgresSiswa {
   soalSalah: Array<{ questionId: string; kodeMateri: string }>;
   /** Waktu pembaruan terakhir (ISO). */
   diubahPada: string;
+  /** Tahap misi per balai (0 belum, 1 misi, 2 cerita dibaca, 3 lulus). */
+  tahap?: Record<string, number>;
+  /** Jumlah alat survival yang terkumpul. */
+  alat?: number;
+  /** Lama membaca Halaman Cerita per balai. */
+  bacaan?: Record<string, { detik: number; ulang: number }>;
+  /** Catatan jawaban ringkas: q=id soal, k=kode materi, b=benar, p=pilihan, n=percobaan. */
+  jawaban?: Array<{ q: string; k: string; b: boolean; p: string[]; n: number }>;
+  /** Nilai Final terbaik per bagian (4 bagian). */
+  finalBagian?: number[];
 }
 
 /** Satu baris siswa pada dasbor guru. */

@@ -26,10 +26,26 @@ export interface KarakterOpsi {
   warnaRambut?: number;
   /** Warna kain penutup kepala bagi karakter perempuan (hijab). */
   warnaHijab?: number;
-  /** Skala keseluruhan (Pasar Ramai memakai penjaga lebih besar). */
+  /** Skala keseluruhan (Menara Kitab memakai penjaga lebih besar). */
   skala?: number;
   /** Penanda panah di atas kepala (khusus pemain). */
   pakaiMarker?: boolean;
+  /** Busana Nusantara untuk NPC penjaga/cantrik. */
+  busana?: BusanaNusantara;
+}
+
+/** Atribut busana Nusantara (penutup kepala, jenggot, selendang, kain jarik). */
+export interface BusanaNusantara {
+  /** Penutup kepala pria: blangkon, caping petani, atau udeng (ikat kepala). */
+  kepala?: 'blangkon' | 'caping' | 'udeng';
+  /** Warna penutup kepala pria (blangkon/udeng). */
+  warnaKepala?: number;
+  /** Jenggot/kumis putih untuk tokoh sepuh. */
+  jenggot?: boolean;
+  /** Selendang menyilang di badan (warna). */
+  selendang?: number;
+  /** Kain jarik bermotif di bawahan (warna motif). */
+  jarik?: number;
 }
 
 export interface KarakterRig {
@@ -60,10 +76,18 @@ export interface KarakterRig {
  */
 export function genderPenjaga(nama: string): PlayerGender {
   const bersih = nama.trim().toLowerCase();
-  if (bersih.startsWith('bu') || bersih.startsWith('ibu') || bersih.startsWith('nyai')) {
+  const perempuan = ['ibu', 'bu ', 'nyai', 'dewi', 'nenek', 'ratu', 'sri ', 'sutra', 'energi', 'hijau', 'air', 'siklus', 'semesta'];
+  const pria = ['pak ', 'bapak', 'raja', 'spring', 'kutub', 'magnet', 'gaung', 'bumi', 'batuan', 'prisma', 'rumput'];
+  if (perempuan.some((p) => bersih.startsWith(p) || bersih.includes(` ${p}`))) {
+    // "Profesor Membumi" dsb. tetap laki-laki bila ada kata bernuansa pria.
+    if (pria.some((p) => bersih.includes(p))) return 'laki-laki';
     return 'perempuan';
   }
-  return 'laki-laki';
+  if (pria.some((p) => bersih.startsWith(p) || bersih.includes(` ${p}`))) return 'laki-laki';
+  // Nama netral ("Kakak X") diberi variasi agar tidak semua NPC seragam.
+  let h = 0;
+  for (let i = 0; i < bersih.length; i++) h = (h * 31 + bersih.charCodeAt(i)) % 997;
+  return h % 2 === 0 ? 'perempuan' : 'laki-laki';
 }
 
 /**
@@ -93,7 +117,7 @@ export type BagianWarna = 'baju' | 'bawahan' | 'hijab';
 export const PALET_PILIHAN: Record<PlayerGender, Record<BagianWarna, PilihanWarna[]>> = {
   'laki-laki': {
     baju: [
-      { nama: 'Hijau Pasar', nilai: 0x2f9e6b },
+      { nama: 'Hijau Rimba', nilai: 0x2f9e6b },
       { nama: 'Biru Langit', nilai: 0x2563eb },
       { nama: 'Oranye Madu', nilai: 0xf08c3a },
     ],
@@ -270,10 +294,11 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
 
   if (perempuan) {
     // HIJAB: kerudung yang membungkus kepala, leher, dan jatuh menutupi dada.
-    // Bentuk: bola tertutup yang lebih besar dari kepala, dibuka di bagian
-    // muka (bidang ±0.72π) supaya wajah tetap tampak.
+    // Bentuk: bola hampir penuh (sedikit lebih besar dari kepala) dengan
+    // bukaan muka berbentuk bundar. Bukaan dibuat lebih kecil dari sebelumnya
+    // agar tidak ada celah yang memperlihatkan bagian dalam kepala.
     const hijabGeo = geo(
-      new THREE.SphereGeometry(0.37, 24, 20, Math.PI / 2 + 0.15, Math.PI * 2 - 0.3, 0, Math.PI * 0.72),
+      new THREE.SphereGeometry(0.39, 28, 22, Math.PI / 2 + 0.32, Math.PI * 2 - 0.64, 0, Math.PI * 0.66),
     );
     const hijab = new THREE.Mesh(hijabGeo, mHijab);
     hijab.scale.set(1, 1.12, 1.06);
@@ -305,6 +330,61 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
     jambul.position.set(0, 2.46, 0.02);
     jambul.rotation.z = 0.4;
     badan.add(jambul);
+  }
+
+  /* ---------------- Busana Nusantara (NPC) ---------------- */
+  const busana = opsi.busana;
+  if (busana) {
+    const mKepala = mat(new THREE.MeshStandardMaterial({ color: busana.warnaKepala ?? 0x5b3a1e, roughness: 0.7 }));
+    if (!perempuan && busana.kepala === 'blangkon') {
+      const topi = new THREE.Mesh(geo(new THREE.SphereGeometry(0.335, 24, 12, 0, Math.PI * 2, 0, Math.PI / 2)), mKepala);
+      topi.scale.set(1, 0.72, 1);
+      topi.position.y = 2.3;
+      badan.add(topi);
+      const lingkar = new THREE.Mesh(geo(new THREE.CylinderGeometry(0.338, 0.338, 0.09, 24)), mKepala);
+      lingkar.position.y = 2.3;
+      badan.add(lingkar);
+      const mondolan = new THREE.Mesh(geo(new THREE.SphereGeometry(0.11, 12, 10)), mKepala);
+      mondolan.position.set(0, 2.24, -0.33);
+      badan.add(mondolan);
+    } else if (!perempuan && busana.kepala === 'caping') {
+      const caping = new THREE.Mesh(
+        geo(new THREE.ConeGeometry(0.78, 0.36, 24, 1, true)),
+        mat(new THREE.MeshStandardMaterial({ color: 0xd9b26a, roughness: 0.9, side: THREE.DoubleSide })),
+      );
+      caping.position.y = 2.62;
+      badan.add(caping);
+    } else if (!perempuan && busana.kepala === 'udeng') {
+      const ikat = new THREE.Mesh(geo(new THREE.TorusGeometry(0.305, 0.055, 8, 24)), mKepala);
+      ikat.rotation.x = Math.PI / 2;
+      ikat.position.y = 2.36;
+      badan.add(ikat);
+    }
+    if (!perempuan && busana.jenggot) {
+      const mPutih = mat(new THREE.MeshStandardMaterial({ color: 0xf1f1f1, roughness: 0.8 }));
+      const jenggot = new THREE.Mesh(geo(new THREE.SphereGeometry(0.16, 12, 10)), mPutih);
+      jenggot.scale.set(1.15, 1.2, 0.7);
+      jenggot.position.set(0, 2.02, 0.2);
+      badan.add(jenggot);
+    }
+    if (busana.selendang !== undefined) {
+      const sel = new THREE.Mesh(
+        geo(new THREE.BoxGeometry(0.14, 1.05, 0.06)),
+        mat(new THREE.MeshStandardMaterial({ color: busana.selendang, roughness: 0.7 })),
+      );
+      sel.position.set(0.04, 1.5, 0.27);
+      sel.rotation.z = 0.55;
+      badan.add(sel);
+    }
+    if (busana.jarik !== undefined) {
+      const mMotif = mat(new THREE.MeshStandardMaterial({ color: busana.jarik, roughness: 0.8 }));
+      for (const y of [0.32, 0.62, 0.92]) {
+        const pita = new THREE.Mesh(geo(new THREE.TorusGeometry(perempuan ? 0.4 : 0.3, 0.025, 6, 24)), mMotif);
+        pita.rotation.x = Math.PI / 2;
+        pita.position.y = y;
+        badan.add(pita);
+      }
+    }
   }
 
   /* ---------------- Lengan (bersendi di pundak) ---------------- */

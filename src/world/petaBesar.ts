@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import { NOKTAH } from '../data/balai';
+import { URUTAN_BALAI, getCerita } from '../data/cerita';
+import { buatPulau3D, posisiDiPulau, DIAMETER_PULAU } from './pulau';
 import { buatKios } from './kios';
 import { buatKarakter, type KarakterRig } from './karakter';
 import type { Elemen, NoktahId, NoktahMeta } from '../../shared/types';
@@ -58,19 +60,15 @@ function persenKeDunia(peta: { x: number; y: number }): { x: number; z: number }
 }
 
 const WARNA_ELEMEN: Record<Elemen, number> = {
-  Bilangan: 0x2f9e6b,
-  Geometri: 0x2563eb,
-  Data: 0xd97706,
+  'Makhluk Hidup': 0x2f9e6b,
+  Fisika: 0x2563eb,
+  Bumi: 0xd97706,
 };
 
 const WARNA_FINAL = 0x9333ea;
 
 /** Urutan noktah untuk menggambar rute perjalanan. */
-const RUTE: NoktahId[] = [
-  'B01', 'B02', 'B03', 'B04', 'B05', 'B06',
-  'G01', 'G02', 'G03', 'G04', 'G05', 'G06', 'G07', 'G08',
-  'D01', 'D02', 'FINAL',
-];
+const RUTE: NoktahId[] = [...URUTAN_BALAI, 'FINAL'];
 
 interface PulauNoktah {
   kode: NoktahId;
@@ -85,6 +83,8 @@ interface PulauNoktah {
   fase: number;
   /** Ketinggian dasar pin (untuk animasi mengapung). */
   basePinY: number;
+  /** Awan kabut yang menutupi balai terkunci. */
+  kabut: THREE.Group;
 }
 
 export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOptions): PetaBesarHandle {
@@ -98,7 +98,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xe8f2fb);
-  scene.fog = new THREE.Fog(0xeaf3fb, 100, 210);
+  scene.fog = new THREE.Fog(0xeaf3fb, 220, 460);
 
   const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 400);
 
@@ -116,13 +116,10 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   scene.add(new THREE.HemisphereLight(0xbfe6ff, 0x155f8f, 0.55));
 
   // --- Papan peta (kertas tua) di atas laut ---
-  const boardTex = track(new THREE.CanvasTexture(buatTeksturPapan()));
-  boardTex.colorSpace = THREE.SRGBColorSpace;
-  const boardGeo = track(new THREE.PlaneGeometry(BOARD_W, BOARD_H));
-  const boardMat = track(new THREE.MeshLambertMaterial({ map: boardTex }));
-  const board = new THREE.Mesh(boardGeo, boardMat);
-  board.rotation.x = -Math.PI / 2;
-  scene.add(board);
+  // Pulau Nusa Kawruh: teras bertingkat + jalan setapak melingkar.
+  scene.add(buatPulau3D(track));
+  void buatTeksturPapan;
+  void persenKeDunia;
 
   // --- Laut beriak (bidang grid dengan gelombang lembut) ---
   const seaGeo = track(new THREE.PlaneGeometry(480, 480, 48, 48));
@@ -161,7 +158,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
         m.scale.set(sk * 1.6, sk * 0.6, sk);
         g.add(m);
       }
-      g.position.set((acakAwan() * 2 - 1) * 110, 52 + acakAwan() * 16, -110 + acakAwan() * 220);
+      g.position.set((acakAwan() * 2 - 1) * 140, 95 + acakAwan() * 20, -160 + acakAwan() * 80);
       g.userData.kecepatan = 0.4 + acakAwan() * 0.5;
       scene.add(g);
       awan.push(g);
@@ -173,15 +170,17 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   const titikRute: THREE.Vector3[] = [];
 
   NOKTAH.forEach((n, i) => {
-    const pos = persenKeDunia(n.peta);
+    const pos = posisiDiPulau(n.kode);
     const pulau = buatPulau(n, pos, i, track);
+    pulau.group.position.y = pos.y;
+    pulau.group.scale.setScalar(n.kode === 'FINAL' ? 0.75 : 0.55);
+    pulau.label.scale.multiplyScalar(1.9);
+    pulau.label.position.y += 1.2;
     scene.add(pulau.group);
     pulauList.push(pulau);
-    titikRute.push(new THREE.Vector3(pos.x, 0.55, pos.z));
+    titikRute.push(new THREE.Vector3(pos.x, pos.y, pos.z));
   });
-
-  // --- Rute perjalanan 3D (pita) ---
-  buildRute(scene, track);
+  void buildRute;
   void RUTE;
 
   // --- Kapal layar penghias ---
@@ -194,9 +193,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   scene.add(kapal2);
 
   // --- Mercusuar penghias ---
-  const mercusuar = buildMercusuar(track);
-  mercusuar.position.set(-42, 0, 30);
-  scene.add(mercusuar);
+  void buildMercusuar;
 
   // --- Ikon pemain: karakter kecil berdiri di noktah tempat ia berada. ---
   type PenampilanPemain = {
@@ -212,8 +209,8 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   scene.add(pemainGroup);
 
   // Peta kode → koordinat dunia (untuk menaruh ikon tepat di atas pulau).
-  const posDunia: Partial<Record<NoktahId, { x: number; z: number }>> = {};
-  for (const n of NOKTAH) posDunia[n.kode] = persenKeDunia(n.peta);
+  const posDunia: Partial<Record<NoktahId, { x: number; y: number; z: number }>> = {};
+  for (const n of NOKTAH) posDunia[n.kode] = posisiDiPulau(n.kode);
 
   function pastikanPemain(): { rig: KarakterRig; ring: THREE.Mesh } {
     if (!pemainRig || !pemainRing) {
@@ -254,7 +251,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     pastikanPemain();
     pemainGroup.visible = true;
     // Sedikit ke samping kios agar karakter tidak menutupi pin.
-    pemainGroup.position.set(pos.x + 1.9, 1.05, pos.z + 1.9);
+    pemainGroup.position.set(pos.x + 1.4, pos.y + 0.6, pos.z + 1.4);
   }
 
   perbaruiPemain();
@@ -262,6 +259,8 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   function perbaruiWarna(): void {
     for (const p of pulauList) {
       const st = options.getStatus(p.kode);
+      p.kabut.visible = st.terkunci;
+      p.labelMat.opacity = st.terkunci ? 0.45 : 0.95;
       if (st.terkunci) {
         p.pinMat.color.setHex(0x9ca3af);
         p.pinMat.emissive.setHex(0x111111);
@@ -288,7 +287,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
 
   // Sudut pandang peta.
   let yaw = 0;
-  let pitch = 0.62; // radian dari horizontal
+  let pitch = 0.82; // radian dari horizontal
   let jarak = 0;
   let jarakDasar = 100;
   let targetYaw = yaw;
@@ -311,9 +310,10 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     const h = canvas.clientHeight || window.innerHeight;
     const aspect = w / h;
     const fovRad = (camera.fov * Math.PI) / 180;
-    const perluTinggi = BOARD_H / Math.tan(fovRad / 2);
-    const perluLebar = BOARD_W / aspect / Math.tan(fovRad / 2);
-    return Math.max(perluTinggi, perluLebar) * 0.62 + 8;
+    const perluTinggi = DIAMETER_PULAU / Math.tan(fovRad / 2);
+    const perluLebar = DIAMETER_PULAU / aspect / Math.tan(fovRad / 2);
+    // Potret (HP): cukup pas lebar papan agar pulau tampak besar dan jelas.
+    return (aspect < 1 ? perluLebar * 0.4 : Math.max(perluTinggi, perluLebar) * 0.5) + 4;
   }
 
   function aturKamera(pertama = false): void {
@@ -337,7 +337,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     const y = Math.sin(cp) * d;
     const z = Math.cos(yaw) * Math.cos(cp) * d;
     camera.position.set(x, y, z);
-    camera.lookAt(0, 0, 0);
+    camera.lookAt(0, 4, 0);
   }
 
   aturKamera(true);
@@ -576,10 +576,16 @@ function buatPulau(
   pasir.position.y = 0.55;
   group.add(pasir);
 
-  // Kios mini di tengah pulau (memakai aset kios pasar).
-  const kios = buatKios({ warna: baseWarna, meriah: isFinal, skala: isFinal ? 0.55 : 0.42 }, track);
-  kios.group.position.y = 0.75;
-  group.add(kios.group);
+  // Kios mini di tengah pulau; pulau puncak berisi Mercusuar Tua.
+  if (isFinal) {
+    const m = buildMercusuar(track);
+    m.position.y = 0.75;
+    group.add(m);
+  } else {
+    const kios = buatKios({ warna: baseWarna, meriah: false, skala: 0.42 }, track);
+    kios.group.position.y = 0.75;
+    group.add(kios.group);
+  }
 
   // Bendera warna elemen di sisi kios.
   const tiangGeo = track(new THREE.CylinderGeometry(0.05, 0.05, 2.2, 6));
@@ -601,24 +607,34 @@ function buatPulau(
   tambahBatu(group, 1.8, 2.0, 0.55, track);
 
   // Pin noktah mengapung di atas kios.
-  const basePinY = isFinal ? 3.6 : 3.2;
+  const basePinY = isFinal ? 10.6 : 3.2;
   const headGeo = track(new THREE.SphereGeometry(isFinal ? 1.15 : 0.85, 18, 14));
   const pinMat = track(new THREE.MeshStandardMaterial({ color: baseWarna, roughness: 0.4, metalness: 0.2 }));
   const pin = new THREE.Mesh(headGeo, pinMat);
   pin.position.y = basePinY;
   group.add(pin);
 
-  // Cincin mahkota untuk Pasar Ramai.
-  if (isFinal) {
-    const mahkotaGeo = track(new THREE.ConeGeometry(0.7, 0.9, 5));
-    const mahkotaMat = track(new THREE.MeshStandardMaterial({ color: 0xfbbf24, metalness: 0.6, roughness: 0.3 }));
-    const mahkota = new THREE.Mesh(mahkotaGeo, mahkotaMat);
-    mahkota.position.y = basePinY + 1.2;
-    group.add(mahkota);
+  // Kabut penutup balai terkunci (gumpalan putih transparan).
+  const kabut = new THREE.Group();
+  const kabutGeo = track(new THREE.IcosahedronGeometry(1, 1));
+  const kabutMat = track(new THREE.MeshLambertMaterial({ color: 0xf1f5f9, transparent: true, opacity: 0.82, depthWrite: false }));
+  for (let i = 0; i < 6; i++) {
+    const m = new THREE.Mesh(kabutGeo, kabutMat);
+    const s = (i / 6) * Math.PI * 2;
+    m.position.set(Math.cos(s) * 2.6, 2.2 + (i % 2) * 0.7, Math.sin(s) * 2.6);
+    m.scale.set(2.6, 1.6, 2.6);
+    kabut.add(m);
   }
+  const tengah = new THREE.Mesh(kabutGeo, kabutMat);
+  tengah.position.y = 3.2;
+  tengah.scale.set(3.4, 2.2, 3.4);
+  kabut.add(tengah);
+  kabut.visible = false;
+  group.add(kabut);
 
-  // Label nama.
-  const labelTex = track(new THREE.CanvasTexture(buatTeksturLabel(n.nama, isFinal ? '👑 ' : '📍 ')));
+  // Label nama (nomor urut bab di jalur pulau).
+  const urut = getCerita(n.kode)?.urutan;
+  const labelTex = track(new THREE.CanvasTexture(buatTeksturLabel(n.nama, isFinal ? '🗼 ' : `${urut ?? ''}. `)));
   labelTex.colorSpace = THREE.SRGBColorSpace;
   const labelMat = track(new THREE.SpriteMaterial({ map: labelTex, transparent: true, opacity: 0.9, depthTest: false }));
   const label = new THREE.Sprite(labelMat);
@@ -637,6 +653,7 @@ function buatPulau(
     baseWarna,
     fase: index * 0.7,
     basePinY,
+    kabut,
   };
 }
 

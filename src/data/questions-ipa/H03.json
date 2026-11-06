@@ -1,0 +1,262 @@
+[
+  {
+    "id": "b05-s01",
+    "balai": "H03",
+    "type": "mcq",
+    "prompt": "Hubungan antara dua makhluk hidup yang keduanya saling menguntungkan disebut ....",
+    "options": [
+      "parasitisme",
+      "komensalisme",
+      "mutualisme",
+      "predasi"
+    ],
+    "answer": "mutualisme",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"mutualisme\".",
+    "explanation": [
+      "Kunci: mutualisme.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Mengenal konsep dasar: Hubungan antara dua makhluk hidup yang keduanya saling menguntungkan disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b05-s02",
+    "balai": "H03",
+    "type": "mcq",
+    "prompt": "Contoh hubungan mutualisme adalah ....",
+    "options": [
+      "lebah dan bunga",
+      "benalu dan pohon mangga",
+      "singa dan zebra",
+      "cacing pita dan manusia"
+    ],
+    "answer": "lebah dan bunga",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"lebah dan bunga\".",
+    "explanation": [
+      "Kunci: lebah dan bunga.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Mengenal konsep dasar: Contoh hubungan mutualisme adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b05-s03",
+    "balai": "H03",
+    "type": "mcq",
+    "prompt": "Anggrek menempel pada batang pohon mangga. Pohon tidak diuntungkan maupun dirugikan. Hubungan ini disebut ....",
+    "options": [
+      "mutualisme",
+      "parasitisme",
+      "predasi",
+      "komensalisme"
+    ],
+    "answer": "komensalisme",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"komensalisme\".",
+    "explanation": [
+      "Kunci: komensalisme.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Mengenal konsep dasar: Anggrek menempel pada batang pohon mangga. Pohon tidak diuntungkan maupun dirugikan. Hubungan ini disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b05-s04",
+    "balai": "H03",
+    "type": "mcq",
+    "prompt": "Benalu yang tumbuh pada pohon jambu menunjukkan hubungan ....",
+    "options": [
+      "mutualisme",
+      "parasitisme",
+      "komensalisme",
+      "kompetisi"
+    ],
+    "answer": "parasitisme",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"parasitisme\".",
+    "explanation": [
+      "Kunci: parasitisme.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Menerapkan konsep pada situasi: Benalu yang tumbuh pada pohon jambu menunjukkan hubungan",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b05-s05",
+    "balai": "H03",
+    "type": "mcq",
+    "prompt": "Pada hubungan parasitisme, ....",
+    "options": [
+      "kedua pihak untung",
+      "kedua pihak rugi",
+      "parasit untung, inang dirugikan",
+      "parasit rugi, inang untung"
+    ],
+    "answer": "parasit untung, inang dirugikan",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"parasit untung, inang dirugikan\".",
+    "explanation": [
+      "Kunci: parasit untung, inang dirugikan.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Menerapkan konsep pada situasi: Pada hubungan parasitisme,",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b05-s06",
+    "balai": "H03",
+    "type": "mcq",
+    "prompt": "Singa memburu dan memakan zebra. Hubungan ini disebut ....",
+    "options": [
+      "predasi",
+      "mutualisme",
+      "komensalisme",
+      "parasitisme"
+    ],
+    "answer": "predasi",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"predasi\".",
+    "explanation": [
+      "Kunci: predasi.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Menerapkan konsep pada situasi: Singa memburu dan memakan zebra. Hubungan ini disebut",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b05-s07",
+    "balai": "H03",
+    "type": "mcq",
+    "prompt": "Hewan yang memangsa hewan lain disebut ....",
+    "options": [
+      "mangsa",
+      "predator",
+      "parasit",
+      "inang"
+    ],
+    "answer": "predator",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"predator\".",
+    "explanation": [
+      "Kunci: predator.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Menerapkan konsep pada situasi: Hewan yang memangsa hewan lain disebut",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b05-s08",
+    "balai": "H03",
+    "type": "mcq",
+    "prompt": "Dua ekor harimau berkelahi memperebutkan wilayah berburu. Peristiwa ini termasuk ....",
+    "options": [
+      "mutualisme",
+      "predasi",
+      "komensalisme",
+      "kompetisi"
+    ],
+    "answer": "kompetisi",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"kompetisi\".",
+    "explanation": [
+      "Kunci: kompetisi.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Menganalisis/menyimpulkan: Dua ekor harimau berkelahi memperebutkan wilayah berburu. Peristiwa ini termasuk",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b05-s09",
+    "balai": "H03",
+    "type": "mcq",
+    "prompt": "Bakteri *Rhizobium* hidup pada akar kacang-kacangan. Bakteri mendapat tempat tinggal, dan tanaman mendapat zat hara (nitrogen). Hubungan ini disebut ....",
+    "options": [
+      "parasitisme",
+      "predasi",
+      "mutualisme",
+      "kompetisi"
+    ],
+    "answer": "mutualisme",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"mutualisme\".",
+    "explanation": [
+      "Kunci: mutualisme.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Menganalisis/menyimpulkan: Bakteri *Rhizobium* hidup pada akar kacang-kacangan. Bakteri mendapat tempat tinggal, dan tanaman mendapat zat hara (nitrogen). Hubungan ini disebut",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b05-s10",
+    "balai": "H03",
+    "type": "mcq",
+    "prompt": "Tanaman jagung dan gulma di ladang saling berebut cahaya, air, dan unsur hara. Hubungan ini termasuk ....",
+    "options": [
+      "mutualisme",
+      "kompetisi",
+      "predasi",
+      "komensalisme"
+    ],
+    "answer": "kompetisi",
+    "hint": "Ingat kembali materi \"Hubungan antar makhluk hidup\"; jawaban yang paling tepat adalah \"kompetisi\".",
+    "explanation": [
+      "Kunci: kompetisi.",
+      "Ini sesuai materi Hubungan antar makhluk hidup (materi H03)."
+    ],
+    "meta": {
+      "kodeMateri": "H03",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Hubungan antar makhluk hidup",
+      "indikator": "Menganalisis/menyimpulkan: Tanaman jagung dan gulma di ladang saling berebut cahaya, air, dan unsur hara. Hubungan ini termasuk",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

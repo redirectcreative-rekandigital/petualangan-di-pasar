@@ -2,110 +2,95 @@
 
 ## Identitas
 
-- **Judul:** Petualangan di Pasar
+- **Judul:** Survival Sains
 - **Pembuat:** Rosyitania Yudha Astari, S.Pd
-- **Sekolah:** Guru SD Muhammadiyah Wonorejo Polokarto
-- **Jenjang sasaran:** Kelas 6 SD/MI
-- **Konteks:** Persiapan Tes Kemampuan Akademik (TKA) Matematika SD/MI
-- **Kategori:** Game edukasi berbasis AI
+- **Sekolah:** SD Muhammadiyah Wonorejo Polokarto
+- **Jenjang/kelas sasaran:** Kelas 5 SD/MI
+- **Mata pelajaran:** IPA (Bab 1 sampai Bab 9)
+- **Platform AI:** Claude (Anthropic)
+- **Teknologi:** game web (HTML, CSS, TypeScript), Three.js untuk 3D, SVG untuk ilustrasi, Web Speech API untuk narasi suara, Node.js + WebSocket untuk mode kelas, PWA
 
 ## Ringkasan
 
-Petualangan di Pasar adalah game web 3D **dua lapis** berbasis penjelajahan:
+Survival Sains adalah game petualangan 3D bergaya RPG. Siswa berperan sebagai penjelajah cilik yang terdampar di Pulau Nusa Kawruh setelah badai. Untuk pulang, siswa harus menyalakan Mercusuar Tua di puncak pulau.
 
-1. **Peta besar 3D** bergaya peta harta karun berisi **16 noktah** (titik materi), satu
-   noktah untuk tiap kode materi TKA Matematika SD/MI. Pemain cukup **mengetuk noktah**
-   untuk memasukinya.
-2. **Dunia noktah 3D**: di dalam tiap noktah pemain **berjalan dengan kamera orang
-   ketiga** menuju **balai** (rumah sub-materi), lalu membuka bacaan dan soal.
-
-Noktah dikelompokkan menjadi **tiga zona**:
-
-| Zona | Elemen | Noktah |
-| --- | --- | --- |
-| Perkampungan Tukang Hitung | Bilangan | B01–B06 (6 noktah) |
-| Alun-Alun Bentuk | Geometri | G01–G08 (8 noktah) |
-| Lorong Catatan | Data | D01–D02 (2 noktah) |
-
-Setiap balai dijaga seorang **NPC penjaga**, punya **papan nama bergaya game**, **lencana
-kode TKA**, dan **bacaan materi satu halaman ringkas** yang boleh dibaca santai. Di tiap
-balai siswa berlatih **3 soal**. Semua noktah **bebas dipilih sejak awal**. Setelah pemain
-**pernah mengunjungi seluruh 16 noktah** (aturan A(ii), tanpa syarat bintang), terbuka babak
-puncak **"Pasar Ramai"**: **30 soal** campuran pilihan ganda, pilihan ganda kompleks, dan
-penalaran HOTS yang dijaga **Raja Diskon**. Lulus Pasar Ramai membuka **sertifikat digital**.
+Sembilan Penjaga pulau menyimpan bekal ilmu dan alat survival. Setiap alat hanya diberikan setelah siswa memahami materinya: membaca Halaman Cerita lalu lulus tantangan soal. Materi IPA dipakai langsung untuk bertahan hidup, sehingga siswa melihat gunanya belajar.
 
 ## Tujuan Pembelajaran
 
 Setelah bermain, siswa mampu:
 
-1. Memahami nilai tempat, perbandingan, dan urutan bilangan cacah (B01).
-2. Menghitung total belanja dan kembalian dengan operasi bilangan cacah/desimal (B02).
-3. Menyelesaikan masalah FPB dan KPK dalam konteks berbagi adil dan jadwal berulang (B03).
-4. Menyederhanakan, membandingkan, dan mengurutkan pecahan (B04–B05).
-5. Menghitung persen, diskon, dan konversi pecahan–desimal–persen (B06).
-6. Mengenali ciri bangun datar dan bangun ruang (G01, G04).
-7. Menghitung keliling dan luas bangun datar (G02–G03).
-8. Menghitung volume bangun ruang (G05).
-9. Mengonversi satuan panjang, berat, dan kapasitas (G06).
-10. Menyelesaikan soal jarak, waktu, dan kecepatan (G07).
-11. Mengidentifikasi jenis sudut dan menaksir ukuran (G08).
-12. Membaca tabel, diagram batang, dan piktogram (D01).
-13. Menarik dan menilai kesimpulan yang sesuai dengan data (D02).
-14. Menalar dan membandingkan beberapa pernyataan berbasis data (babak Pasar Ramai).
+1. Menjelaskan sifat cahaya, bagian mata, dan cara menjaga kesehatan mata (Bab 1).
+2. Menjelaskan sifat bunyi, bagian telinga, dan cara menjaga pendengaran (Bab 2).
+3. Membedakan komponen biotik dan abiotik serta jenis ekosistem (Bab 3).
+4. Menyusun rantai makanan dan menjelaskan perpindahan energi (Bab 4).
+5. Membedakan mutualisme, komensalisme, dan parasitisme (Bab 5).
+6. Menyebutkan penyebab kerusakan lingkungan dan cara menjaga kelestariannya (Bab 6).
+7. Menjelaskan sifat magnet, cara membuat magnet, dan pemanfaatannya (Bab 7).
+8. Menjelaskan rangkaian listrik seri dan paralel, konduktor-isolator, dan cara menghemat listrik (Bab 8).
+9. Menjelaskan litosfer, hidrosfer, lapisan atmosfer, siklus air, serta cara aman menghadapi gempa dan tsunami (Bab 9).
 
-## Nilai Karakter
+## Materi
 
-Tema **amanah dan jujur dalam berdagang** (timbangan tidak dikurangi, kembalian dihitung
-benar) muncul sebagai dialog singkat tiap penjaga balai, selaras dengan nilai kejujuran
-yang diajarkan Muhammadiyah.
+| No | Bab | Tempat di pulau | Penjaga | Alat survival |
+| --- | --- | --- | --- | --- |
+| 1 | Bab 1 Cahaya dan Mata | Goa Sinar | Mbok Sinar | Cermin Sinyal |
+| 2 | Bab 2 Bunyi dan Pendengaran | Lembah Gema | Ki Gaung | Kentongan |
+| 3 | Bab 3 Ekosistem | Pondok Tepi Hutan | Nini Rimba | Buku Catatan Penyintas |
+| 4 | Bab 4 Rantai Makanan | Ladang dan Lumbung | Ki Lumbung | Keranjang Bekal |
+| 5 | Bab 5 Simbiosis | Taman Bunga | Nyai Kembang | Kelambu Hutan |
+| 6 | Bab 6 Kelestarian Lingkungan | Persemaian | Eyang Wana | Bibit Pohon |
+| 7 | Bab 7 Magnet | Bukit Batu Besi | Empu Wesi | Kompas Buatan |
+| 8 | Bab 8 Listrik | Sungai Kincir | Mbah Kilat | Dinamo Mercusuar |
+| 9 | Bab 9a Litosfer | Tebing Berlapis | Ibu Pertiwi | Tali Pendaki |
+| 10 | Bab 9b Hidrosfer dan Atmosfer | Mata Air | Ibu Pertiwi | Botol Air Bersih |
+| 11 | Bab 9c Siklus Air dan Bencana | Pos Siaga | Ibu Pertiwi | Peta Jalur Aman |
+| Final | Semua bab | Mercusuar Tua | Kesembilan penjaga | Lampu mercusuar menyala |
 
-## Fitur Unggulan
+Bank soal: 90 soal balai dan 30 soal Final, semua pilihan ganda A–D dengan metadata (kode materi, indikator, level kognitif, tingkat kesulitan).
 
-1. **Peta besar 3D yang dapat diklik** (bergaya peta harta karun) menuju dunia noktah 3D
-   yang dapat dijelajahi dengan kamera orang ketiga, dibangun dari bentuk dasar (tanpa
-   model unduhan) sehingga ringan dan bebas lisensi.
-2. **16 noktah materi TKA + babak puncak** yang memetakan seluruh kode materi TKA SD/MI.
-3. **Bacaan materi 1 halaman** di tiap balai sebagai pengantar sebelum berlatih.
-4. **Metadata TKA pada setiap soal** (kode materi, indikator, level kognitif, tingkat
-   kesulitan) untuk memudahkan pemetaan capaian.
-5. **Soal pilihan ganda kompleks** (pilih semua jawaban benar) selain pilihan ganda,
-   isian angka, dan penalaran.
-6. **Papan data 3D**: tabel dan diagram batang dibuat otomatis dari data soal.
-7. **Babak Pasar Ramai 30 soal** dengan alur ganda, termasuk soal penalaran (HOTS).
-8. **Alur pembuka ramah anak**: cover → pilih karakter (laki-laki/perempuan) → isi nama
-   panggilan → loading singkat → peta.
-9. **Sertifikat digital** berisi nama pemain, total bintang, akurasi, dan pesan karakter.
-10. **Layar darurat ramah** hanya bila perangkat benar-benar tanpa dukungan WebGL.
+## Cara Bermain
+
+1. Tekan **Mulai Petualangan**, tonton cutscene badai, lalu isi Kartu Anggota Ekspedisi (karakter, warna pakaian, nama panggilan, mode Sendiri atau Kelas).
+2. Kamu terbangun di **Goa Sinar**. Mbok Sinar menyapa dan memberi misi pertama. Balai ini sekaligus tutorial.
+3. Berjalan dengan joystick (HP) atau W A S D (laptop). Ikuti **panah kuning** ke tujuan berikutnya, lalu tekan tombol **A**.
+4. Di setiap balai: terima **misi** dari Penjaga → baca **Halaman Cerita** bersama Cantrik → jawab **3 soal** di Tempat Uji → terima **alat survival** → lewati **gerbang** ke peta.
+5. Tiap soal punya **3 obor** (kesempatan). Bila salah, Penjaga memberi petunjuk dan tombol **Ingat cerita** untuk membuka adegan yang relevan.
+6. Setelah 11 alat terkumpul, naiki **Mercusuar Tua**: 30 soal dalam 4 lantai. Lulus bila minimal 21 benar, lalu sertifikat "Penyintas Sains" terbuka.
 
 ## Sistem Permainan
 
-- **Struktur:** 2 lapis — peta besar (16 noktah + Pasar Ramai) → dunia noktah (balai).
-- **Soal per balai:** 3 soal (babak Pasar Ramai: 30 soal).
-- **Kesempatan menjawab:** 3 kali per soal. Habis 3× salah berarti soal dianggap gagal
-  dan pemain lanjut ke soal berikutnya.
-- **Bintang:** 3 benar = ⭐⭐⭐, 2 benar = ⭐⭐, 1 benar = ⭐. Minimal 1 bintang untuk lulus.
-- **Kunci progres:** semua noktah bebas dipilih sejak awal (tidak ada penguncian progresif).
-- **Babak Puncak:** Pasar Ramai terbuka setelah pemain **pernah mengunjungi seluruh 16
-  noktah** (aturan A(ii), tanpa syarat bintang). Gagal berarti mengulang dari awal.
-- **Koin:** +10 untuk tiap jawaban benar.
-- **Sertifikat:** terbuka setelah lulus Pasar Ramai.
-- **Progres:** tersimpan di perangkat (localStorage), bisa direset.
+- **Urutan:** balai dibuka berurutan sesuai bab buku, di mode sendiri maupun mode kelas.
+- **Tempat Uji** terbuka setelah Halaman Cerita selesai dibaca.
+- **Bintang:** 3 benar = 3 bintang, 2 = 2, 1 = 1. Minimal 1 bintang untuk lulus balai. Balai boleh diulang untuk menambah bintang.
+- **Final:** lulus bila ≥ 21 dari 30 (70%). Bila belum lulus, cukup ulangi lantai yang skornya di bawah 70%.
+- **Umpan balik:** setiap jawaban ditanggapi Penjaga. Jawaban benar disertai penjelasan dari cerita, jawaban salah diberi petunjuk.
+
+## Nilai Karakter, Keislaman, dan Kemuhammadiyahan
+
+- Salam di setiap pertemuan, basmalah sebelum tantangan, hamdalah setelah berhasil.
+- Alam dipandang sebagai tanda kebesaran Allah yang diajak untuk diamati (tadabbur alam).
+- Manusia sebagai khalifah penjaga bumi (Bab 6 dan pesan hikmah tiap balai).
+- Hemat air dan listrik sebagai wujud syukur; tolong-menolong seperti lebah dan bunga; ikhtiar dengan ilmu lalu bertawakal saat bencana.
+- Semangat berkemajuan: ilmu dipakai untuk menyelamatkan diri dan menolong sesama.
+
+## Mode Kelas dan Analisis Guru
+
+Guru membuat sesi di **Mode Guru** dan membagikan token 4 digit. Siswa bergabung dengan token, lalu menjelajah sesuai kecepatan masing-masing. Siswa di balai yang sama saling melihat dan bisa menyapa dengan emoji. Tidak ada obrolan bebas dan tidak ada papan peringkat.
+
+Dasbor guru memperbarui data setiap 3 detik:
+
+- **Kelas:** matriks siswa × 11 balai (belum mulai, menerima misi, sudah membaca, lulus, perlu bantuan) dan persen benar kelas per bab.
+- **Soal:** soal yang paling jarang dijawab benar pada percobaan pertama, beserta pilihan salah yang paling sering dipilih (miskonsepsi).
+- **Siswa:** detail per bab (status, bintang, lama membaca, jumlah benar) dan rekomendasi tindak lanjut.
+- Ekspor **CSV Kelas** dan **CSV Jawaban** untuk analisis lanjutan.
+
+## Manfaat
+
+- **Bagi siswa:** belajar IPA lewat cerita yang runtut. Materi dibacakan dengan suara, dilengkapi gambar bergerak dan latihan langsung. Kesalahan menjadi bagian dari belajar.
+- **Bagi guru:** dapat memantau ketuntasan per bab dan per siswa, menemukan miskonsepsi kelas, dan menyiapkan bimbingan ulang yang tepat sasaran.
+- **Bagi sekolah:** media yang berjalan di HP siswa, bisa dipasang offline, dan tidak membutuhkan biaya lisensi.
 
 ## Pemanfaatan AI
 
-AI dipakai untuk membantu ide soal, kerangka kode, dan proses debug. Seluruh kunci
-jawaban diverifikasi manual dan diuji otomatis. Rincian ada di `docs/jurnal-ai.md`.
-
-## Teknologi
-
-TypeScript 5, Vite 7, Three.js, zod, Pointer Events, SVG/kanvas, Web Audio API,
-vite-plugin-pwa, Vitest. Tanpa server maupun basis data; hosting statis HTTPS.
-
-## Petunjuk Bermain Singkat
-
-1. Tekan **Mulai Petualangan**, pilih karakter, lalu isi nama panggilan.
-2. Di **peta 3D**, ketuk salah satu dari **16 noktah** untuk masuk.
-3. Di dalam noktah, berjalan dengan joystick (HP) atau WASD (laptop); putar kamera dengan menggeser.
-4. Dekati balai yang ada tanda seru, tekan **A** (atau E) untuk membuka balai.
-5. Baca materi singkat (opsional), lalu jawab 3 soal dengan 3 kesempatan tiap soal.
-6. Kunjungi seluruh 16 noktah, lalu taklukkan **Pasar Ramai** dan raih sertifikat.
+AI (Claude) dipakai untuk merancang alur cerita, menyusun naskah dialog, membuat kode, dan menguji game. Semua keputusan desain dan pemeriksaan materi dilakukan penulis. Rincian ada di `docs/jurnal-ai.md`.

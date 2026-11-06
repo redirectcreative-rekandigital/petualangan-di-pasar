@@ -69,7 +69,7 @@ export function resolveAll(circle: Circle, boxes: ColliderBox[]): { x: number; z
   return current;
 }
 
-/** Membatasi posisi agar tetap di dalam area pasar. */
+/** Membatasi posisi agar tetap di dalam area peta. */
 export function clampToMap(x: number, z: number, half: number, margin: number): { x: number; z: number } {
   const limit = half - margin;
   return {

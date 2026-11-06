@@ -1,0 +1,262 @@
+[
+  {
+    "id": "b06-s01",
+    "balai": "H04",
+    "type": "mcq",
+    "prompt": "Menjaga kelestarian ekosistem berarti ....",
+    "options": [
+      "menjaga agar ekosistem tetap seimbang dan tidak rusak",
+      "mengubah hutan menjadi pabrik",
+      "memburu semua hewan liar",
+      "menebang semua pohon"
+    ],
+    "answer": "menjaga agar ekosistem tetap seimbang dan tidak rusak",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"menjaga agar ekosistem tetap seimbang dan tidak rusak\".",
+    "explanation": [
+      "Kunci: menjaga agar ekosistem tetap seimbang dan tidak rusak.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Mengenal konsep dasar: Menjaga kelestarian ekosistem berarti",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b06-s02",
+    "balai": "H04",
+    "type": "mcq",
+    "prompt": "Berikut ini yang merupakan penyebab rusaknya ekosistem adalah ....",
+    "options": [
+      "reboisasi",
+      "membuang sampah pada tempatnya",
+      "penebangan hutan secara liar",
+      "membuat taman nasional"
+    ],
+    "answer": "penebangan hutan secara liar",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"penebangan hutan secara liar\".",
+    "explanation": [
+      "Kunci: penebangan hutan secara liar.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Mengenal konsep dasar: Berikut ini yang merupakan penyebab rusaknya ekosistem adalah",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b06-s03",
+    "balai": "H04",
+    "type": "mcq",
+    "prompt": "Penebangan hutan secara liar dapat menyebabkan ....",
+    "options": [
+      "udara menjadi lebih bersih",
+      "banjir dan tanah longsor",
+      "jumlah hewan bertambah",
+      "air sungai menjadi jernih"
+    ],
+    "answer": "banjir dan tanah longsor",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"banjir dan tanah longsor\".",
+    "explanation": [
+      "Kunci: banjir dan tanah longsor.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Mengenal konsep dasar: Penebangan hutan secara liar dapat menyebabkan",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "b06-s04",
+    "balai": "H04",
+    "type": "mcq",
+    "prompt": "Penanaman kembali hutan yang gundul disebut ....",
+    "options": [
+      "deforestasi",
+      "erosi",
+      "urbanisasi",
+      "reboisasi"
+    ],
+    "answer": "reboisasi",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"reboisasi\".",
+    "explanation": [
+      "Kunci: reboisasi.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Menerapkan konsep pada situasi: Penanaman kembali hutan yang gundul disebut",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b06-s05",
+    "balai": "H04",
+    "type": "mcq",
+    "prompt": "Tempat yang digunakan untuk melindungi tumbuhan dan hewan agar tidak punah disebut ....",
+    "options": [
+      "cagar alam",
+      "pasar hewan",
+      "kebun binatang pribadi",
+      "kolam pemancingan"
+    ],
+    "answer": "cagar alam",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"cagar alam\".",
+    "explanation": [
+      "Kunci: cagar alam.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Menerapkan konsep pada situasi: Tempat yang digunakan untuk melindungi tumbuhan dan hewan agar tidak punah disebut",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b06-s06",
+    "balai": "H04",
+    "type": "mcq",
+    "prompt": "Penangkapan ikan dengan bom dapat merusak ....",
+    "options": [
+      "hutan bakau",
+      "gunung",
+      "terumbu karang",
+      "sungai kecil"
+    ],
+    "answer": "terumbu karang",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"terumbu karang\".",
+    "explanation": [
+      "Kunci: terumbu karang.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Menerapkan konsep pada situasi: Penangkapan ikan dengan bom dapat merusak",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b06-s07",
+    "balai": "H04",
+    "type": "mcq",
+    "prompt": "Singkatan 3R dalam pengelolaan sampah adalah ....",
+    "options": [
+      "reduce, repair, rent",
+      "reduce, reuse, recycle",
+      "reuse, rebuild, remove",
+      "recycle, return, rest"
+    ],
+    "answer": "reduce, reuse, recycle",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"reduce, reuse, recycle\".",
+    "explanation": [
+      "Kunci: reduce, reuse, recycle.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Menerapkan konsep pada situasi: Singkatan 3R dalam pengelolaan sampah adalah",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "b06-s08",
+    "balai": "H04",
+    "type": "mcq",
+    "prompt": "Tindakan berikut yang dapat menjaga kelestarian ekosistem adalah ....",
+    "options": [
+      "membakar sampah di hutan",
+      "membuang limbah ke sungai",
+      "menangkap satwa langka untuk dijual",
+      "membuang sampah pada tempatnya dan menanam pohon"
+    ],
+    "answer": "membuang sampah pada tempatnya dan menanam pohon",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"membuang sampah pada tempatnya dan menanam pohon\".",
+    "explanation": [
+      "Kunci: membuang sampah pada tempatnya dan menanam pohon.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Menganalisis/menyimpulkan: Tindakan berikut yang dapat menjaga kelestarian ekosistem adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b06-s09",
+    "balai": "H04",
+    "type": "mcq",
+    "prompt": "Hewan langka yang dilindungi di Indonesia adalah ....",
+    "options": [
+      "harimau Sumatra",
+      "ayam kampung",
+      "kambing",
+      "bebek"
+    ],
+    "answer": "harimau Sumatra",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"harimau Sumatra\".",
+    "explanation": [
+      "Kunci: harimau Sumatra.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Menganalisis/menyimpulkan: Hewan langka yang dilindungi di Indonesia adalah",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "b06-s10",
+    "balai": "H04",
+    "type": "mcq",
+    "prompt": "Penggunaan pestisida secara berlebihan dapat menyebabkan ....",
+    "options": [
+      "tanah menjadi subur selamanya",
+      "hama hilang tanpa dampak lain",
+      "pencemaran tanah dan air serta matinya hewan yang bermanfaat",
+      "udara menjadi segar"
+    ],
+    "answer": "pencemaran tanah dan air serta matinya hewan yang bermanfaat",
+    "hint": "Ingat kembali materi \"Kelestarian ekosistem\"; jawaban yang paling tepat adalah \"pencemaran tanah dan air serta matinya hewan yang bermanfaat\".",
+    "explanation": [
+      "Kunci: pencemaran tanah dan air serta matinya hewan yang bermanfaat.",
+      "Ini sesuai materi Kelestarian ekosistem (materi H04)."
+    ],
+    "meta": {
+      "kodeMateri": "H04",
+      "elemen": "Makhluk Hidup",
+      "submateri": "Kelestarian ekosistem",
+      "indikator": "Menganalisis/menyimpulkan: Penggunaan pestisida secara berlebihan dapat menyebabkan",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

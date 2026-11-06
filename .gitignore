@@ -1,0 +1,21 @@
+# Dependensi
+node_modules/
+
+# Hasil build
+dist/
+coverage/
+
+# Berkas sementara / log
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+
+# Lingkungan lokal
+.env
+.env.local
+.env.*.local
+
+# Editor
+.vscode/
+.idea/

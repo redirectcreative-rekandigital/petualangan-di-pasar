@@ -1,0 +1,162 @@
+[
+  {
+    "id": "L3-01",
+    "level": 3,
+    "type": "number",
+    "unit": "gelas",
+    "prompt": "Perhatikan tabel penjualan es teh berikut. Berapa rata-rata es teh yang terjual per hari?",
+    "data": {
+      "kind": "table",
+      "labels": ["Sen", "Sel", "Rab", "Kam", "Jum"],
+      "values": [12, 15, 9, 18, 21],
+      "unit": "gelas"
+    },
+    "answer": 15,
+    "hint": "Rata-rata = jumlah semua data : banyak hari.",
+    "explanation": [
+      "Total = 12 + 15 + 9 + 18 + 21 = 75 gelas.",
+      "Banyak hari = 5.",
+      "Rata-rata = 75 : 5 = 15 gelas per hari."
+    ]
+  },
+  {
+    "id": "L3-02",
+    "level": 3,
+    "type": "number",
+    "unit": "gelas",
+    "prompt": "Masih dari tabel penjualan es teh. Berapa selisih penjualan terbanyak dan paling sedikit?",
+    "data": {
+      "kind": "table",
+      "labels": ["Sen", "Sel", "Rab", "Kam", "Jum"],
+      "values": [12, 15, 9, 18, 21],
+      "unit": "gelas"
+    },
+    "answer": 12,
+    "hint": "Cari nilai terbesar dan terkecil, lalu kurangkan.",
+    "explanation": [
+      "Penjualan terbanyak = 21 gelas (Jumat).",
+      "Penjualan paling sedikit = 9 gelas (Rabu).",
+      "Selisih = 21 − 9 = 12 gelas."
+    ]
+  },
+  {
+    "id": "L3-03",
+    "level": 3,
+    "type": "number",
+    "unit": "roti",
+    "prompt": "Tabel berikut menunjukkan penjualan roti selama 4 hari. Berapa jumlah seluruh roti yang terjual?",
+    "data": {
+      "kind": "table",
+      "labels": ["Sen", "Sel", "Rab", "Kam"],
+      "values": [25, 30, 20, 35],
+      "unit": "roti"
+    },
+    "answer": 110,
+    "hint": "Jumlahkan semua angka pada tabel.",
+    "explanation": [
+      "Total = 25 + 30 + 20 + 35.",
+      "Total = 110 roti.",
+      "Jadi seluruh roti yang terjual 110 buah."
+    ]
+  },
+  {
+    "id": "L3-04",
+    "level": 3,
+    "type": "mcq",
+    "prompt": "Perhatikan diagram batang penjualan buku berikut. Hari apa penjualan buku paling banyak?",
+    "data": {
+      "kind": "bar",
+      "labels": ["Sen", "Sel", "Rab", "Kam", "Jum"],
+      "values": [10, 14, 8, 16, 12],
+      "unit": "buku"
+    },
+    "options": ["Senin", "Selasa", "Kamis", "Jumat"],
+    "answer": "Kamis",
+    "hint": "Cari batang tertinggi pada diagram.",
+    "explanation": [
+      "Nilai diagram: Sen 10, Sel 14, Rab 8, Kam 16, Jum 12.",
+      "Nilai tertinggi adalah 16 buku pada hari Kamis.",
+      "Jadi penjualan terbanyak terjadi pada hari Kamis."
+    ]
+  },
+  {
+    "id": "L3-05",
+    "level": 3,
+    "type": "number",
+    "unit": "buku",
+    "prompt": "Dari diagram batang yang sama (Sen 10, Sel 14, Rab 8, Kam 16, Jum 12), berapa selisih penjualan Selasa dan Rabu?",
+    "data": {
+      "kind": "bar",
+      "labels": ["Sen", "Sel", "Rab", "Kam", "Jum"],
+      "values": [10, 14, 8, 16, 12],
+      "unit": "buku"
+    },
+    "answer": 6,
+    "hint": "Selasa 14 buku, Rabu 8 buku.",
+    "explanation": [
+      "Penjualan Selasa = 14 buku.",
+      "Penjualan Rabu = 8 buku.",
+      "Selisih = 14 − 8 = 6 buku."
+    ]
+  },
+  {
+    "id": "L3-06",
+    "level": 3,
+    "type": "number",
+    "unit": "kg",
+    "prompt": "Tabel penjualan buah selama 3 hari. Berapa total buah yang terjual seluruhnya?",
+    "data": {
+      "kind": "table",
+      "labels": ["Hari 1", "Hari 2", "Hari 3"],
+      "values": [18, 22, 20],
+      "unit": "kg"
+    },
+    "answer": 60,
+    "hint": "Jumlahkan 18 + 22 + 20.",
+    "explanation": [
+      "Total = 18 + 22 + 20.",
+      "Total = 60 kg.",
+      "Jadi seluruh buah yang terjual 60 kg."
+    ]
+  },
+  {
+    "id": "L3-07",
+    "level": 3,
+    "type": "mcq",
+    "prompt": "Perhatikan diagram batang berikut (nilai dalam kg). Hari mana penjualan paling sedikit?",
+    "data": {
+      "kind": "bar",
+      "labels": ["Sen", "Sel", "Rab", "Kam"],
+      "values": [20, 15, 25, 18],
+      "unit": "kg"
+    },
+    "options": ["Senin", "Selasa", "Rabu", "Kamis"],
+    "answer": "Selasa",
+    "hint": "Cari batang paling pendek.",
+    "explanation": [
+      "Nilai diagram: Sen 20, Sel 15, Rab 25, Kam 18.",
+      "Nilai terkecil adalah 15 kg pada hari Selasa.",
+      "Jadi penjualan paling sedikit pada hari Selasa."
+    ]
+  },
+  {
+    "id": "L3-08",
+    "level": 3,
+    "type": "number",
+    "unit": "donat",
+    "prompt": "Tabel penjualan donat: Senin 40, Selasa 35, Rabu 45, Kamis 30, Jumat 50. Berapa rata-rata donat yang terjual per hari?",
+    "data": {
+      "kind": "table",
+      "labels": ["Sen", "Sel", "Rab", "Kam", "Jum"],
+      "values": [40, 35, 45, 30, 50],
+      "unit": "donat"
+    },
+    "answer": 40,
+    "hint": "Jumlahkan semua data lalu bagi 5.",
+    "explanation": [
+      "Total = 40 + 35 + 45 + 30 + 50 = 200 donat.",
+      "Banyak hari = 5.",
+      "Rata-rata = 200 : 5 = 40 donat per hari."
+    ]
+  }
+]

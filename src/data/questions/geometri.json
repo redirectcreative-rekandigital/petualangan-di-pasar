@@ -1,0 +1,533 @@
+[
+  {
+    "id": "G01-01",
+    "balai": "G01",
+    "type": "mcq",
+    "prompt": "Bangun datar yang memiliki 4 sisi sama panjang dan 4 sudut siku-siku adalah ...",
+    "options": ["persegi", "persegi panjang", "jajargenjang", "trapesium"],
+    "answer": "persegi",
+    "hint": "Perhatikan: semua sisi sama panjang DAN semua sudut siku-siku.",
+    "explanation": [
+      "Persegi memiliki 4 sisi yang sama panjang dan 4 sudut siku-siku (90 derajat).",
+      "Persegi panjang sudutnya siku-siku, tetapi sisi-sisinya tidak harus sama semua."
+    ],
+    "meta": {
+      "kodeMateri": "G01",
+      "elemen": "Geometri",
+      "submateri": "Ciri bangun datar",
+      "indikator": "Mengidentifikasi bangun datar berdasarkan cirinya",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "G01-02",
+    "balai": "G01",
+    "type": "mcq",
+    "prompt": "Ciri khas yang dimiliki trapesium tetapi tidak dimiliki segitiga adalah ...",
+    "options": [
+      "memiliki sepasang sisi sejajar",
+      "memiliki tiga sudut",
+      "memiliki tiga sisi",
+      "semua sisinya sama panjang"
+    ],
+    "answer": "memiliki sepasang sisi sejajar",
+    "hint": "Ingat bentuk trapesium seperti atap atau tangga.",
+    "explanation": [
+      "Trapesium adalah segi empat dengan tepat sepasang sisi yang sejajar.",
+      "Segitiga hanya memiliki tiga sisi dan tiga sudut, tanpa sisi sejajar."
+    ],
+    "meta": {
+      "kodeMateri": "G01",
+      "elemen": "Geometri",
+      "submateri": "Ciri bangun datar",
+      "indikator": "Membedakan ciri antar bangun datar",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G01-03",
+    "balai": "G01",
+    "type": "mcq",
+    "prompt": "Sebuah bangun datar memiliki dua pasang sisi sejajar, tetapi sudutnya tidak siku-siku. Bangun tersebut adalah ...",
+    "options": ["jajargenjang", "persegi", "persegi panjang", "segitiga"],
+    "answer": "jajargenjang",
+    "hint": "Dua pasang sisi sejajar, tetapi tidak ada sudut 90 derajat.",
+    "explanation": [
+      "Jajargenjang memiliki dua pasang sisi sejajar dan sudut tidak siku-siku.",
+      "Persegi dan persegi panjang sudutnya siku-siku, segitiga hanya 3 sisi."
+    ],
+    "meta": {
+      "kodeMateri": "G01",
+      "elemen": "Geometri",
+      "submateri": "Ciri bangun datar",
+      "indikator": "Menentukan nama bangun datar dari cirinya",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G02-01",
+    "balai": "G02",
+    "type": "number",
+    "prompt": "Sebuah taman berbentuk persegi panjang berukuran 12 m x 7 m. Berapa meter keliling taman tersebut?",
+    "answer": 38,
+    "unit": "m",
+    "hint": "Keliling persegi panjang = 2 x (panjang + lebar).",
+    "explanation": [
+      "Keliling = 2 x (panjang + lebar).",
+      "Keliling = 2 x (12 + 7) = 2 x 19 = 38.",
+      "Jadi keliling taman 38 m."
+    ],
+    "meta": {
+      "kodeMateri": "G02",
+      "elemen": "Geometri",
+      "submateri": "Keliling bangun datar",
+      "indikator": "Menghitung keliling persegi panjang",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G02-02",
+    "balai": "G02",
+    "type": "mcq",
+    "prompt": "Sebuah taman berbentuk persegi memiliki sisi 9 m. Keliling taman tersebut adalah ...",
+    "options": ["18 m", "36 m", "81 m", "27 m"],
+    "answer": "36 m",
+    "hint": "Persegi punya 4 sisi sama panjang.",
+    "explanation": [
+      "Keliling persegi = 4 x sisi.",
+      "Keliling = 4 x 9 = 36.",
+      "Jadi keliling taman 36 m."
+    ],
+    "meta": {
+      "kodeMateri": "G02",
+      "elemen": "Geometri",
+      "submateri": "Keliling bangun datar",
+      "indikator": "Menghitung keliling persegi",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "G02-03",
+    "balai": "G02",
+    "type": "number",
+    "prompt": "Sebuah segitiga memiliki panjang sisi 8 cm, 11 cm, dan 13 cm. Berapa cm keliling segitiga tersebut?",
+    "answer": 32,
+    "unit": "cm",
+    "hint": "Keliling segitiga = jumlah ketiga sisinya.",
+    "explanation": [
+      "Keliling segitiga = jumlah ketiga sisinya.",
+      "Keliling = 8 + 11 + 13 = 32.",
+      "Jadi keliling segitiga 32 cm."
+    ],
+    "meta": {
+      "kodeMateri": "G02",
+      "elemen": "Geometri",
+      "submateri": "Keliling bangun datar",
+      "indikator": "Menghitung keliling segitiga",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G03-01",
+    "balai": "G03",
+    "type": "number",
+    "prompt": "Sebuah lantai berukuran panjang 12 m dan lebar 7 m. Berapa meter persegi luas lantai tersebut?",
+    "answer": 84,
+    "unit": "m2",
+    "hint": "Luas persegi panjang = panjang x lebar.",
+    "explanation": [
+      "Luas = panjang x lebar.",
+      "Luas = 12 x 7 = 84.",
+      "Jadi luas lantai 84 m2."
+    ],
+    "meta": {
+      "kodeMateri": "G03",
+      "elemen": "Geometri",
+      "submateri": "Luas bangun datar",
+      "indikator": "Menghitung luas persegi panjang",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G03-02",
+    "balai": "G03",
+    "type": "mcq",
+    "prompt": "Sebuah segitiga memiliki alas 10 cm dan tinggi 6 cm. Luas segitiga tersebut adalah ...",
+    "options": ["30 cm2", "60 cm2", "16 cm2", "36 cm2"],
+    "answer": "30 cm2",
+    "hint": "Luas segitiga = 1/2 x alas x tinggi.",
+    "explanation": [
+      "Luas segitiga = 1/2 x alas x tinggi.",
+      "Luas = 1/2 x 10 x 6 = 30.",
+      "Jadi luas segitiga 30 cm2."
+    ],
+    "meta": {
+      "kodeMateri": "G03",
+      "elemen": "Geometri",
+      "submateri": "Luas bangun datar",
+      "indikator": "Menghitung luas segitiga",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G03-03",
+    "balai": "G03",
+    "type": "number",
+    "prompt": "Sebuah persegi memiliki sisi 15 cm. Berapa cm2 luas persegi tersebut?",
+    "answer": 225,
+    "unit": "cm2",
+    "hint": "Luas persegi = sisi x sisi.",
+    "explanation": [
+      "Luas persegi = sisi x sisi.",
+      "Luas = 15 x 15 = 225.",
+      "Jadi luas persegi 225 cm2."
+    ],
+    "meta": {
+      "kodeMateri": "G03",
+      "elemen": "Geometri",
+      "submateri": "Luas bangun datar",
+      "indikator": "Menghitung luas persegi",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G04-01",
+    "balai": "G04",
+    "type": "mcq",
+    "prompt": "Bangun ruang yang semua rusuknya sama panjang dan setiap sisi berupa persegi adalah ...",
+    "options": ["kubus", "balok", "tabung", "limas"],
+    "answer": "kubus",
+    "hint": "Semua rusuk sama panjang, semua sisi persegi.",
+    "explanation": [
+      "Kubus memiliki 12 rusuk yang semuanya sama panjang.",
+      "Setiap sisi kubus berupa persegi, sedangkan balok sisinya persegi panjang."
+    ],
+    "meta": {
+      "kodeMateri": "G04",
+      "elemen": "Geometri",
+      "submateri": "Ciri bangun ruang",
+      "indikator": "Mengidentifikasi bangun ruang berdasarkan cirinya",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "G04-02",
+    "balai": "G04",
+    "type": "mcq-complex",
+    "prompt": "Pilihlah semua pernyataan yang BENAR tentang balok!",
+    "options": [
+      "Balok memiliki 6 sisi.",
+      "Sisi-sisi balok yang berhadapan sama besar.",
+      "Semua rusuk balok selalu sama panjang.",
+      "Balok memiliki 8 titik sudut."
+    ],
+    "answer": ["Balok memiliki 6 sisi.", "Sisi-sisi balok yang berhadapan sama besar.", "Balok memiliki 8 titik sudut."],
+    "hint": "Bandingkan ciri balok dan kubus.",
+    "explanation": [
+      "Balok memiliki 6 sisi, jadi pernyataan pertama benar.",
+      "Sisi yang berhadapan pada balok sama besar, jadi pernyataan kedua benar.",
+      "Rusuk balok tidak harus sama panjang, jadi pernyataan ketiga salah.",
+      "Balok memiliki 8 titik sudut, jadi pernyataan keempat benar."
+    ],
+    "meta": {
+      "kodeMateri": "G04",
+      "elemen": "Geometri",
+      "submateri": "Ciri bangun ruang",
+      "indikator": "Menilai kebenaran pernyataan tentang ciri balok",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "G04-03",
+    "balai": "G04",
+    "type": "mcq",
+    "prompt": "Sebuah bangun ruang memiliki 6 sisi berbentuk persegi panjang dan 12 rusuk. Bangun tersebut adalah ...",
+    "options": ["balok", "kubus", "prisma segitiga", "limas segiempat"],
+    "answer": "balok",
+    "hint": "6 sisi persegi panjang, bukan persegi.",
+    "explanation": [
+      "Balok memiliki 6 sisi berbentuk persegi panjang dan 12 rusuk.",
+      "Kubus juga memiliki 12 rusuk, tetapi sisinya berupa persegi."
+    ],
+    "meta": {
+      "kodeMateri": "G04",
+      "elemen": "Geometri",
+      "submateri": "Ciri bangun ruang",
+      "indikator": "Menentukan bangun ruang berdasarkan cirinya",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G05-01",
+    "balai": "G05",
+    "type": "number",
+    "prompt": "Sebuah balok berukuran panjang 10 cm, lebar 5 cm, dan tinggi 4 cm. Berapa cm3 volume balok tersebut?",
+    "answer": 200,
+    "unit": "cm3",
+    "hint": "Volume balok = panjang x lebar x tinggi.",
+    "explanation": [
+      "Volume balok = panjang x lebar x tinggi.",
+      "Volume = 10 x 5 x 4 = 200.",
+      "Jadi volume balok 200 cm3."
+    ],
+    "meta": {
+      "kodeMateri": "G05",
+      "elemen": "Geometri",
+      "submateri": "Volume bangun ruang",
+      "indikator": "Menghitung volume balok",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G05-02",
+    "balai": "G05",
+    "type": "mcq",
+    "prompt": "Sebuah kubus memiliki panjang rusuk 6 cm. Volume kubus tersebut adalah ...",
+    "options": ["216 cm3", "36 cm3", "72 cm3", "18 cm3"],
+    "answer": "216 cm3",
+    "hint": "Volume kubus = rusuk x rusuk x rusuk.",
+    "explanation": [
+      "Volume kubus = rusuk x rusuk x rusuk.",
+      "Volume = 6 x 6 x 6 = 216.",
+      "Jadi volume kubus 216 cm3."
+    ],
+    "meta": {
+      "kodeMateri": "G05",
+      "elemen": "Geometri",
+      "submateri": "Volume bangun ruang",
+      "indikator": "Menghitung volume kubus",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G05-03",
+    "balai": "G05",
+    "type": "number",
+    "prompt": "Sebuah kubus memiliki panjang rusuk 4 cm. Berapa cm3 volume kubus tersebut?",
+    "answer": 64,
+    "unit": "cm3",
+    "hint": "Kalikan rusuk tiga kali.",
+    "explanation": [
+      "Volume kubus = rusuk x rusuk x rusuk.",
+      "Volume = 4 x 4 x 4 = 64.",
+      "Jadi volume kubus 64 cm3."
+    ],
+    "meta": {
+      "kodeMateri": "G05",
+      "elemen": "Geometri",
+      "submateri": "Volume bangun ruang",
+      "indikator": "Menghitung volume kubus",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "G06-01",
+    "balai": "G06",
+    "type": "number",
+    "prompt": "Panjang sebuah tali 2,5 meter. Berapa cm panjang tali tersebut? (tulis angkanya saja)",
+    "answer": 250,
+    "unit": "cm",
+    "hint": "Dari meter ke cm turun dua tingkat, dikali 100.",
+    "explanation": [
+      "1 meter = 100 cm.",
+      "2,5 meter = 2,5 x 100 = 250.",
+      "Jadi panjang tali 250 cm."
+    ],
+    "meta": {
+      "kodeMateri": "G06",
+      "elemen": "Geometri",
+      "submateri": "Konversi satuan panjang",
+      "indikator": "Mengubah satuan meter menjadi sentimeter",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G06-02",
+    "balai": "G06",
+    "type": "mcq",
+    "prompt": "Berat sekarung beras adalah 3 kg. Berapa gram berat beras tersebut?",
+    "options": ["300 gram", "3.000 gram", "30.000 gram", "300.000 gram"],
+    "answer": "3.000 gram",
+    "hint": "1 kg = 1.000 gram.",
+    "explanation": [
+      "1 kg = 1.000 gram.",
+      "3 kg = 3 x 1.000 = 3.000 gram.",
+      "Jadi berat beras 3.000 gram."
+    ],
+    "meta": {
+      "kodeMateri": "G06",
+      "elemen": "Geometri",
+      "submateri": "Konversi satuan massa",
+      "indikator": "Mengubah satuan kilogram menjadi gram",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "G06-03",
+    "balai": "G06",
+    "type": "number",
+    "prompt": "Sebuah botol berisi 1,5 liter air. Berapa ml isi air dalam botol tersebut? (tulis angkanya saja)",
+    "answer": 1500,
+    "unit": "ml",
+    "hint": "1 liter = 1.000 ml.",
+    "explanation": [
+      "1 liter = 1.000 ml.",
+      "1,5 liter = 1,5 x 1.000 = 1.500.",
+      "Jadi isi air dalam botol 1.500 ml."
+    ],
+    "meta": {
+      "kodeMateri": "G06",
+      "elemen": "Geometri",
+      "submateri": "Konversi satuan kapasitas",
+      "indikator": "Mengubah satuan liter menjadi mililiter",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G07-01",
+    "balai": "G07",
+    "type": "number",
+    "prompt": "Sebuah mobil menempuh jarak 120 km dengan kecepatan 60 km/jam. Berapa jam waktu yang dibutuhkan? (tulis angkanya saja)",
+    "answer": 2,
+    "unit": "jam",
+    "hint": "Waktu = jarak : kecepatan.",
+    "explanation": [
+      "Waktu = jarak : kecepatan.",
+      "Waktu = 120 : 60 = 2.",
+      "Jadi waktu yang dibutuhkan 2 jam."
+    ],
+    "meta": {
+      "kodeMateri": "G07",
+      "elemen": "Geometri",
+      "submateri": "Jarak, waktu, dan kecepatan",
+      "indikator": "Menghitung waktu tempuh",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G07-02",
+    "balai": "G07",
+    "type": "mcq",
+    "prompt": "Pak Hamid mengendarai sepeda motor dengan kecepatan 40 km/jam selama 3 jam. Berapa km jarak yang ditempuh?",
+    "options": ["80 km", "120 km", "43 km", "133 km"],
+    "answer": "120 km",
+    "hint": "Jarak = kecepatan x waktu.",
+    "explanation": [
+      "Jarak = kecepatan x waktu.",
+      "Jarak = 40 x 3 = 120.",
+      "Jadi jarak yang ditempuh 120 km."
+    ],
+    "meta": {
+      "kodeMateri": "G07",
+      "elemen": "Geometri",
+      "submateri": "Jarak, waktu, dan kecepatan",
+      "indikator": "Menghitung jarak tempuh",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G07-03",
+    "balai": "G07",
+    "type": "number",
+    "prompt": "Sebuah bus menempuh jarak 180 km dalam waktu 3 jam. Berapa km/jam kecepatan bus tersebut? (tulis angkanya saja)",
+    "answer": 60,
+    "unit": "km/jam",
+    "hint": "Kecepatan = jarak : waktu.",
+    "explanation": [
+      "Kecepatan = jarak : waktu.",
+      "Kecepatan = 180 : 3 = 60.",
+      "Jadi kecepatan bus 60 km/jam."
+    ],
+    "meta": {
+      "kodeMateri": "G07",
+      "elemen": "Geometri",
+      "submateri": "Jarak, waktu, dan kecepatan",
+      "indikator": "Menghitung kecepatan",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "G08-01",
+    "balai": "G08",
+    "type": "mcq",
+    "prompt": "Sudut yang besarnya kurang dari 90 derajat disebut sudut ...",
+    "options": ["lancip", "siku-siku", "tumpul", "lurus"],
+    "answer": "lancip",
+    "hint": "Lebih kecil dari sudut siku-siku.",
+    "explanation": [
+      "Sudut lancip besarnya kurang dari 90 derajat.",
+      "Sudut siku-siku tepat 90 derajat, sudut tumpul antara 90 dan 180 derajat."
+    ],
+    "meta": {
+      "kodeMateri": "G08",
+      "elemen": "Geometri",
+      "submateri": "Jenis sudut",
+      "indikator": "Mengidentifikasi jenis sudut berdasarkan besarannya",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "G08-02",
+    "balai": "G08",
+    "type": "mcq",
+    "prompt": "Sudut yang besarnya tepat 90 derajat adalah sudut ...",
+    "options": ["siku-siku", "lancip", "tumpul", "lurus"],
+    "answer": "siku-siku",
+    "hint": "Seperti sudut pada pojok persegi.",
+    "explanation": [
+      "Sudut siku-siku besarnya tepat 90 derajat.",
+      "Sudut ini biasanya ditandai dengan simbol persegi kecil di pojoknya."
+    ],
+    "meta": {
+      "kodeMateri": "G08",
+      "elemen": "Geometri",
+      "submateri": "Jenis sudut",
+      "indikator": "Mengidentifikasi sudut siku-siku",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "G08-03",
+    "balai": "G08",
+    "type": "mcq",
+    "prompt": "Perkiraan yang paling masuk akal untuk panjang sebuah meja belajar adalah ...",
+    "options": ["1 meter", "1 sentimeter", "1 kilometer", "1 milimeter"],
+    "answer": "1 meter",
+    "hint": "Pilih satuan yang wajar untuk benda seukuran meja.",
+    "explanation": [
+      "Meja belajar memiliki panjang sekitar 1 meter.",
+      "1 sentimeter dan 1 milimeter terlalu pendek, 1 kilometer terlalu panjang."
+    ],
+    "meta": {
+      "kodeMateri": "G08",
+      "elemen": "Geometri",
+      "submateri": "Penaksiran panjang",
+      "indikator": "Menaksir panjang benda dengan satuan yang sesuai",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  }
+]

@@ -1,0 +1,118 @@
+[
+  {
+    "id": "L4-01",
+    "level": 4,
+    "type": "number",
+    "unit": "Rp",
+    "prompt": "Bu Sari membeli 2 kg apel @ Rp30.000 dan 3 kg jeruk @ Rp20.000. Ia mendapat diskon 10% dari total belanja. Jika Bu Sari membayar Rp150.000, berapa kembaliannya?",
+    "answer": 42000,
+    "hint": "Hitung total dulu, lalu diskon 10%, baru kurangkan dari Rp150.000.",
+    "explanation": [
+      "Apel = 2 × Rp30.000 = Rp60.000. Jeruk = 3 × Rp20.000 = Rp60.000.",
+      "Total awal = Rp60.000 + Rp60.000 = Rp120.000.",
+      "Diskon = 10% × Rp120.000 = Rp12.000; bayar = Rp120.000 − Rp12.000 = Rp108.000.",
+      "Kembalian = Rp150.000 − Rp108.000 = Rp42.000."
+    ]
+  },
+  {
+    "id": "L4-02",
+    "level": 4,
+    "type": "number",
+    "unit": "Rp",
+    "prompt": "Sebuah toko membeli 20 kg jeruk dengan harga Rp15.000 per kg. Jeruk dijual kembali dengan harga Rp20.000 per kg dan seluruhnya habis terjual. Berapa keuntungan toko?",
+    "answer": 100000,
+    "hint": "Keuntungan = (harga jual × jumlah) − (harga beli × jumlah).",
+    "explanation": [
+      "Modal = 20 × Rp15.000 = Rp300.000.",
+      "Hasil penjualan = 20 × Rp20.000 = Rp400.000.",
+      "Keuntungan = Rp400.000 − Rp300.000 = Rp100.000."
+    ]
+  },
+  {
+    "id": "L4-03",
+    "level": 4,
+    "type": "number",
+    "unit": "Rp",
+    "prompt": "Ibu membeli 3 kotak kue. Setiap kotak berisi 12 kue dan berharga Rp24.000 per kotak. Ibu membayar dengan 2 lembar uang Rp50.000. Berapa kembalian Ibu?",
+    "answer": 28000,
+    "hint": "Total harga = 3 × Rp24.000. Uang dibayar = 2 × Rp50.000.",
+    "explanation": [
+      "Total harga = 3 × Rp24.000 = Rp72.000.",
+      "Uang dibayar = 2 × Rp50.000 = Rp100.000.",
+      "Kembalian = Rp100.000 − Rp72.000 = Rp28.000."
+    ]
+  },
+  {
+    "id": "L4-04",
+    "level": 4,
+    "type": "number",
+    "unit": "Rp",
+    "prompt": "Bu Ina menjual 50 pensil dengan harga Rp2.000 per buah. Ia lalu membeli lagi 40 buku dengan harga Rp5.000 per buku. Berapa sisa uang Bu Ina jika uang awalnya Rp300.000?",
+    "answer": 200000,
+    "hint": "Uang masuk dari pensil, uang keluar untuk buku. Hitung selisihnya dari Rp300.000.",
+    "explanation": [
+      "Uang masuk dari pensil = 50 × Rp2.000 = Rp100.000.",
+      "Uang keluar untuk buku = 40 × Rp5.000 = Rp200.000.",
+      "Sisa uang = Rp300.000 + Rp100.000 − Rp200.000.",
+      "Sisa uang = Rp200.000."
+    ]
+  },
+  {
+    "id": "L4-05",
+    "level": 4,
+    "type": "number",
+    "unit": "Rp",
+    "prompt": "Pak Adi membeli 5 kg daging dengan harga Rp90.000 per kg. Ia mendapat diskon 10%. Jika Pak Adi membayar dengan 5 lembar uang Rp100.000, berapa kembaliannya?",
+    "answer": 95000,
+    "hint": "Total = 5 × Rp90.000; diskon 10%; uang dibayar = 5 × Rp100.000.",
+    "explanation": [
+      "Total awal = 5 × Rp90.000 = Rp450.000.",
+      "Diskon = 10% × Rp450.000 = Rp45.000; bayar = Rp450.000 − Rp45.000 = Rp405.000.",
+      "Uang dibayar = 5 × Rp100.000 = Rp500.000.",
+      "Kembalian = Rp500.000 − Rp405.000 = Rp95.000."
+    ]
+  },
+  {
+    "id": "L4-06",
+    "level": 4,
+    "type": "number",
+    "unit": "buah",
+    "prompt": "Seorang pedagang memiliki 10 keranjang telur. Setiap keranjang berisi 30 butir telur. Sebanyak 25 butir telur pecah di jalan. Berapa butir telur yang masih utuh?",
+    "answer": 275,
+    "hint": "Hitung total telur dulu (10 × 30), lalu kurangkan yang pecah.",
+    "explanation": [
+      "Total telur = 10 × 30 = 300 butir.",
+      "Telur pecah = 25 butir.",
+      "Telur utuh = 300 − 25 = 275 butir."
+    ]
+  },
+  {
+    "id": "L4-07",
+    "level": 4,
+    "type": "number",
+    "unit": "Rp",
+    "prompt": "Rina membeli 4 buku @ Rp7.500 dan 2 pulpen @ Rp3.000. Ia membayar dengan Rp50.000. Berapa kembalian Rina?",
+    "answer": 14000,
+    "hint": "Hitung buku dan pulpen terpisah, lalu jumlahkan.",
+    "explanation": [
+      "Buku = 4 × Rp7.500 = Rp30.000.",
+      "Pulpen = 2 × Rp3.000 = Rp6.000.",
+      "Total = Rp30.000 + Rp6.000 = Rp36.000.",
+      "Kembalian = Rp50.000 − Rp36.000 = Rp14.000."
+    ]
+  },
+  {
+    "id": "L4-08",
+    "level": 4,
+    "type": "number",
+    "unit": "Rp",
+    "prompt": "Pak Doni menjual 3 dus minuman. Setiap dus berisi 24 botol dan dijual Rp3.000 per botol. Berapa total uang yang diterima Pak Doni?",
+    "answer": 216000,
+    "hint": "Total botol = 3 × 24, lalu kalikan harga per botol.",
+    "explanation": [
+      "Total botol = 3 × 24 = 72 botol.",
+      "Uang diterima = 72 × Rp3.000 = Rp216.000.",
+      "Jadi total uang Pak Doni Rp216.000."
+    ]
+  }
+]

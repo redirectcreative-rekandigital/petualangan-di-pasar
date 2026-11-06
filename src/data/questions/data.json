@@ -1,0 +1,185 @@
+[
+  {
+    "id": "D01-01",
+    "balai": "D01",
+    "type": "mcq",
+    "prompt": "Perhatikan tabel penjualan buku di Toko Cerdas selama satu minggu berikut. Berapa selisih penjualan buku pada hari Jumat dan hari Selasa?",
+    "data": {
+      "kind": "table",
+      "labels": ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"],
+      "values": [20, 35, 28, 30, 45],
+      "unit": "buku"
+    },
+    "options": ["10 buku", "12 buku", "15 buku", "17 buku"],
+    "answer": "10 buku",
+    "hint": "Cari dulu banyak buku hari Jumat, lalu kurangi dengan hari Selasa.",
+    "explanation": [
+      "Penjualan hari Jumat = 45 buku dan hari Selasa = 35 buku.",
+      "Selisih = 45 - 35 = 10 buku."
+    ],
+    "meta": {
+      "kodeMateri": "D01",
+      "elemen": "Data",
+      "submateri": "Membaca tabel",
+      "indikator": "Menentukan selisih nilai data pada tabel",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "D01-02",
+    "balai": "D01",
+    "type": "number",
+    "prompt": "Diagram batang berikut menunjukkan hasil panen sayur di pasar tani (dalam kg) selama lima hari. Berapa total hasil panen sayur seluruhnya (dalam kg)?",
+    "data": {
+      "kind": "bar",
+      "labels": ["Senin", "Selasa", "Rabu", "Kamis", "Jumat"],
+      "values": [25, 30, 20, 35, 30],
+      "unit": "kg"
+    },
+    "answer": 140,
+    "hint": "Jumlahkan semua tinggi batang pada diagram.",
+    "explanation": [
+      "Nilai tiap hari: 25, 30, 20, 35, dan 30 kg.",
+      "Total = 25 + 30 + 20 + 35 + 30 = 140.",
+      "Jadi total hasil panen 140 kg."
+    ],
+    "meta": {
+      "kodeMateri": "D01",
+      "elemen": "Data",
+      "submateri": "Membaca diagram batang",
+      "indikator": "Menghitung total nilai data pada diagram batang",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "D01-03",
+    "balai": "D01",
+    "type": "mcq",
+    "prompt": "Pada sebuah piktogram hasil penjualan es krim, satu gambar es krim mewakili 5 buah. Jika banyak gambar es krim pada hari Sabtu ada 7 gambar, berapa banyak es krim yang terjual hari Sabtu?",
+    "data": {
+      "kind": "picture",
+      "labels": ["Jumat", "Sabtu"],
+      "values": [4, 7],
+      "unit": "gambar"
+    },
+    "options": ["12 buah", "30 buah", "35 buah", "40 buah"],
+    "answer": "35 buah",
+    "hint": "Kalikan banyak gambar dengan nilai satu gambar.",
+    "explanation": [
+      "Satu gambar mewakili 5 es krim.",
+      "Hari Sabtu ada 7 gambar.",
+      "Banyak es krim = 7 x 5 = 35 buah."
+    ],
+    "meta": {
+      "kodeMateri": "D01",
+      "elemen": "Data",
+      "submateri": "Membaca piktogram",
+      "indikator": "Membaca nilai pada piktogram berdasarkan legenda",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "D02-01",
+    "balai": "D02",
+    "type": "mcq-complex",
+    "prompt": "Perhatikan data banyak buku yang dibaca siswa berikut. Pilihlah semua pernyataan yang BENAR!",
+    "data": {
+      "kind": "table",
+      "labels": ["Ani", "Budi", "Cici", "Dodi"],
+      "values": [5, 8, 6, 8],
+      "unit": "buku"
+    },
+    "options": [
+      "Budi dan Dodi membaca buku sama banyak.",
+      "Ani membaca paling sedikit.",
+      "Total buku yang dibaca seluruh siswa 27.",
+      "Cici membaca paling banyak."
+    ],
+    "answer": ["Budi dan Dodi membaca buku sama banyak.", "Ani membaca paling sedikit.", "Total buku yang dibaca seluruh siswa 27."],
+    "hint": "Periksa tiap pernyataan dengan angka pada data satu per satu.",
+    "explanation": [
+      "Budi 8 dan Dodi 8, jadi pernyataan pertama benar.",
+      "Ani 5 adalah yang paling sedikit, jadi pernyataan kedua benar.",
+      "Total = 5 + 8 + 6 + 8 = 27, jadi pernyataan ketiga benar.",
+      "Yang paling banyak adalah Budi dan Dodi (8), bukan Cici (6), jadi pernyataan keempat salah."
+    ],
+    "meta": {
+      "kodeMateri": "D02",
+      "elemen": "Data",
+      "submateri": "Interpretasi data dan kesimpulan",
+      "indikator": "Menilai kebenaran beberapa pernyataan berdasarkan data",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "D02-02",
+    "balai": "D02",
+    "type": "mcq",
+    "prompt": "Perhatikan data hasil panen mangga (dalam kg) berikut. Manakah kesimpulan yang PALING tepat berdasarkan data?",
+    "data": {
+      "kind": "bar",
+      "labels": ["Pagi", "Siang", "Sore"],
+      "values": [40, 25, 35],
+      "unit": "kg"
+    },
+    "options": [
+      "Panen pagi paling banyak dibanding waktu lain.",
+      "Panen siang paling banyak.",
+      "Panen sore dan pagi sama banyak.",
+      "Total panen seluruhnya 90 kg."
+    ],
+    "answer": "Panen pagi paling banyak dibanding waktu lain.",
+    "hint": "Bandingkan tinggi tiap batang, lalu cocokkan dengan pilihan.",
+    "explanation": [
+      "Data: pagi 40 kg, siang 25 kg, sore 35 kg.",
+      "Nilai terbesar adalah 40 kg pada waktu pagi.",
+      "Total = 40 + 25 + 35 = 100 kg, sehingga pilihan total 90 kg salah."
+    ],
+    "meta": {
+      "kodeMateri": "D02",
+      "elemen": "Data",
+      "submateri": "Interpretasi data dan kesimpulan",
+      "indikator": "Menarik kesimpulan yang sesuai dengan data",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "D02-03",
+    "balai": "D02",
+    "type": "mcq-complex",
+    "prompt": "Tabel berikut menunjukkan banyak pengunjung pasar setiap hari. Pilihlah semua pernyataan yang BENAR!",
+    "data": {
+      "kind": "table",
+      "labels": ["Senin", "Selasa", "Rabu", "Kamis"],
+      "values": [120, 150, 90, 150],
+      "unit": "orang"
+    },
+    "options": [
+      "Pengunjung terbanyak ada pada hari Selasa dan Kamis.",
+      "Selisih pengunjung hari Selasa dan Rabu adalah 60 orang.",
+      "Hari Rabu paling sedikit pengunjungnya.",
+      "Total pengunjung empat hari adalah 500 orang."
+    ],
+    "answer": ["Pengunjung terbanyak ada pada hari Selasa dan Kamis.", "Selisih pengunjung hari Selasa dan Rabu adalah 60 orang.", "Hari Rabu paling sedikit pengunjungnya."],
+    "hint": "Hitung ulang total dan selisih, lalu cocokkan tiap pernyataan.",
+    "explanation": [
+      "Terbanyak 150 orang pada Selasa dan Kamis, jadi pernyataan pertama benar.",
+      "Selisih Selasa dan Rabu = 150 - 90 = 60 orang, jadi pernyataan kedua benar.",
+      "Terkecil 90 orang pada hari Rabu, jadi pernyataan ketiga benar.",
+      "Total = 120 + 150 + 90 + 150 = 510 orang, bukan 500, jadi pernyataan keempat salah."
+    ],
+    "meta": {
+      "kodeMateri": "D02",
+      "elemen": "Data",
+      "submateri": "Interpretasi data dan kesimpulan",
+      "indikator": "Menilai kebenaran beberapa pernyataan berdasarkan data",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

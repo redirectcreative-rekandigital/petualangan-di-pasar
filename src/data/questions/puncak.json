@@ -1,0 +1,702 @@
+[
+  {
+    "id": "FINAL-01",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Pak Rahmat membeli 5 kotak telur. Setiap kotak berisi 12 telur dengan harga Rp2.000 per butir. Berapa rupiah total harga telur yang dibeli Pak Rahmat?",
+    "options": ["Rp100.000", "Rp120.000", "Rp150.000", "Rp240.000"],
+    "answer": "Rp120.000",
+    "hint": "Cari dulu jumlah seluruh telur, lalu kalikan harganya.",
+    "explanation": [
+      "Jumlah telur = 5 x 12 = 60 butir.",
+      "Total harga = 60 x Rp2.000 = Rp120.000."
+    ],
+    "meta": {
+      "kodeMateri": "B02",
+      "elemen": "Bilangan",
+      "submateri": "Operasi bilangan cacah",
+      "indikator": "Menyelesaikan soal cerita belanja gabungan",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-02",
+    "balai": "FINAL",
+    "type": "mcq-complex",
+    "prompt": "Pilihlah semua pecahan yang senilai dengan 2/3!",
+    "options": ["4/6", "6/9", "8/12", "10/12"],
+    "answer": ["4/6", "6/9", "8/12"],
+    "hint": "Kalikan pembilang dan penyebut dengan angka yang sama.",
+    "explanation": [
+      "2/3 = 4/6 (dikali 2), = 6/9 (dikali 3), = 8/12 (dikali 4).",
+      "10/12 = 5/6, tidak senilai dengan 2/3."
+    ],
+    "meta": {
+      "kodeMateri": "B04",
+      "elemen": "Bilangan",
+      "submateri": "Pecahan senilai",
+      "indikator": "Mengidentifikasi beberapa pecahan senilai",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-03",
+    "balai": "FINAL",
+    "type": "number",
+    "prompt": "Bu Ani memiliki 36 kue dan 48 permen yang akan dimasukkan ke dalam beberapa kantong sama banyak. Paling banyak berapa kantong yang dapat dibuat tanpa sisa? (tulis angkanya saja)",
+    "answer": 12,
+    "hint": "Ini soal FPB dari 36 dan 48.",
+    "explanation": [
+      "Faktor 36: 1, 2, 3, 4, 6, 9, 12, 18, 36.",
+      "Faktor 48: 1, 2, 3, 4, 6, 8, 12, 16, 24, 48.",
+      "FPB = 12, jadi paling banyak 12 kantong."
+    ],
+    "meta": {
+      "kodeMateri": "B03",
+      "elemen": "Bilangan",
+      "submateri": "FPB",
+      "indikator": "Menerapkan FPB pada soal pembagian kelompok",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "FINAL-04",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Pak Doni berjualan setiap 6 hari sekali, Pak Eko setiap 8 hari sekali. Jika hari ini mereka berjualan bersamaan, berapa hari lagi mereka berjualan bersamaan lagi?",
+    "options": ["14 hari", "24 hari", "48 hari", "2 hari"],
+    "answer": "24 hari",
+    "hint": "Cari KPK dari 6 dan 8.",
+    "explanation": [
+      "Kelipatan 6: 6, 12, 18, 24, ...",
+      "Kelipatan 8: 8, 16, 24, ...",
+      "KPK = 24, jadi mereka berjualan bersama lagi 24 hari kemudian."
+    ],
+    "meta": {
+      "kodeMateri": "B03",
+      "elemen": "Bilangan",
+      "submateri": "KPK",
+      "indikator": "Menerapkan KPK pada soal jadwal berulang",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-05",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Sebuah baju berharga Rp150.000 mendapat diskon 20%. Rio juga mendapat potongan tambahan Rp5.000. Berapa rupiah yang harus Rio bayar?",
+    "options": ["Rp115.000", "Rp120.000", "Rp125.000", "Rp130.000"],
+    "answer": "Rp115.000",
+    "hint": "Hitung harga setelah diskon, lalu kurangi potongan tambahan.",
+    "explanation": [
+      "Diskon = 20% x Rp150.000 = Rp30.000.",
+      "Harga setelah diskon = Rp150.000 - Rp30.000 = Rp120.000.",
+      "Dikurangi potongan tambahan = Rp120.000 - Rp5.000 = Rp115.000."
+    ],
+    "meta": {
+      "kodeMateri": "B06",
+      "elemen": "Bilangan",
+      "submateri": "Persen dan diskon",
+      "indikator": "Menyelesaikan soal cerita diskon bertingkat",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "FINAL-06",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Bu Tini memakai 2/5 kg gula untuk membuat kue, lalu memakai lagi 1/5 kg. Berapa total gula yang dipakai?",
+    "options": ["1/5", "2/5", "3/5", "3/10"],
+    "answer": "3/5",
+    "hint": "Penyebut sudah sama, jumlahkan pembilangnya.",
+    "explanation": [
+      "Penyebut sama-sama 5, jadi tinggal dijumlahkan pembilangnya.",
+      "2/5 + 1/5 = 3/5.",
+      "Jadi total gula yang dipakai 3/5 kg."
+    ],
+    "meta": {
+      "kodeMateri": "B05",
+      "elemen": "Bilangan",
+      "submateri": "Penjumlahan pecahan",
+      "indikator": "Menjumlahkan pecahan berpenyebut sama dalam konteks",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "FINAL-07",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Nilai angka 8 pada bilangan 280.517 adalah ...",
+    "options": ["8.000", "80.000", "800", "80"],
+    "answer": "80.000",
+    "hint": "Lihat posisi angka 8 dari kanan.",
+    "explanation": [
+      "Bilangan 280.517: angka 8 menempati tempat puluhan ribu.",
+      "Nilai angka 8 = 8 x 10.000 = 80.000."
+    ],
+    "meta": {
+      "kodeMateri": "B01",
+      "elemen": "Bilangan",
+      "submateri": "Nilai tempat bilangan cacah",
+      "indikator": "Menentukan nilai suatu angka berdasarkan nilai tempatnya",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-08",
+    "balai": "FINAL",
+    "type": "mcq-complex",
+    "prompt": "Sebuah toko mencatat penjualan beras (dalam kg) selama empat hari: Senin 40, Selasa 25, Rabu 40, Kamis 30. Pilihlah semua pernyataan yang BENAR!",
+    "options": [
+      "Penjualan hari Senin dan Rabu sama banyak.",
+      "Penjualan hari Selasa paling sedikit.",
+      "Total penjualan empat hari adalah 135 kg.",
+      "Penjualan hari Kamis paling banyak."
+    ],
+    "answer": ["Penjualan hari Senin dan Rabu sama banyak.", "Penjualan hari Selasa paling sedikit.", "Total penjualan empat hari adalah 135 kg."],
+    "hint": "Periksa tiap pernyataan dengan angka pada data.",
+    "explanation": [
+      "Senin 40 dan Rabu 40, jadi pernyataan pertama benar.",
+      "Selasa 25 adalah terkecil, jadi pernyataan kedua benar.",
+      "Total = 40 + 25 + 40 + 30 = 135 kg, jadi pernyataan ketiga benar.",
+      "Terbesar adalah Senin dan Rabu (40), bukan Kamis (30), jadi pernyataan keempat salah."
+    ],
+    "meta": {
+      "kodeMateri": "D02",
+      "elemen": "Data",
+      "submateri": "Interpretasi data dan kesimpulan",
+      "indikator": "Menilai kebenaran beberapa pernyataan berdasarkan data",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "FINAL-09",
+    "balai": "FINAL",
+    "type": "number",
+    "prompt": "Sebuah kolam berbentuk persegi panjang berukuran 15 m x 8 m. Berapa meter persegi luas kolam tersebut?",
+    "answer": 120,
+    "unit": "m2",
+    "hint": "Luas persegi panjang = panjang x lebar.",
+    "explanation": [
+      "Luas = panjang x lebar.",
+      "Luas = 15 x 8 = 120.",
+      "Jadi luas kolam 120 m2."
+    ],
+    "meta": {
+      "kodeMateri": "G03",
+      "elemen": "Geometri",
+      "submateri": "Luas bangun datar",
+      "indikator": "Menghitung luas persegi panjang",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-10",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Sebuah taman berbentuk persegi dengan sisi 14 m akan dipasang pagar di sekelilingnya. Berapa meter panjang pagar yang dibutuhkan?",
+    "options": ["28 m", "56 m", "196 m", "42 m"],
+    "answer": "56 m",
+    "hint": "Panjang pagar = keliling persegi.",
+    "explanation": [
+      "Keliling persegi = 4 x sisi.",
+      "Keliling = 4 x 14 = 56.",
+      "Jadi panjang pagar 56 m."
+    ],
+    "meta": {
+      "kodeMateri": "G02",
+      "elemen": "Geometri",
+      "submateri": "Keliling bangun datar",
+      "indikator": "Menerapkan keliling persegi pada soal pagar",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-11",
+    "balai": "FINAL",
+    "type": "number",
+    "prompt": "Sebuah kotak berbentuk balok berukuran panjang 20 cm, lebar 12 cm, dan tinggi 10 cm. Berapa cm3 volume kotak tersebut?",
+    "answer": 2400,
+    "unit": "cm3",
+    "hint": "Volume balok = panjang x lebar x tinggi.",
+    "explanation": [
+      "Volume balok = panjang x lebar x tinggi.",
+      "Volume = 20 x 12 x 10 = 2.400.",
+      "Jadi volume kotak 2.400 cm3."
+    ],
+    "meta": {
+      "kodeMateri": "G05",
+      "elemen": "Geometri",
+      "submateri": "Volume bangun ruang",
+      "indikator": "Menghitung volume balok",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-12",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Sebuah kendaraan menempuh jarak 240 km dalam waktu 4 jam. Berapa kecepatan kendaraan tersebut?",
+    "options": ["40 km/jam", "60 km/jam", "80 km/jam", "960 km/jam"],
+    "answer": "60 km/jam",
+    "hint": "Kecepatan = jarak : waktu.",
+    "explanation": [
+      "Kecepatan = jarak : waktu.",
+      "Kecepatan = 240 : 4 = 60.",
+      "Jadi kecepatan kendaraan 60 km/jam."
+    ],
+    "meta": {
+      "kodeMateri": "G07",
+      "elemen": "Geometri",
+      "submateri": "Jarak, waktu, dan kecepatan",
+      "indikator": "Menghitung kecepatan",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-13",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Berat 4 karung gula adalah 2 kuintal. Berapa gram berat gula seluruhnya? (1 kuintal = 100 kg)",
+    "options": ["200 gram", "2.000 gram", "20.000 gram", "200.000 gram"],
+    "answer": "200.000 gram",
+    "hint": "Ubah kuintal ke kg, lalu kg ke gram.",
+    "explanation": [
+      "2 kuintal = 2 x 100 kg = 200 kg.",
+      "200 kg = 200 x 1.000 gram = 200.000 gram.",
+      "Jadi berat gula seluruhnya 200.000 gram."
+    ],
+    "meta": {
+      "kodeMateri": "G06",
+      "elemen": "Geometri",
+      "submateri": "Konversi satuan massa",
+      "indikator": "Mengubah satuan kuintal menjadi gram",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "FINAL-14",
+    "balai": "FINAL",
+    "type": "mcq-complex",
+    "prompt": "Pilihlah semua pernyataan yang BENAR tentang bangun ruang kubus!",
+    "options": [
+      "Kubus memiliki 6 sisi persegi.",
+      "Kubus memiliki 12 rusuk yang sama panjang.",
+      "Volume kubus = rusuk x rusuk x rusuk.",
+      "Kubus memiliki 6 titik sudut."
+    ],
+    "answer": ["Kubus memiliki 6 sisi persegi.", "Kubus memiliki 12 rusuk yang sama panjang.", "Volume kubus = rusuk x rusuk x rusuk."],
+    "hint": "Ingat ciri-ciri dan rumus volume kubus.",
+    "explanation": [
+      "Kubus memiliki 6 sisi persegi, jadi pernyataan pertama benar.",
+      "Kubus memiliki 12 rusuk sama panjang, jadi pernyataan kedua benar.",
+      "Volume kubus = rusuk x rusuk x rusuk, jadi pernyataan ketiga benar.",
+      "Kubus memiliki 8 titik sudut, bukan 6, jadi pernyataan keempat salah."
+    ],
+    "meta": {
+      "kodeMateri": "G04",
+      "elemen": "Geometri",
+      "submateri": "Ciri bangun ruang",
+      "indikator": "Menilai kebenaran pernyataan tentang ciri kubus",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "FINAL-15",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Sebuah sudut besarnya 120 derajat. Jenis sudut tersebut adalah ...",
+    "options": ["sudut tumpul", "sudut lancip", "sudut siku-siku", "sudut lurus"],
+    "answer": "sudut tumpul",
+    "hint": "Bandingkan dengan 90 derajat dan 180 derajat.",
+    "explanation": [
+      "Sudut tumpul besarnya antara 90 derajat dan 180 derajat.",
+      "120 derajat berada di antara 90 dan 180, jadi termasuk sudut tumpul."
+    ],
+    "meta": {
+      "kodeMateri": "G08",
+      "elemen": "Geometri",
+      "submateri": "Jenis sudut",
+      "indikator": "Menentukan jenis sudut dari besarannya",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "FINAL-16",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Perhatikan diagram batang penjualan buah (dalam kg): Mangga 30, Jeruk 45, Apel 25, Pisang 40. Berapa selisih penjualan jeruk dan apel?",
+    "data": {
+      "kind": "bar",
+      "labels": ["Mangga", "Jeruk", "Apel", "Pisang"],
+      "values": [30, 45, 25, 40],
+      "unit": "kg"
+    },
+    "options": ["15 kg", "20 kg", "25 kg", "10 kg"],
+    "answer": "20 kg",
+    "hint": "Selisih = nilai jeruk - nilai apel.",
+    "explanation": [
+      "Penjualan jeruk = 45 kg dan apel = 25 kg.",
+      "Selisih = 45 - 25 = 20.",
+      "Jadi selisihnya 20 kg."
+    ],
+    "meta": {
+      "kodeMateri": "D01",
+      "elemen": "Data",
+      "submateri": "Membaca diagram batang",
+      "indikator": "Menentukan selisih nilai data pada diagram batang",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-17",
+    "balai": "FINAL",
+    "type": "number",
+    "prompt": "Hasil dari 15 x 24 - 120 : 4 adalah ... (tulis angkanya saja)",
+    "answer": 330,
+    "hint": "Kerjakan perkalian dan pembagian dulu, baru pengurangan.",
+    "explanation": [
+      "Perkalian dan pembagian dikerjakan lebih dulu: 15 x 24 = 360 dan 120 : 4 = 30.",
+      "Lalu 360 - 30 = 330.",
+      "Jadi hasilnya 330."
+    ],
+    "meta": {
+      "kodeMateri": "B02",
+      "elemen": "Bilangan",
+      "submateri": "Operasi hitung campuran",
+      "indikator": "Menghitung operasi hitung campuran",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-18",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Bentuk desimal dari pecahan 3/4 adalah ...",
+    "options": ["0,75", "0,34", "0,43", "1,33"],
+    "answer": "0,75",
+    "hint": "Bagi pembilang dengan penyebut.",
+    "explanation": [
+      "Ubah pecahan ke desimal dengan membagi 3 : 4.",
+      "3 : 4 = 0,75.",
+      "Jadi bentuk desimal 3/4 adalah 0,75."
+    ],
+    "meta": {
+      "kodeMateri": "B06",
+      "elemen": "Bilangan",
+      "submateri": "Konversi pecahan dan desimal",
+      "indikator": "Mengubah pecahan menjadi desimal",
+      "levelKognitif": "Pemahaman",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "FINAL-19",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Sebuah toko memberi diskon 25% untuk sebuah tas berharga Rp240.000. Berapa rupiah harga tas setelah diskon?",
+    "options": ["Rp180.000", "Rp160.000", "Rp200.000", "Rp60.000"],
+    "answer": "Rp180.000",
+    "hint": "Hitung besar diskon, lalu kurangkan dari harga awal.",
+    "explanation": [
+      "Diskon = 25% x Rp240.000 = Rp60.000.",
+      "Harga setelah diskon = Rp240.000 - Rp60.000 = Rp180.000."
+    ],
+    "meta": {
+      "kodeMateri": "B06",
+      "elemen": "Bilangan",
+      "submateri": "Persen dan diskon",
+      "indikator": "Menghitung harga setelah diskon",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-20",
+    "balai": "FINAL",
+    "type": "mcq-complex",
+    "prompt": "Pilihlah semua pernyataan yang BENAR tentang bangun datar!",
+    "options": [
+      "Persegi memiliki 4 sisi sama panjang.",
+      "Luas segitiga = 1/2 x alas x tinggi.",
+      "Keliling persegi panjang = 2 x (panjang + lebar).",
+      "Semua sudut jajargenjang pasti siku-siku."
+    ],
+    "answer": ["Persegi memiliki 4 sisi sama panjang.", "Luas segitiga = 1/2 x alas x tinggi.", "Keliling persegi panjang = 2 x (panjang + lebar)."],
+    "hint": "Cocokkan tiap pernyataan dengan ciri dan rumus bangun datar.",
+    "explanation": [
+      "Persegi memang punya 4 sisi sama panjang, jadi pernyataan pertama benar.",
+      "Rumus luas segitiga = 1/2 x alas x tinggi, jadi pernyataan kedua benar.",
+      "Keliling persegi panjang = 2 x (panjang + lebar), jadi pernyataan ketiga benar.",
+      "Sudut jajargenjang tidak siku-siku, jadi pernyataan keempat salah."
+    ],
+    "meta": {
+      "kodeMateri": "G01",
+      "elemen": "Geometri",
+      "submateri": "Ciri dan rumus bangun datar",
+      "indikator": "Menilai kebenaran pernyataan tentang bangun datar",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "FINAL-21",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Pada sebuah piktogram, satu gambar ember mewakili 4 liter air. Jika sebuah sumur menghasilkan 9 gambar ember pada hari Senin, berapa liter air yang dihasilkan?",
+    "data": {
+      "kind": "picture",
+      "labels": ["Minggu", "Senin"],
+      "values": [6, 9],
+      "unit": "gambar"
+    },
+    "options": ["36 liter", "13 liter", "24 liter", "45 liter"],
+    "answer": "36 liter",
+    "hint": "Kalikan banyak gambar dengan nilai satu gambar.",
+    "explanation": [
+      "Satu gambar mewakili 4 liter.",
+      "Hari Senin ada 9 gambar.",
+      "Banyak air = 9 x 4 = 36 liter."
+    ],
+    "meta": {
+      "kodeMateri": "D01",
+      "elemen": "Data",
+      "submateri": "Membaca piktogram",
+      "indikator": "Membaca nilai pada piktogram berdasarkan legenda",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-22",
+    "balai": "FINAL",
+    "type": "number",
+    "prompt": "Harga 3 kg jeruk adalah Rp54.000. Berapa rupiah harga 5 kg jeruk? (tulis angkanya saja)",
+    "answer": 90000,
+    "unit": "Rp",
+    "hint": "Cari harga per kg dulu, lalu kalikan 5.",
+    "explanation": [
+      "Harga per kg = Rp54.000 : 3 = Rp18.000.",
+      "Harga 5 kg = 5 x Rp18.000 = Rp90.000.",
+      "Jadi harga 5 kg jeruk Rp90.000."
+    ],
+    "meta": {
+      "kodeMateri": "B02",
+      "elemen": "Bilangan",
+      "submateri": "Perbandingan senilai",
+      "indikator": "Menyelesaikan soal cerita perbandingan harga",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "FINAL-23",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Seorang pedagang memiliki 90 apel. Ia memasukkan apel ke dalam kantong, setiap kantong berisi 6 apel. Berapa kantong yang dibutuhkan?",
+    "options": ["15 kantong", "16 kantong", "12 kantong", "96 kantong"],
+    "answer": "15 kantong",
+    "hint": "Bagi jumlah apel dengan isi tiap kantong.",
+    "explanation": [
+      "Banyak kantong = 90 : 6.",
+      "90 : 6 = 15.",
+      "Jadi dibutuhkan 15 kantong."
+    ],
+    "meta": {
+      "kodeMateri": "B02",
+      "elemen": "Bilangan",
+      "submateri": "Operasi bilangan cacah",
+      "indikator": "Menyelesaikan soal pembagian dalam konteks",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Mudah"
+    }
+  },
+  {
+    "id": "FINAL-24",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Urutan pecahan 1/4 ; 1/2 ; 2/3 dari yang terkecil ke terbesar adalah ...",
+    "options": ["1/4 ; 1/2 ; 2/3", "1/2 ; 1/4 ; 2/3", "2/3 ; 1/2 ; 1/4", "1/4 ; 2/3 ; 1/2"],
+    "answer": "1/4 ; 1/2 ; 2/3",
+    "hint": "Samakan penyebut, lalu bandingkan pembilangnya.",
+    "explanation": [
+      "KPK dari 4, 2, dan 3 adalah 12.",
+      "1/4 = 3/12, 1/2 = 6/12, 2/3 = 8/12.",
+      "Urutan dari terkecil: 3/12 ; 6/12 ; 8/12 yaitu 1/4 ; 1/2 ; 2/3."
+    ],
+    "meta": {
+      "kodeMateri": "B04",
+      "elemen": "Bilangan",
+      "submateri": "Membandingkan pecahan",
+      "indikator": "Mengurutkan pecahan berpenyebut berbeda",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-25",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Sebuah lapangan berbentuk persegi panjang berukuran 25 m x 16 m. Berapa keliling lapangan tersebut?",
+    "options": ["41 m", "82 m", "400 m", "66 m"],
+    "answer": "82 m",
+    "hint": "Keliling = 2 x (panjang + lebar).",
+    "explanation": [
+      "Keliling = 2 x (panjang + lebar).",
+      "Keliling = 2 x (25 + 16) = 2 x 41 = 82.",
+      "Jadi keliling lapangan 82 m."
+    ],
+    "meta": {
+      "kodeMateri": "G02",
+      "elemen": "Geometri",
+      "submateri": "Keliling bangun datar",
+      "indikator": "Menghitung keliling persegi panjang",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-26",
+    "balai": "FINAL",
+    "type": "number",
+    "prompt": "Sebuah akuarium berbentuk kubus dengan panjang rusuk 5 dm. Berapa liter air yang dapat ditampung akuarium tersebut? (1 dm3 = 1 liter, tulis angkanya saja)",
+    "answer": 125,
+    "hint": "Hitung volume kubus, lalu ubah ke liter.",
+    "explanation": [
+      "Volume kubus = rusuk x rusuk x rusuk.",
+      "Volume = 5 x 5 x 5 = 125 dm3.",
+      "1 dm3 = 1 liter, jadi akuarium menampung 125 liter."
+    ],
+    "meta": {
+      "kodeMateri": "G06",
+      "elemen": "Geometri",
+      "submateri": "Volume dan konversi kapasitas",
+      "indikator": "Menghitung volume kubus dan mengubah satuannya",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "FINAL-27",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Perhatikan tabel banyak siswa yang membeli jajanan di kantin: Senin 18, Selasa 22, Rabu 16, Kamis 20. Berapa total siswa yang membeli jajanan selama empat hari?",
+    "data": {
+      "kind": "table",
+      "labels": ["Senin", "Selasa", "Rabu", "Kamis"],
+      "values": [18, 22, 16, 20],
+      "unit": "siswa"
+    },
+    "options": ["72 siswa", "76 siswa", "78 siswa", "66 siswa"],
+    "answer": "76 siswa",
+    "hint": "Jumlahkan seluruh nilai pada tabel.",
+    "explanation": [
+      "Jumlahkan semua nilai: 18 + 22 + 16 + 20.",
+      "18 + 22 = 40, lalu 40 + 16 = 56, lalu 56 + 20 = 76.",
+      "Jadi totalnya 76 siswa."
+    ],
+    "meta": {
+      "kodeMateri": "D01",
+      "elemen": "Data",
+      "submateri": "Membaca tabel",
+      "indikator": "Menghitung total nilai data pada tabel",
+      "levelKognitif": "Penerapan",
+      "tingkatKesulitan": "Sedang"
+    }
+  },
+  {
+    "id": "FINAL-28",
+    "balai": "FINAL",
+    "type": "mcq-complex",
+    "prompt": "Pilihlah semua pernyataan yang BENAR tentang pecahan!",
+    "options": [
+      "1/2 senilai dengan 3/6.",
+      "Hasil 2/4 + 1/4 adalah 3/4.",
+      "Bentuk persen dari 1/2 adalah 50%.",
+      "Pecahan 3/5 lebih kecil dari 2/5."
+    ],
+    "answer": ["1/2 senilai dengan 3/6.", "Hasil 2/4 + 1/4 adalah 3/4.", "Bentuk persen dari 1/2 adalah 50%."],
+    "hint": "Periksa kesenilaian, operasi, dan konversi tiap pernyataan.",
+    "explanation": [
+      "1/2 = 3/6 karena keduanya bernilai 0,5, jadi pernyataan pertama benar.",
+      "2/4 + 1/4 = 3/4, jadi pernyataan kedua benar.",
+      "1/2 x 100% = 50%, jadi pernyataan ketiga benar.",
+      "3/5 = 0,6 lebih besar dari 2/5 = 0,4, jadi pernyataan keempat salah."
+    ],
+    "meta": {
+      "kodeMateri": "B05",
+      "elemen": "Bilangan",
+      "submateri": "Operasi dan pecahan senilai",
+      "indikator": "Menilai kebenaran pernyataan tentang pecahan",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "FINAL-29",
+    "balai": "FINAL",
+    "type": "mcq",
+    "prompt": "Pak Yusuf berangkat dari rumah pukul 07.00 dan tiba di pasar pukul 09.00. Jika kecepatan sepeda motornya 30 km/jam, berapa km jarak rumah ke pasar?",
+    "options": ["30 km", "60 km", "90 km", "15 km"],
+    "answer": "60 km",
+    "hint": "Cari lama perjalanan dulu, lalu jarak = kecepatan x waktu.",
+    "explanation": [
+      "Lama perjalanan = 09.00 - 07.00 = 2 jam.",
+      "Jarak = kecepatan x waktu = 30 x 2.",
+      "Jarak = 60 km."
+    ],
+    "meta": {
+      "kodeMateri": "G07",
+      "elemen": "Geometri",
+      "submateri": "Jarak, waktu, dan kecepatan",
+      "indikator": "Menghitung jarak dari waktu berangkat dan tiba",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  },
+  {
+    "id": "FINAL-30",
+    "balai": "FINAL",
+    "type": "mcq-complex",
+    "prompt": "Pilihlah semua kesimpulan yang BENAR berdasarkan data: seorang pedagang mencatat penjualan (dalam buah) Mangga 50, Jeruk 35, Apel 50, Pisang 20 selama sehari.",
+    "options": [
+      "Mangga dan apel terjual sama banyak.",
+      "Pisang paling sedikit terjual.",
+      "Total buah yang terjual 155.",
+      "Jeruk terjual paling banyak."
+    ],
+    "answer": ["Mangga dan apel terjual sama banyak.", "Pisang paling sedikit terjual.", "Total buah yang terjual 155."],
+    "hint": "Cek tiap pernyataan dengan angka pada data.",
+    "explanation": [
+      "Mangga 50 dan apel 50, jadi pernyataan pertama benar.",
+      "Pisang 20 adalah terkecil, jadi pernyataan kedua benar.",
+      "Total = 50 + 35 + 50 + 20 = 155, jadi pernyataan ketiga benar.",
+      "Paling banyak adalah Mangga dan Apel (50), bukan Jeruk (35), jadi pernyataan keempat salah."
+    ],
+    "meta": {
+      "kodeMateri": "D02",
+      "elemen": "Data",
+      "submateri": "Interpretasi data dan kesimpulan",
+      "indikator": "Menilai kebenaran beberapa pernyataan berdasarkan data",
+      "levelKognitif": "Penalaran",
+      "tingkatKesulitan": "Sulit"
+    }
+  }
+]

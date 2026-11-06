@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { teksturRumput, ulangi } from './tekstur';
 
 /**
  * Pengaturan dasar scene Three.js: renderer, kamera, lampu, kabut, latar langit.
@@ -14,6 +15,8 @@ export interface SceneBundle {
   camera: THREE.PerspectiveCamera;
   /** Apakah bayangan (shadow map) aktif pada kualitas ini. */
   pakaiBayangan: boolean;
+  /** Gerakkan awan (dipanggil tiap frame). */
+  updateAwan: (dt: number) => void;
   dispose: () => void;
 }
 
@@ -57,6 +60,55 @@ export interface SceneOptions {
   groundSize?: number;
   /** Warna lantai plaza di tengah (opsional). */
   plaza?: { size: number; color: number };
+}
+
+/**
+ * Awan lembut melayang di langit (opsional). Dibuat dari beberapa bola putih
+ * pipih dengan material transparan tanpa kedalaman-tulis, lalu digerakkan
+ * pelan oleh `updateAwan()` agar langit terasa hidup.
+ */
+function buatAwan(scene: THREE.Scene, extra: { dispose: () => void }[]): (dt: number) => void {
+  const awan: THREE.Group[] = [];
+  const geo = new THREE.IcosahedronGeometry(1, 1);
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0xffffff,
+    transparent: true,
+    opacity: 0.78,
+    depthWrite: false,
+    fog: false,
+  });
+  extra.push(geo, mat);
+
+  const rng = (() => {
+    let s = 991;
+    return () => {
+      s = (s * 16807) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+  })();
+
+  for (let i = 0; i < 7; i++) {
+    const g = new THREE.Group();
+    const bagian = 3 + Math.floor(rng() * 3);
+    for (let j = 0; j < bagian; j++) {
+      const m = new THREE.Mesh(geo, mat);
+      m.position.set((j - bagian / 2) * 1.5 + rng(), rng() * 0.4, rng() * 0.6 - 0.3);
+      const s = 1.4 + rng() * 1.4;
+      m.scale.set(s * 1.5, s * 0.62, s);
+      g.add(m);
+    }
+    g.position.set((rng() * 2 - 1) * 70, 26 + rng() * 10, -40 + rng() * 70);
+    g.userData.kecepatan = 0.25 + rng() * 0.35;
+    scene.add(g);
+    awan.push(g);
+  }
+
+  return (dt: number) => {
+    for (const g of awan) {
+      g.position.x += (g.userData.kecepatan as number) * dt;
+      if (g.position.x > 80) g.position.x = -80;
+    }
+  };
 }
 
 export function createScene(canvas: HTMLCanvasElement, options: SceneOptions = {}): SceneBundle {
@@ -125,9 +177,19 @@ export function createScene(canvas: HTMLCanvasElement, options: SceneOptions = {
   const hemi = new THREE.HemisphereLight(theme.hemiSky, theme.hemiGround, 0.75);
   scene.add(hemi);
 
-  // Tanah rumput besar (menyembunyikan tepi area).
+  // Tanah rumput besar (menyembunyikan tepi area) dengan tekstur prosedural.
+  // Catatan: jangan memakai peta-alpha di tanah — bidang transparan membuatnya
+  // didahulukan di antrean render sehingga bayangan bocor di atasnya. Tepi
+  // bidang cukup disamarkan oleh kabut.
   const groundGeo = new THREE.PlaneGeometry(groundSize, groundSize);
-  const groundMat = new THREE.MeshStandardMaterial({ color: theme.grass, roughness: 0.95, metalness: 0 });
+  const texRumput = teksturRumput();
+  ulangi(texRumput, Math.max(4, Math.round(groundSize / 6)));
+  const groundMat = new THREE.MeshStandardMaterial({
+    color: texRumput ? 0xffffff : theme.grass,
+    map: texRumput ?? null,
+    roughness: 0.95,
+    metalness: 0,
+  });
   const ground = new THREE.Mesh(groundGeo, groundMat);
   ground.rotation.x = -Math.PI / 2;
   ground.position.y = 0;
@@ -135,6 +197,7 @@ export function createScene(canvas: HTMLCanvasElement, options: SceneOptions = {
   scene.add(ground);
 
   const extra: { dispose: () => void }[] = [groundGeo, groundMat];
+  if (texRumput) extra.push(texRumput);
 
   // Lantai plaza (opsional).
   if (options.plaza) {
@@ -155,6 +218,9 @@ export function createScene(canvas: HTMLCanvasElement, options: SceneOptions = {
   };
   window.addEventListener('resize', handleResize);
 
+  // Awan lembut di langit (ringan: hanya beberapa bola transparan).
+  const updateAwan = buatAwan(scene, extra);
+
   // Beri tahu pemanggil apakah bayangan aktif (untuk mengatur castShadow objek).
   const dispose = (): void => {
     window.removeEventListener('resize', handleResize);
@@ -162,5 +228,5 @@ export function createScene(canvas: HTMLCanvasElement, options: SceneOptions = {
     renderer.dispose();
   };
 
-  return { scene, renderer, camera, pakaiBayangan, dispose };
+  return { scene, renderer, camera, pakaiBayangan, updateAwan, dispose };
 }

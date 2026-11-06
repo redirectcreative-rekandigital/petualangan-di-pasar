@@ -133,6 +133,41 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   sea.position.y = -1.4;
   scene.add(sea);
 
+  // --- Awan lembut melayang di langit peta ---
+  const awan: THREE.Group[] = [];
+  {
+    const geoAwan = track(new THREE.IcosahedronGeometry(1, 1));
+    const matAwan = track(
+      new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.8,
+        depthWrite: false,
+        fog: false,
+      }),
+    );
+    let s = 4242;
+    const acakAwan = (): number => {
+      s = (s * 16807) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+    for (let i = 0; i < 6; i++) {
+      const g = new THREE.Group();
+      const bagian = 3 + Math.floor(acakAwan() * 3);
+      for (let j = 0; j < bagian; j++) {
+        const m = new THREE.Mesh(geoAwan, matAwan);
+        m.position.set((j - bagian / 2) * 4 + acakAwan() * 2, acakAwan() * 1.5, acakAwan() * 2 - 1);
+        const sk = 4 + acakAwan() * 4;
+        m.scale.set(sk * 1.6, sk * 0.6, sk);
+        g.add(m);
+      }
+      g.position.set((acakAwan() * 2 - 1) * 110, 52 + acakAwan() * 16, -110 + acakAwan() * 220);
+      g.userData.kecepatan = 0.4 + acakAwan() * 0.5;
+      scene.add(g);
+      awan.push(g);
+    }
+  }
+
   // --- Pulau-pulau noktah ---
   const pulauList: PulauNoktah[] = [];
   const titikRute: THREE.Vector3[] = [];
@@ -467,6 +502,12 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     kapal.position.x = -30 + Math.sin(t * 0.12) * 10;
     kapal.rotation.z = Math.sin(t * 0.6) * 0.04;
     kapal2.position.z = 40 + Math.cos(t * 0.1) * 8;
+
+    // Awan melayang pelan.
+    for (const g of awan) {
+      g.position.x += (g.userData.kecepatan as number) * dt;
+      if (g.position.x > 120) g.position.x = -120;
+    }
 
     // Ikon pemain: napas, sedikit goyang, dan cincin berdenyut.
     if (pemainGroup.visible && pemainRig && pemainRing) {

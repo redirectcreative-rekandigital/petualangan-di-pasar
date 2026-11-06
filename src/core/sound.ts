@@ -71,6 +71,29 @@ function tone({ freq, duration, type = 'sine', delay = 0, gain = 0.12 }: ToneOpt
   osc.stop(start + duration + 0.05);
 }
 
+/** Bunyi desis pendek (langkah kaki di tanah) memakai noise yang disaring. */
+function noise(duration: number, gain: number, filterHz: number, delay = 0): void {
+  const audio = getCtx();
+  if (!audio) return;
+  const frames = Math.max(1, Math.floor(audio.sampleRate * duration));
+  const buffer = audio.createBuffer(1, frames, audio.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < frames; i++) {
+    // Derau melemah ke ujung agar terasa seperti langkah, bukan klik.
+    data[i] = (Math.random() * 2 - 1) * (1 - i / frames);
+  }
+  const src = audio.createBufferSource();
+  src.buffer = buffer;
+  const filter = audio.createBiquadFilter();
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(filterHz, audio.currentTime + delay);
+  const vol = audio.createGain();
+  vol.gain.setValueAtTime(gain, audio.currentTime + delay);
+  vol.gain.exponentialRampToValueAtTime(0.0001, audio.currentTime + delay + duration);
+  src.connect(filter).connect(vol).connect(audio.destination);
+  src.start(audio.currentTime + delay);
+}
+
 export const sfx = {
   click(): void {
     tone({ freq: 520, duration: 0.08, type: 'triangle', gain: 0.08 });
@@ -92,5 +115,24 @@ export const sfx = {
   },
   lose(): void {
     [392, 330, 262].forEach((freq, i) => tone({ freq, duration: 0.24, type: 'triangle', delay: i * 0.16 }));
+  },
+  /** Langkah kaki ringan (dipanggil bergantian kaki kiri/kanan). */
+  step(kakiKanan = false): void {
+    noise(0.09, 0.05, kakiKanan ? 900 : 780);
+    tone({ freq: kakiKanan ? 150 : 130, duration: 0.05, type: 'sine', gain: 0.03 });
+  },
+  /** Membuka balai / panel (geser naik lembut). */
+  buka(): void {
+    tone({ freq: 392, duration: 0.12, type: 'sine', gain: 0.07 });
+    tone({ freq: 587, duration: 0.16, type: 'sine', delay: 0.07, gain: 0.07 });
+  },
+  /** Naik bintang / dapat hadiah (arpeggio cerah). */
+  naik(): void {
+    [784, 988, 1175].forEach((freq, i) => tone({ freq, duration: 0.12, type: 'triangle', delay: i * 0.07, gain: 0.09 }));
+  },
+  /** Sapaan saat teman datang. */
+  sapa(): void {
+    tone({ freq: 880, duration: 0.1, type: 'sine', gain: 0.07 });
+    tone({ freq: 1100, duration: 0.12, type: 'sine', delay: 0.08, gain: 0.06 });
   },
 };

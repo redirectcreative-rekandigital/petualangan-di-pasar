@@ -19,3 +19,6 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+
+# Tangkapan layar alat bantu pengembangan
+.tangkapan/

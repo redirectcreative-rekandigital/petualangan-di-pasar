@@ -17,6 +17,17 @@ const browser = await chromium.launch({
 });
 const page = await browser.newPage({ viewport: { width: 412, height: 915 } });
 
+// Uji harus mulai dari kondisi bersih (progres, posisi tersimpan, dan WebAudio
+// bisa berbeda di perangkat pengembang). Konteks baru menjamin itu.
+await page.context().clearCookies();
+await page.addInitScript(() => {
+  try {
+    localStorage.clear();
+  } catch {
+    /* abaikan */
+  }
+});
+
 page.on('console', (msg) => {
   if (msg.type() === 'error') {
     errors.push(`console.error: ${msg.text()}`);
@@ -83,6 +94,15 @@ try {
   await page.keyboard.down('w');
   await page.waitForTimeout(3600);
   await page.keyboard.up('w');
+  // Renderer perangkat lunak (SwiftShader) bisa jauh lebih lambat daripada
+  // perangkat asli, jadi tambah langkah berjalan terbatas sampai balai terdeteksi.
+  for (let i = 0; i < 6; i++) {
+    const d = await page.evaluate(() => window.__petualanganDiPasar?.debug?.() ?? null);
+    if (d && d.nearby) break;
+    await page.keyboard.down('w');
+    await page.waitForTimeout(1500);
+    await page.keyboard.up('w');
+  }
 
   const dbg = await page.evaluate(() => window.__petualanganDiPasar?.debug?.() ?? null);
   log(`posisi pemain: ${JSON.stringify(dbg)}`);

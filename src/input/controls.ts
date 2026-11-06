@@ -52,8 +52,16 @@ export function createInputManager(): InputManager {
   const onKeyUp = (ev: KeyboardEvent): void => {
     keys.delete(ev.key.toLowerCase());
   };
+  // Saat jendela kehilangan fokus, `keyup` bisa tidak pernah datang (mis. alt-tab),
+  // sehingga pemain terus berjalan sendiri. Bersihkan tombol yang tertahan.
+  const onBlur = (): void => {
+    keys.clear();
+    joyX = 0;
+    joyY = 0;
+  };
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
+  window.addEventListener('blur', onBlur);
 
   // --- Joystick virtual (menempel di container). ---
   let joyX = 0;
@@ -189,6 +197,7 @@ export function createInputManager(): InputManager {
     }
     state.moving = mlen > DEAD_ZONE;
   };
+
 
   return {
     state,

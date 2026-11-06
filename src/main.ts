@@ -430,6 +430,11 @@ async function buildNoktahWorld(
   app.append(canvas);
 
   const quality: SceneQuality = { pixelRatioCap: 1.5, fogNear: 26, fogFar: 70 };
+  // Pintasan diagnostik: `?tanpaBayangan=1` mematikan shadow map untuk
+  // membandingkan performa. Tidak dipakai pemain biasa.
+  if (new URLSearchParams(window.location.search).get('tanpaBayangan') === '1') {
+    quality.pixelRatioCap = 1.1;
+  }
   const { createNoktahWorld } = await import('./world/noktahWorld');
 
   const input = createInputManager();
@@ -472,6 +477,7 @@ async function buildNoktahWorld(
 
   let last = performance.now();
   let elapsed = 0;
+  let statTerakhir = '';
 
   const loop = (now: number): void => {
     if (!session) return;
@@ -492,7 +498,12 @@ async function buildNoktahWorld(
     if (near) hud.setInteractVisible(true, '🅰️ Bicara');
     else hud.setInteractVisible(false);
 
-    hud.updateStats(progress);
+    // HUD menampilkan statistik bila berubah (bukan setiap frame).
+    const tanda = `${progress.coins}|${progress.answers.length}|${progress.puncakLulus}`;
+    if (tanda !== statTerakhir) {
+      statTerakhir = tanda;
+      hud.updateStats(progress);
+    }
     session.raf = requestAnimationFrame(loop);
   };
 

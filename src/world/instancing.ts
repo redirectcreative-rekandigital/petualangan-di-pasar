@@ -130,7 +130,8 @@ function buatGeometri(
 ): GeometriPasangan {
   switch (jenis) {
     case 'pohon': {
-      // Detail: batang + 2 bola daun. Ringkas: 1 kerucut.
+      // Detail: batang + 2 bola daun. Ringkas: batang + 1 kerucut (agar tetap
+      // menyentuh tanah saat dilihat dari jauh).
       const batang = track(new THREE.CylinderGeometry(0.16, 0.22, 1.6, 8));
       batang.translate(0, 0.8, 0);
       const daunA = track(new THREE.IcosahedronGeometry(1.0, 1));
@@ -138,8 +139,11 @@ function buatGeometri(
       const daunB = track(new THREE.IcosahedronGeometry(0.7, 1));
       daunB.translate(0, 2.9, 0);
       const detail = gabung([batang, daunA, daunB]);
-      const ringkas = track(new THREE.ConeGeometry(1.1, 3.0, 6));
-      ringkas.translate(0, 1.5, 0);
+      const batangRingkas = track(new THREE.CylinderGeometry(0.16, 0.22, 1.6, 6));
+      batangRingkas.translate(0, 0.8, 0);
+      const kerucut = track(new THREE.ConeGeometry(1.15, 2.4, 6));
+      kerucut.translate(0, 2.4, 0);
+      const ringkas = gabung([batangRingkas, kerucut]);
       return {
         detail,
         ringkas,

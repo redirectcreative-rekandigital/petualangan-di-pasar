@@ -27,7 +27,7 @@ export interface WarnaPenampilan {
   warnaHijab?: number;
 }
 
-const UKURAN = 160;
+const UKURAN = 240;
 
 /** Bila WebGL tak tersedia (mis. lingkungan uji/gagal), pakai pratinjau kosong. */
 function previewKosong(): KarakterPreview {
@@ -49,36 +49,48 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
   canvas.width = UKURAN;
   canvas.height = UKURAN;
   canvas.className = 'karakter-preview';
+  // Kanvas pratinjau hanya dipakai untuk menyalin gambar hasil render, jadi
+  // pengaturan WebGL bebas dan tidak mengganggu kanvas dunia 3D.
   canvas.setAttribute('aria-hidden', 'true');
 
   let renderer: THREE.WebGLRenderer;
   try {
-    // Probe dukungan WebGL di kanvas sementara (jangan di kanvas asli, agar
-    // atribut context canva asli ditentukan oleh three.js sendiri).
+    // Probe dukungan WebGL dulu (lingkungan uji jsdom tidak memilikinya).
     const uji = document.createElement('canvas');
     const punyaWebgl = Boolean(uji.getContext('webgl2') ?? uji.getContext('webgl'));
     if (!punyaWebgl) return previewKosong();
-    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    // Renderer lepas (tanpa kanvas terpasang). Kanvas WebGL bawaan three.js
+    // sudah dibuat dengan `alpha: true`, `antialias: true`, dan
+    // `premultipliedAlpha: false` — kombinasi yang membuat latar transparan
+    // tampil benar saat digambar di atas latar CSS. Hasil render disalin ke
+    // kanvas 2D biasa, sehingga tidak ada masalah dengan konteks WebGL statis.
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(UKURAN, UKURAN, false);
+    renderer.setClearColor(0x000000, 0);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.shadowMap.enabled = false;
   } catch {
     // Perangkat/lingkungan tanpa WebGL: jangan pernah menggagalkan layar.
     return previewKosong();
   }
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-  renderer.setSize(UKURAN, UKURAN, false);
-  renderer.outputColorSpace = THREE.SRGBColorSpace;
-  renderer.shadowMap.enabled = false;
+  const ctx2d = canvas.getContext('2d');
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 50);
-  camera.position.set(0, 1.5, 4.6);
-  camera.lookAt(0, 1.3, 0);
+  const camera = new THREE.PerspectiveCamera(33, 1, 0.1, 50);
+  camera.position.set(0, 1.45, 4.2);
+  camera.lookAt(0, 1.25, 0);
 
   // Lampu hangat senada tema "Sore Hangat".
-  scene.add(new THREE.AmbientLight(0xffffff, 1.1));
-  const sun = new THREE.DirectionalLight(0xffd0a0, 1.6);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+  const sun = new THREE.DirectionalLight(0xffe0b8, 2.2);
   sun.position.set(2.5, 5, 3.5);
   scene.add(sun);
-  const hemi = new THREE.HemisphereLight(0xffe4bd, 0x6b7a4a, 0.7);
+  // Cahaya isi dari sisi seberang agar sisi gelap karakter tidak pekat.
+  const isi = new THREE.DirectionalLight(0xcfe4ff, 0.6);
+  isi.position.set(-3, 2, -2);
+  scene.add(isi);
+  const hemi = new THREE.HemisphereLight(0xffe4bd, 0x6b7a4a, 0.85);
   scene.add(hemi);
 
   let rig: KarakterRig | null = null;
@@ -122,6 +134,7 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
     if (!canvas.isConnected) {
       berjalan = false;
       renderer.dispose();
+      renderer.forceContextLoss();
       return;
     }
     const t = (performance.now() - mulai) / 1000;
@@ -130,6 +143,12 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
       rig.idle(t, 0);
     }
     renderer.render(scene, camera);
+    // Salin hasil render ke kanvas 2D. Latar kanvas WebGL dibersihkan dengan
+    // transparan penuh, dan `clearRect` menjaga sisa frame lama tidak tertinggal.
+    if (ctx2d) {
+      ctx2d.clearRect(0, 0, UKURAN, UKURAN);
+      ctx2d.drawImage(renderer.domElement, 0, 0, UKURAN, UKURAN);
+    }
     requestAnimationFrame(frame);
   }
   requestAnimationFrame(frame);
@@ -166,6 +185,9 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
         rig.material.forEach((x) => x.dispose());
       }
       renderer.dispose();
+      // Lepas konteks WebGL agar tidak menumpuk (browser membatasi jumlah
+      // konteks aktif; pratinjau dibuat ulang setiap kali layar digambar).
+      renderer.forceContextLoss();
     },
   };
 }

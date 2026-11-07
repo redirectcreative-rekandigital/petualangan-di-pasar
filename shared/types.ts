@@ -184,7 +184,7 @@ export interface AnswerRecord {
   usedHint: boolean;
   /** Urutan pilihan yang ditekan siswa untuk soal ini (salah dulu, lalu benar). */
   pilihan?: string[];
-  /** Jumlah percobaan (obor) yang terpakai: 1..3. */
+  /** Jumlah percobaan (hati/nyawa) yang terpakai: 1..3. */
   percobaan?: number;
   /** Waktu menjawab (ISO). */
   waktu?: string;

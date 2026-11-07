@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { NOKTAH } from '../data/balai';
-import { URUTAN_BALAI, getCerita } from '../data/cerita';
+import { URUTAN_BALAI } from '../data/cerita';
 import { buatPulau3D, posisiDiPulau, DIAMETER_PULAU } from './pulau';
 import { buatKios } from './kios';
 import { buatKarakter, type KarakterRig } from './karakter';
@@ -29,6 +29,11 @@ export interface PetaBesarOptions {
    * dikunjungi). Ikon karakter kecil akan berdiri di sana.
    */
   getPosisiPemain: () => NoktahId | null;
+  /**
+   * Tujuan berikutnya (balai yang harus dikunjungi). Kamera mendekat ke sini
+   * dan sebuah panah kuning melayang di atasnya.
+   */
+  getTujuan?: () => NoktahId | null;
   /** Penampilan ikon pemain di peta (mengikuti pilihan karakter). */
   penampilanPemain?: {
     gender: 'laki-laki' | 'perempuan';
@@ -44,6 +49,12 @@ export interface PetaBesarHandle {
   renderer: THREE.WebGLRenderer;
   /** Render satu frame + perbarui warna status. */
   render: () => void;
+  /** Zoom bertahap: < 1 mendekat, > 1 menjauh. */
+  zoom: (faktor: number) => void;
+  /** Kembali menyorot tujuan berikutnya dari dekat. */
+  fokusTujuan: () => void;
+  /** Posisi layar (px) tiap balai, untuk uji otomatis. */
+  posisiLayar: () => Array<{ kode: NoktahId; x: number; y: number }>;
   dispose: () => void;
 }
 
@@ -282,28 +293,66 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   /* Kamera orbit + interaksi                                           */
   /* ------------------------------------------------------------------ */
 
-  const raycaster = new THREE.Raycaster();
-  const pointer = new THREE.Vector2();
+  // --- Panah kuning melayang di atas tujuan berikutnya ---
+  const panahTujuan = new THREE.Group();
+  {
+    const matPanah = track(new THREE.MeshStandardMaterial({ color: 0xfacc15, emissive: 0xb45309, emissiveIntensity: 0.45, roughness: 0.45 }));
+    const kepala = new THREE.Mesh(track(new THREE.ConeGeometry(1.5, 2.4, 20)), matPanah);
+    kepala.rotation.x = Math.PI; // ujung menunjuk ke bawah
+    const batang = new THREE.Mesh(track(new THREE.CylinderGeometry(0.55, 0.55, 2, 14)), matPanah);
+    batang.position.y = 2.1;
+    panahTujuan.add(kepala, batang);
+    // Cincin berdenyut di tanah tujuan.
+    const cincinGeo = track(new THREE.RingGeometry(3.6, 4.6, 36));
+    cincinGeo.rotateX(-Math.PI / 2);
+    const cincin = new THREE.Mesh(
+      cincinGeo,
+      track(new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0.75, side: THREE.DoubleSide, depthWrite: false })),
+    );
+    cincin.name = 'cincin';
+    panahTujuan.add(cincin);
+  }
+  panahTujuan.visible = false;
+  scene.add(panahTujuan);
+  const cincinTujuan = panahTujuan.getObjectByName('cincin') as THREE.Mesh;
 
-  // Sudut pandang peta.
+  /** Titik dunia sebuah balai (dasar pulau kecilnya). */
+  const titikBalai = (kode: NoktahId | null | undefined): THREE.Vector3 | null => {
+    const p = kode ? posDunia[kode] : undefined;
+    return p ? new THREE.Vector3(p.x, p.y, p.z) : null;
+  };
+
+  // Sudut pandang peta. Kamera mengorbit sebuah titik FOKUS: saat dekat, fokus
+  // ada di tujuan berikutnya; saat zoom menjauh, fokus bergeser ke tengah pulau
+  // supaya seluruh pulau terlihat.
   let yaw = 0;
-  let pitch = 0.82; // radian dari horizontal
+  let pitch = 0.95; // radian dari horizontal (agak dari atas: semua balai mudah diketuk)
   let jarak = 0;
   let jarakDasar = 100;
   let targetYaw = yaw;
   let targetPitch = pitch;
   let targetJarak = 0;
+  const PUSAT_PULAU = new THREE.Vector3(0, 4, 0);
+  const fokus = new THREE.Vector3().copy(PUSAT_PULAU);
 
   let menyeret = false;
   let gerakTotal = 0;
   let pointerDownAt: { x: number; y: number } | null = null;
   let hovered: PulauNoktah | null = null;
-  let idleSejak = performance.now();
   let berjalan = true;
+  // Jari yang sedang menyentuh: dua jari = cubit (zoom), bukan ketuk/putar.
+  const jariAktif = new Set<number>();
+  let pernahDuaJari = false;
 
   const FOV_MIN = 30;
-  const JARAK_MIN = 0.55;
-  const JARAK_MAKS = 1.7;
+  /** Batas zoom, kelipatan jarakDasar (jarak yang memperlihatkan seluruh pulau). */
+  const JARAK_MIN = 0.26;
+  /** Zoom terjauh = seluruh pulau pas di layar (HP tegak butuh mundur lebih jauh). */
+  const jarakMaks = (): number => (camera.aspect < 1 ? 1.15 : 0.85);
+  /** Zoom awal: dekat ke tujuan berikutnya. */
+  const JARAK_DEKAT = 0.5;
+  /** Radius ketuk (px): jari anak cukup mengenai sekitar pulau, tidak harus tepat di bola. */
+  const RADIUS_KETUK = 46;
 
   function hitungJarakDasar(): number {
     const w = canvas.clientWidth || window.innerWidth;
@@ -322,37 +371,94 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     renderer.setSize(w, h, false);
     camera.aspect = w / h;
     camera.fov = Math.max(FOV_MIN, 50);
+    const dasarLama = jarakDasar;
     jarakDasar = hitungJarakDasar();
     if (pertama || jarak === 0) {
-      jarak = jarakDasar;
-      targetJarak = jarakDasar;
+      jarak = jarakDasar * JARAK_DEKAT;
+      targetJarak = jarak;
+    } else if (dasarLama > 0) {
+      // Layar diputar (tegak ↔ mendatar): pertahankan tingkat zoom relatif.
+      jarak = (jarak / dasarLama) * jarakDasar;
+      targetJarak = (targetJarak / dasarLama) * jarakDasar;
     }
     camera.updateProjectionMatrix();
   }
 
+  const batasJarak = (d: number): number => Math.max(jarakDasar * JARAK_MIN, Math.min(jarakDasar * jarakMaks(), d));
+
+  /** Titik fokus yang diinginkan: tujuan saat dekat, tengah pulau saat jauh. */
+  function fokusDiinginkan(): THREE.Vector3 {
+    const tujuan = titikBalai(options.getTujuan?.() ?? options.getPosisiPemain());
+    if (!tujuan) return PUSAT_PULAU;
+    tujuan.y += 2;
+    const rasio = jarak / jarakDasar;
+    // 0 (dekat, ≤ 0.55) → fokus di tujuan; 1 (jauh, ≥ 0.8) → fokus di tengah pulau.
+    const t = Math.max(0, Math.min(1, (rasio - 0.55) / 0.25));
+    return tujuan.lerp(PUSAT_PULAU, t);
+  }
+
   function terapkanKamera(): void {
-    const d = Math.max(jarakDasar * JARAK_MIN, Math.min(jarakDasar * JARAK_MAKS, jarak));
-    const cp = Math.max(0.18, Math.min(1.25, pitch));
-    const x = Math.sin(yaw) * Math.cos(cp) * d;
-    const y = Math.sin(cp) * d;
-    const z = Math.cos(yaw) * Math.cos(cp) * d;
-    camera.position.set(x, y, z);
-    camera.lookAt(0, 4, 0);
+    const d = batasJarak(jarak);
+    const cp = Math.max(0.3, Math.min(1.3, pitch));
+    camera.position.set(
+      fokus.x + Math.sin(yaw) * Math.cos(cp) * d,
+      fokus.y + Math.sin(cp) * d,
+      fokus.z + Math.cos(yaw) * Math.cos(cp) * d,
+    );
+    camera.lookAt(fokus);
+  }
+
+  /** Hadapkan kamera dari sisi luar pulau ke tujuan, agar tujuan tidak tertutup bukit. */
+  function hadapTujuan(): void {
+    const t = titikBalai(options.getTujuan?.() ?? options.getPosisiPemain());
+    if (!t || Math.hypot(t.x, t.z) < 1) return;
+    targetYaw = Math.atan2(t.x, t.z);
   }
 
   aturKamera(true);
+  hadapTujuan();
+  yaw = targetYaw;
+  fokus.copy(fokusDiinginkan());
   terapkanKamera();
 
-  function pick(ev: PointerEvent): PulauNoktah | null {
+  /* ---------- Memilih balai: berdasarkan jarak di LAYAR, bukan tabrakan sinar ----------
+   * Dulu hanya bola kecil di atas kios yang bisa diketuk, sehingga ketukan sering
+   * meleset. Sekarang tiap balai punya "garis ketuk" dari dasar pulau sampai label
+   * namanya; ketukan dalam radius RADIUS_KETUK px dari garis itu dianggap kena,
+   * dan bila beberapa balai dekat, yang paling dekat ke jari yang dipilih. */
+  const bantu = new THREE.Vector3();
+  function keLayar(v: THREE.Vector3, rect: DOMRect): { x: number; y: number; depan: boolean } {
+    bantu.copy(v).project(camera);
+    return { x: rect.left + ((bantu.x + 1) / 2) * rect.width, y: rect.top + ((1 - bantu.y) / 2) * rect.height, depan: bantu.z < 1 };
+  }
+  function jarakKeRuas(px: number, py: number, a: { x: number; y: number }, b: { x: number; y: number }): number {
+    const vx = b.x - a.x;
+    const vy = b.y - a.y;
+    const pj = vx * vx + vy * vy || 1;
+    const t = Math.max(0, Math.min(1, ((px - a.x) * vx + (py - a.y) * vy) / pj));
+    return Math.hypot(px - (a.x + vx * t), py - (a.y + vy * t));
+  }
+  const dasarDunia = new THREE.Vector3();
+  const labelDunia = new THREE.Vector3();
+  function pick(ev: { clientX: number; clientY: number }): PulauNoktah | null {
     const rect = canvas.getBoundingClientRect();
-    pointer.x = ((ev.clientX - rect.left) / rect.width) * 2 - 1;
-    pointer.y = -((ev.clientY - rect.top) / rect.height) * 2 + 1;
-    raycaster.setFromCamera(pointer, camera);
-    const pins = pulauList.map((p) => p.pin);
-    const hits = raycaster.intersectObjects(pins, false);
-    if (hits.length === 0) return null;
-    const mesh = hits[0]?.object;
-    return pulauList.find((p) => p.pin === mesh) ?? null;
+    let terbaik: PulauNoktah | null = null;
+    let jarakTerbaik = Infinity;
+    for (const p of pulauList) {
+      p.group.getWorldPosition(dasarDunia);
+      p.label.getWorldPosition(labelDunia);
+      const a = keLayar(dasarDunia, rect);
+      const b = keLayar(labelDunia, rect);
+      if (!a.depan && !b.depan) continue;
+      // Label bertambah besar saat dekat: radius ikut melebar sesuai panjang garis.
+      const radius = Math.max(RADIUS_KETUK, Math.hypot(b.x - a.x, b.y - a.y) * 0.35);
+      const d = jarakKeRuas(ev.clientX, ev.clientY, a, b);
+      if (d < radius && d < jarakTerbaik) {
+        jarakTerbaik = d;
+        terbaik = p;
+      }
+    }
+    return terbaik;
   }
 
   function setHover(p: PulauNoktah | null): void {
@@ -368,44 +474,63 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   }
 
   const onPointerDown = (ev: PointerEvent): void => {
+    jariAktif.add(ev.pointerId);
+    if (jariAktif.size > 1) {
+      // Jari kedua menyentuh: ini cubit-zoom, batalkan putar & ketuk.
+      pernahDuaJari = true;
+      menyeret = false;
+      return;
+    }
+    pernahDuaJari = false;
     menyeret = true;
     gerakTotal = 0;
     pointerDownAt = { x: ev.clientX, y: ev.clientY };
     canvas.setPointerCapture?.(ev.pointerId);
-    idleSejak = performance.now();
   };
 
   const onPointerMove = (ev: PointerEvent): void => {
-    if (menyeret && pointerDownAt) {
+    if (menyeret && pointerDownAt && jariAktif.size <= 1) {
       const dx = ev.clientX - pointerDownAt.x;
       const dy = ev.clientY - pointerDownAt.y;
       pointerDownAt = { x: ev.clientX, y: ev.clientY };
       gerakTotal += Math.abs(dx) + Math.abs(dy);
-      targetYaw = yaw = yaw - dx * 0.006;
-      targetPitch = pitch = Math.max(0.18, Math.min(1.25, pitch + dy * 0.004));
-      idleSejak = performance.now();
-      canvas.style.cursor = 'grabbing';
+      // Getaran kecil jari saat mengetuk tidak memutar peta.
+      if (gerakTotal > 10) {
+        targetYaw = yaw = yaw - dx * 0.006;
+        targetPitch = pitch = Math.max(0.3, Math.min(1.3, pitch + dy * 0.004));
+        canvas.style.cursor = 'grabbing';
+      }
       return;
     }
-    setHover(pick(ev));
-    canvas.style.cursor = hovered ? 'pointer' : 'grab';
+    if (ev.pointerType === 'mouse') {
+      setHover(pick(ev));
+      canvas.style.cursor = hovered ? 'pointer' : 'grab';
+    }
   };
 
   const onPointerUp = (ev: PointerEvent): void => {
+    jariAktif.delete(ev.pointerId);
     if (!menyeret) return;
     menyeret = false;
     canvas.releasePointerCapture?.(ev.pointerId);
     canvas.style.cursor = 'grab';
-    if (gerakTotal > 14) return; // dianggap geser, bukan ketuk
+    if (pernahDuaJari || gerakTotal > 18) return; // geser/cubit, bukan ketuk
     const p = pick(ev);
-    if (p && !options.getStatus(p.kode).terkunci) options.onPilih(p.kode);
+    // Balai terkunci tetap diteruskan: main.ts menampilkan pesan "masih tertutup kabut".
+    if (p) options.onPilih(p.kode);
+  };
+  const onPointerCancel = (ev: PointerEvent): void => {
+    jariAktif.delete(ev.pointerId);
+    menyeret = false;
+  };
+
+  const zoomKe = (faktor: number): void => {
+    targetJarak = batasJarak(targetJarak * faktor);
   };
 
   const onWheel = (ev: WheelEvent): void => {
     ev.preventDefault();
-    const faktor = ev.deltaY > 0 ? 1.1 : 0.9;
-    targetJarak = Math.max(jarakDasar * JARAK_MIN, Math.min(jarakDasar * JARAK_MAKS, targetJarak * faktor));
-    idleSejak = performance.now();
+    zoomKe(ev.deltaY > 0 ? 1.12 : 0.89);
   };
 
   // Cubit dua jari (pinch) untuk zoom pada layar sentuh.
@@ -420,8 +545,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
       const now = jarakAntar(ev.touches);
       const rasio = jarakCubit / now;
       jarakCubit = now;
-      targetJarak = Math.max(jarakDasar * JARAK_MIN, Math.min(jarakDasar * JARAK_MAKS, targetJarak * rasio));
-      idleSejak = performance.now();
+      zoomKe(rasio);
       ev.preventDefault();
     }
   };
@@ -438,6 +562,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   canvas.addEventListener('pointerdown', onPointerDown);
   canvas.addEventListener('pointermove', onPointerMove);
   canvas.addEventListener('pointerup', onPointerUp);
+  canvas.addEventListener('pointercancel', onPointerCancel);
   canvas.addEventListener('pointerleave', () => setHover(null));
   canvas.addEventListener('wheel', onWheel, { passive: false });
   canvas.addEventListener('touchstart', onTouchStart, { passive: true });
@@ -472,14 +597,32 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     tPrev = now;
     const t = now / 1000;
 
-    // Kamera: redam menuju target; bila diam lama, putar perlahan sendiri.
-    if (!menyeret && now - idleSejak > 4000) {
-      targetYaw += dt * 0.08;
-    }
-    yaw += (targetYaw - yaw) * Math.min(1, dt * 6);
+    // Kamera: redam menuju target. Peta TIDAK berputar sendiri lagi, karena
+    // balai yang bergerak menyulitkan anak untuk mengetuknya.
+    let bedaYaw = targetYaw - yaw;
+    while (bedaYaw > Math.PI) bedaYaw -= Math.PI * 2;
+    while (bedaYaw < -Math.PI) bedaYaw += Math.PI * 2;
+    yaw += bedaYaw * Math.min(1, dt * 6);
     pitch += (targetPitch - pitch) * Math.min(1, dt * 6);
     jarak += (targetJarak - jarak) * Math.min(1, dt * 6);
+    fokus.lerp(fokusDiinginkan(), Math.min(1, dt * 5));
     terapkanKamera();
+
+    // Panah tujuan berikutnya: melayang naik-turun di atas label namanya.
+    const kodeTujuan = options.getTujuan?.() ?? null;
+    const pTujuan = kodeTujuan ? pulauList.find((p) => p.kode === kodeTujuan) : undefined;
+    if (pTujuan) {
+      pTujuan.label.getWorldPosition(labelDunia);
+      pTujuan.group.getWorldPosition(dasarDunia);
+      panahTujuan.visible = true;
+      panahTujuan.position.set(labelDunia.x, labelDunia.y + 3.2 + Math.sin(t * 3) * 0.6, labelDunia.z);
+      panahTujuan.rotation.y = t * 1.5;
+      cincinTujuan.position.set(0, dasarDunia.y + 0.9 - panahTujuan.position.y, 0);
+      const denyut = 1 + Math.sin(t * 3) * 0.1;
+      cincinTujuan.scale.set(denyut, 1, denyut);
+    } else {
+      panahTujuan.visible = false;
+    }
 
     // Gelombang laut.
     const pos = seaGeo.getAttribute('position') as THREE.BufferAttribute;
@@ -528,6 +671,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     canvas.removeEventListener('pointerdown', onPointerDown);
     canvas.removeEventListener('pointermove', onPointerMove);
     canvas.removeEventListener('pointerup', onPointerUp);
+    canvas.removeEventListener('pointercancel', onPointerCancel);
     canvas.removeEventListener('wheel', onWheel);
     canvas.removeEventListener('touchstart', onTouchStart);
     canvas.removeEventListener('touchmove', onTouchMove);
@@ -543,6 +687,23 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
       perbaruiWarna();
       perbaruiPemain();
       render();
+    },
+    zoom: zoomKe,
+    fokusTujuan: () => {
+      targetJarak = jarakDasar * JARAK_DEKAT;
+      targetPitch = 0.95;
+      hadapTujuan();
+    },
+    posisiLayar: () => {
+      const rect = canvas.getBoundingClientRect();
+      return pulauList.map((p) => {
+        // Titik tengah garis ketuk (antara dasar pulau dan label).
+        p.group.getWorldPosition(dasarDunia);
+        p.label.getWorldPosition(labelDunia);
+        const a = keLayar(dasarDunia, rect);
+        const b = keLayar(labelDunia, rect);
+        return { kode: p.kode, x: Math.round((a.x + b.x) / 2), y: Math.round((a.y + b.y) / 2) };
+      });
     },
     dispose,
   };
@@ -632,9 +793,8 @@ function buatPulau(
   kabut.visible = false;
   group.add(kabut);
 
-  // Label nama (nomor urut bab di jalur pulau).
-  const urut = getCerita(n.kode)?.urutan;
-  const labelTex = track(new THREE.CanvasTexture(buatTeksturLabel(n.nama, isFinal ? '🗼 ' : `${urut ?? ''}. `)));
+  // Label nama balai saja, tanpa nomor urut (mis. "Taman Bunga").
+  const labelTex = track(new THREE.CanvasTexture(buatTeksturLabel(n.nama, isFinal ? '🗼 ' : '')));
   labelTex.colorSpace = THREE.SRGBColorSpace;
   const labelMat = track(new THREE.SpriteMaterial({ map: labelTex, transparent: true, opacity: 0.9, depthTest: false }));
   const label = new THREE.Sprite(labelMat);
@@ -878,11 +1038,18 @@ function buatTeksturLabel(text: string, prefix: string): HTMLCanvasElement {
   ctx.stroke();
 
   ctx.fillStyle = '#3b2a17';
-  ctx.font = 'bold 68px "Baloo 2", "Segoe UI", "Trebuchet MS", Arial, sans-serif';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  const teks = text.length > 18 ? `${text.slice(0, 17)}…` : text;
-  ctx.fillText(`${prefix}${teks}`, canvas.width / 2, canvas.height / 2 + 4);
+  // Nama ditulis utuh: ukuran huruf diperkecil sampai muat di kapsul (tidak dipotong "…").
+  const teks = `${prefix}${text}`;
+  const lebarMaks = canvas.width - 70;
+  let ukuran = 72;
+  do {
+    ctx.font = `bold ${ukuran}px "Baloo 2", "Segoe UI", "Trebuchet MS", Arial, sans-serif`;
+    if (ctx.measureText(teks).width <= lebarMaks) break;
+    ukuran -= 2;
+  } while (ukuran > 36);
+  ctx.fillText(teks, canvas.width / 2, canvas.height / 2 + 4);
 
   return canvas;
 }

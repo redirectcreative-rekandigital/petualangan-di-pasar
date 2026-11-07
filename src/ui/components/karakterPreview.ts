@@ -17,6 +17,12 @@ export interface KarakterPreview {
   setGender: (gender: PlayerGender) => void;
   /** Mengganti warna pakaian tanpa membangun ulang model. */
   setWarna: (warna: WarnaPenampilan) => void;
+  /**
+   * Pose adegan (opsional): `jalan` mengayun kaki & tangan, `arah` = sudut
+   * hadap (radian; 0 = menghadap layar, +π/2 = menghadap kanan). `null`
+   * kembali ke goyang pelan bawaan.
+   */
+  setPose?: (pose: { jalan: boolean; arah: number } | null) => void;
   dispose: () => void;
 }
 
@@ -27,13 +33,17 @@ export interface WarnaPenampilan {
   warnaHijab?: number;
 }
 
-const UKURAN = 240;
+/** Kanvas potret (lebih tinggi daripada lebar) agar badan utuh dari kepala sampai kaki. */
+const LEBAR = 240;
+const TINGGI = 340;
+/** Jarak longgar di atas kepala & bawah kaki (1 = pas, 1.2 = lega 20%). */
+const LONGGAR = 1.18;
 
 /** Bila WebGL tak tersedia (mis. lingkungan uji/gagal), pakai pratinjau kosong. */
 function previewKosong(): KarakterPreview {
   const canvas = document.createElement('canvas');
-  canvas.width = UKURAN;
-  canvas.height = UKURAN;
+  canvas.width = LEBAR;
+  canvas.height = TINGGI;
   canvas.className = 'karakter-preview';
   canvas.setAttribute('aria-hidden', 'true');
   return {
@@ -46,8 +56,11 @@ function previewKosong(): KarakterPreview {
 
 export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPenampilan = {}): KarakterPreview {
   const canvas = document.createElement('canvas');
-  canvas.width = UKURAN;
-  canvas.height = UKURAN;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const W = Math.round(LEBAR * dpr);
+  const H = Math.round(TINGGI * dpr);
+  canvas.width = W;
+  canvas.height = H;
   canvas.className = 'karakter-preview';
   // Kanvas pratinjau hanya dipakai untuk menyalin gambar hasil render, jadi
   // pengaturan WebGL bebas dan tidak mengganggu kanvas dunia 3D.
@@ -65,8 +78,8 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
     // tampil benar saat digambar di atas latar CSS. Hasil render disalin ke
     // kanvas 2D biasa, sehingga tidak ada masalah dengan konteks WebGL statis.
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-    renderer.setSize(UKURAN, UKURAN, false);
+    renderer.setPixelRatio(1);
+    renderer.setSize(W, H, false);
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.shadowMap.enabled = false;
@@ -77,9 +90,26 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
   const ctx2d = canvas.getContext('2d');
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(33, 1, 0.1, 50);
-  camera.position.set(0, 1.45, 4.2);
-  camera.lookAt(0, 1.25, 0);
+  const camera = new THREE.PerspectiveCamera(30, LEBAR / TINGGI, 0.1, 50);
+
+  /**
+   * Arahkan kamera agar seluruh model (kepala, hijab, sampai kaki) masuk bingkai.
+   * Memakai kotak batas model, jadi tetap pas walau tinggi karakter berbeda.
+   */
+  function bingkai(obj: THREE.Object3D): void {
+    const kotak = new THREE.Box3().setFromObject(obj);
+    const ukuran = kotak.getSize(new THREE.Vector3());
+    const pusat = kotak.getCenter(new THREE.Vector3());
+    const fovV = THREE.MathUtils.degToRad(camera.fov);
+    const fovH = 2 * Math.atan(Math.tan(fovV / 2) * camera.aspect);
+    // Lebar memakai diagonal tapak agar tangan tidak terpotong saat berputar.
+    const lebar = Math.hypot(ukuran.x, ukuran.z);
+    const jarakV = (ukuran.y * LONGGAR) / 2 / Math.tan(fovV / 2);
+    const jarakH = (lebar * LONGGAR) / 2 / Math.tan(fovH / 2);
+    const jarak = Math.max(jarakV, jarakH) + lebar / 2;
+    camera.position.set(0, pusat.y + ukuran.y * 0.04, pusat.z + jarak);
+    camera.lookAt(0, pusat.y, pusat.z);
+  }
 
   // Lampu hangat senada tema "Sore Hangat".
   scene.add(new THREE.AmbientLight(0xffffff, 0.85));
@@ -121,12 +151,15 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
     });
     rig.group.position.y = 0.1;
     scene.add(rig.group);
+    bingkai(rig.group);
   }
 
   pasang(gender);
 
   let berjalan = true;
   let mulai = performance.now();
+  let pose: { jalan: boolean; arah: number } | null = null;
+  let terakhirGambar = 0;
 
   function frame(): void {
     if (!berjalan) return;
@@ -137,17 +170,40 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
       renderer.forceContextLoss();
       return;
     }
-    const t = (performance.now() - mulai) / 1000;
-    if (rig) {
-      rig.group.rotation.y = t * 0.6;
+    // Batasi ±30 fps: tiap frame disalin dari WebGL ke kanvas 2D (cukup berat di HP murah).
+    const kini = performance.now();
+    if (kini - terakhirGambar < 32) {
+      requestAnimationFrame(frame);
+      return;
+    }
+    terakhirGambar = kini;
+    const t = (kini - mulai) / 1000;
+    if (rig && pose) {
+      // Pose adegan: putar halus ke arah tujuan, lalu jalan atau diam bernapas.
+      let beda = pose.arah - rig.group.rotation.y;
+      while (beda > Math.PI) beda -= Math.PI * 2;
+      while (beda < -Math.PI) beda += Math.PI * 2;
+      rig.group.rotation.y += beda * 0.18;
+      if (pose.jalan) {
+        // Ayunan ±45°: langkah wajar (nilai besar membuat kaki mengangkang).
+        rig.langkah(1.4, t);
+      } else {
+        // Berhenti: kaki & tangan kembali lurus perlahan, lalu bernapas.
+        for (const bagian of [rig.kakiKiri, rig.kakiKanan, rig.lenganKiri, rig.lenganKanan]) bagian.rotation.x *= 0.8;
+        rig.idle(t, 0);
+      }
+    } else if (rig) {
+      // Bergoyang pelan kiri-kanan (±40°) agar wajah selalu menghadap pemain,
+      // bukan berputar penuh yang sering memperlihatkan punggung.
+      rig.group.rotation.y = Math.sin(t * 0.7) * 0.7;
       rig.idle(t, 0);
     }
     renderer.render(scene, camera);
     // Salin hasil render ke kanvas 2D. Latar kanvas WebGL dibersihkan dengan
     // transparan penuh, dan `clearRect` menjaga sisa frame lama tidak tertinggal.
     if (ctx2d) {
-      ctx2d.clearRect(0, 0, UKURAN, UKURAN);
-      ctx2d.drawImage(renderer.domElement, 0, 0, UKURAN, UKURAN);
+      ctx2d.clearRect(0, 0, W, H);
+      ctx2d.drawImage(renderer.domElement, 0, 0, W, H);
     }
     requestAnimationFrame(frame);
   }
@@ -176,7 +232,11 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
       });
       rig.group.position.y = 0.1;
       scene.add(rig.group);
+      bingkai(rig.group);
       mulai = performance.now();
+    },
+    setPose: (p) => {
+      pose = p;
     },
     dispose: () => {
       berjalan = false;

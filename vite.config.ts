@@ -25,8 +25,11 @@ export default defineConfig({
           'Survival Sains - game petualangan IPA kelas 5 SD/MI: terdampar di Pulau Nusa Kawruh, pelajari 9 bab IPA bersama 9 penjaga, lalu nyalakan Mercusuar Tua.',
         theme_color: '#1f6f4a',
         background_color: '#fff7e6',
-        display: 'standalone',
-        orientation: 'portrait',
+        // Dipasang di layar utama: tampil penuh tanpa bilah status/navigasi.
+        display: 'fullscreen',
+        display_override: ['fullscreen', 'standalone'],
+        // Bebas: bisa dimainkan tegak (portrait) maupun mendatar (landscape).
+        orientation: 'any',
         start_url: './',
         scope: './',
         lang: 'id',

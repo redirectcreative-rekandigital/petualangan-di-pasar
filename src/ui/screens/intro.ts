@@ -18,8 +18,8 @@ import type { PlayerGender } from '../../../shared/types';
 import type { ScreenContext } from './context';
 
 /**
- * Layar pembuka: cover → pilih karakter → pilih warna pakaian → isi nama.
- * Setelah selesai, konteks dipanggil untuk lanjut ke peta + loading.
+ * Layar pembuka: cover → pilih karakter → pilih warna pakaian → isi nama &
+ * mode (sendiri/multiplayer) → cutscene badai → balai pertama (prolog).
  */
 export function renderIntro(ctx: ScreenContext): HTMLElement {
   const progress = ctx.getProgress();
@@ -81,10 +81,8 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
             masukPermainan();
             return;
           }
-          void putarCutscene(document.body, CUTSCENE_BADAI).then(() => {
-            langkah = 'karakter';
-            renderLangkah();
-          });
+          langkah = 'karakter';
+          renderLangkah();
         },
       },
     });
@@ -105,10 +103,8 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
                 onAksi: () => {
                   ctx.reset();
                   bukaKunciSuara();
-                  void putarCutscene(document.body, CUTSCENE_BADAI).then(() => {
-                    langkah = 'karakter';
-                    renderLangkah();
-                  });
+                  langkah = 'karakter';
+                  renderLangkah();
                 },
               });
               document.body.append(dlg.root);
@@ -169,20 +165,27 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       sampul.classList.add('dengan-gambar');
       emojiSampul.remove();
     });
+    // `cover-isi` membungkus judul + tombol: di layar mendatar ia menjadi kolom
+    // kanan, sementara gambar sampul mengisi kolom kiri.
     replace([
       sampul,
-      el('header', {
-        class: 'hero cover-hero',
+      el('div', {
+        class: 'cover-isi',
         children: [
-          emojiSampul,
-          el('h1', { class: 'cover-judul', text: APP_INFO.judul }),
-          el('p', { class: 'subjudul', text: APP_INFO.subjudul }),
-          el('p', { class: 'muted', text: `${APP_INFO.pembuat} · ${APP_INFO.sekolah}` }),
+          el('header', {
+            class: 'hero cover-hero',
+            children: [
+              emojiSampul,
+              el('h1', { class: 'cover-judul', text: APP_INFO.judul }),
+              el('p', { class: 'subjudul', text: APP_INFO.subjudul }),
+              el('p', { class: 'muted', text: `${APP_INFO.pembuat} · ${APP_INFO.sekolah}` }),
+            ],
+          }),
+          sapaan,
+          el('div', { class: 'stack cover-tombol', children: [mulai, mulaiBaru, petunjuk, tentang, guru] }),
+          el('p', { class: 'footer-note', text: 'Lomba Game Edukasi Berbasis AI · Guru Muhammadiyah se-Cabang Blimbing 2026' }),
         ],
       }),
-      sapaan,
-      el('div', { class: 'stack', children: [mulai, mulaiBaru, petunjuk, tentang, guru] }),
-      el('p', { class: 'footer-note', text: 'Lomba Game Edukasi Berbasis AI · Guru Muhammadiyah se-Cabang Blimbing 2026' }),
     ]);
   }
 
@@ -243,9 +246,9 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
     replace([
       el('div', { class: 'topbar', children: [el('h2', { text: 'Kartu Anggota Ekspedisi' })] }),
-      el('p', { class: 'muted center-text', text: 'Siapa penjelajah termuda Kapal Ekspedisi Sains? Pilih karaktermu.' }),
+      el('p', { class: 'muted center-text intro-ket', text: 'Siapa penjelajah termuda Kapal Ekspedisi Sains? Pilih karaktermu.' }),
       el('div', { class: 'pilih-karakter-row', children: [kartu('laki-laki', previewL), kartu('perempuan', previewP)] }),
-      el('div', { class: 'stack', children: [lanjut] }),
+      el('div', { class: 'stack intro-aksi', children: [lanjut] }),
     ]);
   }
 
@@ -374,12 +377,12 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
     replace([
       el('div', { class: 'topbar', children: [el('h2', { text: 'Atur Pakaian' })] }),
-      el('p', { class: 'muted center-text', text: 'Pilih warna pakaian penjelajahmu.' }),
+      el('p', { class: 'muted center-text intro-ket', text: 'Pilih warna pakaian penjelajahmu.' }),
       el('div', { class: 'warna-panggung', children: [previewSatu.canvas] }),
       baju,
       bawahan,
       hijab,
-      el('div', { class: 'stack', children: [lanjut, kembali] }),
+      el('div', { class: 'stack intro-aksi', children: [lanjut, kembali] }),
     ]);
     segarkanPreview();
   }
@@ -479,7 +482,11 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
           };
           ctx.setProgress(next);
           ctx.persist();
-          masukPermainan();
+          // Alur cerita (badai) diputar setelah karakter, nama & mode dipilih,
+          // lalu langsung masuk balai pertama.
+          lepasPreview();
+          (mulai as HTMLButtonElement).disabled = true;
+          void putarCutscene(document.body, CUTSCENE_BADAI).then(() => masukPermainan());
         },
       },
     });
@@ -512,9 +519,9 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
     replace([
       el('div', { class: 'topbar', children: [el('h2', { text: 'Nama & Mode Bermain' })] }),
-      el('p', { class: 'muted center-text', text: 'Nama ini dipakai untuk sertifikat digital dan daftar kelas.' }),
+      el('p', { class: 'muted center-text intro-ket', text: 'Nama ini dipakai untuk sertifikat digital dan daftar kelas.' }),
       el('div', {
-        class: 'card',
+        class: 'card kartu-nama',
         children: [
           el('div', { class: 'karakter-emoji kecil', text: KARAKTER[gender].emoji, attrs: { 'aria-hidden': 'true' } }),
           input,
@@ -522,7 +529,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       }),
       pilihanMode,
       mode === 'multi' ? blokToken : null,
-      el('div', { class: 'stack', children: [mulai, kembali] }),
+      el('div', { class: 'stack intro-aksi', children: [mulai, kembali] }),
     ]);
     input.focus();
   }
@@ -541,6 +548,8 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
   }
 
   function renderLangkah(): void {
+    // Dipakai CSS untuk menata tiap langkah (terutama layar mendatar/landscape).
+    root.dataset.langkah = langkah;
     if (langkah !== 'karakter' && langkah !== 'warna') lepasPreview();
     if (langkah === 'cover') renderCover();
     else if (langkah === 'karakter') renderKarakter();

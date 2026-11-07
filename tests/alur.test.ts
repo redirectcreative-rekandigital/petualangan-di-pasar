@@ -145,12 +145,29 @@ describe('Halaman Cerita (adegan)', () => {
 });
 
 describe('tantangan dalam percakapan', () => {
-  it('mencatat pilihan & jumlah obor terpakai untuk guru', async () => {
+  it('mencatat pilihan & jumlah hati (nyawa) terpakai untuk guru', async () => {
     const c = getCerita('F01');
     if (!c) throw new Error('data hilang');
     const pool = getQuestionsByBalai('F01');
     const p = bukaPercakapan(document.body, { nama: 'Sari', gender: 'perempuan' });
-    const janji = jalankanTantangan(p, { balai: 'F01', pool, jumlah: 3, penjaga: c.penjaga, pembuka: c.pembukaSoal });
+    const percobaan: Array<[boolean, number]> = [];
+    const janji = jalankanTantangan(p, {
+      balai: 'F01',
+      pool,
+      jumlah: 3,
+      penjaga: c.penjaga,
+      pembuka: c.pembukaSoal,
+      onPercobaan: (benar, sisa) => percobaan.push([benar, sisa]),
+    });
+    /** Teks percakapan lengkap (lewati efek mengetik) + jumlah hati ❤️/🤍 yang tampil. */
+    const bacaKotak = (): { teks: string; ada: number; hilang: number } => {
+      document.querySelector('.vn-teks')?.dispatchEvent(new MouseEvent('click'));
+      return {
+        teks: document.querySelector('.vn-teks')?.textContent ?? '',
+        ada: document.querySelectorAll('.nyawa .ada').length,
+        hilang: document.querySelectorAll('.nyawa .hilang').length,
+      };
+    };
 
     const soalSaatIni = async () => {
       const teks = (await tunggu('.vn-pilihan.jawab')) && document.querySelector('.vn-teks');
@@ -164,14 +181,22 @@ describe('tantangan dalam percakapan', () => {
 
     // Soal 1: salah sekali, lalu benar (2 percobaan).
     let q = await soalSaatIni();
+    // Awal soal: 3 hati penuh, tidak ada ikon obor lagi.
+    expect(bacaKotak()).toMatchObject({ ada: 3, hilang: 0 });
+    expect(document.querySelector('.obor')).toBeNull();
     const salah = (q.options ?? []).find((o) => o !== q.answer) as string;
     (await tunggu('.vn-pilihan.jawab', salah)).click();
+    await tunggu('.vn-pilihan', 'Coba lagi');
+    // Satu hati hilang, dan teks (yang juga dibacakan TTS) menyebut sisa hati.
+    const setelahSalah = bacaKotak();
+    expect(setelahSalah).toMatchObject({ ada: 2, hilang: 1 });
+    expect(setelahSalah.teks).toContain('Hatimu tinggal dua');
     (await tunggu('.vn-pilihan', 'Coba lagi')).click();
     q = await soalSaatIni();
     (await tunggu('.vn-pilihan.jawab', String(q.answer))).click();
     (await tunggu('.vn-lanjut')).click();
 
-    // Soal 2: salah 3 kali (obor habis).
+    // Soal 2: salah 3 kali (hati habis).
     q = await soalSaatIni();
     const salahSemua = (q.options ?? []).filter((o) => o !== q.answer);
     for (let i = 0; i < 3; i++) {
@@ -181,6 +206,10 @@ describe('tantangan dalam percakapan', () => {
         q = await soalSaatIni();
       }
     }
+    await tunggu('.vn-lanjut');
+    const habis = bacaKotak();
+    expect(habis.teks).toContain('Hatimu sudah habis');
+    expect(habis).toMatchObject({ ada: 0, hilang: 3 });
     (await tunggu('.vn-lanjut')).click();
 
     // Soal 3: langsung benar.
@@ -195,6 +224,15 @@ describe('tantangan dalam percakapan', () => {
     expect(hasil.jawaban.map((j) => j.percobaan)).toEqual([2, 3, 1]);
     expect(hasil.jawaban.map((j) => j.correct)).toEqual([true, false, true]);
     expect(hasil.jawaban[1]?.pilihan?.length).toBe(3);
+    // Hook untuk panggung menara: tiap percobaan dilaporkan (benar?, sisa hati).
+    expect(percobaan).toEqual([
+      [false, 2],
+      [true, 0],
+      [false, 2],
+      [false, 1],
+      [false, 0],
+      [true, 0],
+    ]);
   }, 30000);
 });
 

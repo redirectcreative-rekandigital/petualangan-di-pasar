@@ -1,0 +1,735 @@
+/* ================================================================== */
+/* Tata letak: HUD balai (kartu Misi, tombol Lompat) + layar mendatar  */
+/* Dimuat paling akhir (setelah main.css & cerita.css) agar menimpa.   */
+/* ================================================================== */
+
+/* ---------- HUD kiri atas: tas & bintang, lalu tombol kartu Misi ---------- */
+.hud-kiri-atas {
+  position: absolute;
+  top: max(10px, env(safe-area-inset-top));
+  left: max(10px, env(safe-area-inset-left));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  pointer-events: auto;
+  max-width: calc(100vw - 90px);
+}
+/* hud-stats sekarang mengalir di dalam kolom, bukan melayang sendiri. */
+.hud-3d .hud-kiri-atas .hud-stats {
+  position: static;
+  top: auto;
+  left: auto;
+}
+
+.misi-tombol {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 46px;
+  padding: 5px 14px 5px 9px;
+  border-radius: 14px;
+  background: rgba(255, 253, 247, 0.96);
+  border-left: 5px solid var(--oranye-500);
+  box-shadow: var(--bayangan);
+  color: var(--hijau-900);
+  text-align: left;
+  transition: transform 0.08s ease;
+}
+.misi-tombol:active {
+  transform: scale(0.96);
+}
+.misi-tombol-ikon {
+  font-size: 1.35rem;
+  line-height: 1;
+}
+.misi-tombol-label {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 1rem;
+}
+.misi-tombol-tahap {
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--oranye-600);
+}
+/* Titik oranye berdenyut: tahap misi baru belum dilihat. */
+.misi-titik {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--merah-600);
+  border: 2px solid #fff;
+  display: none;
+}
+.misi-tombol.baru .misi-titik {
+  display: block;
+  animation: kedip 1s infinite;
+}
+
+/* ---------- Modal misi ---------- */
+.misi-overlay {
+  align-items: center;
+}
+.misi-panel {
+  max-width: 460px;
+  border-top-color: var(--oranye-500);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.misi-daftar {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 6px;
+}
+.misi-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 8px 4px;
+  border-radius: 12px;
+  background: #f1f5f9;
+  color: var(--teks-lemah);
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-align: center;
+  opacity: 0.75;
+}
+.misi-item-ikon {
+  font-size: 1.4rem;
+}
+.misi-item.lewat {
+  background: var(--hijau-100);
+  color: var(--hijau-700);
+  opacity: 1;
+}
+.misi-item.aktif {
+  background: var(--oranye-500);
+  color: #fff;
+  opacity: 1;
+  box-shadow: 0 0 0 3px var(--oranye-100);
+}
+.misi-tugas {
+  background: var(--oranye-100);
+  border: 2px solid var(--krem-200);
+  border-radius: 14px;
+  padding: 10px 12px;
+}
+.misi-tugas p {
+  margin-top: 4px;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--hijau-900);
+}
+
+/* ---------- Tombol kanan bawah ---------- */
+.hud-actions {
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(20px, env(safe-area-inset-bottom));
+  gap: 10px;
+}
+.hud-aksi-atas,
+.hud-aksi-utama {
+  display: flex;
+  align-items: flex-end;
+  gap: 12px;
+}
+.btn-action.lompat {
+  flex-direction: column;
+  gap: 0;
+  width: 74px;
+  min-width: 74px;
+  height: 74px;
+  padding: 0;
+  border-radius: 50%;
+  background: var(--biru-600);
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.btn-action.lompat:active {
+  transform: scale(0.92);
+}
+.lompat-ikon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.lompat-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+.joystick-host {
+  left: max(18px, env(safe-area-inset-left));
+  bottom: max(20px, env(safe-area-inset-bottom));
+}
+.sapa-bar {
+  right: max(16px, env(safe-area-inset-right));
+  bottom: calc(max(20px, env(safe-area-inset-bottom)) + 150px);
+}
+
+/* Layar dunia: panel & modal tak boleh lebih tinggi dari layar. */
+.dialog-panel {
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+}
+
+/* Tas: hanya kisi alat yang digulir; judul & tombol Tutup tetap di tempatnya,
+   sehingga tombol tidak pernah menutupi kartu alat. */
+.dialog-panel.tas-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.tas-panel .tas-grid {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 2px;
+}
+.tas-panel > .btn {
+  flex: none;
+}
+
+/* Tombol 🎓 & ☰ di bar peta: latar putih agar jelas di atas gambar pulau. */
+.peta-bar .btn.ghost {
+  background: rgba(255, 255, 255, 0.95);
+  color: var(--hijau-900);
+  border-color: var(--garis);
+  box-shadow: var(--bayangan);
+}
+
+/* ---------- Tombol zoom peta (kanan bawah) ---------- */
+.peta-zoom {
+  position: fixed;
+  right: max(14px, env(safe-area-inset-right));
+  bottom: max(18px, env(safe-area-inset-bottom));
+  z-index: 45;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.peta-zoom-btn {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.95);
+  border: 2px solid var(--hijau-500);
+  box-shadow: var(--bayangan);
+  font-size: 1.4rem;
+  display: grid;
+  place-items: center;
+}
+.peta-zoom-btn:active {
+  transform: scale(0.92);
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  .peta-zoom {
+    gap: 8px;
+  }
+  .peta-zoom-btn {
+    width: 48px;
+    height: 48px;
+    font-size: 1.2rem;
+  }
+}
+
+/* HP tegak: sisakan ruang atas untuk tombol bisu 🔊 agar tidak menindih panel. */
+.overlay.dialog-overlay,
+.overlay.hadiah-overlay {
+  padding-top: max(58px, env(safe-area-inset-top));
+}
+
+/* Judul layar Mercusuar tidak tertutup tombol bisu di kanan atas. */
+.final-kepala {
+  padding-right: 56px;
+}
+
+/* ================================================================== */
+/* LAYAR MENDATAR (landscape) di HP: tinggi layar sempit (≤ 600px).    */
+/* Prinsip: dua kolom (gambar di kiri, teks & tombol di kanan) supaya   */
+/* semua isi muat tanpa saling menimpa.                                */
+/* ================================================================== */
+@media (orientation: landscape) and (max-height: 600px) {
+  #app {
+    max-width: 1100px;
+    padding: 10px max(16px, env(safe-area-inset-right)) 10px max(16px, env(safe-area-inset-left));
+  }
+  .screen {
+    gap: 10px;
+  }
+
+  /* ---------- Sampul: gambar kiri, judul & tombol kanan ---------- */
+  .intro-screen[data-langkah='cover'] {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+    gap: 20px;
+    align-items: center;
+    min-height: calc(100dvh - 20px);
+  }
+  .intro-screen[data-langkah='cover'] .sampul {
+    margin: 0;
+    border-radius: var(--radius);
+    height: calc(100dvh - 20px);
+    box-shadow: var(--bayangan);
+  }
+  .intro-screen[data-langkah='cover'] .sampul-gambar {
+    height: 100%;
+  }
+  .intro-screen[data-langkah='cover'] .sampul:not(.dengan-gambar) {
+    display: none;
+  }
+  .cover-isi {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: calc(100dvh - 20px);
+    overflow-y: auto;
+    padding: 4px 2px;
+  }
+  .cover-hero {
+    padding: 0;
+  }
+  .cover-judul {
+    font-size: 2rem;
+  }
+  .cover-hero .subjudul {
+    font-size: 0.92rem;
+    margin-top: 2px;
+  }
+  .cover-hero .muted {
+    font-size: 0.8rem;
+  }
+  .cover-tombol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .cover-tombol > :first-child {
+    grid-column: 1 / -1;
+  }
+  .cover-tombol .btn {
+    min-height: 42px;
+    padding: 8px 12px;
+    font-size: 0.95rem;
+  }
+  .footer-note {
+    padding: 0;
+    font-size: 0.72rem;
+  }
+
+  /* ---------- Pilih karakter: kartu di kiri, judul & tombol di kanan ---------- */
+  .intro-screen[data-langkah='karakter'],
+  .intro-screen[data-langkah='warna'] {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(240px, 1fr);
+    grid-auto-flow: row dense;
+    column-gap: 20px;
+    row-gap: 8px;
+    align-content: center;
+    min-height: calc(100dvh - 20px);
+  }
+  .intro-screen[data-langkah='karakter'] > *,
+  .intro-screen[data-langkah='warna'] > * {
+    grid-column: 2;
+  }
+  .intro-screen[data-langkah='karakter'] .intro-ket,
+  .intro-screen[data-langkah='warna'] .intro-ket {
+    text-align: left;
+  }
+  .intro-screen[data-langkah='karakter'] .topbar,
+  .intro-screen[data-langkah='warna'] .topbar {
+    padding-right: 56px; /* ruang tombol bisu */
+  }
+  /* Baris 1 & 5 (1fr) menyerap sisa tinggi, jadi judul-teks-tombol di kolom
+     kanan tetap ringkas di tengah dan tombol tidak ikut memanjang. */
+  .intro-screen[data-langkah='karakter'] {
+    grid-template-rows: 1fr auto auto auto 1fr;
+  }
+  .intro-screen[data-langkah='karakter'] .topbar {
+    grid-row: 2;
+  }
+  .intro-screen[data-langkah='karakter'] .intro-ket {
+    grid-row: 3;
+  }
+  .intro-screen[data-langkah='karakter'] .intro-aksi {
+    grid-row: 4;
+  }
+  .intro-screen[data-langkah='karakter'] .pilih-karakter-row {
+    grid-column: 1;
+    grid-row: 1 / -1;
+    align-self: center;
+    margin: 0;
+  }
+  .pilih-karakter {
+    padding: 10px 8px;
+    gap: 4px;
+  }
+  .karakter-preview {
+    width: auto;
+    height: min(58dvh, 260px);
+  }
+
+  /* ---------- Atur pakaian: pratinjau kiri (menempel), pilihan warna kanan ---------- */
+  .intro-screen[data-langkah='warna'] {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    align-content: start;
+  }
+  .intro-screen[data-langkah='warna'] .warna-panggung {
+    grid-column: 1;
+    grid-row: 1 / span 6;
+    align-self: start;
+    position: sticky;
+    top: 10px;
+    height: calc(100dvh - 20px);
+    align-items: center;
+  }
+  .karakter-preview.preview-besar {
+    width: auto;
+    height: calc(100dvh - 40px);
+  }
+  .warna-baris {
+    padding: 6px 10px 8px;
+  }
+  .warna-label {
+    margin-bottom: 4px;
+    font-size: 0.85rem;
+  }
+  .warna-tombol {
+    flex-direction: row;
+    justify-content: flex-start;
+    gap: 6px;
+    padding: 5px 6px;
+  }
+  .warna-bulatan {
+    width: 24px;
+    height: 24px;
+    flex: none;
+  }
+  .warna-nama {
+    font-size: 0.72rem;
+    text-align: left;
+  }
+  .intro-screen[data-langkah='warna'] .intro-aksi,
+  .intro-screen[data-langkah='nama'] .intro-aksi {
+    grid-template-columns: 1fr auto;
+  }
+
+  /* ---------- Nama & mode: nama kiri, pilihan mode kanan ---------- */
+  .intro-screen[data-langkah='nama'] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 14px;
+    row-gap: 10px;
+    align-content: center;
+    min-height: calc(100dvh - 20px);
+  }
+  .intro-screen[data-langkah='nama'] > * {
+    grid-column: 1 / -1;
+  }
+  .intro-screen[data-langkah='nama'] .topbar {
+    padding-right: 56px;
+  }
+  .intro-screen[data-langkah='nama'] .kartu-nama {
+    grid-column: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .intro-screen[data-langkah='nama'] .pilih-mode {
+    grid-column: 2;
+    margin: 0;
+  }
+  .kartu-nama .isian {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* ---------- Cutscene: gambar kiri, narasi kanan ---------- */
+  .cut-overlay {
+    flex-direction: row;
+  }
+  .cut-teks {
+    width: min(40%, 380px);
+    max-width: none;
+    margin: 0;
+    border-radius: 20px 0 0 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 16px max(16px, env(safe-area-inset-right)) 16px 16px;
+    overflow-y: auto;
+  }
+  .cut-teks p {
+    font-size: 1.05rem;
+  }
+  .cut-aksi {
+    flex-wrap: wrap;
+  }
+
+  /* ---------- Percakapan & tantangan: kotak lebar, pilihan 2 kolom ---------- */
+  .vn-overlay {
+    padding: 8px max(10px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom))
+      max(10px, env(safe-area-inset-left));
+  }
+  .vn-kotak {
+    max-width: min(780px, 100%);
+    max-height: calc(100dvh - 16px);
+    padding: 10px 14px 8px;
+  }
+  .vn-potret {
+    width: 48px;
+    height: 48px;
+    font-size: 1.4rem;
+  }
+  .vn-kepala {
+    margin-bottom: 2px;
+  }
+  .vn-teks {
+    font-size: 1rem;
+    min-height: 2.4em;
+    margin: 2px 0 8px;
+  }
+  .vn-aksi {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 8px;
+  }
+  .vn-pilihan {
+    min-height: 42px;
+    padding: 8px 12px;
+  }
+  .vn-suara-onoff {
+    margin-top: 4px;
+    min-height: 26px;
+  }
+
+  /* ---------- Halaman Cerita: ilustrasi kiri (menempel), narasi kanan ---------- */
+  .cerita-overlay {
+    padding: 6px max(8px, env(safe-area-inset-right)) 6px max(8px, env(safe-area-inset-left));
+  }
+  .cerita-buku {
+    max-width: 1040px;
+    padding: 10px 14px;
+    gap: 8px;
+  }
+  .cerita-buku.ada-panggung {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-auto-flow: row dense;
+    column-gap: 14px;
+    row-gap: 8px;
+    align-content: start;
+  }
+  .cerita-buku.ada-panggung > * {
+    grid-column: 2;
+  }
+  .cerita-buku.ada-panggung > .cerita-kepala {
+    grid-column: 1 / -1;
+  }
+  .cerita-buku.ada-panggung > .cerita-panggung {
+    grid-column: 1;
+    grid-row: 2 / span 4;
+    align-self: start;
+    position: sticky;
+    top: 0;
+  }
+  .cerita-buku.ada-panggung .cerita-svg {
+    max-height: calc(100dvh - 100px);
+  }
+  .cerita-narasi p {
+    font-size: 1rem;
+    margin-bottom: 4px;
+  }
+  .cerita-potret {
+    width: 44px;
+    height: 44px;
+  }
+
+  /* ---------- Kartu hadiah: alat & bintang kiri, hikmah & tombol kanan ---------- */
+  .hadiah-overlay {
+    padding: 8px;
+  }
+  .hadiah-kartu {
+    max-width: 780px;
+    max-height: calc(100dvh - 16px);
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    column-gap: 20px;
+    align-items: center;
+    padding: 12px 18px;
+  }
+  .hadiah-kanan {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .hadiah-kiri h2 {
+    font-size: 1.3rem;
+  }
+  .hadiah-kiri .muted {
+    font-size: 0.85rem;
+    line-height: 1.35;
+  }
+  .hadiah-emoji {
+    font-size: 2.6rem;
+    line-height: 1.1;
+  }
+  .hadiah-potret {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 2px;
+  }
+  .hadiah-bintang {
+    font-size: 1.5rem;
+    margin: 2px 0;
+  }
+
+  /* ---------- Modal & panel di atas dunia 3D ---------- */
+  .overlay {
+    padding: 8px;
+    align-items: center;
+  }
+  .dialog-panel {
+    max-height: calc(100dvh - 16px);
+    padding: 14px 16px;
+  }
+  .tas-panel {
+    max-width: 860px;
+    max-height: calc(100dvh - 16px);
+  }
+  .tas-grid {
+    grid-template-columns: repeat(auto-fill, minmax(128px, 1fr));
+    margin: 8px 0 10px;
+  }
+  .tas-item {
+    padding: 8px;
+  }
+  .tas-emoji {
+    font-size: 1.6rem;
+  }
+  /* Sisakan ruang kanan-kiri untuk tombol bisu 🔊 (kanan atas) supaya tidak
+     menindih pojok panel. Dibuat simetris agar panel tetap di tengah. */
+  .overlay.dialog-overlay,
+  .overlay.hadiah-overlay {
+    padding-top: 8px;
+    padding-left: max(64px, env(safe-area-inset-left));
+    padding-right: max(64px, env(safe-area-inset-right));
+  }
+  .misi-panel {
+    max-width: 560px;
+  }
+
+  /* ---------- HUD dunia: lebih ringkas agar tengah layar lega ---------- */
+  .joystick-base {
+    width: 116px;
+    height: 116px;
+  }
+  .joystick-knob {
+    width: 50px;
+    height: 50px;
+  }
+  .btn-action {
+    min-width: 56px;
+    height: 56px;
+  }
+  .btn-action.menu {
+    min-width: 48px;
+    height: 48px;
+  }
+  .btn-action.lompat {
+    width: 68px;
+    min-width: 68px;
+    height: 68px;
+  }
+  .hud-actions {
+    gap: 8px;
+  }
+  .misi-tombol {
+    min-height: 42px;
+    padding: 4px 12px 4px 8px;
+  }
+  .sapa-bar {
+    bottom: calc(max(20px, env(safe-area-inset-bottom)) + 130px);
+    flex-direction: row;
+  }
+  /* Pesan singkat turun ke bawah-tengah, di antara joystick dan tombol. */
+  .toast {
+    bottom: max(16px, env(safe-area-inset-bottom));
+    max-width: calc(100vw - 340px);
+    min-width: 200px;
+    border-radius: 16px;
+  }
+
+  /* ---------- Layar teks panjang: kartu dibagi dua kolom ---------- */
+  .screen > .stack:has(> .langkah) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .screen > .stack:has(> .btn) {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+  .final-screen {
+    padding: 12px;
+  }
+  .menara {
+    margin: 8px 0;
+  }
+  .loading-box {
+    padding: 18px 22px;
+  }
+}
+
+/* HP mendatar yang sangat pendek (≤ 380px): tombol HUD sedikit lebih kecil. */
+@media (orientation: landscape) and (max-height: 380px) {
+  .cover-hero {
+    padding-right: 44px; /* judul tidak tertutup tombol bisu */
+  }
+  .cover-judul {
+    font-size: 1.7rem;
+  }
+  .cover-hero .subjudul {
+    font-size: 0.82rem;
+  }
+  .cover-isi {
+    gap: 6px;
+  }
+  .cover-isi > .muted {
+    font-size: 0.82rem;
+  }
+  .cover-tombol .btn {
+    min-height: 40px;
+    padding: 6px 8px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+  }
+  .footer-note {
+    font-size: 0.66rem;
+  }
+  .hadiah-potret {
+    width: 60px;
+    height: 60px;
+  }
+  .joystick-base {
+    width: 104px;
+    height: 104px;
+  }
+  .joystick-knob {
+    width: 44px;
+    height: 44px;
+  }
+  .misi-tombol-tahap {
+    display: none;
+  }
+}

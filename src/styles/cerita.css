@@ -215,17 +215,25 @@
   background: var(--hijau-100);
   color: var(--hijau-900);
 }
-.obor {
+/* Nyawa menjawab: tiga hati. */
+.nyawa {
   display: flex;
   gap: 4px;
   font-size: 1.35rem;
+  line-height: 1;
 }
-.obor .padam {
-  opacity: 0.45;
-  filter: grayscale(1);
+.nyawa .hilang {
+  opacity: 0.55;
 }
-.obor .nyala {
-  animation: kedip 1.2s infinite;
+/* Berdenyut sekali saat muncul (tidak terus-menerus: lebih ringan di HP murah). */
+.nyawa .ada {
+  animation: kedip 0.7s 1;
+}
+.nyawa .ada:nth-child(2) {
+  animation-delay: 0.15s;
+}
+.nyawa .ada:nth-child(3) {
+  animation-delay: 0.3s;
 }
 
 @keyframes goyang {
@@ -316,10 +324,9 @@
   height: auto;
   aspect-ratio: 320 / 200;
 }
+/* Garis tepi & latar label diatur di halamanCerita.ts (pil / garis tepi gelap),
+   bukan di sini: garis tepi putih lama membuat teks terang tampak kabur. */
 .cerita-label {
-  paint-order: stroke;
-  stroke: rgba(255, 255, 255, 0.75);
-  stroke-width: 3px;
   font-family: var(--font-display);
 }
 .cerita-narasi p {
@@ -488,6 +495,46 @@
   animation: a-gambar 1s ease-out forwards;
 }
 
+/* ---- Listrik: arus mengalir di kabel & lampu putus (siklus 6 detik) ---- */
+.anim-alir,
+.anim-alir-padam {
+  stroke-dasharray: 3 9;
+  stroke-linecap: round;
+}
+.anim-alir {
+  animation: a-alir 0.7s linear infinite;
+}
+.anim-alir-padam {
+  animation:
+    a-alir 0.7s linear infinite,
+    a-alir-padam 6s step-end infinite;
+}
+.anim-nyala-padam {
+  animation: a-nyala-padam 6s ease-in-out infinite;
+}
+.anim-tanda-putus {
+  animation: a-tanda-putus 6s ease-out infinite;
+}
+@keyframes a-alir {
+  to { stroke-dashoffset: -12; }
+}
+/* Arus berhenti saat lampu putus (detik 3–6), lalu mengalir lagi. */
+@keyframes a-alir-padam {
+  0% { opacity: 1; }
+  50% { opacity: 0; }
+}
+@keyframes a-nyala-padam {
+  0%, 45% { opacity: 1; filter: none; }
+  52%, 95% { opacity: 0.28; filter: grayscale(1); }
+  100% { opacity: 1; filter: none; }
+}
+@keyframes a-tanda-putus {
+  0%, 47% { opacity: 0; transform: scale(0.4); }
+  52% { opacity: 1; transform: scale(1.25); }
+  58%, 95% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.4); }
+}
+
 g[class^='anim-'] {
   transform-box: view-box;
 }
@@ -509,6 +556,14 @@ g[class^='anim-'] {
     animation: none !important;
     stroke-dashoffset: 0 !important;
     opacity: 1 !important;
+  }
+  /* Tanpa animasi: tampilkan keadaan "lampu putus" secara diam agar pesannya tetap jelas. */
+  .anim-nyala-padam {
+    opacity: 0.28 !important;
+    filter: grayscale(1);
+  }
+  .anim-alir-padam {
+    opacity: 0 !important;
   }
 }
 
@@ -564,6 +619,31 @@ g[class^='anim-'] {
 .cut-ombak .cut-laut { height: 60%; background: #0c4a6e; animation-duration: 0.9s; }
 .cut-putih { background: #fff; }
 .cut-putih .cut-laut { display: none; }
+.cut-putih .cut-gambar { animation: a-melayang 3s ease-in-out infinite; opacity: 0.6; }
+/* Ilustrasi ombak tenggelam perlahan ke dalam cahaya putih: "lalu semuanya menjadi sunyi". */
+.cut-putih::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 45%, rgba(255, 255, 255, 0.35) 0, rgba(255, 255, 255, 0.85) 70%);
+  animation: sunyi-pudar 4s ease-out forwards;
+}
+.cut-adegan.cut-putih.dengan-gambar .cut-ilustrasi,
+.cut-adegan.cut-putih.dengan-gambar .cut-buram {
+  filter: grayscale(0.6) blur(1.5px) brightness(1.15);
+  animation: sunyi-redup 6s ease-out forwards;
+}
+.cut-adegan.cut-putih.dengan-gambar .cut-buram { filter: blur(18px) grayscale(0.6) brightness(1.2); }
+@keyframes sunyi-pudar {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes sunyi-redup {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0.55; transform: scale(1.08); }
+}
 .cut-goa { background: radial-gradient(circle at 50% 20%, #fde68a 0, #44403c 30%, #0c0a09 70%); }
 .cut-goa .cut-laut { display: none; }
 .cut-mercusuar { background: linear-gradient(#0f172a, #1e3a8a); }

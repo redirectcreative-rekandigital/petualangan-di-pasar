@@ -1,5 +1,7 @@
 import './styles/main.css';
 import './styles/cerita.css';
+import './styles/tata-letak.css';
+import './styles/menara.css';
 import { el, mount } from './ui/components/dom';
 import {
   loadProgress,
@@ -41,6 +43,7 @@ import { renderAbout } from './ui/screens/about';
 import { renderGuru } from './ui/screens/guru';
 import { renderFinal } from './ui/screens/final';
 import { toggleMuted, isMuted, sfx } from './core/sound';
+import { pasangLayarPenuhOtomatis } from './core/layarPenuh';
 import { starsForCorrect } from './core/scoring';
 import type { ScreenContext, ScreenName } from './ui/screens/context';
 import type { NoktahId, Progress, TahapMisi } from '../shared/types';
@@ -251,6 +254,7 @@ async function buildPeta(options: Record<string, unknown>): Promise<void> {
       dikunjungi: tahapMisi(progress, kode) >= 3,
     }),
     getPosisiPemain: () => (options.dari as NoktahId | undefined) ?? balaiTujuan(progress),
+    getTujuan: () => balaiTujuan(progress),
     penampilanPemain: {
       gender: progress.gender,
       warnaPakaian: progress.warnaBaju,
@@ -266,6 +270,7 @@ async function buildPeta(options: Record<string, unknown>): Promise<void> {
     },
   };
   tambahkanBarPeta();
+  tambahkanZoomPeta(handle);
   updateMuteButton();
 
   const tujuan = balaiTujuan(progress);
@@ -307,6 +312,27 @@ function tambahkanBarPeta(): void {
     ],
   });
   app.append(bar);
+}
+
+/** Tombol zoom besar di kanan bawah peta: anak tidak perlu mencubit layar. */
+function tambahkanZoomPeta(handle: import('./world/petaBesar').PetaBesarHandle): void {
+  const tombol = (teks: string, label: string, aksi: () => void): HTMLElement =>
+    el('button', {
+      class: 'peta-zoom-btn',
+      text: teks,
+      attrs: { type: 'button', 'aria-label': label, title: label },
+      on: { click: () => { sfx.click(); aksi(); } },
+    });
+  app.append(
+    el('div', {
+      class: 'peta-zoom',
+      children: [
+        tombol('➕', 'Perbesar peta', () => handle.zoom(0.7)),
+        tombol('➖', 'Perkecil peta', () => handle.zoom(1.4)),
+        tombol('🎯', 'Lihat tujuan berikutnya', () => handle.fokusTujuan()),
+      ],
+    }),
+  );
 }
 
 function menuPeta(): void {
@@ -391,7 +417,7 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean): Promise<void> 
   if (!meta || !cerita) return;
   stopNoktahWorld();
   app.innerHTML = '';
-  document.body.classList.add('world-mode');
+  document.body.classList.add('world-mode', 'balai-mode');
   const canvas = document.createElement('canvas');
   canvas.className = 'world-canvas';
   canvas.setAttribute('aria-label', `Dunia 3D ${cerita.tempat}`);
@@ -416,6 +442,9 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean): Promise<void> 
     onInteract: () => void handleInteract(),
     onMenu: openMenu,
     onTas: () => bukaTas(),
+    onLompat: () => {
+      if (!session?.sibuk) input.pressJump();
+    },
     onSapa: (emoji) => {
       sfx.click();
       klien?.kirimSapa(emoji);
@@ -702,15 +731,27 @@ function tampilkanHadiah(c: CeritaBalai, bintang: number, alatBaru: boolean): Pr
         el('div', {
           class: 'hadiah-kartu',
           children: [
-            potretHadiah(c),
-            el('div', { class: 'hadiah-label', text: alatBaru ? '🎒 Alat survival baru!' : '⭐ Latihan selesai!' }),
-            el('div', { class: 'hadiah-emoji', text: c.alat.emoji }),
-            el('h2', { text: c.alat.nama }),
-            el('p', { class: 'muted', text: c.alat.guna }),
-            el('div', { class: 'hadiah-bintang', text: `${'⭐'.repeat(bintang)}${'☆'.repeat(3 - bintang)}` }),
-            el('div', { class: 'card jujur', children: [el('span', { class: 'label-kecil', text: '🤲 Hikmah' }), el('p', { text: c.hikmah })] }),
-            el('p', { class: 'hadiah-berikut', text: teksBerikut }),
-            ok,
+            // Dua kelompok: di HP tegak bertumpuk, di layar mendatar jadi dua kolom
+            // (alat & bintang di kiri, hikmah & tombol di kanan).
+            el('div', {
+              class: 'hadiah-kiri',
+              children: [
+                potretHadiah(c),
+                el('div', { class: 'hadiah-label', text: alatBaru ? '🎒 Alat survival baru!' : '⭐ Latihan selesai!' }),
+                el('div', { class: 'hadiah-emoji', text: c.alat.emoji }),
+                el('h2', { text: c.alat.nama }),
+                el('p', { class: 'muted', text: c.alat.guna }),
+                el('div', { class: 'hadiah-bintang', text: `${'⭐'.repeat(bintang)}${'☆'.repeat(3 - bintang)}` }),
+              ],
+            }),
+            el('div', {
+              class: 'hadiah-kanan',
+              children: [
+                el('div', { class: 'card jujur', children: [el('span', { class: 'label-kecil', text: '🤲 Hikmah' }), el('p', { text: c.hikmah })] }),
+                el('p', { class: 'hadiah-berikut', text: teksBerikut }),
+                ok,
+              ],
+            }),
           ],
         }),
       ],
@@ -795,7 +836,7 @@ function stopNoktahWorld(): void {
     petaSession = null;
   }
   app.querySelectorAll('.vn-overlay, .cerita-overlay, .hadiah-overlay, .dialog-overlay').forEach((n) => n.remove());
-  document.body.classList.remove('world-mode');
+  document.body.classList.remove('world-mode', 'balai-mode');
 }
 
 function openMenu(): void {
@@ -857,6 +898,8 @@ function renderEmergencyScreen(): void {
 
 /* ---------- Titik masuk ---------- */
 function boot(): void {
+  // HP/tablet: layar penuh otomatis sejak ketukan pertama, tegak maupun mendatar.
+  pasangLayarPenuhOtomatis(new URLSearchParams(window.location.search).get('layarpenuh') === '1');
   if (!bankReady()) return;
   updateMuteButton();
   navigate('intro');
@@ -874,6 +917,7 @@ boot();
   pindahKe: (peran: PeranTitik) => session?.world.pindahKe(peran) ?? false,
   interaksi: () => handleInteract(),
   kePeta: () => navigate('map'),
+  petaLayar: () => petaSession?.handle.posisiLayar() ?? null,
   keFinal: () => navigate('final'),
   isPuncakUnlocked: () => isPuncakUnlocked(progress),
   online: () => ({ status: statusKlien, teman: klien ? klien.terakhirPosisi.length : 0 }),

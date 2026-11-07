@@ -32,7 +32,7 @@ const LANGKAH: Langkah[] = [
   {
     ikon: '🔥',
     judul: '5. Jawab tantangan di Tempat Uji',
-    isi: 'Penjaga memberi 3 soal pilihan ganda. Setiap soal punya 3 obor (kesempatan). Bila salah, tekan "Ingat cerita" untuk melihat petunjuk.',
+    isi: 'Penjaga memberi 3 soal pilihan ganda. Setiap soal punya 3 hati ❤️ (nyawa). Tiap jawaban salah, satu hati hilang. Bila salah, tekan "Ingat cerita" untuk melihat petunjuk.',
   },
   {
     ikon: '🗼',
@@ -134,7 +134,7 @@ export function renderHowto(ctx: ScreenContext): HTMLElement {
               el('li', { text: 'Balai dibuka berurutan mengikuti bab buku IPA kelas 5 (Bab 1 Cahaya sampai Bab 9 Bumi).' }),
               el('li', { text: 'Setiap balai: misi dari Penjaga → Halaman Cerita → tantangan di Tempat Uji → pulang lewat gerbang.' }),
               el('li', { text: 'Tempat Uji terbuka setelah Halaman Cerita selesai dibaca.' }),
-              el('li', { text: '3 soal per balai, 3 obor per soal. 3 benar = ⭐⭐⭐, 2 = ⭐⭐, 1 = ⭐. Minimal 1 bintang untuk lulus.' }),
+              el('li', { text: '3 soal per balai, 3 hati ❤️ per soal. 3 benar = ⭐⭐⭐, 2 = ⭐⭐, 1 = ⭐. Minimal 1 bintang untuk lulus.' }),
               el('li', { text: 'Final di Mercusuar Tua: 30 soal dalam 4 lantai. Lulus bila minimal 21 benar (70%).' }),
             ],
           }),

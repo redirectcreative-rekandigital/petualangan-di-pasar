@@ -38,7 +38,7 @@ dari data game dengan `npm run naskah`).
 
 ## Fitur utama
 
-- **Kuis pilihan ganda di dalam percakapan:** Penjaga mengajukan soal, 3 obor = 3 kesempatan,
+- **Kuis pilihan ganda di dalam percakapan:** Penjaga mengajukan soal, 3 hati ❤️ = 3 nyawa,
   jawaban salah memberi petunjuk yang merujuk adegan cerita (tombol "Ingat cerita"), jawaban benar
   diberi penjelasan dari cerita.
 - **Halaman Cerita** untuk 11 materi (44 adegan SVG beranimasi), ditutup Kunci Ingat, diagram
@@ -88,7 +88,7 @@ src/
 ├─ data/balai.ts         # materi, diagram, urutan jalur
 ├─ core/                 # state (misi, kunci berurutan), engine soal, suara (TTS), analisis guru
 ├─ ui/percakapan.ts      # kotak percakapan bergaya visual novel
-├─ ui/tantangan.ts       # kuis di dalam percakapan (obor, petunjuk, catatan jawaban)
+├─ ui/tantangan.ts       # kuis di dalam percakapan (hati nyawa, petunjuk, catatan jawaban)
 ├─ ui/halamanCerita.ts   # buku cerita bergerak
 ├─ ui/cutscene.ts        # cutscene badai & epilog
 ├─ ui/screens/           # intro, final, guru, hasil, petunjuk, tentang

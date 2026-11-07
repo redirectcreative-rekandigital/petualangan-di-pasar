@@ -13,6 +13,7 @@ import { warnaBalai } from '../data/balai';
 import { bangunLatar, TEMA_BALAI } from './latarBalai';
 import type { CeritaBalai } from '../data/cerita';
 import type { InputManager } from '../input/controls';
+import { sfx } from '../core/sound';
 import type { BalaiMeta, Progress, TahapMisi } from '../../shared/types';
 import type { PosisiPemain } from '../../shared/net';
 import type { ColliderBox } from './mapConfig';
@@ -62,7 +63,7 @@ export interface NoktahWorldHandle {
   posisiPemain: () => { x: number; z: number; rot: number };
   /** Pintasan uji: letakkan pemain di dekat sebuah titik. */
   pindahKe: (peran: PeranTitik) => boolean;
-  debugState: () => { x: number; z: number; nearby: string | null; tahap: number };
+  debugState: () => { x: number; z: number; nearby: string | null; tahap: number; tinggi: number; yaw: number };
   dispose: () => void;
 }
 
@@ -380,8 +381,19 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     if (orbit.yaw !== 0 || orbit.pitch !== 0) camCtrl.orbit(orbit.yaw, orbit.pitch);
 
     if (!paused) {
-      const wishX = options.input.state.moveX * MOVE_SPEED * dt;
-      const wishZ = -options.input.state.moveY * MOVE_SPEED * dt;
+      // Gerak relatif ke kamera: joystick "atas" = menjauh dari kamera (maju di
+      // layar), "kanan" = ke kanan layar, ke mana pun kamera sedang menghadap.
+      // Kamera berada di (sin yaw, cos yaw) dari pemain, jadi arah maju adalah
+      // (-sin yaw, -cos yaw) dan arah kanan (cos yaw, -sin yaw).
+      const yaw = camCtrl.getYaw();
+      const sinY = Math.sin(yaw);
+      const cosY = Math.cos(yaw);
+      const mx = options.input.state.moveX;
+      const my = options.input.state.moveY;
+      const wishX = (mx * cosY - my * sinY) * MOVE_SPEED * dt;
+      const wishZ = (-mx * sinY - my * cosY) * MOVE_SPEED * dt;
+      if (options.input.state.jumpPressed && player.lompat()) sfx.lompat();
+      if (player.updateLompat(dt)) sfx.mendarat();
       if (options.input.state.moving) {
         const resolved = resolveAll({ x: player.position.x + wishX, z: player.position.z + wishZ, r: PLAYER_RADIUS }, colliders);
         const clamped = clampToMap(resolved.x, resolved.z, SETENGAH, PLAYER_RADIUS + 0.4);
@@ -467,6 +479,8 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
       z: Math.round(player.position.z * 100) / 100,
       nearby: nearby?.peran ?? null,
       tahap,
+      tinggi: Math.round(player.group.position.y * 100) / 100,
+      yaw: Math.round(camCtrl.getYaw() * 1000) / 1000,
     }),
     dispose: () => {
       player.dispose();

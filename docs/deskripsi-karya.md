@@ -55,7 +55,7 @@ Bank soal: 90 soal balai dan 30 soal Final, semua pilihan ganda A–D dengan met
 2. Kamu terbangun di **Goa Sinar**. Mbok Sinar menyapa dan memberi misi pertama. Balai ini sekaligus tutorial.
 3. Berjalan dengan joystick (HP) atau W A S D (laptop). Ikuti **panah kuning** ke tujuan berikutnya, lalu tekan tombol **A**.
 4. Di setiap balai: terima **misi** dari Penjaga → baca **Halaman Cerita** bersama Cantrik → jawab **3 soal** di Tempat Uji → terima **alat survival** → lewati **gerbang** ke peta.
-5. Tiap soal punya **3 obor** (kesempatan). Bila salah, Penjaga memberi petunjuk dan tombol **Ingat cerita** untuk membuka adegan yang relevan.
+5. Tiap soal punya **3 hati ❤️** (nyawa); satu hati hilang tiap jawaban salah. Bila salah, Penjaga memberi petunjuk dan tombol **Ingat cerita** untuk membuka adegan yang relevan.
 6. Setelah 11 alat terkumpul, naiki **Mercusuar Tua**: 30 soal dalam 4 lantai. Lulus bila minimal 21 benar, lalu sertifikat "Penyintas Sains" terbuka.
 
 ## Sistem Permainan

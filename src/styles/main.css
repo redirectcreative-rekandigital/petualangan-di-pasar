@@ -952,8 +952,11 @@ body.world-mode #app {
 
 /* Kanvas pratinjau 3D di kartu pilih karakter. */
 .karakter-preview {
-  width: clamp(120px, 42vw, 176px);
-  height: clamp(120px, 42vw, 176px);
+  /* Potret 240:340 agar karakter utuh dari kepala sampai kaki. */
+  width: clamp(120px, 40vw, 190px);
+  height: auto;
+  aspect-ratio: 240 / 340;
+  max-width: 100%;
   display: block;
   border-radius: 12px;
   background: radial-gradient(circle at 50% 30%, var(--hijau-100), transparent 70%);
@@ -1290,7 +1293,8 @@ body.world-mode #app {
 
 .karakter-preview.preview-besar {
   width: 240px;
-  height: 240px;
+  height: auto;
+  aspect-ratio: 240 / 340;
   max-width: 100%;
   position: relative;
   z-index: 1;

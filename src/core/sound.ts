@@ -121,6 +121,15 @@ export const sfx = {
     noise(0.09, 0.05, kakiKanan ? 900 : 780);
     tone({ freq: kakiKanan ? 150 : 130, duration: 0.05, type: 'sine', gain: 0.03 });
   },
+  /** Lompat: nada naik pendek "hup". */
+  lompat(): void {
+    tone({ freq: 330, duration: 0.07, type: 'triangle', gain: 0.07 });
+    tone({ freq: 520, duration: 0.09, type: 'triangle', delay: 0.05, gain: 0.06 });
+  },
+  /** Mendarat: "tuk" pelan di tanah. */
+  mendarat(): void {
+    noise(0.07, 0.06, 600);
+  },
   /** Membuka balai / panel (geser naik lembut). */
   buka(): void {
     tone({ freq: 392, duration: 0.12, type: 'sine', gain: 0.07 });

@@ -36,7 +36,7 @@ beforeEach(() => {
   document.body.innerHTML = '';
 });
 
-/** Melewati cutscene badai yang muncul setelah tombol Mulai. */
+/** Melewati cutscene badai yang muncul setelah nama & mode dipilih (tombol "Mulai Bertahan Hidup"). */
 async function lewatiCutscene(): Promise<void> {
   const lewati = Array.from(document.body.querySelectorAll('.cut-overlay button')).find((b) => b.textContent?.includes('Lewati'));
   (lewati as HTMLButtonElement | undefined)?.click();
@@ -54,8 +54,8 @@ describe('layar pembuka (intro)', async () => {
     // Cover -> pilih karakter.
     const mulai = Array.from(node.querySelectorAll('button')).find((b) => b.textContent?.includes('Mulai Petualangan'));
     mulai?.dispatchEvent(new MouseEvent('click'));
-    expect(document.body.querySelector('.cut-overlay')).not.toBeNull();
-    await lewatiCutscene();
+    // Cerita belum diputar: pemain memilih karakter & nama dulu.
+    expect(document.body.querySelector('.cut-overlay')).toBeNull();
     expect(node.textContent).toContain('Kartu Anggota Ekspedisi');
     expect(node.querySelectorAll('.pilih-karakter').length).toBe(2);
 
@@ -75,6 +75,10 @@ describe('layar pembuka (intro)', async () => {
     if (input) input.value = 'Sari';
     const mulai2 = Array.from(node.querySelectorAll('button')).find((b) => b.textContent?.includes('Mulai Bertahan'));
     mulai2?.dispatchEvent(new MouseEvent('click'));
+    // Baru sekarang cerita badai diputar, lalu masuk balai pertama.
+    expect(document.body.querySelector('.cut-overlay')).not.toBeNull();
+    expect(nav).not.toHaveBeenCalled();
+    await lewatiCutscene();
     await new Promise((r) => setTimeout(r, 1300));
     expect(nav).toHaveBeenCalledWith('noktah', { noktah: 'F01', prolog: true });
   });
@@ -115,6 +119,7 @@ describe('layar pembuka (intro)', async () => {
     Array.from(node.querySelectorAll('button'))
       .find((b) => b.textContent?.includes('Mulai Bertahan'))
       ?.dispatchEvent(new MouseEvent('click'));
+    await lewatiCutscene();
     await new Promise((r) => setTimeout(r, 1300));
     expect(nav).toHaveBeenCalledWith('noktah', { noktah: 'F01', prolog: true });
     expect(ctx.getProgress().token).toBe('4260');
@@ -180,6 +185,7 @@ describe('layar pembuka (intro)', async () => {
     Array.from(node.querySelectorAll('button'))
       .find((b) => b.textContent?.includes('Mulai Bertahan'))
       ?.dispatchEvent(new MouseEvent('click'));
+    await lewatiCutscene();
 
     await new Promise((r) => setTimeout(r, 1300));
     expect(nav).toHaveBeenCalledWith('noktah', { noktah: 'F01', prolog: true });

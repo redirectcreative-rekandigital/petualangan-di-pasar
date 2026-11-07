@@ -37,7 +37,15 @@ export type Animasi =
   | 'goyang'
   | 'getar'
   | 'muncul'
-  | 'gambar';
+  | 'gambar'
+  /** Garis: titik-titik berjalan sepanjang kabel (arus listrik mengalir). */
+  | 'alir'
+  /** Garis: arus mengalir, lalu berhenti di paruh kedua siklus 6 detik (karena lampu putus). */
+  | 'alir-padam'
+  /** Lampu/cahaya: menyala, lalu padam di paruh kedua siklus 6 detik. */
+  | 'nyala-padam'
+  /** Tanda ❌ "putus": tersembunyi, lalu muncul di paruh kedua siklus 6 detik. */
+  | 'tanda-putus';
 
 export type Sprite =
   | { t?: 'emoji'; e: string; x: number; y: number; s?: number; a?: Animasi; d?: number }
@@ -74,6 +82,21 @@ const g = (x1: number, y1: number, x2: number, y2: number, w = '#fde047', a: Ani
 const l = (teks: string, x: number, y: number, s = 11, a: Animasi = 'muncul', d = 0, w = '#0f172a'): Sprite => ({
   t: 'label', teks, x, y, s, a, d, w,
 });
+
+/**
+ * Kabel listrik: garis dasar abu-abu tua + lapisan titik kuning berjalan (arus).
+ * `alir` = arus terus mengalir; `alir-padam` = arus berhenti saat lampu putus.
+ */
+const kabel = (x1: number, y1: number, x2: number, y2: number, alir: Animasi = 'alir'): Sprite[] => [
+  { t: 'garis', x1, y1, x2, y2, w: '#334155', tebal: 5 },
+  { t: 'garis', x1, y1, x2, y2, w: '#facc15', tebal: 3, a: alir },
+];
+
+/** Lampu dengan cahaya bulat di belakangnya; `padam` = ikut siklus putus/padam. */
+const lampu = (x: number, y: number, padam = false, s = 26): Sprite[] => [
+  { t: 'kotak', x: x - s * 0.75, y: y - s * 0.75, lebar: s * 1.5, tinggi: s * 1.5, r: s * 0.75, w: 'rgba(253, 224, 71, 0.55)', a: padam ? 'nyala-padam' : 'denyut' },
+  e('💡', x, y, s, padam ? 'nyala-padam' : undefined),
+];
 
 export const ADEGAN: Record<MateriKode, Adegan[]> = {
   /* ============================ BAB 1 CAHAYA ============================ */
@@ -242,7 +265,13 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
       judul: 'Catat Penghuni Hutan',
       latar: 'hutan',
       narasi: ['Ekosistem ada di darat, di perairan, dan ada juga buatan manusia seperti sawah.', 'Ayo catat penghuni hutan di Buku Catatan!'],
-      sprite: [e('📒', 160, 100, 50)],
+      // Buku catatan + penghuni hutan yang akan dikelompokkan (biotik/abiotik).
+      sprite: [
+        e('📒', 160, 62, 44, 'denyut'),
+        e('🌳', 50, 140, 40, 'muncul', 0.2), e('🐿️', 105, 150, 32, 'muncul', 0.4), e('🍄', 150, 155, 28, 'muncul', 0.6),
+        e('💧', 200, 152, 26, 'muncul', 0.8), e('☀️', 245, 140, 32, 'muncul', 1), e('🌬️', 290, 150, 28, 'muncul', 1.2),
+        l('biotik atau abiotik?', 160, 112, 12, 'muncul', 1.4),
+      ],
       kata: ['darat', 'perairan', 'buatan', 'sawah', 'kolam', 'akuarium', 'laut'],
       interaksi: {
         jenis: 'kelompok',
@@ -300,7 +329,15 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
       judul: 'Susun Rantai Makanan',
       latar: 'ladang',
       narasi: ['Sekarang giliranmu. Susun rantai makanan dari produsen sampai konsumen puncak!'],
-      sprite: [e('🧺', 160, 100, 50)],
+      // Rantai yang belum lengkap: produsen → ? → ? → konsumen puncak.
+      sprite: [
+        e('🌾', 40, 100, 36), g(62, 100, 92, 100, '#ea580c', 'gambar', 0.2, 4),
+        e('❓', 118, 100, 32, 'denyut', 0.4), g(140, 100, 170, 100, '#ea580c', 'gambar', 0.6, 4),
+        e('❓', 196, 100, 32, 'denyut', 0.8), g(218, 100, 248, 100, '#ea580c', 'gambar', 1, 4),
+        e('🦅', 278, 96, 38),
+        l('produsen', 40, 140, 11, 'muncul', 0.3), l('konsumen puncak', 256, 140, 11, 'muncul', 1.2),
+        l('susun dari bawah ke atas!', 160, 52, 12, 'muncul', 1.4),
+      ],
       kata: ['urutan', 'susun'],
       interaksi: {
         jenis: 'urut',
@@ -352,7 +389,13 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
       judul: 'Cocokkan Pasangan',
       latar: 'taman',
       narasi: ['Ayo tentukan jenis hubungan setiap pasangan makhluk hidup!'],
-      sprite: [e('🥅', 160, 100, 50)],
+      // Tiga pasangan makhluk hidup; tanda tanya = jenis simbiosisnya.
+      sprite: [
+        e('🐝', 45, 80, 30, 'melayang'), e('🌸', 80, 88, 30), e('❓', 62, 135, 24, 'denyut', 0.3),
+        e('🌳', 145, 82, 40), e('🌺', 170, 70, 20), e('❓', 160, 135, 24, 'denyut', 0.6),
+        e('🦟', 240, 72, 24, 'melayang'), e('🧒', 272, 90, 32), e('❓', 258, 135, 24, 'denyut', 0.9),
+        l('mutualisme · komensalisme · parasitisme', 160, 30, 11, 'muncul', 1.2),
+      ],
       kata: ['simbiosis', 'hubungan'],
       interaksi: {
         jenis: 'kelompok',
@@ -440,13 +483,20 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
         'Kutub yang sama saling tolak-menolak. Kutub yang berbeda saling tarik-menarik.',
       ],
       sprite: [
+        // Merah = S (selatan), biru = U (utara). Tiap huruf ikut animasi baloknya
+        // supaya tetap menempel saat magnet bergerak.
+        // Atas: U menghadap U → kedua magnet saling menjauh (tolak-menolak).
         { t: 'kotak', x: 30, y: 50, lebar: 50, tinggi: 26, w: '#ef4444', r: 4, a: 'geser-balik' }, { t: 'kotak', x: 80, y: 50, lebar: 50, tinggi: 26, w: '#3b82f6', r: 4, a: 'geser-balik' },
+        l('S', 55, 68, 14, 'geser-balik', 0, '#fff'), l('U', 105, 68, 14, 'geser-balik', 0, '#fff'),
         { t: 'kotak', x: 190, y: 50, lebar: 50, tinggi: 26, w: '#3b82f6', r: 4, a: 'geser' }, { t: 'kotak', x: 240, y: 50, lebar: 50, tinggi: 26, w: '#ef4444', r: 4, a: 'geser' },
-        l('S   U', 80, 67, 12, 'muncul', 0, '#fff'), l('S   U', 240, 67, 12, 'muncul', 0, '#fff'),
-        l('U bertemu U → tolak-menolak', 160, 110, 12),
-        { t: 'kotak', x: 70, y: 140, lebar: 45, tinggi: 24, w: '#ef4444', r: 4 }, { t: 'kotak', x: 115, y: 140, lebar: 45, tinggi: 24, w: '#3b82f6', r: 4 },
-        { t: 'kotak', x: 165, y: 140, lebar: 45, tinggi: 24, w: '#ef4444', r: 4, a: 'muncul', d: 1 }, { t: 'kotak', x: 210, y: 140, lebar: 45, tinggi: 24, w: '#3b82f6', r: 4, a: 'muncul', d: 1 },
-        l('U bertemu S → tarik-menarik', 160, 185, 12, 'muncul', 1.2),
+        l('U', 215, 68, 14, 'geser', 0, '#fff'), l('S', 265, 68, 14, 'geser', 0, '#fff'),
+        l('U bertemu U → tolak-menolak', 160, 104, 12),
+        // Bawah: U menghadap S → menempel (tarik-menarik).
+        { t: 'kotak', x: 70, y: 132, lebar: 45, tinggi: 24, w: '#ef4444', r: 4 }, { t: 'kotak', x: 115, y: 132, lebar: 45, tinggi: 24, w: '#3b82f6', r: 4 },
+        l('S', 92, 149, 13, 'muncul', 0, '#fff'), l('U', 137, 149, 13, 'muncul', 0, '#fff'),
+        { t: 'kotak', x: 165, y: 132, lebar: 45, tinggi: 24, w: '#ef4444', r: 4, a: 'muncul', d: 1 }, { t: 'kotak', x: 210, y: 132, lebar: 45, tinggi: 24, w: '#3b82f6', r: 4, a: 'muncul', d: 1 },
+        l('S', 187, 149, 13, 'muncul', 1, '#fff'), l('U', 232, 149, 13, 'muncul', 1, '#fff'),
+        l('U bertemu S → tarik-menarik', 160, 172, 12, 'muncul', 1.2),
       ],
       kata: ['kutub', 'utara', 'selatan', 'tolak', 'tarik', 'senama', 'sejenis', 'berbeda', 'sama'],
     },
@@ -487,7 +537,15 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
         'Air sungai yang deras memutar kincir. Kincir memutar generator dan menghasilkan listrik.',
         'Inilah cara kerja pembangkit listrik tenaga air (PLTA). Ada juga tenaga surya, angin, dan uap.',
       ],
-      sprite: [e('🌊', 60, 160, 40, 'geser'), e('🎡', 150, 110, 60, 'putar'), g(180, 110, 250, 80, '#facc15', 'gambar', 0.6, 3), e('💡', 265, 70, 36, 'kedip', 1)],
+      sprite: [
+        // Sumber listrik lain di baris atas.
+        e('☀️', 34, 30, 24), l('surya', 34, 56, 11), e('🌬️', 92, 30, 24), l('angin', 92, 56, 11), e('🔋', 150, 30, 24), l('baterai', 150, 56, 11),
+        // PLTA: air → kincir/generator → kabel berarus → lampu menyala.
+        e('🌊', 50, 158, 40, 'geser'), e('🎡', 130, 125, 56, 'putar'), l('generator', 130, 172, 11),
+        ...kabel(158, 125, 230, 125), ...kabel(230, 125, 230, 96),
+        ...lampu(240, 78, false, 32),
+        l('listrik mengalir!', 262, 150, 11, 'muncul', 0.8),
+      ],
       kata: ['pembangkit', 'plta', 'kincir', 'generator', 'sumber', 'surya', 'angin', 'baterai', 'aki', 'energi'],
     },
     {
@@ -497,7 +555,15 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
         'Arus listrik mengalir dari baterai, lewat kabel, ke lampu, lalu kembali ke baterai.',
         'Bila rangkaian terputus, lampu padam. Logam adalah konduktor; karet dan plastik adalah isolator.',
       ],
-      sprite: [e('🔋', 70, 140, 40), e('💡', 250, 60, 40, 'kedip', 1.2), g(85, 125, 85, 60, '#f97316', 'gambar', 0, 3), g(85, 60, 230, 60, '#f97316', 'gambar', 0.3, 3), g(255, 80, 255, 140, '#f97316', 'gambar', 0.6, 3), g(255, 140, 95, 140, '#f97316', 'gambar', 0.9, 3), l('konduktor · isolator', 170, 180, 11)],
+      // Satu lingkaran tertutup: baterai (+) → kabel → lampu → kabel → baterai (−).
+      sprite: [
+        ...kabel(60, 120, 60, 50), ...kabel(60, 50, 250, 50), ...kabel(250, 50, 250, 150), ...kabel(250, 150, 60, 150), ...kabel(60, 150, 60, 120),
+        e('🔋', 60, 118, 36), l('+', 90, 100, 14), l('−', 90, 142, 14),
+        ...lampu(250, 76, false, 32),
+        e('➡️', 155, 50, 16, 'geser'), e('⬅️', 155, 150, 16, 'geser-balik'),
+        l('rangkaian tertutup', 155, 104, 12, 'muncul', 0.4),
+        l('konduktor · isolator', 155, 182, 11, 'muncul', 0.8),
+      ],
       kata: ['arus', 'tertutup', 'terbuka', 'konduktor', 'isolator', 'kabel', 'saklar', 'sakelar', 'mengalir'],
     },
     {
@@ -507,8 +573,28 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
         'Pada rangkaian seri, lampu disusun berderet. Bila satu putus, semua padam.',
         'Pada rangkaian paralel, lampu disusun bercabang. Bila satu putus, yang lain tetap menyala.',
       ],
-      sprite: [l('SERI', 80, 30, 13), e('💡', 50, 80, 28), e('💡', 110, 80, 28, 'kedip'), l('satu putus, semua padam', 80, 130, 10),
-        l('PARALEL', 240, 30, 13), e('💡', 240, 65, 28), e('💡', 240, 110, 28, 'kedip'), l('yang lain tetap menyala', 240, 155, 10)],
+      // Siklus 6 detik: semua lampu menyala, lalu satu lampu PUTUS (❌).
+      // SERI (kiri): satu jalur → semua lampu & arus ikut padam.
+      // PARALEL (kanan): bercabang → hanya cabang yang putus yang padam.
+      sprite: [
+        // --- SERI: baterai di kiri, dua lampu berderet di kabel atas ---
+        ...kabel(18, 105, 18, 60, 'alir-padam'), ...kabel(18, 60, 142, 60, 'alir-padam'), ...kabel(142, 60, 142, 150, 'alir-padam'),
+        ...kabel(142, 150, 18, 150, 'alir-padam'), ...kabel(18, 150, 18, 105, 'alir-padam'),
+        e('🔋', 18, 108, 26),
+        ...lampu(58, 60, true), ...lampu(104, 60, true),
+        e('❌', 104, 60, 16, 'tanda-putus'),
+        l('SERI', 80, 26, 13),
+        l('satu putus, semua padam', 80, 176, 11),
+        // --- PARALEL: baterai di kiri, dua lampu di cabang masing-masing ---
+        ...kabel(182, 105, 182, 50), ...kabel(182, 50, 240, 50), ...kabel(240, 50, 290, 50, 'alir-padam'),
+        ...kabel(182, 160, 240, 160), ...kabel(240, 160, 290, 160, 'alir-padam'), ...kabel(182, 160, 182, 105),
+        ...kabel(240, 50, 240, 160), ...kabel(290, 50, 290, 160, 'alir-padam'),
+        e('🔋', 182, 108, 26),
+        ...lampu(240, 100, false), ...lampu(290, 100, true),
+        e('❌', 290, 100, 16, 'tanda-putus'),
+        l('PARALEL', 240, 26, 13),
+        l('yang lain tetap menyala', 240, 184, 11),
+      ],
       kata: ['seri', 'paralel', 'berderet', 'bercabang', 'padam', 'menyala', 'rangkaian'],
     },
     {
@@ -571,7 +657,17 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
       judul: 'Tunjukkan Lapisannya',
       latar: 'tebing',
       narasi: ['Ayo tentukan, mana yang termasuk litosfer?'],
-      sprite: [e('🪢', 160, 100, 50)],
+      // Potongan tebing berlapis; salah satu lapisan diberi tanda tanya.
+      sprite: [
+        { t: 'kotak', x: 50, y: 42, lebar: 220, tinggi: 28, w: '#a16207', r: 4 },
+        { t: 'kotak', x: 50, y: 72, lebar: 220, tinggi: 28, w: '#78716c', r: 4 },
+        { t: 'kotak', x: 50, y: 102, lebar: 220, tinggi: 34, w: '#57534e', r: 4 },
+        { t: 'kotak', x: 50, y: 138, lebar: 220, tinggi: 34, w: '#ea580c', r: 4 },
+        l('tanah', 160, 61, 12, 'muncul', 0, '#fff'), l('batuan', 160, 91, 12, 'muncul', 0, '#fff'),
+        l('? ? ?', 160, 124, 14, 'kedip', 0, '#fff'), l('lapisan dalam bumi', 160, 160, 12, 'muncul', 0, '#fff'),
+        e('🧗', 296, 100, 26, 'naik'),
+        l('mana yang litosfer?', 160, 22, 12, 'muncul', 0.6),
+      ],
       kata: ['contoh', 'termasuk'],
       interaksi: {
         jenis: 'kelompok',
@@ -626,7 +722,15 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
       judul: 'Susun Lapisan Udara',
       latar: 'langit',
       narasi: ['Susun lapisan atmosfer dari yang paling dekat dengan bumi!'],
-      sprite: [e('🫙', 160, 100, 50)],
+      // Lapisan langit kosong dari bawah (awan) ke atas (satelit), siap disusun.
+      sprite: [
+        e('🌍', 160, 178, 36),
+        e('☁️', 60, 150, 28, 'geser'), e('✈️', 250, 120, 24, 'geser-balik'),
+        e('☄️', 70, 70, 22, 'jatuh'), e('🛰️', 260, 36, 24, 'melayang'),
+        l('1 ?', 160, 148, 12, 'muncul', 0.2, '#fff'), l('2 ?', 160, 118, 12, 'muncul', 0.4, '#fff'),
+        l('3 ?', 160, 88, 12, 'muncul', 0.6, '#fff'), l('4 ?', 160, 58, 12, 'muncul', 0.8, '#fff'),
+        l('5 ?', 160, 28, 12, 'muncul', 1, '#fff'),
+      ],
       kata: ['susun'],
       interaksi: {
         jenis: 'urut',
@@ -673,7 +777,7 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
         'Gempa di dasar laut bisa menimbulkan gelombang besar yang disebut tsunami.',
         'Bila air laut surut tiba-tiba setelah gempa, segera lari ke tempat yang tinggi. Jangan mendekati pantai!',
       ],
-      sprite: [e('🌊', 60, 120, 70, 'geser'), e('🏃', 220, 150, 34, 'geser'), e('⛰️', 280, 100, 60), g(230, 140, 275, 90, '#16a34a', 'gambar', 0.6, 3), l('ke tempat tinggi!', 250, 185, 11, 'muncul', 1)],
+      sprite: [e('🌊', 60, 120, 70, 'geser'), e('🏃', 220, 150, 34, 'geser'), e('⛰️', 272, 100, 56), g(230, 140, 268, 92, '#16a34a', 'gambar', 0.6, 3), l('ke tempat tinggi!', 245, 185, 11, 'muncul', 1)],
       kata: ['tsunami', 'surut', 'gelombang', 'pantai', 'tempat tinggi', 'bukit'],
     },
     {

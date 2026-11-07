@@ -297,8 +297,11 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
     // Bentuk: bola hampir penuh (sedikit lebih besar dari kepala) dengan
     // bukaan muka berbentuk bundar. Bukaan dibuat lebih kecil dari sebelumnya
     // agar tidak ada celah yang memperlihatkan bagian dalam kepala.
+    // Bukaan muka ±0.62 rad di arah +Z: cukup lebar agar kedua mata (x = ±0.1)
+    // tidak tertutup kain saat dilihat dari depan.
+    const BUKA = 0.62;
     const hijabGeo = geo(
-      new THREE.SphereGeometry(0.39, 28, 22, Math.PI / 2 + 0.32, Math.PI * 2 - 0.64, 0, Math.PI * 0.66),
+      new THREE.SphereGeometry(0.39, 28, 22, Math.PI / 2 + BUKA, Math.PI * 2 - BUKA * 2, 0, Math.PI * 0.66),
     );
     const hijab = new THREE.Mesh(hijabGeo, mHijab);
     hijab.scale.set(1, 1.12, 1.06);
@@ -319,11 +322,23 @@ export function buatKarakter(opsi: KarakterOpsi = {}): KarakterRig {
     badan.add(bingkai);
   } else {
     // Rambut pendek pria + jambul kecil di atas.
-    const rambutGeo = geo(new THREE.SphereGeometry(0.315, 24, 18, 0, Math.PI * 2, 0, Math.PI / 1.7));
-    const rambut = new THREE.Mesh(rambutGeo, mRambut);
-    rambut.scale.set(1, 1.05, 1);
-    rambut.position.y = 2.27;
-    badan.add(rambut);
+    // Rambut dua bagian: tudung atas penuh (berhenti di atas alis), lalu bagian
+    // belakang/samping yang turun lebih rendah dengan celah di muka, supaya
+    // mata tetap terlihat dari depan tapi tengkuk tetap tertutup rambut.
+    const BATAS_DAHI = Math.PI / 2.55;
+    const rambutAtasGeo = geo(new THREE.SphereGeometry(0.315, 24, 12, 0, Math.PI * 2, 0, BATAS_DAHI));
+    const rambutAtas = new THREE.Mesh(rambutAtasGeo, mRambut);
+    rambutAtas.scale.set(1, 1.05, 1);
+    rambutAtas.position.y = 2.27;
+    badan.add(rambutAtas);
+    const CELAH = 0.75;
+    const rambutBelakangGeo = geo(
+      new THREE.SphereGeometry(0.315, 24, 8, Math.PI / 2 + CELAH, Math.PI * 2 - CELAH * 2, BATAS_DAHI, Math.PI / 1.7 - BATAS_DAHI),
+    );
+    const rambutBelakang = new THREE.Mesh(rambutBelakangGeo, mRambut);
+    rambutBelakang.scale.set(1, 1.05, 1);
+    rambutBelakang.position.y = 2.27;
+    badan.add(rambutBelakang);
 
     const jambulGeo = geo(new THREE.ConeGeometry(0.14, 0.22, 14));
     const jambul = new THREE.Mesh(jambulGeo, mRambut);

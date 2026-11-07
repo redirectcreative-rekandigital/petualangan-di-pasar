@@ -13,6 +13,8 @@ export interface InputState {
   interactPressed: boolean;
   /** Tombol menu/hint (B) ditekan pada frame ini. */
   menuPressed: boolean;
+  /** Tombol lompat (Spasi / tombol ⤴️) ditekan pada frame ini. */
+  jumpPressed: boolean;
 }
 
 export interface InputManager {
@@ -23,6 +25,8 @@ export interface InputManager {
   mountJoystick: (container: HTMLElement) => void;
   /** Dipanggil tiap frame untuk mereset tombol "pressed" sesaat. */
   endFrame: () => void;
+  /** Meminta lompat (dari tombol HUD). Diproses pada frame berikutnya. */
+  pressJump: () => void;
   destroy: () => void;
 }
 
@@ -36,17 +40,34 @@ export function createInputManager(): InputManager {
     moving: false,
     interactPressed: false,
     menuPressed: false,
+    jumpPressed: false,
   };
   let orbitYaw = 0;
   let orbitPitch = 0;
+  // Tombol sesaat yang menunggu frame berikutnya. Event keyboard/sentuh datang di
+  // antara frame; disimpan di sini lalu dipindahkan ke `state` di awal frame,
+  // sehingga tidak ada penekanan yang hilang.
+  let jumpQueued = false;
+  let interactQueued = false;
+  let menuQueued = false;
+
+  /** Mengetik di kolom isian tidak boleh menggerakkan atau melompatkan karakter. */
+  const sedangMengetik = (ev: KeyboardEvent): boolean => {
+    const t = ev.target as HTMLElement | null;
+    return !!t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
+  };
 
   // --- Keyboard ---
   const onKeyDown = (ev: KeyboardEvent): void => {
-    keys.add(ev.key.toLowerCase());
-    if (ev.key.toLowerCase() === 'e') state.interactPressed = true;
-    if (ev.key.toLowerCase() === 'escape' || ev.key.toLowerCase() === 'h') state.menuPressed = true;
-    if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(ev.key.toLowerCase())) {
-      ev.preventDefault();
+    if (sedangMengetik(ev)) return;
+    const k = ev.key.toLowerCase();
+    keys.add(k);
+    if (k === 'e') interactQueued = true;
+    if (k === 'escape' || k === 'h') menuQueued = true;
+    // Spasi = lompat. Abaikan saat fokus di tombol, karena Spasi juga "mengklik" tombol itu.
+    if (k === ' ' && !ev.repeat && !(ev.target instanceof HTMLButtonElement)) jumpQueued = true;
+    if (['w', 'a', 's', 'd', ' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) {
+      if (!(ev.target instanceof HTMLButtonElement)) ev.preventDefault();
     }
   };
   const onKeyUp = (ev: KeyboardEvent): void => {
@@ -58,6 +79,7 @@ export function createInputManager(): InputManager {
     keys.clear();
     joyX = 0;
     joyY = 0;
+    resetJoystick?.();
   };
   window.addEventListener('keydown', onKeyDown);
   window.addEventListener('keyup', onKeyUp);
@@ -67,6 +89,8 @@ export function createInputManager(): InputManager {
   let joyX = 0;
   let joyY = 0;
   let joyActive = false;
+  /** Mengembalikan kenop ke tengah (dipasang oleh mountJoystick). */
+  let resetJoystick: (() => void) | null = null;
 
   const mountJoystick = (container: HTMLElement): void => {
     const base = document.createElement('div');
@@ -107,22 +131,37 @@ export function createInputManager(): InputManager {
       setKnob(dx, dy);
       const nx = dx / maxR;
       const ny = dy / maxR;
-      joyX = Math.abs(nx) < DEAD_ZONE ? 0 : nx;
-      joyY = Math.abs(ny) < DEAD_ZONE ? 0 : -ny; // layar Y ke bawah, dunia Z ke depan
+      // Zona mati melingkar (bukan per sumbu): arah tetap utuh, sehingga dorongan
+      // serong tidak "terpotong" menjadi lurus dan arah tidak meloncat-loncat.
+      const besar = Math.hypot(nx, ny);
+      if (besar < DEAD_ZONE) {
+        joyX = 0;
+        joyY = 0;
+      } else {
+        // Skala ulang agar kecepatan naik mulus dari 0 tepat di tepi zona mati.
+        const skala = Math.min(1, (besar - DEAD_ZONE) / (1 - DEAD_ZONE)) / besar;
+        joyX = nx * skala;
+        joyY = -ny * skala; // layar Y ke bawah; "atas" di joystick = maju
+      }
     };
-    const onUp = (ev: PointerEvent): void => {
-      if (ev.pointerId !== pointerId) return;
+    const lepas = (): void => {
       joyActive = false;
       pointerId = null;
       joyX = 0;
       joyY = 0;
       setKnob(0, 0);
     };
+    resetJoystick = lepas;
+    const onUp = (ev: PointerEvent): void => {
+      if (ev.pointerId !== pointerId) return;
+      lepas();
+    };
 
     base.addEventListener('pointerdown', onDown);
     base.addEventListener('pointermove', handleMove);
     base.addEventListener('pointerup', onUp);
     base.addEventListener('pointercancel', onUp);
+    base.addEventListener('lostpointercapture', onUp);
   };
 
   // --- Drag kamera di sisi kanan layar (area selain joystick & tombol). ---
@@ -143,8 +182,9 @@ export function createInputManager(): InputManager {
     const dy = ev.clientY - lastY;
     lastX = ev.clientX;
     lastY = ev.clientY;
-    orbitYaw = dx * 0.005;
-    orbitPitch = dy * 0.004;
+    // Dijumlahkan (bukan ditimpa): beberapa event bisa datang dalam satu frame.
+    orbitYaw += dx * 0.005;
+    orbitPitch += dy * 0.004;
   };
   const onPointerUp = (ev: PointerEvent): void => {
     if (dragId === ev.pointerId) dragId = null;
@@ -161,9 +201,14 @@ export function createInputManager(): InputManager {
     return out;
   };
 
-  const endFrame = (): void => {
-    state.interactPressed = false;
-    state.menuPressed = false;
+  /** Memindahkan tombol sesaat yang tertunda ke status frame ini, lalu mengosongkan antrean. */
+  const ambilTombol = (): void => {
+    state.interactPressed = interactQueued;
+    state.menuPressed = menuQueued;
+    state.jumpPressed = jumpQueued;
+    interactQueued = false;
+    menuQueued = false;
+    jumpQueued = false;
   };
 
   const destroy = (): void => {
@@ -203,9 +248,14 @@ export function createInputManager(): InputManager {
     state,
     consumeOrbit,
     mountJoystick,
+    // Dipanggil sekali di AWAL tiap frame (lihat loop di main.ts): hitung gerak
+    // dan ambil tombol sesaat untuk frame ini.
     endFrame: () => {
       computeMove();
-      endFrame();
+      ambilTombol();
+    },
+    pressJump: () => {
+      jumpQueued = true;
     },
     destroy,
   };

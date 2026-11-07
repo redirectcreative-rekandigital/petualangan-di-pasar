@@ -405,7 +405,7 @@ function tabSoal(siswa: RosterSiswa[]): HTMLElement[] {
             children: [
               el('span', { class: 'chip', text: q.kode }),
               el('span', { text: `🎯 ${q.persenBenarPertama}% benar langsung` }),
-              el('span', { text: `🔥 ${q.rataPercobaan} percobaan` }),
+              el('span', { text: `❤️ ${q.rataPercobaan} percobaan` }),
               el('span', { text: `👥 ${q.dijawab}` }),
             ],
           }),

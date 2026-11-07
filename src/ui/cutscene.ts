@@ -13,14 +13,15 @@ const GAMBAR: Record<AdeganCutscene['latar'], string> = {
   kapal: '⛵',
   badai: '⛈️',
   ombak: '🌊',
-  putih: '',
+  putih: '🫧',
   goa: '🕯️',
   mercusuar: '🗼',
   'kapal-datang': '🚢',
   pantai: '🏝️',
 };
 
-const namaGambar = (latar: AdeganCutscene['latar']): string | undefined => (latar === 'putih' ? undefined : `cut-${latar}`);
+/** Adegan "sunyi" (putih) memakai ilustrasi ombak yang perlahan memudar menjadi putih. */
+const namaGambar = (latar: AdeganCutscene['latar']): string => (latar === 'putih' ? 'cut-ombak' : `cut-${latar}`);
 
 export function putarCutscene(host: HTMLElement, daftar: AdeganCutscene[]): Promise<void> {
   muatAwal(daftar.map((a) => namaGambar(a.latar)));

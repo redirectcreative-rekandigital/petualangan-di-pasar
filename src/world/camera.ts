@@ -11,6 +11,8 @@ export interface CameraController {
   orbit: (deltaYaw: number, deltaPitch: number) => void;
   /** Menghadapkan kamera ke suatu arah (radian). */
   setYaw: (yaw: number) => void;
+  /** Arah kamera saat ini (radian), dipakai agar gerak joystick relatif ke kamera. */
+  getYaw: () => number;
   /** Memperbarui posisi kamera mengikuti target tiap frame. */
   update: (target: THREE.Vector3, dt: number) => void;
   /** Mengatur sudut awal. */
@@ -65,5 +67,5 @@ export function createCameraController(camera: THREE.PerspectiveCamera): CameraC
     /* tidak ada sumber daya GPU yang perlu dibersihkan */
   };
 
-  return { camera, orbit, setYaw, update, reset, dispose };
+  return { camera, orbit, setYaw, getYaw: () => yaw, update, reset, dispose };
 }

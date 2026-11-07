@@ -11,7 +11,8 @@ import type { AnswerRecord, BalaiId, Question } from '../../shared/types';
  * Tantangan soal pilihan ganda yang dibawakan Penjaga dalam percakapan.
  *
  * - Setiap soal dibuka dengan kalimat yang mengaitkannya dengan misi.
- * - Tiga kesempatan ditampilkan sebagai 3 obor; satu padam tiap jawaban salah.
+ * - Tiga kesempatan ditampilkan sebagai 3 hati (❤️ = nyawa); satu hilang (🤍)
+ *   tiap jawaban salah. Teks yang dibacakan (TTS) ikut menyebut sisa hati.
  * - Jawaban salah → petunjuk yang merujuk adegan Halaman Cerita, dengan tombol
  *   "Ingat cerita" untuk membuka adegan itu.
  * - Jawaban benar → pujian + satu kalimat pembahasan dari cerita.
@@ -29,6 +30,8 @@ export interface OpsiTantangan {
   ingatCerita?: (kodeMateri: string, adegan: number) => Promise<void>;
   /** Dipanggil setelah tiap soal selesai (untuk efek visual di dunia 3D). */
   onSoalSelesai?: (benar: boolean, indeks: number) => void;
+  /** Dipanggil pada SETIAP percobaan jawaban (benar/salah) beserta sisa hati. */
+  onPercobaan?: (benar: boolean, sisaHati: number) => void;
   /** Label kemajuan (mis. "Bagian 2"). */
   label?: string;
 }
@@ -46,12 +49,21 @@ function pilihAcak<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)] as T;
 }
 
-function obor(sisa: number): HTMLElement {
-  const wadah = el('div', { class: 'obor', attrs: { 'aria-label': `Kesempatan tersisa ${sisa}` } });
+/** Deretan hati nyawa: ❤️ masih ada, 🤍 sudah hilang. */
+function hati(sisa: number): HTMLElement {
+  const wadah = el('div', {
+    class: 'nyawa',
+    attrs: { role: 'img', 'aria-label': `Sisa nyawa ${sisa} hati dari ${RULES.attemptsPerQuestion}` },
+  });
   for (let i = 0; i < RULES.attemptsPerQuestion; i++) {
-    wadah.append(el('span', { class: i < sisa ? 'nyala' : 'padam', text: i < sisa ? '🔥' : '💨' }));
+    wadah.append(el('span', { class: i < sisa ? 'ada' : 'hilang', text: i < sisa ? '❤️' : '🤍', attrs: { 'aria-hidden': 'true' } }));
   }
   return wadah;
+}
+
+/** Kalimat sisa nyawa yang enak dibacakan TTS, mis. "Hatimu tinggal 2." */
+function teksSisaHati(sisa: number): string {
+  return sisa === 1 ? 'Hatimu tinggal satu, pelan-pelan ya.' : `Hatimu tinggal ${sisa === 2 ? 'dua' : sisa}.`;
 }
 
 /** Kalimat cerita yang paling cocok untuk menjelaskan jawaban. */
@@ -100,7 +112,7 @@ export async function jalankanTantangan(p: Percakapan, opsi: OpsiTantangan): Pro
         class: 'tantangan-kepala',
         children: [
           el('span', { class: 'chip', text: `${opsi.label ? `${opsi.label} · ` : ''}Soal ${nomor + 1}/${total}` }),
-          obor(sesi.attemptsLeft),
+          hati(sesi.attemptsLeft),
         ],
       });
       const teksSoal = dipilih.length === 0 && pembuka ? `${pembuka} ${q.prompt}` : q.prompt;
@@ -109,6 +121,7 @@ export async function jalankanTantangan(p: Percakapan, opsi: OpsiTantangan): Pro
       dipilih.push(jawaban);
       const hasil = submitAnswer(sesi, jawaban);
       sesi = hasil.session;
+      opsi.onPercobaan?.(hasil.correct, hasil.correct || hasil.advanced ? 0 : sesi.attemptsLeft);
 
       if (hasil.correct) {
         p.tandai(i, 'benar');
@@ -124,8 +137,8 @@ export async function jalankanTantangan(p: Percakapan, opsi: OpsiTantangan): Pro
         const penjelas = kalimatPenjelas(kodeMateri, q);
         await p.bicara(
           opsi.penjaga,
-          `Obornya sudah padam. Tidak apa-apa, kita belajar bersama. Jawaban yang benar adalah: ${String(q.answer)}.${penjelas ? ` ${penjelas}` : ''}`,
-          { tambahan: obor(0) },
+          `Hatimu sudah habis. Tidak apa-apa, kita belajar bersama. Jawaban yang benar adalah: ${String(q.answer)}.${penjelas ? ` ${penjelas}` : ''}`,
+          { tambahan: hati(0) },
         );
         lanjut = false;
       } else {
@@ -134,8 +147,8 @@ export async function jalankanTantangan(p: Percakapan, opsi: OpsiTantangan): Pro
         const petunjuk = judulAdegan ? `Ingat adegan "${judulAdegan}" di Halaman Cerita?` : 'Baca soalnya pelan-pelan sekali lagi.';
         const tombol = opsi.ingatCerita && judulAdegan ? ['🔁 Coba lagi', '📖 Ingat cerita'] : ['🔁 Coba lagi'];
         const pilihan = await p.pilih(opsi.penjaga, tombol, {
-          teks: `${pilihAcak(SEMANGAT)} ${petunjuk}`,
-          tambahan: obor(sesi.attemptsLeft),
+          teks: `${pilihAcak(SEMANGAT)} ${teksSisaHati(sesi.attemptsLeft)} ${petunjuk}`,
+          tambahan: hati(sesi.attemptsLeft),
         });
         if (pilihan === 1 && opsi.ingatCerita) {
           await opsi.ingatCerita(kodeMateri, adeganIdx);

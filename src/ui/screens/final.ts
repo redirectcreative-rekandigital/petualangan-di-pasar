@@ -8,6 +8,7 @@ import { bukaPercakapan } from '../percakapan';
 import { jalankanTantangan } from '../tantangan';
 import { bukaHalamanCerita } from '../halamanCerita';
 import { putarCutscene } from '../cutscene';
+import { bukaAdeganMenara } from '../menaraAdegan';
 import type { AnswerRecord, Question } from '../../../shared/types';
 import type { ScreenContext } from './context';
 
@@ -120,15 +121,35 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
     sfx.click();
     aksi.innerHTML = '';
     const prog0 = ctx.getProgress();
+    // Panggung menara di belakang kotak percakapan: karakter pemain naik lantai
+    // demi lantai dan berdiri terhalang di depan pintu saat menjawab.
+    const adegan = bukaAdeganMenara(document.body, {
+      gender: prog0.gender,
+      warnaPakaian: prog0.warnaBaju,
+      warnaBawahan: prog0.warnaBawahan,
+      warnaHijab: prog0.gender === 'perempuan' ? prog0.warnaHijab : undefined,
+    });
     const p = bukaPercakapan(document.body, { nama: prog0.playerName, gender: prog0.gender });
+    /** Sembunyikan kotak percakapan selama karakter bergerak, agar gerakannya terlihat jelas. */
+    const sambilBergerak = async (gerak: Promise<void>): Promise<void> => {
+      p.root.classList.add('tersembunyi');
+      try {
+        await gerak;
+      } finally {
+        p.root.classList.remove('tersembunyi');
+      }
+    };
     const semuaJawaban: AnswerRecord[] = [];
     try {
       for (const i of bagianDimainkan) {
         const b = FINAL_BAGIAN[i];
         if (!b || p.tertutup()) break;
         const penjaga = penjagaBagian(i);
-        await p.bicara(penjaga, `${b.tempat}. ${b.pembuka}`, { labelLanjut: 'Bismillah ▶' });
         const pool = poolBagian(i);
+        await sambilBergerak(adegan.masukLantai(i, pool.length, batasBagian(i)));
+        await p.bicara(penjaga, `${b.tempat}. ${b.pembuka} Pintu ini terkunci. Jawab ${batasBagian(i)} soal dengan benar untuk membukanya!`, {
+          labelLanjut: 'Bismillah ▶',
+        });
         const hasil = await jalankanTantangan(p, {
           balai: 'FINAL',
           pool,
@@ -136,6 +157,8 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
           penjaga,
           pembuka: [],
           label: b.tempat,
+          onPercobaan: (benar) => adegan.jawab(benar),
+          onSoalSelesai: (benar) => adegan.soalSelesai(benar),
           ingatCerita: async (kodeMateri, adegan) => {
             const c = getCerita(kodeMateri);
             const m = getBalai(kodeMateri);
@@ -149,8 +172,19 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
         if (!latihan) ctx.setProgress(catatFinalBagian(ctx.getProgress(), i, hasil.benar));
         gambarMenara();
         const tuntas = hasil.benar >= batasBagian(i);
-        await p.bicara(penjaga, tuntas ? `Alhamdulillah! ${b.selesai}` : `${hasil.benar} dari ${hasil.total} benar. Lantai ini perlu diulang nanti, tapi kita terus naik dulu.`);
+        if (p.tertutup()) break;
+        await p.bicara(
+          penjaga,
+          tuntas
+            ? `Alhamdulillah! Pintunya terbuka. ${b.selesai}`
+            : `${hasil.benar} dari ${hasil.total} benar. Pintunya terbuka sedikit. Lantai ini perlu diulang nanti, tapi kita terus naik dulu.`,
+          { labelLanjut: i === FINAL_BAGIAN.length - 1 ? 'Masuk ▶' : 'Naik ▶' },
+        );
+        await sambilBergerak(adegan.keluarLantai(tuntas));
       }
+    } catch (err) {
+      adegan.tutup();
+      throw err;
     } finally {
       p.tutup();
     }
@@ -161,6 +195,11 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
     const sudahLulus = prog.puncakLulus;
     ctx.setProgress(applyPuncakResult(prog, lulus || sudahLulus, semuaJawaban));
     gambarMenara();
+    if (lulus) {
+      adegan.nyalakanLampu();
+      await new Promise((r) => window.setTimeout(r, 1600));
+    }
+    adegan.tutup();
     if (lulus && !sudahLulus && !latihan) {
       sfx.win();
       await putarCutscene(document.body, EPILOG);

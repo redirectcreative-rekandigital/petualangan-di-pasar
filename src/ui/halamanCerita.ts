@@ -83,7 +83,85 @@ function gambarLatar(svg: SVGSVGElement, latar: Latar, id: string): void {
   l.hiasan?.(svg);
 }
 
-function gambarSprite(svg: SVGSVGElement, s: Sprite): void {
+/** Kecerahan relatif warna #rgb/#rrggbb (0 gelap … 1 terang). */
+function kecerahan(warna: string): number {
+  let h = warna.replace('#', '');
+  if (h.length === 3) h = h.split('').map((c) => c + c).join('');
+  const n = parseInt(h.slice(0, 6), 16);
+  if (Number.isNaN(n)) return 0;
+  const r = (n >> 16) & 255;
+  const g = (n >> 8) & 255;
+  const b = n & 255;
+  return (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+}
+
+const FONT_LABEL = '"Baloo 2", "Segoe UI", system-ui, sans-serif';
+
+/**
+ * Label adegan yang selalu terbaca.
+ * - Label bebas diberi "pil" latar (putih + teks gelap, atau gelap + teks terang)
+ *   sehingga tetap jelas di atas goa gelap, berkas sinar kuning, maupun langit.
+ * - Label yang menempel di atas balok berwarna (kutub magnet, lapisan tanah)
+ *   cukup teks tegas bergaris tepi gelap tipis, tanpa pil.
+ */
+function gambarLabel(svg: SVGSVGElement, s: Extract<Sprite, { t: 'label' }>, diAtasKotak: boolean, kelas: string, gaya: string): void {
+  const ukuran = Math.max(11, s.s ?? 11);
+  const warnaTeks = s.w ?? '#0f172a';
+  const terang = kecerahan(warnaTeks) > 0.6;
+  const g = svgEl('g', { class: `${kelas} label-pil`.trim(), style: `${gaya};transform-origin:${s.x}px ${s.y}px;transform-box:view-box` });
+  const t = svgEl('text', {
+    x: s.x,
+    y: s.y,
+    'font-size': ukuran,
+    'font-family': FONT_LABEL,
+    'text-anchor': 'middle',
+    'font-weight': 800,
+    fill: warnaTeks,
+    class: 'cerita-label',
+  });
+  t.textContent = s.teks;
+  if (diAtasKotak) {
+    t.setAttribute('stroke', terang ? 'rgba(15,23,42,0.55)' : 'rgba(255,255,255,0.85)');
+    t.setAttribute('stroke-width', '2.2');
+    t.setAttribute('paint-order', 'stroke');
+    t.setAttribute('stroke-linejoin', 'round');
+    g.append(t);
+    svg.append(g);
+    return;
+  }
+  // Lebar pil: perkiraan awal, lalu disesuaikan dengan ukuran teks sebenarnya
+  // begitu SVG tampil di layar (dan sekali lagi setelah font selesai dimuat).
+  const padX = ukuran * 0.55;
+  const tinggi = ukuran * 1.35;
+  const pil = svgEl('rect', {
+    x: s.x - (s.teks.length * ukuran * 0.56) / 2 - padX,
+    y: s.y - ukuran * 0.98,
+    width: s.teks.length * ukuran * 0.56 + padX * 2,
+    height: tinggi,
+    rx: tinggi / 2,
+    fill: terang ? 'rgba(15,23,42,0.78)' : 'rgba(255,255,255,0.9)',
+    stroke: terang ? 'rgba(255,255,255,0.35)' : 'rgba(15,23,42,0.18)',
+    'stroke-width': 1,
+  });
+  g.append(pil, t);
+  svg.append(g);
+  const pas = (): void => {
+    if (!t.isConnected) return;
+    try {
+      const b = t.getBBox();
+      if (b.width <= 0) return;
+      pil.setAttribute('x', String(b.x - padX));
+      pil.setAttribute('width', String(b.width + padX * 2));
+      pil.setAttribute('y', String(b.y + b.height / 2 - tinggi / 2));
+    } catch {
+      /* getBBox tidak tersedia (lingkungan uji) */
+    }
+  };
+  requestAnimationFrame(() => requestAnimationFrame(pas));
+  void document.fonts?.ready.then(pas);
+}
+
+function gambarSprite(svg: SVGSVGElement, s: Sprite, kotakAdegan: Array<Extract<Sprite, { t: 'kotak' }>> = []): void {
   const kelas = s.a ? `anim-${s.a}` : '';
   const gaya = s.d ? `animation-delay:${s.d}s` : '';
   if (s.t === 'garis') {
@@ -113,24 +191,15 @@ function gambarSprite(svg: SVGSVGElement, s: Sprite): void {
         rx: s.r ?? 0,
         fill: s.w,
         class: kelas,
-        style: gaya,
+        // Animasi skala (denyut) berpusat di tengah kotak, bukan di pojok kiri atas.
+        style: `${gaya};transform-box:view-box;transform-origin:${s.x + s.lebar / 2}px ${s.y + s.tinggi / 2}px`,
       }),
     );
     return;
   }
   if (s.t === 'label') {
-    const t = svgEl('text', {
-      x: s.x,
-      y: s.y,
-      'font-size': s.s ?? 11,
-      'text-anchor': 'middle',
-      'font-weight': 700,
-      fill: s.w ?? '#0f172a',
-      class: `cerita-label ${kelas}`,
-      style: gaya,
-    });
-    t.textContent = s.teks;
-    svg.append(t);
+    const diAtasKotak = kotakAdegan.some((k) => s.x >= k.x && s.x <= k.x + k.lebar && s.y >= k.y && s.y <= k.y + k.tinggi + 4);
+    gambarLabel(svg, s, diAtasKotak, kelas, gaya);
     return;
   }
   const g = svgEl('g', { class: kelas, style: `${gaya};transform-origin:${s.x}px ${s.y}px;transform-box:view-box` });
@@ -150,7 +219,8 @@ function gambarSprite(svg: SVGSVGElement, s: Sprite): void {
 export function gambarAdegan(adegan: Adegan, id: string): SVGSVGElement {
   const svg = svgEl('svg', { viewBox: '0 0 320 200', class: 'cerita-svg', role: 'img', 'aria-label': adegan.judul });
   gambarLatar(svg, adegan.latar, id);
-  for (const s of adegan.sprite) gambarSprite(svg, s);
+  const kotak = adegan.sprite.filter((s): s is Extract<Sprite, { t: 'kotak' }> => s.t === 'kotak');
+  for (const s of adegan.sprite) gambarSprite(svg, s, kotak);
   return svg;
 }
 
@@ -396,6 +466,8 @@ export function bukaHalamanCerita(host: HTMLElement, opsi: OpsiHalaman): Promise
         });
       }
 
+      // `ada-panggung`: di layar mendatar, gambar adegan di kiri & narasi di kanan.
+      buku.classList.add('ada-panggung');
       buku.append(kepala(a.judul), el('div', { class: 'cerita-panggung', children: [svg] }), narasi, el('div', { class: 'cerita-alat', children: [ulang] }));
       if (interaksiEl) buku.append(interaksiEl);
       buku.append(el('div', { class: 'cerita-navigasi', children: opsi.modeIngat ? [kembali] : [kembali, lanjut] }));
@@ -404,6 +476,7 @@ export function bukaHalamanCerita(host: HTMLElement, opsi: OpsiHalaman): Promise
 
     const renderPenutup = (): void => {
       tamat = true;
+      buku.classList.remove('ada-panggung');
       const meta = opsi.meta;
       const lengkap = el('details', {
         class: 'cerita-lengkap',

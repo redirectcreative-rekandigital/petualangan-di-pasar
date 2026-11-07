@@ -20,6 +20,12 @@ export interface PlayerBundle {
   faceDirection: (dx: number, dz: number, dt: number) => void;
   /** Animasi jalan sederhana (ayun kaki) berdasarkan kecepatan. */
   animate: (speed: number, elapsed: number) => void;
+  /** Mulai melompat. `false` bila diabaikan karena masih di udara. */
+  lompat: () => boolean;
+  /** Memajukan fisika lompat (gravitasi) tiap frame. `true` pada frame mendarat. */
+  updateLompat: (dt: number) => boolean;
+  /** Apakah pemain sedang di udara. */
+  diUdara: () => boolean;
   /**
    * Coba ganti model dengan avatar GLB bila tersedia di `public/assets/models/`.
    * Bila berkas tidak ada, pemain tetap memakai karakter prosedural.
@@ -61,9 +67,47 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
   // Bila model GLB berhasil dimuat, `glb` menggantikan animasi prosedural.
   let glb: Awaited<ReturnType<typeof cobaAvatarGlb>> = null;
 
+  // Lompat: hanya tubuh (akar) yang naik; `position` tetap di tanah supaya
+  // kamera, collision, dan posisi multiplayer tidak ikut terguncang.
+  let tinggi = 0;
+  let kecepatanY = 0;
+  let mendarat = 0; // sisa waktu efek "mendarat" (tubuh memendek sesaat)
+
   const setPosition = (x: number, z: number): void => {
     position.set(x, 0, z);
-    akar.position.set(x, 0, z);
+    akar.position.set(x, tinggi, z);
+  };
+
+  const lompat = (): boolean => {
+    if (tinggi > 0 || kecepatanY !== 0) return false;
+    kecepatanY = KECEPATAN_LOMPAT;
+    return true;
+  };
+
+  const updateLompat = (dt: number): boolean => {
+    let baruMendarat = false;
+    if (tinggi > 0 || kecepatanY !== 0) {
+      kecepatanY -= GRAVITASI * dt;
+      tinggi += kecepatanY * dt;
+      if (tinggi <= 0) {
+        tinggi = 0;
+        kecepatanY = 0;
+        mendarat = 0.14;
+        baruMendarat = true;
+      }
+      akar.position.y = tinggi;
+    }
+    // Efek pegas kecil: memendek saat mendarat, sedikit memanjang di udara.
+    if (mendarat > 0) {
+      mendarat = Math.max(0, mendarat - dt);
+      const k = Math.sin((mendarat / 0.14) * Math.PI) * 0.12;
+      akar.scale.set(1 + k * 0.5, 1 - k, 1 + k * 0.5);
+    } else if (tinggi > 0) {
+      akar.scale.set(0.97, 1.05, 0.97);
+    } else {
+      akar.scale.set(1, 1, 1);
+    }
+    return baruMendarat;
   };
 
   const faceDirection = (dx: number, dz: number, dt: number): void => {
@@ -108,5 +152,20 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
     rig.material.forEach((m) => m.dispose());
   };
 
-  return { group: akar, position, setPosition, faceDirection, animate, cobaPakaiGlb, dispose };
+  return {
+    group: akar,
+    position,
+    setPosition,
+    faceDirection,
+    animate: (speed, elapsed) => animate(tinggi > 0 ? 0 : speed, elapsed),
+    lompat,
+    updateLompat,
+    diUdara: () => tinggi > 0,
+    cobaPakaiGlb,
+    dispose,
+  };
 }
+
+/** Kecepatan awal lompat (satuan/detik) dan gravitasi: puncak ±1,1 satuan, ±0,6 detik di udara. */
+const KECEPATAN_LOMPAT = 6.6;
+const GRAVITASI = 20;

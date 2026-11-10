@@ -1,4 +1,5 @@
 import { el, mount } from './components/dom';
+import { t } from '../core/bahasa';
 
 /**
  * Layar loading singkat dengan spinner. Dipakai setiap kali berpindah ke peta
@@ -14,14 +15,14 @@ export interface LoadingOptions {
 }
 
 const TIPS: string[] = [
-  'Tahukah kamu? Cahaya merambat lurus dan bisa dipantulkan cermin.',
-  'Tahukah kamu? Bunyi tidak dapat merambat di ruang hampa.',
-  'Tahukah kamu? Semua energi dalam rantai makanan berawal dari matahari.',
-  'Tahukah kamu? Lebah dan bunga saling menguntungkan (mutualisme).',
-  'Tahukah kamu? Kutub magnet yang sama saling tolak-menolak.',
-  'Tahukah kamu? Pada rangkaian paralel, satu lampu putus yang lain tetap menyala.',
-  'Tahukah kamu? Awan dan hujan terjadi di lapisan troposfer.',
-  'Saat gempa, lindungi kepala dan berlindunglah di bawah meja yang kuat.',
+  t('Tahukah kamu? Cahaya merambat lurus dan bisa dipantulkan cermin.'),
+  t('Tahukah kamu? Bunyi tidak dapat merambat di ruang hampa.'),
+  t('Tahukah kamu? Semua energi dalam rantai makanan berawal dari matahari.'),
+  t('Tahukah kamu? Lebah dan bunga saling menguntungkan (mutualisme).'),
+  t('Tahukah kamu? Kutub magnet yang sama saling tolak-menolak.'),
+  t('Tahukah kamu? Pada rangkaian paralel, satu lampu putus yang lain tetap menyala.'),
+  t('Tahukah kamu? Awan dan hujan terjadi di lapisan troposfer.'),
+  t('Saat gempa, lindungi kepala dan berlindunglah di bawah meja yang kuat.'),
 ]; 
 
 /** Menampilkan overlay loading singkat lalu memanggil `onSelesai`. */

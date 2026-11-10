@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import type { PlayerGender } from '../../shared/types';
+import { t } from '../core/bahasa';
 
 /**
  * Pabrik karakter low-poly bergaya kartun (prosedural, tanpa model unduhan).
@@ -117,36 +118,36 @@ export type BagianWarna = 'baju' | 'bawahan' | 'hijab';
 export const PALET_PILIHAN: Record<PlayerGender, Record<BagianWarna, PilihanWarna[]>> = {
   'laki-laki': {
     baju: [
-      { nama: 'Hijau Rimba', nilai: 0x2f9e6b },
-      { nama: 'Biru Langit', nilai: 0x2563eb },
-      { nama: 'Oranye Madu', nilai: 0xf08c3a },
+      { nama: t('Hijau Rimba'), nilai: 0x2f9e6b },
+      { nama: t('Biru Langit'), nilai: 0x2563eb },
+      { nama: t('Oranye Madu'), nilai: 0xf08c3a },
     ],
     bawahan: [
-      { nama: 'Biru Tua', nilai: 0x2c3e6b },
-      { nama: 'Cokelat Kayu', nilai: 0x6b4f3a },
-      { nama: 'Abu Arang', nilai: 0x4b5563 },
+      { nama: t('Biru Tua'), nilai: 0x2c3e6b },
+      { nama: t('Cokelat Kayu'), nilai: 0x6b4f3a },
+      { nama: t('Abu Arang'), nilai: 0x4b5563 },
     ],
     hijab: [
-      { nama: 'Putih Bersih', nilai: 0xffffff },
-      { nama: 'Hijau Daun', nilai: 0x2f9e6b },
-      { nama: 'Biru Langit', nilai: 0x2563eb },
+      { nama: t('Putih Bersih'), nilai: 0xffffff },
+      { nama: t('Hijau Daun'), nilai: 0x2f9e6b },
+      { nama: t('Biru Langit'), nilai: 0x2563eb },
     ],
   },
   perempuan: {
     baju: [
-      { nama: 'Merah Jambu', nilai: 0xf26fa3 },
-      { nama: 'Ungu Lembut', nilai: 0x9b6bd6 },
-      { nama: 'Hijau Mint', nilai: 0x3fbfa0 },
+      { nama: t('Merah Jambu'), nilai: 0xf26fa3 },
+      { nama: t('Ungu Lembut'), nilai: 0x9b6bd6 },
+      { nama: t('Hijau Mint'), nilai: 0x3fbfa0 },
     ],
     bawahan: [
-      { nama: 'Ungu Tua', nilai: 0x7c3aed },
-      { nama: 'Biru Tua', nilai: 0x2c3e6b },
-      { nama: 'Cokelat Kayu', nilai: 0x6b4f3a },
+      { nama: t('Ungu Tua'), nilai: 0x7c3aed },
+      { nama: t('Biru Tua'), nilai: 0x2c3e6b },
+      { nama: t('Cokelat Kayu'), nilai: 0x6b4f3a },
     ],
     hijab: [
-      { nama: 'Merah Jambu', nilai: 0xf4a3c8 },
-      { nama: 'Putih Bersih', nilai: 0xffffff },
-      { nama: 'Ungu Lembut', nilai: 0x9b6bd6 },
+      { nama: t('Merah Jambu'), nilai: 0xf4a3c8 },
+      { nama: t('Putih Bersih'), nilai: 0xffffff },
+      { nama: t('Ungu Lembut'), nilai: 0x9b6bd6 },
     ],
   },
 };

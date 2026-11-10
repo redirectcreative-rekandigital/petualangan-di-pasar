@@ -15,8 +15,8 @@ try {
     if (r.url().includes('/api/') && r.status() >= 400) gagal.push(`${r.status()} ${r.url()}`);
   });
 
-  await page.goto(BASE, { waitUntil: 'networkidle' });
-  await page.locator('button', { hasText: 'Mode Guru' }).click();
+  // Mode Guru punya alamat sendiri (tidak ada tombolnya di beranda siswa).
+  await page.goto(new URL('modeguru/', BASE).href, { waitUntil: 'networkidle' });
   await page.locator('button', { hasText: 'Buat Sesi Kelas' }).click();
   await page.waitForSelector('.token-besar', { timeout: 10000 });
   const token = (await page.locator('.token-besar').textContent()).trim();

@@ -4,6 +4,7 @@ import { ucapkan, berhenti, suaraAktif, setSuaraAktif, ttsTersedia } from '../co
 import type { TokohCerita } from '../data/cerita';
 import { pasangGambar } from '../core/gambar';
 import type { PlayerGender } from '../../shared/types';
+import { t } from '../core/bahasa';
 
 /**
  * Kotak percakapan bergaya visual novel di bagian bawah layar.
@@ -57,15 +58,15 @@ export function bukaPercakapan(host: HTMLElement, pemain: InfoPemain): Percakapa
 
   const tombolSuara = el('button', {
     class: 'vn-suara',
-    attrs: { type: 'button', 'aria-label': 'Ulangi suara' },
+    attrs: { type: 'button', 'aria-label': t('Ulangi suara') },
     text: '🔊',
   });
   const tombolSuaraOnOff = el('button', {
     class: 'vn-suara-onoff',
-    attrs: { type: 'button', 'aria-label': 'Nyalakan atau matikan suara narasi' },
+    attrs: { type: 'button', 'aria-label': t('Nyalakan atau matikan suara narasi') },
   });
   const perbaruiOnOff = (): void => {
-    tombolSuaraOnOff.textContent = suaraAktif() ? '🗣️ Suara: nyala' : '🤫 Suara: mati';
+    tombolSuaraOnOff.textContent = suaraAktif() ? t('🗣️ Suara: nyala') : t('🤫 Suara: mati');
   };
   perbaruiOnOff();
   if (!ttsTersedia()) {
@@ -82,10 +83,18 @@ export function bukaPercakapan(host: HTMLElement, pemain: InfoPemain): Percakapa
     class: 'vn-kotak',
     children: [kepala, teks, tambahanHost, aksi, tombolSuaraOnOff],
   });
-  const root = el('div', { class: 'vn-overlay', attrs: { role: 'dialog', 'aria-modal': 'true' }, children: [kotak] });
+  // Tombol ✕ merah di dekat tombol suara: keluar dari percakapan/soal kapan saja.
+  const tombolTutup = el('button', {
+    class: 'tutup-x',
+    text: '✕',
+    attrs: { type: 'button', 'aria-label': t('Tutup'), title: t('Tutup') },
+  });
+  const root = el('div', { class: 'vn-overlay', attrs: { role: 'dialog', 'aria-modal': 'true' }, children: [kotak, tombolTutup] });
   host.append(root);
 
   let ditutup = false;
+  /** Menyelesaikan Promise `bicara`/`pilih` yang sedang menunggu saat percakapan ditutup. */
+  let batalkan: (() => void) | null = null;
   let ucapanTerakhir: { teks: string; pitch: number; rate: number } | null = null;
   let timerKetik = 0;
   let selesaiKetik: (() => void) | null = null;
@@ -107,8 +116,8 @@ export function bukaPercakapan(host: HTMLElement, pemain: InfoPemain): Percakapa
       potret.style.backgroundImage = '';
       potret.classList.remove('ada-gambar');
       potret.style.setProperty('--warna-tokoh', '#f59e0b');
-      nama.textContent = pemain.nama || 'Kamu';
-      peran.textContent = 'Penjelajah';
+      nama.textContent = pemain.nama || t('Kamu');
+      peran.textContent = t('Penjelajah');
       kotak.classList.add('pemain');
       return { pitch: pemain.gender === 'perempuan' ? 1.35 : 1.2, rate: 1.05 };
     }
@@ -158,6 +167,7 @@ export function bukaPercakapan(host: HTMLElement, pemain: InfoPemain): Percakapa
   }
 
   function bersihkanAksi(): void {
+    aksi.classList.remove('jawab');
     while (aksi.firstChild) aksi.removeChild(aksi.firstChild);
   }
 
@@ -169,9 +179,10 @@ export function bukaPercakapan(host: HTMLElement, pemain: InfoPemain): Percakapa
     await tampilkanTeks(isi, suara);
     if (ditutup) return;
     await new Promise<void>((resolve) => {
+      batalkan = resolve;
       const lanjut = el('button', {
         class: 'btn block vn-lanjut',
-        text: opsi.labelLanjut ?? 'Lanjut ▶',
+        text: opsi.labelLanjut ?? t('Lanjut ▶'),
         attrs: { type: 'button' },
       });
       lanjut.addEventListener('click', () => {
@@ -190,10 +201,14 @@ export function bukaPercakapan(host: HTMLElement, pemain: InfoPemain): Percakapa
     pasangTambahan(opsi.tambahan);
     const suara = pasangPenutur(siapa);
     if (opsi.teks) await tampilkanTeks(opsi.teks, suara);
-    else teks.textContent = siapa === 'pemain' ? 'Apa jawabanmu?' : '';
+    else teks.textContent = siapa === 'pemain' ? t('Apa jawabanmu?') : '';
     if (ditutup) return 0;
     return new Promise<number>((resolve) => {
+      // Ditutup tanpa memilih: kembalikan -1 (pemanggil memeriksa `tertutup()`).
+      batalkan = () => resolve(-1);
       const gaya = opsi.gaya ?? 'balas';
+      // Penanda untuk tata letak: pilihan jawaban soal (A–D) jadi grid 2×2 saat mendatar.
+      aksi.classList.toggle('jawab', gaya === 'jawab');
       pilihan.forEach((p, i) => {
         const b = el('button', {
           class: `vn-pilihan ${gaya}`,
@@ -228,7 +243,17 @@ export function bukaPercakapan(host: HTMLElement, pemain: InfoPemain): Percakapa
     window.clearInterval(timerKetik);
     berhenti();
     root.remove();
+    selesaiKetik?.();
+    const b = batalkan;
+    batalkan = null;
+    b?.();
   };
+
+  tombolTutup.addEventListener('click', (ev) => {
+    ev.stopPropagation();
+    sfx.click();
+    tutup();
+  });
 
   return { root, bicara, pilih, tandai, tutup, tertutup: () => ditutup };
 }

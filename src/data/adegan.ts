@@ -1,3 +1,4 @@
+import { lokalkan } from '../core/bahasa';
 import type { MateriKode } from '../../shared/types';
 
 /**
@@ -98,7 +99,8 @@ const lampu = (x: number, y: number, padam = false, s = 26): Sprite[] => [
   e('💡', x, y, s, padam ? 'nyala-padam' : undefined),
 ];
 
-export const ADEGAN: Record<MateriKode, Adegan[]> = {
+/** Adegan asli (Bahasa Indonesia): kata kunci `kata` dicocokkan dengan teks soal asli. */
+export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
   /* ============================ BAB 1 CAHAYA ============================ */
   F01: [
     {
@@ -799,16 +801,26 @@ export const ADEGAN: Record<MateriKode, Adegan[]> = {
   ],
 };
 
+/** Adegan sesuai bahasa pilihan pemain (lihat core/bahasa.ts). */
+export const ADEGAN: Record<MateriKode, Adegan[]> = lokalkan(ADEGAN_ASLI);
+
 export function getAdegan(kode: string): Adegan[] {
   return ADEGAN[kode as MateriKode] ?? [];
+}
+
+/** Adegan dalam Bahasa Indonesia (untuk pencocokan kata kunci). */
+export function getAdeganAsli(kode: string): Adegan[] {
+  return ADEGAN_ASLI[kode as MateriKode] ?? [];
 }
 
 /**
  * Mencari adegan yang paling relevan untuk sebuah soal (berdasarkan kata
  * kunci di teks soal & kunci). Dipakai Penjaga untuk memberi petunjuk.
+ * `teks` harus teks soal asli (Bahasa Indonesia); indeks adegan sama di
+ * semua bahasa.
  */
 export function adeganUntukSoal(kode: string, teks: string): number {
-  const daftar = getAdegan(kode);
+  const daftar = getAdeganAsli(kode);
   const t = teks.toLowerCase();
   let terbaik = 0;
   let skorTerbaik = -1;

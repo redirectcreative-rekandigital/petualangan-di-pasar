@@ -11,6 +11,7 @@ import {
 import { getBalai } from '../../data/balai';
 import { CERITA, URUTAN_BALAI } from '../../data/cerita';
 import type { ScreenContext } from './context';
+import { t } from '../../core/bahasa';
 
 function bintangKecil(stars: number): string {
   return `${'⭐'.repeat(stars)}${'☆'.repeat(Math.max(0, 3 - stars))}`;
@@ -31,7 +32,7 @@ export function renderResult(ctx: ScreenContext): HTMLElement {
       class: 'ringkas-baris',
       children: [
         el('span', { text: `${progress.alat.includes(kode) ? c?.alat.emoji ?? '✅' : '❔'} ${c?.bab ?? ''} ${c?.judulBab ?? kode}` }),
-        el('span', { class: 'muted', text: `${correct}/${total} benar` }),
+        el('span', { class: 'muted', text: t('{correct}/{total} benar', { correct, total }) }),
         el('span', { class: 'bintang', text: bintangKecil(stars) }),
       ],
     });
@@ -46,18 +47,18 @@ export function renderResult(ctx: ScreenContext): HTMLElement {
     class: 'isian',
     attrs: {
       type: 'text',
-      placeholder: 'Tulis nama atau panggilanmu',
+      placeholder: t('Tulis nama atau panggilanmu'),
       value: progress.playerName,
       maxlength: '40',
-      'aria-label': 'Nama pemain untuk sertifikat',
+      'aria-label': t('Nama pemain untuk sertifikat'),
     },
   });
 
-  const namaPreview = el('p', { class: 'nama-pemain', text: progress.playerName || 'Nama Pemain' });
+  const namaPreview = el('p', { class: 'nama-pemain', text: progress.playerName || t('Nama Pemain') });
 
   namaInput.addEventListener('input', () => {
     progress.playerName = namaInput.value.trim();
-    namaPreview.textContent = progress.playerName || 'Nama Pemain';
+    namaPreview.textContent = progress.playerName || t('Nama Pemain');
     ctx.persist();
   });
 
@@ -67,13 +68,13 @@ export function renderResult(ctx: ScreenContext): HTMLElement {
     ? el('div', {
         class: 'sertifikat',
         children: [
-          el('p', { class: 'label-kecil', text: '🎓 Sertifikat Digital' }),
+          el('p', { class: 'label-kecil', text: t('🎓 Sertifikat Digital') }),
           el('h2', { text: APP_INFO.judul }),
-          el('p', { class: 'muted', text: 'Sertifikat "Penyintas Sains" diberikan kepada' }),
+          el('p', { class: 'muted', text: t('Sertifikat "Penyintas Sains" diberikan kepada') }),
           namaPreview,
-          el('p', { class: 'muted', text: `atas keberhasilan menyalakan Mercusuar Tua dengan 11 bekal ilmu IPA.` }),
-          el('p', { class: 'muted', text: `Total bintang: ${totalStars(progress)} dari ${maxStars()} · Final: ${totalFinal}/30` }),
-          el('p', { class: 'muted', text: `Akurasi jawaban: ${akurasi}% (${totalBenar}/${totalSoal})` }),
+          el('p', { class: 'muted', text: t('atas keberhasilan menyalakan Mercusuar Tua dengan 11 bekal ilmu IPA.') }),
+          el('p', { class: 'muted', text: t('Total bintang: {v0} dari {v1} · Final: {totalFinal}/30', { v0: totalStars(progress), v1: maxStars(), totalFinal }) }),
+          el('p', { class: 'muted', text: t('Akurasi jawaban: {akurasi}% ({totalBenar}/{totalSoal})', { akurasi, totalBenar, totalSoal }) }),
           el('p', {
             class: 'muted',
             attrs: { style: 'margin-top:10px;font-style:italic' },
@@ -85,16 +86,16 @@ export function renderResult(ctx: ScreenContext): HTMLElement {
     : el('div', {
         class: 'card jujur',
         children: [
-          el('span', { class: 'label-kecil', text: 'Sertifikat Terkunci' }),
+          el('span', { class: 'label-kecil', text: t('Sertifikat Terkunci') }),
           el('p', {
-            text: `Nyalakan Mercusuar Tua untuk membuka sertifikat "Penyintas Sains"! Alat terkumpul: ${balaiSelesaiCount(progress)}/11${isPuncakUnlocked(progress) ? '. Mercusuar sudah terbuka, ayo tuntaskan Final!' : '.'}`,
+            text: `${t('Nyalakan Mercusuar Tua untuk membuka sertifikat "Penyintas Sains"! Alat terkumpul: {jumlah}/11.', { jumlah: balaiSelesaiCount(progress) })}${isPuncakUnlocked(progress) ? ` ${t('Mercusuar sudah terbuka, ayo tuntaskan Final!')}` : ''}`,
           }),
         ],
       });
 
   const kembaliPeta = el('button', {
     class: 'btn block',
-    text: '🗺️ Kembali ke Peta',
+    text: t('🗺️ Kembali ke Peta'),
     attrs: { type: 'button' },
     on: {
       click: () => {
@@ -106,7 +107,7 @@ export function renderResult(ctx: ScreenContext): HTMLElement {
 
   const cetak = el('button', {
     class: 'btn secondary block',
-    text: '🖨️ Cetak / Simpan Sertifikat',
+    text: t('🖨️ Cetak / Simpan Sertifikat'),
     attrs: { type: 'button' },
     on: {
       click: () => {
@@ -121,18 +122,18 @@ export function renderResult(ctx: ScreenContext): HTMLElement {
     children: [
       el('div', {
         class: 'topbar',
-        children: [el('h2', { text: '🏁 Hasil Akhir' })],
+        children: [el('h2', { text: t('🏁 Hasil Akhir') })],
       }),
       el('div', {
         class: 'card',
         children: [
-          el('span', { class: 'label-kecil', text: 'Ringkasan per Bab' }),
+          el('span', { class: 'label-kecil', text: t('Ringkasan per Bab') }),
           el('div', { class: 'ringkas-level', attrs: { style: 'margin-top:10px' }, children: ringkas }),
         ],
       }),
       el('div', {
         class: 'card',
-        children: [el('span', { class: 'label-kecil', text: 'Nama untuk Sertifikat' }), namaInput],
+        children: [el('span', { class: 'label-kecil', text: t('Nama untuk Sertifikat') }), namaInput],
       }),
       kartuSertifikat,
       el('div', { class: 'stack', children: sertifikatTerbuka ? [cetak, kembaliPeta] : [kembaliPeta] }),

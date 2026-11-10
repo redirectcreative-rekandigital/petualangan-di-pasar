@@ -2,6 +2,8 @@ import { el } from './components/dom';
 import type { Progress } from '../../shared/types';
 import { totalStars, maxStars } from '../core/state';
 import { sfx } from '../core/sound';
+import { t } from '../core/bahasa';
+import { jadikanModalAktif } from './modal';
 
 /**
  * HUD dunia balai.
@@ -16,6 +18,8 @@ export interface HudHandlers {
   onInteract: () => void;
   onMenu: () => void;
   onTas: () => void;
+  /** Membuka ringkasan bintang per bab. */
+  onBintang?: () => void;
   onLompat: () => void;
   onSapa?: (emoji: string) => void;
 }
@@ -35,24 +39,24 @@ export interface Hud {
 
 const DAFTAR_SAPA = ['👋', '👍', '😀', '🎉', '❤️', '🙌'];
 const LANGKAH: Array<{ nama: string; ikon: string }> = [
-  { nama: 'Misi', ikon: '🗣️' },
-  { nama: 'Cerita', ikon: '📖' },
-  { nama: 'Tantangan', ikon: '🔥' },
-  { nama: 'Pulang', ikon: '🗺️' },
+  { nama: t('Misi'), ikon: '🗣️' },
+  { nama: t('Cerita'), ikon: '📖' },
+  { nama: t('Tantangan'), ikon: '🔥' },
+  { nama: t('Pulang'), ikon: '🗺️' },
 ];
 
 export function createHud(handlers: HudHandlers): Hud {
   const interactBtn = el('button', {
     class: 'btn-action interact hidden',
     text: '🅰️',
-    attrs: { type: 'button', 'aria-label': 'Bicara atau berinteraksi' },
+    attrs: { type: 'button', 'aria-label': t('Bicara atau berinteraksi') },
     on: { click: () => handlers.onInteract() },
   });
 
   const lompatBtn = el('button', {
     class: 'btn-action lompat',
-    attrs: { type: 'button', 'aria-label': 'Lompat' },
-    children: [el('span', { class: 'lompat-ikon', text: '⤴️' }), el('span', { class: 'lompat-label', text: 'Lompat' })],
+    attrs: { type: 'button', 'aria-label': t('Lompat') },
+    children: [el('span', { class: 'lompat-ikon', text: '⤴️' }), el('span', { class: 'lompat-label', text: t('Lompat') })],
   });
   // pointerdown (bukan click) agar lompat terasa langsung di layar sentuh,
   // dan tetap bisa ditekan sambil jari lain memegang joystick.
@@ -66,31 +70,36 @@ export function createHud(handlers: HudHandlers): Hud {
   });
 
   const menuBtn = el('button', {
-    class: 'btn-action menu',
+    class: 'btn-action menu hud-menu-kanan',
     text: '☰',
-    attrs: { type: 'button', 'aria-label': 'Menu' },
+    attrs: { type: 'button', 'aria-label': t('Menu') },
     on: { click: () => handlers.onMenu() },
   });
 
   const tasChip = el('button', {
     class: 'chip tas',
-    text: '🎒 0/11',
-    attrs: { type: 'button', 'aria-label': 'Buka tas survival' },
+    text: t('🎒 Tas {jumlah}/11', { jumlah: 0 }),
+    attrs: { type: 'button', 'aria-label': t('Buka tas survival') },
     on: { click: () => handlers.onTas() },
   });
-  const starChip = el('span', { class: 'chip progress', text: '⭐ 0/33' });
+  const starChip = el('button', {
+    class: 'chip progress',
+    text: '⭐ 0/33',
+    attrs: { type: 'button', 'aria-label': t('Lihat bintang belajar') },
+    on: { click: () => handlers.onBintang?.() },
+  });
   const onlineChip = el('span', { class: 'chip online hidden', text: '👥 0' });
   const stats = el('div', { class: 'hud-stats', children: [tasChip, starChip, onlineChip] });
 
   /* ---------- Kartu tombol Misi + modal ---------- */
   let misiTeksKini = '';
   let tahapKini = 0;
-  const misiTahap = el('span', { class: 'misi-tombol-tahap', text: 'Misi' });
+  const misiTahap = el('span', { class: 'misi-tombol-tahap', text: t('Misi') });
   const misiTitik = el('span', { class: 'misi-titik', attrs: { 'aria-hidden': 'true' } });
   const misiBtn = el('button', {
     class: 'misi-tombol',
-    attrs: { type: 'button', 'aria-label': 'Lihat misi', 'aria-haspopup': 'dialog' },
-    children: [el('span', { class: 'misi-tombol-ikon', text: '📜' }), el('span', { class: 'misi-tombol-label', children: [el('span', { text: 'Misi' }), misiTahap] }), misiTitik],
+    attrs: { type: 'button', 'aria-label': t('Lihat misi'), 'aria-haspopup': 'dialog' },
+    children: [el('span', { class: 'misi-tombol-ikon', text: '📜' }), el('span', { class: 'misi-tombol-label', children: [el('span', { text: t('Misi') }), misiTahap] }), misiTitik],
   });
   misiBtn.addEventListener('click', () => {
     sfx.click();
@@ -115,18 +124,18 @@ export function createHud(handlers: HudHandlers): Hud {
         }),
       );
     });
-    const tutup = el('button', { class: 'btn block', text: 'Siap! 👍', attrs: { type: 'button' } });
+    const tutup = el('button', { class: 'btn block', text: t('Siap! 👍'), attrs: { type: 'button' } });
     // Kelas `dialog-overlay` membuat dunia 3D otomatis dijeda selama modal terbuka.
     const overlay = el('div', {
       class: 'overlay dialog-overlay misi-overlay',
-      attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Misi saat ini' },
+      attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': t('Misi saat ini') },
       children: [
         el('div', {
           class: 'dialog-panel misi-panel',
           children: [
-            el('h3', { text: '📜 Misi Saat Ini' }),
+            el('h3', { text: t('📜 Misi Saat Ini') }),
             daftar,
-            el('div', { class: 'misi-tugas', children: [el('span', { class: 'label-kecil', text: 'Tugasmu sekarang' }), el('p', { text: misiTeksKini })] }),
+            el('div', { class: 'misi-tugas', children: [el('span', { class: 'label-kecil', text: t('Tugasmu sekarang') }), el('p', { text: misiTeksKini })] }),
             tutup,
           ],
         }),
@@ -135,7 +144,14 @@ export function createHud(handlers: HudHandlers): Hud {
     const tutupModal = (): void => {
       overlay.remove();
       modal = null;
+      document.removeEventListener('keydown', esc);
+      lepas();
     };
+    const lepas = jadikanModalAktif(tutupModal);
+    const esc = (ev: KeyboardEvent): void => {
+      if (ev.key === 'Escape') tutupModal();
+    };
+    document.addEventListener('keydown', esc);
     tutup.addEventListener('click', () => {
       sfx.click();
       tutupModal();
@@ -157,7 +173,7 @@ export function createHud(handlers: HudHandlers): Hud {
       el('button', {
         class: 'btn-sapa',
         text: emo,
-        attrs: { type: 'button', 'aria-label': `Sapa ${emo}` },
+        attrs: { type: 'button', 'aria-label': t('Sapa {emo}', { emo }) },
         on: {
           click: () => {
             handlers.onSapa?.(emo);
@@ -170,7 +186,7 @@ export function createHud(handlers: HudHandlers): Hud {
   const sapaBtn = el('button', {
     class: 'btn-action sapa hidden',
     text: '👋',
-    attrs: { type: 'button', 'aria-label': 'Sapa teman' },
+    attrs: { type: 'button', 'aria-label': t('Sapa teman') },
     on: { click: () => barSapa.classList.toggle('tampil') },
   });
 
@@ -179,11 +195,12 @@ export function createHud(handlers: HudHandlers): Hud {
   const actions = el('div', {
     class: 'hud-actions',
     children: [
-      el('div', { class: 'hud-aksi-atas', children: [sapaBtn, menuBtn] }),
+      el('div', { class: 'hud-aksi-atas', children: [sapaBtn] }),
       el('div', { class: 'hud-aksi-utama', children: [interactBtn, lompatBtn] }),
     ],
   });
-  const root = el('div', { class: 'hud-3d', children: [kiriAtas, joystickHost, barSapa, actions] });
+  // Tombol ☰ berdiri sendiri di pojok kanan atas.
+  const root = el('div', { class: 'hud-3d', children: [kiriAtas, menuBtn, joystickHost, barSapa, actions] });
 
   return {
     root,
@@ -192,7 +209,7 @@ export function createHud(handlers: HudHandlers): Hud {
       if (interactBtn.textContent !== label) interactBtn.textContent = label;
     },
     updateStats: (progress) => {
-      tasChip.textContent = `🎒 ${progress.alat.length}/11`;
+      tasChip.textContent = t('🎒 Tas {jumlah}/11', { jumlah: progress.alat.length });
       starChip.textContent = `⭐ ${totalStars(progress)}/${maxStars()}`;
     },
     setMisi: (teks, tahap) => {

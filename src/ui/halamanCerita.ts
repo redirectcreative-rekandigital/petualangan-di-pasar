@@ -6,6 +6,7 @@ import { getAdegan, type Adegan, type Interaksi, type Latar, type Sprite } from 
 import type { CeritaBalai } from '../data/cerita';
 import { pasangGambar } from '../core/gambar';
 import type { BalaiMeta } from '../../shared/types';
+import { t } from '../core/bahasa';
 
 /**
  * Halaman Cerita: buku cerita bergerak berisi 4 adegan per materi, ditutup
@@ -254,7 +255,7 @@ function bangunInteraksi(ia: Interaksi, onTuntas: (pesan: string) => void): HTML
       if (!item) {
         kartu.textContent = '✅';
         tombol.remove();
-        onTuntas('Semua sudah dikelompokkan dengan benar!');
+        onTuntas(t('Semua sudah dikelompokkan dengan benar!'));
         return;
       }
       kartu.innerHTML = '';
@@ -276,7 +277,7 @@ function bangunInteraksi(ia: Interaksi, onTuntas: (pesan: string) => void): HTML
           kartu.classList.remove('goyang');
           void kartu.offsetWidth;
           kartu.classList.add('goyang');
-          umpan.textContent = `Coba lagi. ${item.nama} bukan ${nama.toLowerCase()}.`;
+          umpan.textContent = t('Coba lagi. {item} bukan {kelompok}.', { item: item.nama, kelompok: nama.toLowerCase() });
         }
       });
       tombol.append(b);
@@ -306,13 +307,13 @@ function bangunInteraksi(ia: Interaksi, onTuntas: (pesan: string) => void): HTML
           susunan.append(el('span', { class: 'cerita-susunan-item', text: `${langkah > 0 ? '→ ' : ''}${item.e} ${item.nama}` }));
           langkah++;
           if (langkah === benar.length) onTuntas(ia.selesai);
-          else umpan.textContent = 'Bagus! Lanjutkan.';
+          else umpan.textContent = t('Bagus! Lanjutkan.');
         } else {
           sfx.wrong();
           b.classList.remove('goyang');
           void b.offsetWidth;
           b.classList.add('goyang');
-          umpan.textContent = 'Belum tepat. Pikirkan lagi urutannya.';
+          umpan.textContent = t('Belum tepat. Pikirkan lagi urutannya.');
         }
       });
       pilihan.append(b);
@@ -365,7 +366,13 @@ export function bukaHalamanCerita(host: HTMLElement, opsi: OpsiHalaman): Promise
 
   const root = el('div', { class: 'cerita-overlay', attrs: { role: 'dialog', 'aria-modal': 'true' } });
   const buku = el('div', { class: 'cerita-buku', attrs: { style: `--aksen:#${opsi.cerita.cantrik.warnaBaju.toString(16).padStart(6, '0')}` } });
-  root.append(buku);
+  // Tombol ✕ merah di dekat tombol suara: keluar dari materi kapan saja.
+  const tombolTutup = el('button', {
+    class: 'tutup-x',
+    text: '✕',
+    attrs: { type: 'button', 'aria-label': t('Tutup materi'), title: t('Tutup') },
+  });
+  root.append(buku, tombolTutup);
   host.append(root);
 
   return new Promise<HasilBaca>((resolve) => {
@@ -374,6 +381,10 @@ export function bukaHalamanCerita(host: HTMLElement, opsi: OpsiHalaman): Promise
       root.remove();
       resolve({ detik: (performance.now() - mulai) / 1000, tamat });
     };
+    tombolTutup.addEventListener('click', () => {
+      sfx.click();
+      selesai();
+    });
 
     const kepala = (judul: string): HTMLElement => {
       const titik = el('div', { class: 'cerita-titik' });
@@ -426,12 +437,12 @@ export function bukaHalamanCerita(host: HTMLElement, opsi: OpsiHalaman): Promise
         });
       };
 
-      const ulang = el('button', { class: 'btn kecil ghost', text: '🔊 Bacakan lagi', attrs: { type: 'button' } });
+      const ulang = el('button', { class: 'btn kecil ghost', text: t('🔊 Bacakan lagi'), attrs: { type: 'button' } });
       ulang.addEventListener('click', () => bacakan(0));
 
       const kembali = el('button', {
         class: 'btn ghost',
-        text: opsi.modeIngat ? '↩️ Kembali ke tantangan' : '◀ Sebelumnya',
+        text: opsi.modeIngat ? t('↩️ Kembali ke tantangan') : t('◀ Sebelumnya'),
         attrs: { type: 'button' },
       });
       kembali.disabled = !opsi.modeIngat && indeks === 0;
@@ -445,7 +456,7 @@ export function bukaHalamanCerita(host: HTMLElement, opsi: OpsiHalaman): Promise
         render();
       });
 
-      const lanjut = el('button', { class: 'btn', text: 'Lanjut ▶', attrs: { type: 'button' } });
+      const lanjut = el('button', { class: 'btn', text: t('Lanjut ▶'), attrs: { type: 'button' } });
       lanjut.addEventListener('click', () => {
         sfx.click();
         indeks++;
@@ -456,12 +467,12 @@ export function bukaHalamanCerita(host: HTMLElement, opsi: OpsiHalaman): Promise
       if (a.interaksi && !opsi.modeIngat) {
         const sudah = interaksiTuntas.has(indeks);
         lanjut.disabled = !sudah;
-        if (!sudah) lanjut.textContent = '🔒 Selesaikan tantangan kecil';
+        if (!sudah) lanjut.textContent = t('🔒 Selesaikan tantangan kecil');
         const i0 = indeks;
         interaksiEl = bangunInteraksi(a.interaksi, (pesan) => {
           interaksiTuntas.add(i0);
           lanjut.disabled = false;
-          lanjut.textContent = 'Lanjut ▶';
+          lanjut.textContent = t('Lanjut ▶');
           ucapkan(pesan, opsi.cerita.cantrik.suara);
         });
       }
@@ -481,40 +492,57 @@ export function bukaHalamanCerita(host: HTMLElement, opsi: OpsiHalaman): Promise
       const lengkap = el('details', {
         class: 'cerita-lengkap',
         children: [
-          el('summary', { text: '📚 Baca ringkasan materi lengkap' }),
-          ...meta.materiPoin.map((p) =>
-            el('div', { class: 'cerita-poin', children: [el('strong', { text: p.judul }), el('p', { text: p.teks })] }),
-          ),
+          // Tombol besar yang jelas terlihat (bukan sekadar teks tautan).
+          el('summary', {
+            class: 'lengkap-tombol',
+            children: [
+              el('span', { class: 'lengkap-ikon', attrs: { 'aria-hidden': 'true' }, text: '📚' }),
+              el('span', {
+                class: 'lengkap-teks',
+                children: [
+                  el('strong', { text: t('Baca ringkasan materi lengkap') }),
+                  el('span', { class: 'lengkap-sub', text: t('{jumlah} poin penting untuk diingat', { jumlah: meta.materiPoin.length }) }),
+                ],
+              }),
+              el('span', { class: 'lengkap-panah', attrs: { 'aria-hidden': 'true' }, text: '▾' }),
+            ],
+          }),
+          el('ol', {
+            class: 'lengkap-daftar',
+            children: meta.materiPoin.map((p) =>
+              el('li', { class: 'cerita-poin', children: [el('strong', { text: p.judul }), el('p', { text: p.teks })] }),
+            ),
+          }),
         ],
       });
 
-      const ulangDariAwal = el('button', { class: 'btn ghost', text: '🔁 Ulangi cerita', attrs: { type: 'button' } });
+      const ulangDariAwal = el('button', { class: 'btn ghost', text: t('🔁 Ulangi cerita'), attrs: { type: 'button' } });
       ulangDariAwal.addEventListener('click', () => {
         sfx.click();
         indeks = 0;
         render();
       });
-      const tutup = el('button', { class: 'btn', text: '✅ Selesai membaca', attrs: { type: 'button' } });
+      const tutup = el('button', { class: 'btn', text: t('✅ Selesai membaca'), attrs: { type: 'button' } });
       tutup.addEventListener('click', () => {
         sfx.click();
         selesai();
       });
 
       buku.append(
-        kepala('Kunci Ingat'),
+        kepala(t('Kunci Ingat')),
         el('div', {
           class: 'cerita-kunci',
-          children: [el('span', { class: 'label-kecil', text: '🔑 Kunci Ingat' }), el('p', { text: meta.kunciJawab })],
+          children: [el('span', { class: 'label-kecil', text: t('🔑 Kunci Ingat') }), el('p', { text: meta.kunciJawab })],
         }),
         renderDiagramMateri(meta.diagram),
         lengkap,
         el('div', {
           class: 'cerita-hikmah',
-          children: [el('span', { class: 'label-kecil', text: '🤲 Hikmah' }), el('p', { text: opsi.cerita.hikmah })],
+          children: [el('span', { class: 'label-kecil', text: t('🤲 Hikmah') }), el('p', { text: opsi.cerita.hikmah })],
         }),
         el('div', { class: 'cerita-navigasi', children: [ulangDariAwal, tutup] }),
       );
-      ucapkan(`Kunci ingat. ${meta.kunciJawab}`, opsi.cerita.cantrik.suara);
+      ucapkan(`${t('Kunci ingat.')} ${meta.kunciJawab}`, opsi.cerita.cantrik.suara);
     };
 
     render();

@@ -17,6 +17,8 @@ import { sfx } from '../core/sound';
 import type { BalaiMeta, Progress, TahapMisi } from '../../shared/types';
 import type { PosisiPemain } from '../../shared/net';
 import type { ColliderBox } from './mapConfig';
+import { t } from '../core/bahasa';
+import { kostumDari } from '../core/kostumPemain';
 
 /**
  * Dunia 3D satu BALAI. Setiap balai punya lima titik yang dikunjungi
@@ -61,9 +63,23 @@ export interface NoktahWorldHandle {
   resetCamera: () => void;
   setPemainLain: (daftar: PosisiPemain[]) => void;
   posisiPemain: () => { x: number; z: number; rot: number };
+  /** Sudut kamera orbit saat ini (radian). */
+  yawKamera: () => number;
+  /** Pemain memutar animasi interaksi (bicara/baca/tantangan/gerbang). */
+  animasiInteraksi: () => void;
+  /** Meletakkan pemain di koordinat tertentu (mis. setelah ganti bahasa). */
+  letakkanPemain: (pos: { x: number; z: number; rot: number; yaw?: number }) => void;
   /** Pintasan uji: letakkan pemain di dekat sebuah titik. */
   pindahKe: (peran: PeranTitik) => boolean;
-  debugState: () => { x: number; z: number; nearby: string | null; tahap: number; tinggi: number; yaw: number };
+  debugState: () => {
+    x: number;
+    z: number;
+    nearby: string | null;
+    tahap: number;
+    tinggi: number;
+    yaw: number;
+    animasi: { klip: string; timeScale: number } | null;
+  };
   dispose: () => void;
 }
 
@@ -191,7 +207,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   penjagaRig.geometri.forEach((x) => track(x));
   penjagaRig.material.forEach((x) => track(x));
   penjagaRig.group.traverse((o) => (o.castShadow = true));
-  const tagPenjaga = buildTag('Penjaga', cerita.penjaga.nama, warna, track);
+  const tagPenjaga = buildTag(t('Penjaga'), cerita.penjaga.nama, warna, track);
   tagPenjaga.scale.setScalar(0.9);
   tagPenjaga.position.set(0, 2.35, 0.2);
   penjagaRig.group.add(tagPenjaga);
@@ -235,7 +251,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   const posCantrik = posisiLokal(ruang, new THREE.Vector3(1.9, 0, 0.2));
   cantrikRig.group.position.set(posCantrik.x, 0, posCantrik.z);
   cantrikRig.group.rotation.y = ruang.rotation.y;
-  const tagCantrik = buildTag('Halaman Cerita', cerita.cantrik.nama, warna, track);
+  const tagCantrik = buildTag(t('Halaman Cerita'), cerita.cantrik.nama, warna, track);
   tagCantrik.scale.setScalar(0.85);
   tagCantrik.position.set(0, 2.1, 0.2);
   cantrikRig.group.add(tagCantrik);
@@ -305,6 +321,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     warnaPakaian: prog.warnaBaju,
     warnaBawahan: prog.warnaBawahan,
     warnaHijab: prog.warnaHijab,
+    kostum: kostumDari(prog),
   });
   const arahMuncul = { x: tata.muncul.x - tata.penjaga.x, z: tata.muncul.z - tata.penjaga.z };
   const panjangArah = Math.hypot(arahMuncul.x, arahMuncul.z) || 1;
@@ -394,13 +411,21 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
       const wishZ = (-mx * sinY - my * cosY) * MOVE_SPEED * dt;
       if (options.input.state.jumpPressed && player.lompat()) sfx.lompat();
       if (player.updateLompat(dt)) sfx.mendarat();
+      // Kecepatan NYATA (setelah tabrakan) dikirim ke animasi: berjalan menabrak
+      // dinding tidak membuat kaki melangkah di tempat terlalu cepat.
+      const xLama = player.position.x;
+      const zLama = player.position.z;
       if (options.input.state.moving) {
         const resolved = resolveAll({ x: player.position.x + wishX, z: player.position.z + wishZ, r: PLAYER_RADIUS }, colliders);
         const clamped = clampToMap(resolved.x, resolved.z, SETENGAH, PLAYER_RADIUS + 0.4);
         player.setPosition(clamped.x, clamped.z);
         player.faceDirection(wishX, wishZ, dt);
       }
-      player.animate(options.input.state.moving ? MOVE_SPEED : 0, elapsed);
+      const kecepatanNyata = dt > 0 ? Math.hypot(player.position.x - xLama, player.position.z - zLama) / dt : 0;
+      player.animate(kecepatanNyata, elapsed);
+    } else {
+      // Dijeda (percakapan/modal): animasi tetap hidup (Idle / Interact selesai main).
+      player.animate(0, elapsed);
     }
 
     // Penjaga berjalan pelan menuju posisinya (mis. pindah ke Tempat Uji).
@@ -465,6 +490,14 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     resetCamera: () => camCtrl.reset(),
     setPemainLain: (daftar) => pemainLain.set(daftar),
     posisiPemain: () => ({ x: player.position.x, z: player.position.z, rot: player.group.rotation.y }),
+    animasiInteraksi: () => player.interaksi(),
+    yawKamera: () => camCtrl.getYaw(),
+    letakkanPemain: (pos) => {
+      player.setPosition(pos.x, pos.z);
+      player.faceDirection(Math.sin(pos.rot), Math.cos(pos.rot), 1);
+      if (pos.yaw !== undefined) camCtrl.setYaw(pos.yaw);
+      nearby = cariDekat();
+    },
     pindahKe: (peran) => {
       const p = posisiTitik(peran);
       const dx = tata.muncul.x - p.x;
@@ -481,6 +514,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
       tahap,
       tinggi: Math.round(player.group.position.y * 100) / 100,
       yaw: Math.round(camCtrl.getYaw() * 1000) / 1000,
+      animasi: player.infoAnimasi(),
     }),
     dispose: () => {
       player.dispose();
@@ -610,7 +644,7 @@ function buatGerbang(track: Track): { group: THREE.Group; update: (t: number, me
   const portal = new THREE.Mesh(track(new THREE.PlaneGeometry(2.9, 3.1)), portalMat);
   portal.position.set(0, 1.6, 0);
   g.add(portal);
-  const papan = buildSign('🗺️ Jalan ke Peta', 0x0e7490, track);
+  const papan = buildSign(t('🗺️ Jalan ke Peta'), 0x0e7490, track);
   papan.scale.setScalar(0.7);
   papan.position.set(0, 3.7, 0.1);
   g.add(papan);

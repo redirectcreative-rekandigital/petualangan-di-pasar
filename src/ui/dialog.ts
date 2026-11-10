@@ -1,4 +1,5 @@
 import { el } from './components/dom';
+import { t } from '../core/bahasa';
 
 /**
  * Kotak dialog tokoh (HTML overlay di atas scene 3D).
@@ -33,7 +34,7 @@ export function showDialog(options: DialogOptions): { root: HTMLElement; close: 
   const batalBtn = options.onBatal
     ? el('button', {
         class: 'btn ghost block',
-        text: 'Nanti saja',
+        text: t('Nanti saja'),
         attrs: { type: 'button' },
         on: {
           click: () => {

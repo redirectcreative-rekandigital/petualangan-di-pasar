@@ -3,7 +3,7 @@ import { CERITA } from '../data/cerita';
 import type { NoktahId } from '../../shared/types';
 
 /**
- * Pulau Nusa Kawruh 3D untuk peta besar.
+ * Pulau Wonorejo 3D untuk peta besar.
  *
  * Pulau dibangun dari teras-teras bertingkat (pantai → sawah → hutan → bukit →
  * tebing → puncak) seperti ilustrasi sampul. Jalan setapak melingkar naik

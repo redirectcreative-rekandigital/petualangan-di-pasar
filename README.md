@@ -11,7 +11,7 @@ Berbasis AI - Guru Muhammadiyah se-Cabang Blimbing 2026**.
 
 ## Cerita
 
-Pemain adalah anggota termuda Kapal Ekspedisi Sains yang terdampar di **Pulau Nusa Kawruh**
+Pemain adalah anggota termuda Kapal Ekspedisi Sains yang terdampar di **Pulau Wonorejo**
 setelah badai. Untuk pulang, ia harus menyalakan **Mercusuar Tua** di puncak pulau. Sembilan
 Penjaga pulau masing-masing menyimpan bekal ilmu dan satu **alat survival**. Setiap materi IPA
 langsung dipakai untuk bertahan hidup: cahaya untuk keluar dari goa dan membuat sinyal, bunyi
@@ -71,6 +71,10 @@ node scripts/smoke-multiplayer.mjs   # uji guru + 2 siswa (butuh `npm run serve`
 ```
 
 Port bisa diganti: `PORT=9000 npm run serve` atau `npx vite --port 5180`.
+
+**Mode Guru** tidak ditampilkan di beranda siswa. Guru membukanya lewat alamat khusus
+`domain/modeguru` (mis. `http://localhost:8787/modeguru`). Di hosting statis tanpa fallback SPA,
+halaman `public/modeguru/index.html` meneruskan ke `?mode=guru`; `#modeguru` juga bisa dipakai.
 
 ## Hosting untuk juri
 

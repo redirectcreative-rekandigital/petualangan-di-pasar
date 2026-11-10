@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { t } from '../core/bahasa';
 
 /**
  * Papan & label 3D bertekstur kanvas: papan nama balai, nametag tokoh, plakat
@@ -103,7 +104,7 @@ export function buildPlakat(
     ctx.font = 'bold 34px "Segoe UI", Arial, sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText('RUANG MATERI', canvas.width / 2, 56);
+    ctx.fillText(t('RUANG MATERI'), canvas.width / 2, 56);
 
     ctx.fillStyle = '#fff7e6';
     const baris = susunBaris(ctx, teks, canvas.width - 130, 52, 3);

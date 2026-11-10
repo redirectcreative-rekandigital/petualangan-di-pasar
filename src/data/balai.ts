@@ -1,3 +1,4 @@
+import { lokalkan } from '../core/bahasa';
 import type {
   BalaiMeta,
   DiagramBagian,
@@ -735,7 +736,7 @@ function posisiJalur(urutan: number): { x: number; y: number } {
  * Daftar noktah final: diurutkan sesuai bab buku (jalur pulau), dengan nama
  * penjaga & cantrik bernuansa Nusantara dari naskah cerita.
  */
-export const NOKTAH: NoktahMeta[] = [
+export const NOKTAH: NoktahMeta[] = lokalkan([
   ...URUTAN_BALAI.map((kode) => {
     const asli = NOKTAH_ASLI.find((n) => n.kode === kode) as NoktahMeta;
     const c = getCerita(kode);
@@ -760,7 +761,7 @@ export const NOKTAH: NoktahMeta[] = [
     peta: { x: 50, y: 50 },
     balai: n.balai.map((b) => ({ ...b, nama: 'Mercusuar Tua', penjaga: 'Sembilan Penjaga' })),
   })),
-];
+]);
 void CERITA;
 
 export const SEMUA_BALAI: BalaiMeta[] = NOKTAH.flatMap((n) => n.balai);
@@ -773,11 +774,11 @@ export interface ZonaMeta {
   warna: number;
 }
 
-export const ZONA: ZonaMeta[] = [
+export const ZONA: ZonaMeta[] = lokalkan([
   { elemen: 'Makhluk Hidup', nama: 'Rimba Kehidupan', warna: 0x2f9e6b },
   { elemen: 'Fisika', nama: 'Ngarai Gelombang', warna: 0x2563eb },
   { elemen: 'Bumi', nama: 'Puncak Bumi', warna: 0xd97706 },
-];
+]);
 
 /**
  * Warna aksen khas tiap balai.

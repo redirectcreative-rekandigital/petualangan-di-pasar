@@ -280,7 +280,17 @@
   justify-content: space-between;
   align-items: flex-start;
   gap: 8px;
-  padding-right: 48px;
+  padding-right: 52px; /* ruang untuk tombol ✕ di kanan atas */
+}
+/* HP tegak: tombol ✕ mendapat baris sendiri di atas kepala buku,
+   sehingga judul materi tetap lebar. */
+@media (max-width: 480px) {
+  .cerita-buku {
+    padding-top: 46px;
+  }
+  .cerita-kepala {
+    padding-right: 0;
+  }
 }
 .cerita-bab {
   font-size: 0.78rem;
@@ -371,17 +381,147 @@
   margin: 4px 0 0;
   font-size: 1.02rem;
 }
-.cerita-lengkap summary {
+/* ---------- 📚 Ringkasan materi lengkap: tombol besar + kartu bernomor ---------- */
+.cerita-lengkap {
+  border-radius: 14px;
+  border: 2px solid var(--biru-600);
+  background: var(--biru-100);
+  overflow: hidden;
+}
+.lengkap-tombol {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  min-height: var(--tap);
   cursor: pointer;
-  font-weight: 700;
-  padding: 10px 0;
-  color: var(--hijau-700);
+  color: #1e3a8a;
+}
+.lengkap-tombol::-webkit-details-marker {
+  display: none;
+}
+.lengkap-tombol:hover {
+  background: rgba(37, 99, 235, 0.08);
+}
+.lengkap-tombol:focus-visible {
+  outline: 3px solid var(--oranye-500);
+  outline-offset: -3px;
+}
+.lengkap-ikon {
+  flex: none;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: var(--biru-600);
+  font-size: 1.35rem;
+}
+.lengkap-teks {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.lengkap-teks strong {
+  font-size: 1.02rem;
+}
+.lengkap-sub {
+  font-size: 0.82rem;
+  color: #1d4ed8;
+}
+.lengkap-panah,
+.diagram-panah {
+  flex: none;
+  font-size: 1.2rem;
+  transition: transform 0.2s ease;
+}
+.cerita-lengkap[open] .lengkap-panah,
+.diagram-item[open] .diagram-panah {
+  transform: rotate(180deg);
+}
+.lengkap-daftar {
+  margin: 0;
+  padding: 4px 12px 12px 34px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #fff;
+  border-top: 2px solid #bfdbfe;
+}
+.lengkap-daftar .cerita-poin {
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+.lengkap-daftar .cerita-poin::marker {
+  font-weight: 800;
+  color: var(--biru-600);
 }
 .cerita-poin {
   margin: 6px 0;
 }
 .cerita-poin p {
   margin: 2px 0 0;
+}
+
+/* ---------- 🔎 Diagram materi: dropdown per bagian ---------- */
+.diagram-kepala {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.diagram-kepala p {
+  margin: 2px 0 0;
+}
+.diagram-ikon {
+  flex: none;
+  font-size: 2.2rem;
+  line-height: 1;
+}
+.diagram-daftar {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.diagram-item {
+  border-radius: 12px;
+  border: 2px solid var(--garis);
+  background: #fff;
+  overflow: hidden;
+}
+.diagram-item[open] {
+  border-color: var(--hijau-500);
+}
+.diagram-tombol {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  min-height: var(--tap);
+  padding: 8px 14px;
+  cursor: pointer;
+  font-weight: 700;
+  color: var(--hijau-900);
+}
+.diagram-tombol::-webkit-details-marker {
+  display: none;
+}
+.diagram-item[open] .diagram-tombol {
+  background: var(--hijau-100);
+}
+.diagram-tombol:focus-visible {
+  outline: 3px solid var(--oranye-500);
+  outline-offset: -3px;
+}
+.diagram-isi {
+  margin: 0;
+  padding: 10px 14px 12px;
+  border-top: 1px dashed var(--garis);
+  line-height: 1.5;
 }
 
 /* Interaksi di adegan terakhir */
@@ -995,4 +1135,10 @@ g[class^='anim-'] {
   height: clamp(260px, 62vh, 520px);
   object-fit: cover;
   object-position: center 30%;
+}
+
+/* Isi buku tidak boleh menyusut: kotak ber-overflow:hidden (ringkasan,
+   diagram) bisa terjepit menjadi garis tipis di dalam kolom flex. */
+.cerita-buku > * {
+  flex-shrink: 0;
 }

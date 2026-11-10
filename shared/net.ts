@@ -106,6 +106,8 @@ export type PesanKlien =
   | {
       t: 'join';
       token: string;
+      /** ID tetap profil siswa di perangkat (lihat src/core/profil.ts). */
+      idSiswa?: string;
       nama: string;
       gender: PlayerGender;
       warnaBaju?: number;
@@ -122,7 +124,8 @@ export type PesanServer =
   | { t: 'galat'; pesan: string }
   /** Daftar pemain yang berada di noktah yang sama (untuk digambar). */
   | { t: 'pemain'; daftar: PosisiPemain[] }
-  | { t: 'kabar'; teks: string };
+  /** Kabar untuk siswa. `kode` dipakai klien untuk menerjemahkan pesan. */
+  | { t: 'kabar'; teks: string; kode?: 'nama-ganda'; nama?: string };
 
 /** Rentang emoji sapaan yang diizinkan (aman untuk anak). */
 export const SAPAAN_EMOJI = ['👋', '👍', '😀', '🎉', '❤️', '🙌'] as const;

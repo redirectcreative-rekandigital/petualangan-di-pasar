@@ -1,3 +1,4 @@
+import { lokalkan } from '../core/bahasa';
 import { questionBankSchema } from './schema';
 import type { Question, BalaiId } from '../../shared/types';
 import H01 from './questions-ipa/H01.json';
@@ -27,11 +28,26 @@ export function loadQuestionBank(): Question[] {
   return parsed.data as Question[];
 }
 
+let cacheAsli: Question[] | null = null;
 let cache: Question[] | null = null;
+let indeksAsli: Map<string, Question> | null = null;
 
+/** Bank soal asli (Bahasa Indonesia), dipakai dasbor guru & pencocokan materi. */
+export function getQuestionBankAsli(): Question[] {
+  if (!cacheAsli) cacheAsli = loadQuestionBank();
+  return cacheAsli;
+}
+
+/** Bank soal sesuai bahasa pilihan pemain (lihat core/bahasa.ts). */
 export function getQuestionBank(): Question[] {
-  if (!cache) cache = loadQuestionBank();
+  if (!cache) cache = lokalkan(getQuestionBankAsli());
   return cache;
+}
+
+/** Versi Bahasa Indonesia dari sebuah soal (berdasarkan id). */
+export function soalAsli(id: string): Question | undefined {
+  if (!indeksAsli) indeksAsli = new Map(getQuestionBankAsli().map((q) => [q.id, q]));
+  return indeksAsli.get(id);
 }
 
 /** Soal-soal untuk satu balai (atau seluruhnya untuk "FINAL"). */

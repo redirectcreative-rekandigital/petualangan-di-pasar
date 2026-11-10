@@ -3,8 +3,8 @@ import { sfx } from '../../core/sound';
 import { APP_INFO } from '../../core/state';
 import { showToast } from '../dialog';
 import { ambilSesiGuru, buatSesiGuru, onlineTersedia, type RosterSiswa } from '../../net/klien';
-import { getQuestionBank } from '../../data/bank';
-import { CERITA, URUTAN_BALAI } from '../../data/cerita';
+import { getQuestionBankAsli as getQuestionBank } from '../../data/bank';
+import { CERITA_ASLI as CERITA, URUTAN_BALAI } from '../../data/cerita';
 import {
   statusBalai,
   statistikSoal,
@@ -37,7 +37,7 @@ interface StateGuru {
   dipilih: string | null;
 }
 
-export function renderGuru(ctx: ScreenContext): HTMLElement {
+export function renderGuru(_ctx: ScreenContext): HTMLElement {
   const st: StateGuru = {
     token: bacaTokenGuru(),
     guru: APP_INFO.pembuat,
@@ -55,14 +55,16 @@ export function renderGuru(ctx: ScreenContext): HTMLElement {
 
   const kembali = el('button', {
     class: 'btn ghost block',
-    text: '← Kembali ke Pembuka',
+    text: '🏝️ Buka Halaman Siswa',
     attrs: { type: 'button' },
     on: {
       click: () => {
         sfx.click();
         st.jalan = false;
         window.clearInterval(st.timer);
-        ctx.navigate('intro');
+        // Mode Guru punya alamat sendiri: kembali ke alamat game siswa (tanpa /modeguru, ?mode=guru).
+        const akar = window.location.pathname.replace(/modeguru\/?$/i, '');
+        window.location.href = akar || './';
       },
     },
   });

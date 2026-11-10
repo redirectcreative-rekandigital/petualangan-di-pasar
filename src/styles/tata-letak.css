@@ -172,9 +172,17 @@
   font-weight: 800;
   letter-spacing: 0.02em;
 }
+/* Joystick digeser agak ke atas & ke kanan agar tidak mepet pojok:
+   ibu jari lebih nyaman dan tidak tertutup tepi melengkung/bilah navigasi HP. */
 .joystick-host {
-  left: max(18px, env(safe-area-inset-left));
-  bottom: max(20px, env(safe-area-inset-bottom));
+  left: calc(max(18px, env(safe-area-inset-left)) + 22px);
+  bottom: calc(max(20px, env(safe-area-inset-bottom)) + 36px);
+}
+@media (orientation: landscape) and (max-height: 600px) {
+  .joystick-host {
+    left: calc(max(18px, env(safe-area-inset-left)) + 40px);
+    bottom: calc(max(20px, env(safe-area-inset-bottom)) + 16px);
+  }
 }
 .sapa-bar {
   right: max(16px, env(safe-area-inset-right));
@@ -185,6 +193,32 @@
 .dialog-panel {
   max-height: calc(100dvh - 24px);
   overflow-y: auto;
+}
+
+/* Petunjuk Kontrol (modal di arena): hanya isi yang digulir, tombol Tutup tetap
+   terlihat di bawah. */
+.dialog-panel.petunjuk-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 640px;
+  overflow: hidden;
+}
+.petunjuk-panel h3 {
+  margin: 0;
+  padding-right: 44px;
+}
+.petunjuk-panel .petunjuk-isi {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  -webkit-overflow-scrolling: touch;
+}
+.petunjuk-panel .petunjuk-isi > .card {
+  margin: 0;
 }
 
 /* Tas: hanya kisi alat yang digulir; judul & tombol Tutup tetap di tempatnya,
@@ -247,16 +281,6 @@
   }
 }
 
-/* HP tegak: sisakan ruang atas untuk tombol bisu 🔊 agar tidak menindih panel. */
-.overlay.dialog-overlay,
-.overlay.hadiah-overlay {
-  padding-top: max(58px, env(safe-area-inset-top));
-}
-
-/* Judul layar Mercusuar tidak tertutup tombol bisu di kanan atas. */
-.final-kepala {
-  padding-right: 56px;
-}
 
 /* ================================================================== */
 /* LAYAR MENDATAR (landscape) di HP: tinggi layar sempit (≤ 600px).    */
@@ -349,10 +373,6 @@
   .intro-screen[data-langkah='warna'] .intro-ket {
     text-align: left;
   }
-  .intro-screen[data-langkah='karakter'] .topbar,
-  .intro-screen[data-langkah='warna'] .topbar {
-    padding-right: 56px; /* ruang tombol bisu */
-  }
   /* Baris 1 & 5 (1fr) menyerap sisa tinggi, jadi judul-teks-tombol di kolom
      kanan tetap ringkas di tengah dan tombol tidak ikut memanjang. */
   .intro-screen[data-langkah='karakter'] {
@@ -438,9 +458,6 @@
   }
   .intro-screen[data-langkah='nama'] > * {
     grid-column: 1 / -1;
-  }
-  .intro-screen[data-langkah='nama'] .topbar {
-    padding-right: 56px;
   }
   .intro-screen[data-langkah='nama'] .kartu-nama {
     grid-column: 1;
@@ -620,13 +637,9 @@
   .tas-emoji {
     font-size: 1.6rem;
   }
-  /* Sisakan ruang kanan-kiri untuk tombol bisu 🔊 (kanan atas) supaya tidak
-     menindih pojok panel. Dibuat simetris agar panel tetap di tengah. */
   .overlay.dialog-overlay,
   .overlay.hadiah-overlay {
     padding-top: 8px;
-    padding-left: max(64px, env(safe-area-inset-left));
-    padding-right: max(64px, env(safe-area-inset-right));
   }
   .misi-panel {
     max-width: 560px;
@@ -693,9 +706,6 @@
 
 /* HP mendatar yang sangat pendek (≤ 380px): tombol HUD sedikit lebih kecil. */
 @media (orientation: landscape) and (max-height: 380px) {
-  .cover-hero {
-    padding-right: 44px; /* judul tidak tertutup tombol bisu */
-  }
   .cover-judul {
     font-size: 1.7rem;
   }
@@ -731,5 +741,155 @@
   }
   .misi-tombol-tahap {
     display: none;
+  }
+}
+
+/* ================================================================== */
+/* Pilihan jawaban soal (A–D): grid 2×2 saat layar mendatar, satu      */
+/* kolom saat tegak. Berlaku juga di Final Mercusuar.                  */
+/* ================================================================== */
+@media (orientation: landscape) {
+  .vn-aksi.jawab,
+  body.mode-menara .vn-aksi.jawab {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .vn-aksi.jawab .vn-pilihan {
+    height: 100%;
+  }
+}
+
+/* Selama percakapan/soal/materi terbuka, tombol ☰ disembunyikan agar tidak
+   bertumpuk dengan tombol ✕ di pojok kanan atas. */
+body:has(.vn-overlay:not(.tersembunyi)) .hud-menu-kanan,
+body:has(.cerita-overlay) .hud-menu-kanan {
+  visibility: hidden;
+}
+
+/* ================================================================== */
+/* Modal di atas semua kontrol layar                                   */
+/* Bilah peta & tombol zoom (z-index 45) dulu tampil di atas modal     */
+/* (40), sehingga Tas/Menu bisa terbuka bertumpuk. Kini modal (48)     */
+/* menutupi keduanya; kotak percakapan (50) & hadiah (60) tetap di     */
+/* atasnya.                                                            */
+/* ================================================================== */
+.overlay.dialog-overlay {
+  z-index: 48;
+}
+/* Kontrol kamera & bilah sapa disembunyikan selama modal terbuka. */
+body:has(.dialog-overlay) .peta-zoom,
+body:has(.dialog-overlay) .sapa-bar,
+body:has(.dialog-overlay) .hud-menu-kanan {
+  visibility: hidden;
+}
+
+/* ---------- ⭐ Bintang Belajar: daftar bab + bintang ---------- */
+.bintang-panel .bintang-daftar {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.bintang-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  background: #f8fafc;
+  border: 1px solid var(--garis);
+}
+.bintang-item.dapat {
+  background: var(--oranye-100);
+  border-color: #fcd34d;
+}
+.bintang-item.terkunci {
+  opacity: 0.6;
+}
+.bintang-item.final {
+  border-width: 2px;
+  border-color: #c4b5fd;
+}
+.bintang-nama {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.bintang-nilai {
+  flex: none;
+  font-size: 1.05rem;
+  letter-spacing: 1px;
+  color: #b45309;
+  font-weight: 700;
+}
+.chip.progress {
+  cursor: pointer;
+  font-weight: 800;
+}
+.peta-bar .chip.progress {
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: var(--bayangan);
+  pointer-events: auto;
+}
+
+/* Bilah peta: 🎒 Tas · ⭐ bintang · ▶ tujuan di kiri, ☰ menu di pojok kanan.
+   Tombol tujuan selebar teksnya saja (tidak memanjang); bila layar sempit
+   namanya dipotong "…" agar tetap satu baris. */
+.peta-bar {
+  right: max(8px, env(safe-area-inset-right));
+}
+.peta-bar .chip {
+  flex: none;
+}
+.peta-bar .btn.kecil:not(.ghost) {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+.peta-bar .btn.kecil.ghost {
+  flex: none;
+  margin-left: auto;
+}
+
+/* ================================================================== */
+/* Modal Menu ☰ (peta & balai): tombol berjarak; mendatar = 2 kolom.   */
+/* ================================================================== */
+.menu-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.menu-panel h3,
+.menu-panel p {
+  margin: 0;
+}
+.menu-tombol {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 4px;
+}
+.menu-tombol .btn {
+  margin: 0;
+}
+@media (orientation: landscape) {
+  .menu-panel {
+    max-width: 640px;
+  }
+  .menu-tombol {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  /* Tombol yang sendirian di baris terakhir (jumlah ganjil) dilebarkan
+     selebar panel agar grid tetap rapi. */
+  .menu-tombol > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
   }
 }

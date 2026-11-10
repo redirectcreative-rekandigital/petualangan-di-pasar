@@ -11,6 +11,7 @@ import { putarCutscene } from '../cutscene';
 import { bukaAdeganMenara } from '../menaraAdegan';
 import type { AnswerRecord, Question } from '../../../shared/types';
 import type { ScreenContext } from './context';
+import { t } from '../../core/bahasa';
 
 /**
  * Final Chapter: "Malam Badai di Mercusuar Tua".
@@ -43,9 +44,9 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
     root.append(
       el('div', {
         class: 'card jujur',
-        children: [el('span', { class: 'label-kecil', text: '🔒 Masih Terkunci' }), el('p', { text: 'Mercusuar Tua terbuka setelah 11 alat survival terkumpul.' })],
+        children: [el('span', { class: 'label-kecil', text: t('🔒 Masih Terkunci') }), el('p', { text: t('Mercusuar Tua terbuka setelah 11 alat survival terkumpul.') })],
       }),
-      el('button', { class: 'btn block', text: '🗺️ Kembali ke Peta', attrs: { type: 'button' }, on: { click: () => ctx.navigate('map') } }),
+      el('button', { class: 'btn block', text: t('🗺️ Kembali ke Peta'), attrs: { type: 'button' }, on: { click: () => ctx.navigate('map') } }),
     );
     return root;
   }
@@ -56,7 +57,7 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
   root.append(
     el('div', {
       class: 'final-kepala',
-      children: [el('h2', { text: '🗼 Mercusuar Tua' }), el('p', { class: 'muted', text: 'Malam badai. Nyalakan lampu sebelum kapal penyelamat lewat!' })],
+      children: [el('h2', { text: t('🗼 Mercusuar Tua') }), el('p', { class: 'muted', text: t('Malam badai. Nyalakan lampu sebelum kapal penyelamat lewat!') })],
     }),
     menara,
     status,
@@ -85,7 +86,7 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
       );
     }
     const total = prog.finalBagian.reduce((a, b) => a + b, 0);
-    status.textContent = `Total benar: ${total}/30 · batas lulus ${BATAS_LULUS_FINAL}`;
+    status.textContent = t('Total benar: {total}/30 · batas lulus {batas}', { total, batas: BATAS_LULUS_FINAL });
   };
 
   const tombolAksi = (): void => {
@@ -94,7 +95,7 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
     const belum = FINAL_BAGIAN.map((_, i) => i).filter((i) => (prog.finalBagian[i] ?? 0) < batasBagian(i));
     const pernahMain = prog.finalBagian.some((n) => n > 0);
     if (!prog.puncakLulus) {
-      const label = !pernahMain ? '🌩️ Mulai Malam Badai (30 soal)' : `🔁 Ulangi lantai yang belum tuntas (${belum.length})`;
+      const label = !pernahMain ? t('🌩️ Mulai Malam Badai (30 soal)') : t('🔁 Ulangi lantai yang belum tuntas ({jumlah})', { jumlah: belum.length });
       aksi.append(
         el('button', {
           class: 'btn block',
@@ -105,16 +106,16 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
       );
     } else {
       aksi.append(
-        el('button', { class: 'btn block', text: '🎓 Lihat Sertifikat', attrs: { type: 'button' }, on: { click: () => ctx.navigate('result') } }),
+        el('button', { class: 'btn block', text: t('🎓 Lihat Sertifikat'), attrs: { type: 'button' }, on: { click: () => ctx.navigate('result') } }),
         el('button', {
           class: 'btn secondary block',
-          text: '🔁 Main lagi untuk latihan',
+          text: t('🔁 Main lagi untuk latihan'),
           attrs: { type: 'button' },
           on: { click: () => void main(FINAL_BAGIAN.map((_, i) => i), true) },
         }),
       );
     }
-    aksi.append(el('button', { class: 'btn ghost block', text: '🗺️ Kembali ke Peta', attrs: { type: 'button' }, on: { click: () => ctx.navigate('map') } }));
+    aksi.append(el('button', { class: 'btn ghost block', text: t('🗺️ Kembali ke Peta'), attrs: { type: 'button' }, on: { click: () => ctx.navigate('map') } }));
   };
 
   async function main(bagianDimainkan: number[], latihan = false): Promise<void> {
@@ -147,8 +148,8 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
         const penjaga = penjagaBagian(i);
         const pool = poolBagian(i);
         await sambilBergerak(adegan.masukLantai(i, pool.length, batasBagian(i)));
-        await p.bicara(penjaga, `${b.tempat}. ${b.pembuka} Pintu ini terkunci. Jawab ${batasBagian(i)} soal dengan benar untuk membukanya!`, {
-          labelLanjut: 'Bismillah ▶',
+        await p.bicara(penjaga, t('{tempat}. {pembuka} Pintu ini terkunci. Jawab {v2} soal dengan benar untuk membukanya!', { tempat: b.tempat, pembuka: b.pembuka, v2: batasBagian(i) }), {
+          labelLanjut: t('Bismillah ▶'),
         });
         const hasil = await jalankanTantangan(p, {
           balai: 'FINAL',
@@ -168,6 +169,8 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
             p.root.classList.remove('tersembunyi');
           },
         });
+        // Keluar lewat tombol ✕ di tengah lantai: lantai ini tidak dicatat.
+        if (p.tertutup()) break;
         semuaJawaban.push(...hasil.jawaban);
         if (!latihan) ctx.setProgress(catatFinalBagian(ctx.getProgress(), i, hasil.benar));
         gambarMenara();
@@ -176,9 +179,9 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
         await p.bicara(
           penjaga,
           tuntas
-            ? `Alhamdulillah! Pintunya terbuka. ${b.selesai}`
-            : `${hasil.benar} dari ${hasil.total} benar. Pintunya terbuka sedikit. Lantai ini perlu diulang nanti, tapi kita terus naik dulu.`,
-          { labelLanjut: i === FINAL_BAGIAN.length - 1 ? 'Masuk ▶' : 'Naik ▶' },
+            ? t('Alhamdulillah! Pintunya terbuka. {selesai}', { selesai: b.selesai })
+            : t('{benar} dari {total} benar. Pintunya terbuka sedikit. Lantai ini perlu diulang nanti, tapi kita terus naik dulu.', { benar: hasil.benar, total: hasil.total }),
+          { labelLanjut: i === FINAL_BAGIAN.length - 1 ? t('Masuk ▶') : t('Naik ▶') },
         );
         await sambilBergerak(adegan.keluarLantai(tuntas));
       }

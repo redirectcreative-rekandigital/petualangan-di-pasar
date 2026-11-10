@@ -14,7 +14,7 @@ const siapa = (s: string, c: (typeof CERITA)[number]): string =>
 L.push('# Naskah Survival Sains', '');
 L.push('Naskah ini dibuat otomatis dari data cerita di dalam game (`src/data/cerita.ts` dan `src/data/adegan.ts`).', '');
 L.push('## Premis', '');
-L.push('Pemain adalah anggota termuda Kapal Ekspedisi Sains. Badai menghantam kapal, dan pemain terbangun di Pulau Nusa Kawruh. Untuk pulang, pemain harus menyalakan Mercusuar Tua di puncak pulau. Sembilan Penjaga pulau menyimpan bekal ilmu dan alat survival yang hanya diberikan kepada pemain yang memahami ilmunya.', '');
+L.push('Pemain adalah anggota termuda Kapal Ekspedisi Sains. Badai menghantam kapal, dan pemain terbangun di Pulau Wonorejo. Untuk pulang, pemain harus menyalakan Mercusuar Tua di puncak pulau. Sembilan Penjaga pulau menyimpan bekal ilmu dan alat survival yang hanya diberikan kepada pemain yang memahami ilmunya.', '');
 L.push('## Cutscene pembuka', '');
 for (const a of CUTSCENE_BADAI) L.push(`- **${a.siapa === 'kapten' ? 'Kapten Bahari' : 'Narator'}:** ${a.teks}`);
 L.push('');

@@ -2,7 +2,9 @@ import { el } from './components/dom';
 import { sfx } from '../core/sound';
 import { RULES } from '../core/scoring';
 import { startSession, currentQuestion, submitAnswer, type SessionState } from '../core/engine';
-import { adeganUntukSoal, getAdegan } from '../data/adegan';
+import { adeganUntukSoal, getAdegan, getAdeganAsli } from '../data/adegan';
+import { soalAsli } from '../data/bank';
+import { t, tk, keAsli } from '../core/bahasa';
 import type { Percakapan } from './percakapan';
 import type { TokohCerita } from '../data/cerita';
 import type { AnswerRecord, BalaiId, Question } from '../../shared/types';
@@ -42,8 +44,8 @@ export interface HasilTantangan {
   jawaban: AnswerRecord[];
 }
 
-const PUJIAN = ['Masya Allah, tepat sekali!', 'Benar! Kamu teliti.', 'Bagus sekali, jawabanmu benar!', 'Tepat! Ilmumu bertambah.'];
-const SEMANGAT = ['Belum tepat, jangan menyerah.', 'Hampir! Coba pikirkan lagi.', 'Belum benar. Tenang, coba sekali lagi.'];
+const PUJIAN = (): string[] => [t('Masya Allah, tepat sekali!'), t('Benar! Kamu teliti.'), t('Bagus sekali, jawabanmu benar!'), t('Tepat! Ilmumu bertambah.')];
+const SEMANGAT = (): string[] => [t('Belum tepat, jangan menyerah.'), t('Hampir! Coba pikirkan lagi.'), t('Belum benar. Tenang, coba sekali lagi.')];
 
 function pilihAcak<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)] as T;
@@ -53,7 +55,7 @@ function pilihAcak<T>(arr: T[]): T {
 function hati(sisa: number): HTMLElement {
   const wadah = el('div', {
     class: 'nyawa',
-    attrs: { role: 'img', 'aria-label': `Sisa nyawa ${sisa} hati dari ${RULES.attemptsPerQuestion}` },
+    attrs: { role: 'img', 'aria-label': t('Sisa nyawa {sisa} hati dari {total}', { sisa, total: RULES.attemptsPerQuestion }) },
   });
   for (let i = 0; i < RULES.attemptsPerQuestion; i++) {
     wadah.append(el('span', { class: i < sisa ? 'ada' : 'hilang', text: i < sisa ? '❤️' : '🤍', attrs: { 'aria-hidden': 'true' } }));
@@ -63,12 +65,17 @@ function hati(sisa: number): HTMLElement {
 
 /** Kalimat sisa nyawa yang enak dibacakan TTS, mis. "Hatimu tinggal 2." */
 function teksSisaHati(sisa: number): string {
-  return sisa === 1 ? 'Hatimu tinggal satu, pelan-pelan ya.' : `Hatimu tinggal ${sisa === 2 ? 'dua' : sisa}.`;
+  if (sisa === 1) return t('Hatimu tinggal satu, pelan-pelan ya.');
+  if (sisa === 2) return t('Hatimu tinggal dua.');
+  return t('Hatimu tinggal {sisa}.', { sisa });
 }
 
-/** Kalimat cerita yang paling cocok untuk menjelaskan jawaban. */
+/**
+ * Kalimat cerita yang paling cocok untuk menjelaskan jawaban. Pencocokan
+ * memakai teks asli (Bahasa Indonesia), lalu hasilnya diterjemahkan.
+ */
 function kalimatPenjelas(kodeMateri: string, q: Question): string | null {
-  const daftar = getAdegan(kodeMateri);
+  const daftar = getAdeganAsli(kodeMateri);
   if (daftar.length === 0) return null;
   const teks = `${q.prompt} ${String(q.answer)}`.toLowerCase();
   const jawab = String(q.answer).toLowerCase();
@@ -85,7 +92,7 @@ function kalimatPenjelas(kodeMateri: string, q: Question): string | null {
       }
     }
   }
-  return skor >= 1 ? terbaik : null;
+  return skor >= 1 && terbaik ? tk(terbaik) : null;
 }
 
 export async function jalankanTantangan(p: Percakapan, opsi: OpsiTantangan): Promise<HasilTantangan> {
@@ -101,7 +108,8 @@ export async function jalankanTantangan(p: Percakapan, opsi: OpsiTantangan): Pro
     const nomor = sesi.index;
     const pembuka = opsi.pembuka[nomor % Math.max(1, opsi.pembuka.length)] ?? '';
     const kodeMateri = q.meta.kodeMateri;
-    const adeganIdx = adeganUntukSoal(kodeMateri, `${q.prompt} ${String(q.answer)}`);
+    const qAsli = soalAsli(q.id) ?? q;
+    const adeganIdx = adeganUntukSoal(kodeMateri, `${qAsli.prompt} ${String(qAsli.answer)}`);
     const judulAdegan = getAdegan(kodeMateri)[adeganIdx]?.judul;
     const dipilih: string[] = [];
     const opsiJawab = q.options ?? [];
@@ -111,14 +119,18 @@ export async function jalankanTantangan(p: Percakapan, opsi: OpsiTantangan): Pro
       const kepala = el('div', {
         class: 'tantangan-kepala',
         children: [
-          el('span', { class: 'chip', text: `${opsi.label ? `${opsi.label} · ` : ''}Soal ${nomor + 1}/${total}` }),
+          el('span', { class: 'chip', text: `${opsi.label ? `${opsi.label} · ` : ''}${t('Soal {n}/{total}', { n: nomor + 1, total })}` }),
           hati(sesi.attemptsLeft),
         ],
       });
       const teksSoal = dipilih.length === 0 && pembuka ? `${pembuka} ${q.prompt}` : q.prompt;
       const i = await p.pilih(opsi.penjaga, opsiJawab, { teks: teksSoal, tambahan: kepala, gaya: 'jawab' });
+      // Ditutup lewat tombol ✕: jangan catat jawaban kosong sebagai salah.
+      if (p.tertutup()) break;
       const jawaban = opsiJawab[i] ?? '';
-      dipilih.push(jawaban);
+      // Catatan untuk guru selalu memakai teks pilihan Bahasa Indonesia
+      // (diambil dari soal asli berdasarkan urutan pilihan).
+      dipilih.push(qAsli.options?.[i] ?? keAsli(jawaban));
       const hasil = submitAnswer(sesi, jawaban);
       sesi = hasil.session;
       opsi.onPercobaan?.(hasil.correct, hasil.correct || hasil.advanced ? 0 : sesi.attemptsLeft);
@@ -126,30 +138,31 @@ export async function jalankanTantangan(p: Percakapan, opsi: OpsiTantangan): Pro
       if (hasil.correct) {
         p.tandai(i, 'benar');
         sfx.correct();
-        const penjelas = kalimatPenjelas(kodeMateri, q);
-        await p.bicara(opsi.penjaga, `${pilihAcak(PUJIAN)} Jawabannya: ${String(q.answer)}.${penjelas ? ` ${penjelas}` : ''}`, {
-          tambahan: el('div', { class: 'tantangan-kepala', children: [el('span', { class: 'chip benar', text: '✅ Benar' })] }),
+        const penjelas = kalimatPenjelas(kodeMateri, qAsli);
+        await p.bicara(opsi.penjaga, `${pilihAcak(PUJIAN())} ${t('Jawabannya: {jawaban}.', { jawaban: String(q.answer) })}${penjelas ? ` ${penjelas}` : ''}`, {
+          tambahan: el('div', { class: 'tantangan-kepala', children: [el('span', { class: 'chip benar', text: t('✅ Benar') })] }),
         });
         lanjut = false;
       } else if (hasil.advanced) {
         p.tandai(i, 'salah');
         sfx.wrong();
-        const penjelas = kalimatPenjelas(kodeMateri, q);
+        const penjelas = kalimatPenjelas(kodeMateri, qAsli);
         await p.bicara(
           opsi.penjaga,
-          `Hatimu sudah habis. Tidak apa-apa, kita belajar bersama. Jawaban yang benar adalah: ${String(q.answer)}.${penjelas ? ` ${penjelas}` : ''}`,
+          `${t('Hatimu sudah habis. Tidak apa-apa, kita belajar bersama. Jawaban yang benar adalah: {jawaban}.', { jawaban: String(q.answer) })}${penjelas ? ` ${penjelas}` : ''}`,
           { tambahan: hati(0) },
         );
         lanjut = false;
       } else {
         p.tandai(i, 'salah');
         sfx.wrong();
-        const petunjuk = judulAdegan ? `Ingat adegan "${judulAdegan}" di Halaman Cerita?` : 'Baca soalnya pelan-pelan sekali lagi.';
-        const tombol = opsi.ingatCerita && judulAdegan ? ['🔁 Coba lagi', '📖 Ingat cerita'] : ['🔁 Coba lagi'];
+        const petunjuk = judulAdegan ? t('Ingat adegan "{judul}" di Halaman Cerita?', { judul: judulAdegan }) : t('Baca soalnya pelan-pelan sekali lagi.');
+        const tombol = opsi.ingatCerita && judulAdegan ? [t('🔁 Coba lagi'), t('📖 Ingat cerita')] : [t('🔁 Coba lagi')];
         const pilihan = await p.pilih(opsi.penjaga, tombol, {
-          teks: `${pilihAcak(SEMANGAT)} ${teksSisaHati(sesi.attemptsLeft)} ${petunjuk}`,
+          teks: `${pilihAcak(SEMANGAT())} ${teksSisaHati(sesi.attemptsLeft)} ${petunjuk}`,
           tambahan: hati(sesi.attemptsLeft),
         });
+        if (p.tertutup()) break;
         if (pilihan === 1 && opsi.ingatCerita) {
           await opsi.ingatCerita(kodeMateri, adeganIdx);
         }

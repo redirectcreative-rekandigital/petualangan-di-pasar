@@ -4,7 +4,7 @@ Naskah ini dibuat otomatis dari data cerita di dalam game (`src/data/cerita.ts` 
 
 ## Premis
 
-Pemain adalah anggota termuda Kapal Ekspedisi Sains. Badai menghantam kapal, dan pemain terbangun di Pulau Nusa Kawruh. Untuk pulang, pemain harus menyalakan Mercusuar Tua di puncak pulau. Sembilan Penjaga pulau menyimpan bekal ilmu dan alat survival yang hanya diberikan kepada pemain yang memahami ilmunya.
+Pemain adalah anggota termuda Kapal Ekspedisi Sains. Badai menghantam kapal, dan pemain terbangun di Pulau Wonorejo. Untuk pulang, pemain harus menyalakan Mercusuar Tua di puncak pulau. Sembilan Penjaga pulau menyimpan bekal ilmu dan alat survival yang hanya diberikan kepada pemain yang memahami ilmunya.
 
 ## Cutscene pembuka
 
@@ -35,7 +35,7 @@ Pemain adalah anggota termuda Kapal Ekspedisi Sains. Badai menghantam kapal, dan
 
 - **Mbok Sinar:** Assalamu'alaikum, {nama}. Alhamdulillah, kamu sudah sadar.
 - **Pemain:** Wa'alaikumussalam. Di mana aku? Gelap sekali di sini.
-- **Mbok Sinar:** Ombak membawamu ke Pulau Nusa Kawruh. Kamu ada di dalam Goa Sinar.
+- **Mbok Sinar:** Ombak membawamu ke Pulau Wonorejo. Kamu ada di dalam Goa Sinar.
 - **Mbok Sinar:** Untuk pulang, nyalakan Mercusuar Tua di puncak pulau. Kapal penyelamat akan melihatnya.
 - **Mbok Sinar:** Tapi pertama, kita harus keluar dari goa gelap ini. Hanya ada satu berkas cahaya di sana.
 

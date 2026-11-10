@@ -1,5 +1,8 @@
 import * as THREE from 'three';
 import { buatKarakter, type KarakterRig } from '../../world/karakter';
+import { cobaAvatarGlb, type AvatarModel } from '../../world/avatarModel';
+import type { PilihanKostum } from '../../world/kostum';
+import { warnaTurunan } from '../../core/kostumPemain';
 import type { PlayerGender } from '../../../shared/types';
 
 /**
@@ -17,6 +20,8 @@ export interface KarakterPreview {
   setGender: (gender: PlayerGender) => void;
   /** Mengganti warna pakaian tanpa membangun ulang model. */
   setWarna: (warna: WarnaPenampilan) => void;
+  /** Mengganti kostum avatar GLB (atau warna turunannya bila memakai cadangan). */
+  setKostum?: (pilihan: PilihanKostum) => void;
   /**
    * Pose adegan (opsional): `jalan` mengayun kaki & tangan, `arah` = sudut
    * hadap (radian; 0 = menghadap layar, +π/2 = menghadap kanan). `null`
@@ -50,11 +55,25 @@ function previewKosong(): KarakterPreview {
     canvas,
     setGender: () => {},
     setWarna: () => {},
+    setKostum: () => {},
     dispose: () => {},
   };
 }
 
-export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPenampilan = {}): KarakterPreview {
+export interface OpsiPreview {
+  /**
+   * Bila diisi, pratinjau memakai avatar GLB asli (animasi Idle) dengan kostum
+   * ini, sama persis dengan avatar di game. Karakter prosedural tetap menjadi
+   * cadangan bila GLB tidak bisa dimuat.
+   */
+  kostum?: PilihanKostum;
+}
+
+export function createKarakterPreview(
+  gender: PlayerGender,
+  warnaAwal: WarnaPenampilan = {},
+  opsi: OpsiPreview = {},
+): KarakterPreview {
   const canvas = document.createElement('canvas');
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   const W = Math.round(LEBAR * dpr);
@@ -124,6 +143,10 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
   scene.add(hemi);
 
   let rig: KarakterRig | null = null;
+  let glb: AvatarModel | null = null;
+  let kostumKini: PilihanKostum | undefined = opsi.kostum;
+  /** Penanda muat GLB terakhir: hasil muat lama (gender sebelumnya) diabaikan. */
+  let nomorMuat = 0;
   let genderKini: PlayerGender = gender;
   let warnaKini: WarnaPenampilan = {
     warnaPakaian: warnaAwal.warnaPakaian,
@@ -139,9 +162,37 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
     rig = null;
   }
 
+  function buangGlb(): void {
+    if (!glb) return;
+    scene.remove(glb.group);
+    glb.dispose();
+    glb = null;
+  }
+
+  /** Muat avatar GLB (bila diminta); setelah siap, karakter prosedural disembunyikan. */
+  function muatGlb(g: PlayerGender): void {
+    if (!kostumKini) return;
+    const nomor = ++nomorMuat;
+    void cobaAvatarGlb(g, renderer, kostumKini).then((model) => {
+      if (!model) return;
+      if (nomor !== nomorMuat || !berjalan || genderKini !== g) {
+        model.dispose();
+        return;
+      }
+      buangGlb();
+      glb = model;
+      if (kostumKini) glb.setKostum(kostumKini);
+      glb.group.position.y = 0.1;
+      scene.add(glb.group);
+      if (rig) rig.group.visible = false;
+      bingkai(glb.group);
+    });
+  }
+
   function pasang(g: PlayerGender): void {
     genderKini = g;
     buangRig();
+    buangGlb();
     rig = buatKarakter({
       gender: g,
       warnaPakaian: warnaKini.warnaPakaian,
@@ -152,11 +203,12 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
     rig.group.position.y = 0.1;
     scene.add(rig.group);
     bingkai(rig.group);
+    muatGlb(g);
   }
 
+  let berjalan = true;
   pasang(gender);
 
-  let berjalan = true;
   let mulai = performance.now();
   let pose: { jalan: boolean; arah: number } | null = null;
   let terakhirGambar = 0;
@@ -176,9 +228,21 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
       requestAnimationFrame(frame);
       return;
     }
+    const dtGambar = Math.min(0.1, (kini - terakhirGambar) / 1000);
     terakhirGambar = kini;
     const t = (kini - mulai) / 1000;
-    if (rig && pose) {
+    if (glb) {
+      // Avatar GLB: animasi klip sendiri (Idle, atau Walk saat adegan berjalan).
+      if (pose) {
+        let beda = pose.arah - glb.group.rotation.y;
+        while (beda > Math.PI) beda -= Math.PI * 2;
+        while (beda < -Math.PI) beda += Math.PI * 2;
+        glb.group.rotation.y += beda * 0.18;
+      } else {
+        glb.group.rotation.y = Math.sin(t * 0.7) * 0.7;
+      }
+      glb.update(pose?.jalan ? 1.1 : 0, dtGambar);
+    } else if (rig && pose) {
       // Pose adegan: putar halus ke arah tujuan, lalu jalan atau diam bernapas.
       let beda = pose.arah - rig.group.rotation.y;
       while (beda > Math.PI) beda -= Math.PI * 2;
@@ -232,14 +296,32 @@ export function createKarakterPreview(gender: PlayerGender, warnaAwal: WarnaPena
       });
       rig.group.position.y = 0.1;
       scene.add(rig.group);
-      bingkai(rig.group);
+      // Avatar GLB sedang tampil: karakter prosedural tetap tersembunyi.
+      if (glb) rig.group.visible = false;
+      else bingkai(rig.group);
       mulai = performance.now();
+    },
+    setKostum: (pilihan) => {
+      kostumKini = pilihan;
+      if (glb) {
+        glb.setKostum(pilihan);
+        return;
+      }
+      // Cadangan prosedural: bangun ulang dengan warna turunan kostum.
+      const w = warnaTurunan(genderKini, pilihan);
+      warnaKini = { warnaPakaian: w.warnaBaju, warnaBawahan: w.warnaBawahan, warnaHijab: w.warnaHijab };
+      buangRig();
+      rig = buatKarakter({ gender: genderKini, ...warnaKini, pakaiMarker: false });
+      rig.group.position.y = 0.1;
+      scene.add(rig.group);
+      bingkai(rig.group);
     },
     setPose: (p) => {
       pose = p;
     },
     dispose: () => {
       berjalan = false;
+      buangGlb();
       if (rig) {
         rig.geometri.forEach((x) => x.dispose());
         rig.material.forEach((x) => x.dispose());

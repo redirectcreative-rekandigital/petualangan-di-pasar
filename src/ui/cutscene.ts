@@ -3,6 +3,7 @@ import { sfx } from '../core/sound';
 import { ucapkan, berhenti } from '../core/suara';
 import { KAPTEN, NARATOR, type AdeganCutscene } from '../data/cerita';
 import { pasangGambar, muatAwal } from '../core/gambar';
+import { t } from '../core/bahasa';
 
 /**
  * Cutscene 2D singkat (badai pembuka & epilog). Setiap adegan berupa latar CSS
@@ -44,13 +45,13 @@ export function putarCutscene(host: HTMLElement, daftar: AdeganCutscene[]): Prom
       }
       root.innerHTML = '';
       const tokoh = a.siapa === 'kapten' ? KAPTEN : NARATOR;
-      const lanjut = el('button', { class: 'btn', text: i === daftar.length - 1 ? 'Mulai ▶' : 'Lanjut ▶', attrs: { type: 'button' } });
+      const lanjut = el('button', { class: 'btn', text: i === daftar.length - 1 ? t('Mulai ▶') : t('Lanjut ▶'), attrs: { type: 'button' } });
       lanjut.addEventListener('click', () => {
         sfx.click();
         i++;
         render();
       });
-      const lewati = el('button', { class: 'btn ghost kecil', text: 'Lewati ⏭', attrs: { type: 'button' } });
+      const lewati = el('button', { class: 'btn ghost kecil', text: t('Lewati ⏭'), attrs: { type: 'button' } });
       lewati.addEventListener('click', () => {
         sfx.click();
         selesai();

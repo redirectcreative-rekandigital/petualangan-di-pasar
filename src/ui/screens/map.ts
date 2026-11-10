@@ -13,13 +13,14 @@ import {
 import { getCerita } from '../../data/cerita';
 import type { NoktahMeta, Stars } from '../../../shared/types';
 import type { ScreenContext } from './context';
+import { t } from '../../core/bahasa';
 
 function bintangEl(stars: Stars): HTMLElement {
   const parts: HTMLElement[] = [];
   for (let i = 0; i < 3; i++) {
     parts.push(el('span', { class: i < stars ? 'on' : 'off', text: i < stars ? '★' : '☆' }));
   }
-  return el('div', { class: 'bintang', attrs: { 'aria-label': `Bintang: ${stars} dari 3` }, children: parts });
+  return el('div', { class: 'bintang', attrs: { 'aria-label': t('Bintang: {stars} dari 3', { stars }) }, children: parts });
 }
 
 function noktahCard(ctx: ScreenContext, n: NoktahMeta, progress = ctx.getProgress()): HTMLElement {
@@ -43,12 +44,12 @@ function noktahCard(ctx: ScreenContext, n: NoktahMeta, progress = ctx.getProgres
             ? el('p', {
                 class: 'muted',
                 text: terkunci
-                  ? `Kumpulkan 11 alat dulu (${balaiSelesaiCount(progress)}/11).`
-                  : 'Siap dihadapi!',
+                  ? t('Kumpulkan 11 alat dulu ({v0}/11).', { v0: balaiSelesaiCount(progress) })
+                  : t('Siap dihadapi!'),
               })
             : dikunjungi
               ? bintangEl(stars)
-              : el('p', { class: 'muted', text: terkunci ? '🌫️ Tertutup kabut' : '✨ Belum dijelajahi' }),
+              : el('p', { class: 'muted', text: terkunci ? t('🌫️ Tertutup kabut') : t('✨ Belum dijelajahi') }),
         ],
       }),
       el('div', { text: terkunci ? '' : '▶️', attrs: { 'aria-hidden': 'true' } }),
@@ -71,7 +72,7 @@ export function renderMap(ctx: ScreenContext): HTMLElement {
     el('div', {
       class: 'card',
       children: [
-        el('span', { class: 'label-kecil', text: 'Jalur Pulau Nusa Kawruh (urut bab)' }),
+        el('span', { class: 'label-kecil', text: t('Jalur Pulau Wonorejo (urut bab)') }),
         el('div', {
           class: 'peta',
           attrs: { style: 'margin-top:10px' },
@@ -85,18 +86,18 @@ export function renderMap(ctx: ScreenContext): HTMLElement {
   const finalCard = el('div', {
     class: 'card',
     children: [
-      el('span', { class: 'label-kecil', text: 'Final' }),
+      el('span', { class: 'label-kecil', text: t('Final') }),
       finalNoktah ? noktahCard(ctx, finalNoktah, progress) : el('span'),
     ],
   });
 
   const resetBtn = el('button', {
     class: 'btn danger block',
-    text: '🗑️ Reset Progres',
+    text: t('🗑️ Reset Progres'),
     attrs: { type: 'button' },
     on: {
       click: () => {
-        const yakin = window.confirm('Reset semua progres? Semua bintang akan dihapus.');
+        const yakin = window.confirm(t('Reset semua progres? Semua bintang akan dihapus.'));
         if (!yakin) return;
         ctx.setProgress(resetProgress());
         sfx.click();
@@ -107,7 +108,7 @@ export function renderMap(ctx: ScreenContext): HTMLElement {
 
   const hasilBtn = el('button', {
     class: 'btn secondary block',
-    text: '🎓 Lihat Hasil Akhir',
+    text: t('🎓 Lihat Hasil Akhir'),
     attrs: { type: 'button' },
     on: {
       click: () => {
@@ -123,7 +124,7 @@ export function renderMap(ctx: ScreenContext): HTMLElement {
       el('div', {
         class: 'topbar',
         children: [
-          el('h2', { text: '🏝️ Daftar Balai' }),
+          el('h2', { text: t('🏝️ Daftar Balai') }),
           el('div', {
             class: 'hud-chips',
             children: [el('span', { class: 'progress chip', text: `⭐ ${totalStars(progress)}/${maxStars()}` })],
@@ -133,7 +134,7 @@ export function renderMap(ctx: ScreenContext): HTMLElement {
       ...zonaBlok,
       finalCard,
       el('div', { class: 'stack', children: [hasilBtn, resetBtn] }),
-      el('p', { class: 'footer-note', text: 'Balai terbuka berurutan. Selesaikan balai sebelumnya untuk menyibak kabut.' }),
+      el('p', { class: 'footer-note', text: t('Balai terbuka berurutan. Selesaikan balai sebelumnya untuk menyibak kabut.') }),
     ],
   });
 }

@@ -3,6 +3,7 @@ import { GLTFLoader, type GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js'
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader.js';
 import { KTX2Loader } from 'three/examples/jsm/loaders/KTX2Loader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
+import { clone as klonDenganRig } from 'three/examples/jsm/utils/SkeletonUtils.js';
 
 /**
  * Pemuatan aset model 3D (glTF/GLB) yang dioptimalkan.
@@ -75,9 +76,17 @@ export function loadModel(nama: string, renderer?: THREE.WebGLRenderer): Promise
   return promise;
 }
 
-/** Mengkloning scene glTF agar bisa dipakai banyak instance secara aman. */
+/**
+ * Mengkloning scene glTF agar bisa dipakai banyak instance secara aman.
+ *
+ * Memakai `SkeletonUtils.clone`: `Object3D.clone()` biasa membuat SkinnedMesh
+ * hasil klon tetap terikat ke tulang milik model ASLI (di cache), sehingga rig
+ * rusak/diam saat avatar dimuat lebih dari sekali. SkeletonUtils membuat
+ * kerangka (Skeleton) baru dan mengikat ulang setiap mesh ke tulang klonnya.
+ * Geometri tetap dibagi (hemat memori); material diklon per instance.
+ */
 export function klonModel(gltf: GLTF): THREE.Object3D {
-  const scene = gltf.scene.clone(true);
+  const scene = klonDenganRig(gltf.scene);
   scene.traverse((obj) => {
     const mesh = obj as THREE.Mesh;
     if (mesh.isMesh && mesh.material) {

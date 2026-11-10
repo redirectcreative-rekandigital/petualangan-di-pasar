@@ -12,7 +12,7 @@
 
 ## Ringkasan
 
-Survival Sains adalah game petualangan 3D bergaya RPG. Siswa berperan sebagai penjelajah cilik yang terdampar di Pulau Nusa Kawruh setelah badai. Untuk pulang, siswa harus menyalakan Mercusuar Tua di puncak pulau.
+Survival Sains adalah game petualangan 3D bergaya RPG. Siswa berperan sebagai penjelajah cilik yang terdampar di Pulau Wonorejo setelah badai. Untuk pulang, siswa harus menyalakan Mercusuar Tua di puncak pulau.
 
 Sembilan Penjaga pulau menyimpan bekal ilmu dan alat survival. Setiap alat hanya diberikan setelah siswa memahami materinya: membaca Halaman Cerita lalu lulus tantangan soal. Materi IPA dipakai langsung untuk bertahan hidup, sehingga siswa melihat gunanya belajar.
 

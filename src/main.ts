@@ -8,6 +8,8 @@ import {
   saveProgress,
   resetProgress,
   isPuncakUnlocked,
+  totalStars,
+  maxStars,
   isBalaiUnlocked,
   balaiKey,
   balaiTujuan,
@@ -36,17 +38,22 @@ import { jalankanTantangan } from './ui/tantangan';
 import { KlienMultiplayer, onlineTersedia, type StatusKlien } from './net/klien';
 import { ringkasProgres } from './net/ringkas';
 import { renderIntro } from './ui/screens/intro';
-import { renderHowto } from './ui/screens/howto';
+import { renderHowto, bukaPetunjukModal, type AsalPetunjuk } from './ui/screens/howto';
 import { renderMap } from './ui/screens/map';
 import { renderResult } from './ui/screens/result';
 import { renderAbout } from './ui/screens/about';
 import { renderGuru } from './ui/screens/guru';
 import { renderFinal } from './ui/screens/final';
-import { toggleMuted, isMuted, sfx } from './core/sound';
+import { sfx } from './core/sound';
 import { pasangLayarPenuhOtomatis } from './core/layarPenuh';
 import { starsForCorrect } from './core/scoring';
 import type { ScreenContext, ScreenName } from './ui/screens/context';
 import type { NoktahId, Progress, TahapMisi } from '../shared/types';
+import { t, BAHASA, aturPenyimpanPosisi, ambilPosisiTersimpan } from './core/bahasa';
+import { bukaKunciSuara } from './core/suara';
+import { bukaPengaturan } from './ui/pengaturan';
+import { jadikanModalAktif, pasangTutupUmum, tutupModalAktif } from './ui/modal';
+import { aturAksiKelas, parkirProfil, ambilProfilSendiri, profilSendiriBaru, buatIdSiswa } from './core/profil';
 
 const appRoot = document.getElementById('app');
 if (!appRoot) throw new Error('Elemen #app tidak ditemukan di index.html');
@@ -67,8 +74,14 @@ function aktifkanKlien(): void {
   }
   if (klien && statusKlien !== 'galat' && klien.tokenSaya === token) return;
   tutupKlien();
+  // Profil kelas lama (sebelum ada ID tetap): beri ID sekali, lalu simpan.
+  if (!progress.idSiswa) {
+    progress = { ...progress, idSiswa: buatIdSiswa() };
+    saveProgress(progress);
+  }
   klien = new KlienMultiplayer({
     token,
+    idSiswa: progress.idSiswa,
     nama: progress.playerName || 'Siswa',
     gender: progress.gender,
     warnaBaju: progress.warnaBaju,
@@ -82,7 +95,7 @@ function aktifkanKlien(): void {
     },
     onStatus: (status) => {
       statusKlien = status;
-      if (status === 'terputus' && progress.token) showToast('Koneksi kelas terputus. Coba muat ulang halaman, ya.');
+      if (status === 'terputus' && progress.token) showToast(t('Koneksi kelas terputus. Coba muat ulang halaman, ya.'));
       if (status === 'tersambung') kirimProgresKeServer();
     },
     onKabar: (teks) => showToast(teks),
@@ -127,7 +140,14 @@ const ctx: ScreenContext = {
   setProgress: (next) => simpan(next),
   persist: () => saveProgress(progress),
   reset: () => {
+    const lama = progress;
     progress = resetProgress();
+    // Mulai dari awal di kelas: tetap di kelas yang sama dengan ID yang sama
+    // (satu baris di dasbor guru, progresnya diulang).
+    if (lama.token) {
+      progress = { ...progress, token: lama.token, idSiswa: lama.idSiswa };
+      saveProgress(progress);
+    }
     tutupKlien();
     return progress;
   },
@@ -144,20 +164,19 @@ function navigate(screen: ScreenName, options: Record<string, unknown> = {}): vo
     return;
   }
   document.body.classList.remove('world-mode');
-  const view = buildScreen(screen);
+  const view = buildScreen(screen, options);
   if (view) {
     mount(app, view);
-    updateMuteButton();
   }
 }
 
-function buildScreen(screen: ScreenName): HTMLElement | null {
+function buildScreen(screen: ScreenName, options: Record<string, unknown> = {}): HTMLElement | null {
   if (!bankReady()) return null;
   switch (screen) {
     case 'intro':
       return renderIntro(ctx);
     case 'howto':
-      return renderHowto(ctx);
+      return renderHowto(ctx, (options.dari as AsalPetunjuk | undefined) ?? 'map');
     case 'about':
       return renderAbout(ctx);
     case 'guru':
@@ -180,34 +199,14 @@ function renderFatal(message: string): void {
         el('div', {
           class: 'card',
           children: [
-            el('h2', { text: '⚠️ Bank soal tidak valid' }),
-            el('p', { class: 'muted', text: 'Periksa berkas di src/data/questions-ipa/' }),
+            el('h2', { text: t('⚠️ Bank soal tidak valid') }),
+            el('p', { class: 'muted', text: t('Periksa berkas di src/data/questions-ipa/') }),
             el('pre', { text: message, attrs: { style: 'white-space:pre-wrap;font-size:0.85rem' } }),
           ],
         }),
       ],
     }),
   );
-}
-
-/* ---------- Tombol bisu efek suara ---------- */
-let muteButton: HTMLButtonElement | null = null;
-function updateMuteButton(): void {
-  if (!muteButton) {
-    muteButton = el('button', {
-      class: 'mute-btn',
-      attrs: { type: 'button', 'aria-label': 'Bisukan atau nyalakan efek suara' },
-      on: {
-        click: () => {
-          const nowMuted = toggleMuted();
-          updateMuteButton();
-          if (!nowMuted) sfx.click();
-        },
-      },
-    });
-    document.body.append(muteButton);
-  }
-  muteButton.textContent = isMuted() ? '🔇' : '🔊';
 }
 
 /* ================================================================== */
@@ -219,6 +218,20 @@ interface PetaSession {
   cleanup: () => void;
 }
 let petaSession: PetaSession | null = null;
+/** Balai tempat pemain berdiri di peta (dipakai untuk memulihkan posisi). */
+let petaDari: NoktahId | null = null;
+
+/** Posisi pemain di dunia balai yang disimpan sebelum ganti bahasa. */
+interface PosisiBalai {
+  x: number;
+  z: number;
+  rot: number;
+  yaw?: number;
+}
+
+/** Tempat pemain berada, disimpan sebelum game dimuat ulang (ganti bahasa). */
+type PosisiLanjut =
+  { layar: 'noktah'; noktah: NoktahId; posisi: PosisiBalai } | { layar: 'map'; dari: NoktahId | null };
 
 function bukaPeta(options: Record<string, unknown> = {}): void {
   if (!bankReady()) return;
@@ -230,16 +243,17 @@ function bukaPeta(options: Record<string, unknown> = {}): void {
     }
     void buildPeta(options);
   };
-  if (options.dariIntro) showLoading(app, { pesan: 'Membuka peta Pulau Nusa Kawruh...' }, mulai);
+  if (options.dariIntro) showLoading(app, { pesan: t('Membuka peta Pulau Wonorejo...') }, mulai);
   else mulai();
 }
 
 async function buildPeta(options: Record<string, unknown>): Promise<void> {
+  petaDari = (options.dari as NoktahId | undefined) ?? null;
   app.innerHTML = '';
   document.body.classList.add('world-mode');
   const canvas = document.createElement('canvas');
   canvas.className = 'world-canvas';
-  canvas.setAttribute('aria-label', 'Peta Pulau Nusa Kawruh 3D');
+  canvas.setAttribute('aria-label', 'Peta Pulau Wonorejo 3D');
   app.append(canvas);
 
   const { createPetaBesar } = await import('./world/petaBesar');
@@ -271,43 +285,52 @@ async function buildPeta(options: Record<string, unknown>): Promise<void> {
   };
   tambahkanBarPeta();
   tambahkanZoomPeta(handle);
-  updateMuteButton();
 
   const tujuan = balaiTujuan(progress);
-  const namaTujuan = tujuan === 'FINAL' ? 'Mercusuar Tua' : (getCerita(tujuan)?.tempat ?? tujuan);
+  const namaTujuan = tujuan === 'FINAL' ? t('Mercusuar Tua') : (getCerita(tujuan)?.tempat ?? tujuan);
   if (options.pesan) showToast(String(options.pesan), 3600);
-  else showToast(`Tujuan berikutnya: ${namaTujuan}. Ketuk penandanya!`, 3200);
+  else showToast(t('Tujuan berikutnya: {namaTujuan}. Ketuk penandanya!', { namaTujuan }), 3200);
 }
 
 function tambahkanBarPeta(): void {
   const tujuan = balaiTujuan(progress);
-  const namaTujuan = tujuan === 'FINAL' ? '🗼 Mercusuar Tua' : `📍 ${getCerita(tujuan)?.tempat ?? tujuan}`;
+  const namaTujuan = tujuan === 'FINAL' ? `🗼 ${t('Mercusuar Tua')}` : `📍 ${getCerita(tujuan)?.tempat ?? tujuan}`;
   const bar = el('div', {
     class: 'peta-bar',
     children: [
       el('button', {
         class: 'chip tas',
-        text: `🎒 ${progress.alat.length}/11`,
-        attrs: { type: 'button', 'aria-label': 'Buka tas survival' },
+        text: t('🎒 Tas {jumlah}/11', { jumlah: progress.alat.length }),
+        attrs: { type: 'button', 'aria-label': t('Buka tas survival') },
         on: { click: () => bukaTas() },
+      }),
+      el('button', {
+        class: 'chip progress',
+        text: `⭐ ${totalStars(progress)}/${maxStars()}`,
+        attrs: { type: 'button', 'aria-label': t('Lihat bintang belajar') },
+        on: { click: () => bukaBintang() },
       }),
       el('button', {
         class: 'btn kecil',
         text: `▶ ${namaTujuan}`,
         attrs: { type: 'button' },
-        on: { click: () => { sfx.click(); petaKeNoktah(tujuan); } },
-      }),
-      el('button', {
-        class: 'btn kecil ghost',
-        text: '🎓',
-        attrs: { type: 'button', 'aria-label': 'Hasil belajar' },
-        on: { click: () => { sfx.click(); navigate('result'); } },
+        on: {
+          click: () => {
+            sfx.click();
+            petaKeNoktah(tujuan);
+          },
+        },
       }),
       el('button', {
         class: 'btn kecil ghost',
         text: '☰',
-        attrs: { type: 'button', 'aria-label': 'Menu' },
-        on: { click: () => { sfx.click(); menuPeta(); } },
+        attrs: { type: 'button', 'aria-label': t('Menu') },
+        on: {
+          click: () => {
+            sfx.click();
+            menuPeta();
+          },
+        },
       }),
     ],
   });
@@ -321,7 +344,12 @@ function tambahkanZoomPeta(handle: import('./world/petaBesar').PetaBesarHandle):
       class: 'peta-zoom-btn',
       text: teks,
       attrs: { type: 'button', 'aria-label': label, title: label },
-      on: { click: () => { sfx.click(); aksi(); } },
+      on: {
+        click: () => {
+          sfx.click();
+          aksi();
+        },
+      },
     });
   app.append(
     el('div', {
@@ -336,19 +364,42 @@ function tambahkanZoomPeta(handle: import('./world/petaBesar').PetaBesarHandle):
 }
 
 function menuPeta(): void {
-  const menu = el('div', { class: 'overlay dialog-overlay' });
-  const tutup = (): void => menu.remove();
+  const menu = el('div', { class: 'overlay dialog-overlay', attrs: { role: 'dialog', 'aria-modal': 'true' } });
+  const tutup = (): void => {
+    menu.remove();
+    lepasEsc();
+    lepas();
+  };
+  const lepas = jadikanModalAktif(tutup);
+  const lepasEsc = pasangTutupUmum(menu, tutup);
   const tombol = (teks: string, aksi: () => void, kelas = 'btn block'): HTMLElement =>
-    el('button', { class: kelas, text: teks, attrs: { type: 'button' }, on: { click: () => { sfx.click(); tutup(); aksi(); } } });
+    el('button', {
+      class: kelas,
+      text: teks,
+      attrs: { type: 'button' },
+      on: {
+        click: () => {
+          sfx.click();
+          tutup();
+          aksi();
+        },
+      },
+    });
   menu.append(
     el('div', {
-      class: 'dialog-panel',
+      class: 'dialog-panel menu-panel',
       children: [
-        el('h3', { text: '🏝️ Pulau Nusa Kawruh' }),
-        tombol('📖 Petunjuk Bermain', () => navigate('howto')),
-        tombol('🎓 Hasil Belajar', () => navigate('result'), 'btn secondary block'),
-        tombol('🚪 Keluar ke Sampul', () => navigate('intro'), 'btn secondary block'),
-        tombol('✖️ Tutup', () => {}, 'btn ghost block'),
+        el('h3', { text: t('🏝️ Pulau Wonorejo') }),
+        el('div', {
+          class: 'menu-tombol',
+          children: [
+            tombol(t('📖 Petunjuk Bermain'), () => navigate('howto', { dari: 'map' })),
+            tombol(t('⚙️ Pengaturan'), () => bukaPengaturan(app), 'btn secondary block'),
+            tombol(t('🎓 Hasil Belajar'), () => navigate('result'), 'btn secondary block'),
+            tombol(t('🏠 Kembali ke Menu Utama'), () => navigate('intro'), 'btn secondary block'),
+            tombol(t('✖️ Tutup'), () => {}, 'btn ghost block'),
+          ],
+        }),
       ],
     }),
   );
@@ -357,8 +408,8 @@ function menuPeta(): void {
 
 function petaKeNoktah(kode: NoktahId): void {
   if (!isBalaiUnlocked(progress, kode)) {
-    if (kode === 'FINAL') showToast('Mercusuar Tua terbuka setelah 11 alat survival terkumpul.');
-    else showToast('Jalan ke sana masih tertutup kabut. Selesaikan balai sebelumnya dulu.');
+    if (kode === 'FINAL') showToast(t('Mercusuar Tua terbuka setelah 11 alat survival terkumpul.'));
+    else showToast(t('Jalan ke sana masih tertutup kabut. Selesaikan balai sebelumnya dulu.'));
     return;
   }
   const noktah = getNoktah(kode);
@@ -368,10 +419,10 @@ function petaKeNoktah(kode: NoktahId): void {
     petaSession = null;
   }
   if (kode === 'FINAL') {
-    showLoading(app, { pesan: 'Mendaki Mercusuar Tua...' }, () => navigate('final'));
+    showLoading(app, { pesan: t('Mendaki Mercusuar Tua...') }, () => navigate('final'));
     return;
   }
-  showLoading(app, { pesan: `Menuju ${noktah.nama}...` }, () => navigate('noktah', { noktah: kode }));
+  showLoading(app, { pesan: t('Menuju {nama}...', { nama: noktah.nama }) }, () => navigate('noktah', { noktah: kode }));
 }
 
 /* ================================================================== */
@@ -400,7 +451,7 @@ function bukaNoktah(options: Record<string, unknown>): void {
     return;
   }
   if (!isBalaiUnlocked(progress, kode)) {
-    navigate('map', { pesan: 'Balai itu masih tertutup kabut.' });
+    navigate('map', { pesan: t('Balai itu masih tertutup kabut.') });
     return;
   }
   simpan(tandaiNoktahDikunjungi(progress, kode));
@@ -408,10 +459,10 @@ function bukaNoktah(options: Record<string, unknown>): void {
     renderEmergencyScreen();
     return;
   }
-  void buildNoktahWorld(kode, Boolean(options.prolog));
+  void buildNoktahWorld(kode, Boolean(options.prolog), options.posisi as PosisiBalai | undefined);
 }
 
-async function buildNoktahWorld(kode: NoktahId, prolog: boolean): Promise<void> {
+async function buildNoktahWorld(kode: NoktahId, prolog: boolean, posisi?: PosisiBalai): Promise<void> {
   const meta = getBalai(kode);
   const cerita = getCerita(kode);
   if (!meta || !cerita) return;
@@ -442,6 +493,7 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean): Promise<void> 
     onInteract: () => void handleInteract(),
     onMenu: openMenu,
     onTas: () => bukaTas(),
+    onBintang: () => bukaBintang(),
     onLompat: () => {
       if (!session?.sibuk) input.pressJump();
     },
@@ -476,7 +528,9 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean): Promise<void> 
     last = now;
     elapsed += dt;
     input.endFrame();
-    const sibuk = session.sibuk || document.body.querySelector('.dialog-overlay, .vn-overlay, .cerita-overlay, .hadiah-overlay') !== null;
+    const sibuk =
+      session.sibuk ||
+      document.body.querySelector('.dialog-overlay, .vn-overlay, .cerita-overlay, .hadiah-overlay') !== null;
     if (!sibuk && input.state.interactPressed) void handleInteract();
     world.setPaused(sibuk);
     world.update(dt, elapsed);
@@ -508,50 +562,62 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean): Promise<void> 
   perbaruiMisi();
   muatAwal([cerita.penjaga.gambar, cerita.cantrik.gambar]);
   session.raf = requestAnimationFrame(loop);
-  updateMuteButton();
+
+  // Kembali dari ganti bahasa: letakkan pemain di tempat semula, tanpa sapaan awal.
+  if (posisi) {
+    world.letakkanPemain(posisi);
+    return;
+  }
 
   // Prolog: percakapan pertama dimulai otomatis begitu pemain terbangun.
   if (prolog && tahapMisi(progress, kode) === 0) {
     window.setTimeout(() => void percakapanMisi(), 700);
   } else if (tahapMisi(progress, kode) === 0) {
-    showToast(`Selamat datang di ${cerita.tempat}! Temui ${cerita.penjaga.nama}.`, 3000);
+    showToast(
+      t('Selamat datang di {tempat}! Temui {nama}.', { tempat: cerita.tempat, nama: cerita.penjaga.nama }),
+      3000,
+    );
   }
 }
 
 function labelInteraksi(peran: PeranTitik | undefined): string {
   if (!session || !peran) return '🅰️';
   const tahap = tahapMisi(progress, session.kode);
-  if (peran === 'penjaga') return '💬 Bicara';
-  if (peran === 'cantrik') return '📖 Baca Cerita';
-  if (peran === 'uji') return tahap >= 2 ? '🔥 Tantangan' : '🔒 Tempat Uji';
-  return '🗺️ Ke Peta';
+  if (peran === 'penjaga') return t('💬 Bicara');
+  if (peran === 'cantrik') return t('📖 Baca Cerita');
+  if (peran === 'uji') return tahap >= 2 ? t('🔥 Tantangan') : t('🔒 Tempat Uji');
+  return t('🗺️ Ke Peta');
 }
 
 function teksMisi(c: CeritaBalai, tahap: TahapMisi): string {
-  if (tahap === 0) return `Temui ${c.penjaga.nama} untuk menerima misi.`;
-  if (tahap === 1) return `Baca Halaman Cerita bersama ${c.cantrik.nama}.`;
-  if (tahap === 2) return `Jawab tantangan ${c.penjaga.nama} di Tempat Uji.`;
-  return `Misi selesai! Lewati gerbang untuk kembali ke peta.`;
+  if (tahap === 0) return t('Temui {nama} untuk menerima misi.', { nama: c.penjaga.nama });
+  if (tahap === 1) return t('Baca Halaman Cerita bersama {nama}.', { nama: c.cantrik.nama });
+  if (tahap === 2) return t('Jawab tantangan {nama} di Tempat Uji.', { nama: c.penjaga.nama });
+  return t('Misi selesai! Lewati gerbang untuk kembali ke peta.');
 }
 
 function perbaruiMisi(): void {
   if (!session) return;
-  const t = tahapMisi(progress, session.kode);
-  session.hud.setMisi(`${session.cerita.alat.emoji} ${teksMisi(session.cerita, t)}`, t);
-  session.world.setTahap(t);
+  const tahap = tahapMisi(progress, session.kode);
+  session.hud.setMisi(`${session.cerita.alat.emoji} ${teksMisi(session.cerita, tahap)}`, tahap);
+  session.world.setTahap(tahap);
 }
 
 function infoPemain(): { nama: string; gender: Progress['gender'] } {
-  return { nama: progress.playerName || 'Penjelajah', gender: progress.gender };
+  return { nama: progress.playerName || t('Penjelajah'), gender: progress.gender };
 }
 
-/** Menjalankan satu percakapan dengan penanda sibuk (dunia dijeda). */
-async function denganPercakapan(fn: (p: Percakapan) => Promise<void>): Promise<void> {
-  if (!session || session.sibuk) return;
+/**
+ * Menjalankan satu percakapan dengan penanda sibuk (dunia dijeda).
+ * Mengembalikan `true` bila pemain menutupnya lewat tombol ✕.
+ */
+async function denganPercakapan(fn: (p: Percakapan) => Promise<void>): Promise<boolean> {
+  if (!session || session.sibuk) return true;
   session.sibuk = true;
   const p = bukaPercakapan(app, infoPemain());
   try {
     await fn(p);
+    return p.tertutup();
   } finally {
     p.tutup();
     if (session) session.sibuk = false;
@@ -563,6 +629,7 @@ async function handleInteract(): Promise<void> {
   if (!session || session.sibuk) return;
   const near = session.world.getNearby();
   if (!near) return;
+  session.world.animasiInteraksi();
   const tahap = tahapMisi(progress, session.kode);
   if (near.peran === 'penjaga') {
     if (tahap === 0) await percakapanMisi();
@@ -580,19 +647,25 @@ async function handleInteract(): Promise<void> {
 async function percakapanMisi(): Promise<void> {
   if (!session) return;
   const c = session.cerita;
-  await denganPercakapan(async (p) => {
+  const batal = await denganPercakapan(async (p) => {
     for (const b of c.misi) {
       if (p.tertutup()) return;
       const teks = isiNama(b.teks, progress.playerName);
       await p.bicara(b.siapa === 'pemain' ? 'pemain' : b.siapa === 'cantrik' ? c.cantrik : c.penjaga, teks);
     }
-    const i = await p.pilih('pemain', c.pilihan.map((x) => x.teks), { teks: 'Apa yang ingin kamu katakan?' });
+    const i = await p.pilih(
+      'pemain',
+      c.pilihan.map((x) => x.teks),
+      { teks: t('Apa yang ingin kamu katakan?') },
+    );
     const pilihan = c.pilihan[i];
     if (pilihan) await p.bicara(c.penjaga, pilihan.balasan);
-    await p.bicara(c.penjaga, c.tugas, { labelLanjut: 'Siap! ▶' });
+    await p.bicara(c.penjaga, c.tugas, { labelLanjut: t('Siap! ▶') });
+    if (p.tertutup()) return;
     simpan(setTahapMisi(progress, c.kode, 1));
   });
-  if (session) showToast(`📖 Cari ${session.cerita.cantrik.nama}. Ikuti panah kuning!`, 3000);
+  if (batal) return;
+  if (session) showToast(t('📖 Cari {nama}. Ikuti panah kuning!', { nama: session.cerita.cantrik.nama }), 3000);
 }
 
 async function percakapanPengingat(): Promise<void> {
@@ -601,7 +674,11 @@ async function percakapanPengingat(): Promise<void> {
   const tahap = tahapMisi(progress, c.kode);
   await denganPercakapan(async (p) => {
     if (tahap === 1) await p.bicara(c.penjaga, c.tugas);
-    else await p.bicara(c.penjaga, `Alhamdulillah, ${progress.playerName}. Perjalananmu masih panjang. Semangat!`);
+    else
+      await p.bicara(
+        c.penjaga,
+        t('Alhamdulillah, {playerName}. Perjalananmu masih panjang. Semangat!', { playerName: progress.playerName }),
+      );
   });
 }
 
@@ -614,14 +691,17 @@ async function bacaCerita(): Promise<void> {
   const tahap = tahapMisi(progress, c.kode);
   if (tahap === 0) {
     await denganPercakapan(async (p) => {
-      await p.bicara(c.cantrik, `Halo! Temui ${c.penjaga.nama} dulu, ya. Beliau punya misi penting untukmu.`);
+      await p.bicara(
+        c.cantrik,
+        t('Halo! Temui {nama} dulu, ya. Beliau punya misi penting untukmu.', { nama: c.penjaga.nama }),
+      );
     });
     return;
   }
-  await denganPercakapan(async (p) => {
-    await p.bicara(c.cantrik, c.cantrikSapa, { labelLanjut: '📖 Buka Halaman Cerita' });
+  const batal = await denganPercakapan(async (p) => {
+    await p.bicara(c.cantrik, c.cantrikSapa, { labelLanjut: t('📖 Buka Halaman Cerita') });
   });
-  if (!session) return;
+  if (batal || !session) return;
   session.sibuk = true;
   const hasil = await bukaHalamanCerita(app, { cerita: c, meta });
   if (!session) return;
@@ -634,9 +714,9 @@ async function bacaCerita(): Promise<void> {
     await denganPercakapan(async (p) => {
       await p.bicara(c.cantrik, c.cantrikTutup);
     });
-    showToast(`🔥 Tempat Uji terbuka! ${c.penjaga.nama} menunggumu.`, 3000);
-  } else if (!hasil.tamat) {
-    showToast('Selesaikan Halaman Cerita sampai akhir untuk membuka Tempat Uji.', 3000);
+    showToast(t('🔥 Tempat Uji terbuka! {nama} menunggumu.', { nama: c.penjaga.nama }), 3000);
+  } else if (!hasil.tamat && tahap < 2) {
+    showToast(t('Selesaikan Halaman Cerita sampai akhir untuk membuka Tempat Uji.'), 3000);
   }
 }
 
@@ -658,12 +738,12 @@ async function tantanganBalai(): Promise<void> {
   let jawaban: import('../shared/types').AnswerRecord[] = [];
   await denganPercakapan(async (p) => {
     if (tahap === 3) {
-      const i = await p.pilih(c.penjaga, ['🔥 Ya, latihan lagi', 'Nanti saja'], {
-        teks: 'Kamu sudah lulus di sini. Mau berlatih lagi untuk menambah bintang?',
+      const i = await p.pilih(c.penjaga, [t('🔥 Ya, latihan lagi'), t('Nanti saja')], {
+        teks: t('Kamu sudah lulus di sini. Mau berlatih lagi untuk menambah bintang?'),
       });
       if (i !== 0) return;
     }
-    await p.bicara(c.penjaga, c.ujiBuka, { labelLanjut: 'Bismillah ▶' });
+    await p.bicara(c.penjaga, c.ujiBuka, { labelLanjut: t('Bismillah ▶') });
     session?.world.setOborUji(0);
     let benarSejauh = 0;
     const hasil = await jalankanTantangan(p, {
@@ -684,12 +764,14 @@ async function tantanganBalai(): Promise<void> {
         session?.world.setOborUji(benarSejauh);
       },
     });
+    // Ditutup lewat ✕ di tengah soal: percobaan ini tidak dinilai.
+    if (p.tertutup()) return;
     hasilBenar = hasil.benar;
     jawaban = hasil.jawaban;
-    if (p.tertutup()) return;
     const bintang = starsForCorrect(hasil.benar);
     if (bintang >= 1) {
-      for (const b of c.lulus) await p.bicara(b.siapa === 'pemain' ? 'pemain' : c.penjaga, isiNama(b.teks, progress.playerName));
+      for (const b of c.lulus)
+        await p.bicara(b.siapa === 'pemain' ? 'pemain' : c.penjaga, isiNama(b.teks, progress.playerName));
     } else {
       await p.bicara(c.penjaga, c.gagal);
     }
@@ -720,11 +802,11 @@ function tampilkanHadiah(c: CeritaBalai, bintang: number, alatBaru: boolean): Pr
     if (session) session.sibuk = true;
     const berikut = balaiSesudah(c.kode);
     const teksBerikut = berikut
-      ? `Jalan menuju ${getCerita(berikut)?.tempat ?? berikut} sudah terbuka!`
+      ? t('Jalan menuju {tempat} sudah terbuka!', { tempat: getCerita(berikut)?.tempat ?? berikut })
       : progress.alat.length >= URUTAN_BALAI.length
-        ? 'Semua alat terkumpul! Mercusuar Tua sudah terbuka.'
-        : 'Kumpulkan semua alat untuk membuka Mercusuar Tua.';
-    const ok = el('button', { class: 'btn block', text: 'Alhamdulillah ✨', attrs: { type: 'button' } });
+        ? t('Semua alat terkumpul! Mercusuar Tua sudah terbuka.')
+        : t('Kumpulkan semua alat untuk membuka Mercusuar Tua.');
+    const ok = el('button', { class: 'btn block', text: t('Alhamdulillah ✨'), attrs: { type: 'button' } });
     const overlay = el('div', {
       class: 'overlay hadiah-overlay',
       children: [
@@ -737,7 +819,10 @@ function tampilkanHadiah(c: CeritaBalai, bintang: number, alatBaru: boolean): Pr
               class: 'hadiah-kiri',
               children: [
                 potretHadiah(c),
-                el('div', { class: 'hadiah-label', text: alatBaru ? '🎒 Alat survival baru!' : '⭐ Latihan selesai!' }),
+                el('div', {
+                  class: 'hadiah-label',
+                  text: alatBaru ? t('🎒 Alat survival baru!') : t('⭐ Latihan selesai!'),
+                }),
                 el('div', { class: 'hadiah-emoji', text: c.alat.emoji }),
                 el('h2', { text: c.alat.nama }),
                 el('p', { class: 'muted', text: c.alat.guna }),
@@ -747,7 +832,10 @@ function tampilkanHadiah(c: CeritaBalai, bintang: number, alatBaru: boolean): Pr
             el('div', {
               class: 'hadiah-kanan',
               children: [
-                el('div', { class: 'card jujur', children: [el('span', { class: 'label-kecil', text: '🤲 Hikmah' }), el('p', { text: c.hikmah })] }),
+                el('div', {
+                  class: 'card jujur',
+                  children: [el('span', { class: 'label-kecil', text: t('🤲 Hikmah') }), el('p', { text: c.hikmah })],
+                }),
                 el('p', { class: 'hadiah-berikut', text: teksBerikut }),
                 ok,
               ],
@@ -760,7 +848,7 @@ function tampilkanHadiah(c: CeritaBalai, bintang: number, alatBaru: boolean): Pr
       sfx.click();
       overlay.remove();
       if (session) session.sibuk = false;
-      showToast('🗺️ Ikuti panah ke gerbang untuk kembali ke peta.', 3000);
+      showToast(t('🗺️ Ikuti panah ke gerbang untuk kembali ke peta.'), 3000);
       resolve();
     });
     app.append(overlay);
@@ -779,20 +867,28 @@ async function keluarLewatGerbang(): Promise<void> {
   const tahap = tahapMisi(progress, c.kode);
   let ke = false;
   await denganPercakapan(async (p) => {
-    const teks = tahap === 3 ? 'Gerbang menuju peta pulau. Lanjutkan perjalanan?' : 'Misimu di sini belum selesai. Tetap ingin kembali ke peta? Kemajuanmu tersimpan.';
-    const i = await p.pilih('pemain', ['🗺️ Ya, ke peta', 'Belum, tetap di sini'], { teks });
+    const teks =
+      tahap === 3
+        ? t('Gerbang menuju peta pulau. Lanjutkan perjalanan?')
+        : t('Misimu di sini belum selesai. Tetap ingin kembali ke peta? Kemajuanmu tersimpan.');
+    const i = await p.pilih('pemain', [t('🗺️ Ya, ke peta'), t('Belum, tetap di sini')], { teks });
     ke = i === 0;
   });
   if (!ke) return;
   const dari = session.kode;
   const berikut = balaiSesudah(dari);
-  const pesan = tahap === 3 && berikut ? `Kabut tersibak! Jalan ke ${getCerita(berikut)?.tempat} terbuka.` : undefined;
-  showLoading(app, { pesan: 'Kembali ke peta pulau...' }, () => navigate('map', { pesan }));
+  const pesan =
+    tahap === 3 && berikut
+      ? t('Kabut tersibak! Jalan ke {tempat} terbuka.', { tempat: getCerita(berikut)?.tempat ?? berikut })
+      : undefined;
+  showLoading(app, { pesan: t('Kembali ke peta pulau...') }, () => navigate('map', { pesan }));
 }
 
 /* ---------- Tas survival ---------- */
 function bukaTas(): void {
   if (session) session.sibuk = true;
+  let tutupTas = (): void => {};
+  const lepas = jadikanModalAktif(() => tutupTas());
   const daftar = el('div', { class: 'tas-grid' });
   for (const c of [...CERITA].sort((a, b) => a.urutan - b.urutan)) {
     const punya = progress.alat.includes(c.kode);
@@ -807,25 +903,132 @@ function bukaTas(): void {
       }),
     );
   }
-  const tutup = el('button', { class: 'btn block', text: 'Tutup', attrs: { type: 'button' } });
+  const tutup = el('button', { class: 'btn block', text: t('Tutup'), attrs: { type: 'button' } });
   const overlay = el('div', {
     class: 'overlay dialog-overlay',
     children: [
       el('div', {
         class: 'dialog-panel tas-panel',
-        children: [el('h3', { text: `🎒 Tas Survival (${progress.alat.length}/11)` }), el('p', { class: 'muted', text: 'Kumpulkan 11 alat untuk membuka Mercusuar Tua.' }), daftar, tutup],
+        children: [
+          el('h3', { text: t('🎒 Tas Survival ({length}/11)', { length: progress.alat.length }) }),
+          el('p', { class: 'muted', text: t('Kumpulkan 11 alat untuk membuka Mercusuar Tua.') }),
+          daftar,
+          tutup,
+        ],
       }),
     ],
   });
+  let lepasEsc = (): void => {};
+  tutupTas = (): void => {
+    overlay.remove();
+    lepasEsc();
+    lepas();
+    if (session) session.sibuk = false;
+  };
+  lepasEsc = pasangTutupUmum(overlay, tutupTas);
   tutup.addEventListener('click', () => {
     sfx.click();
+    tutupTas();
+  });
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  app.append(overlay);
+  tutup.focus({ preventScroll: true });
+}
+
+/* ---------- Bintang belajar per bab ---------- */
+function bukaBintang(): void {
+  sfx.click();
+  if (session) session.sibuk = true;
+  const baris = [...CERITA]
+    .sort((a, b) => a.urutan - b.urutan)
+    .map((c) => {
+      const bintang = progress.balai[balaiKey(c.kode)]?.stars ?? 0;
+      const terkunci = !isBalaiUnlocked(progress, c.kode);
+      return el('li', {
+        class: `bintang-item ${bintang > 0 ? 'dapat' : ''} ${terkunci ? 'terkunci' : ''}`,
+        children: [
+          el('div', {
+            class: 'bintang-nama',
+            children: [
+              el('strong', { text: c.tempat }),
+              el('span', { class: 'muted kecil-teks', text: `${c.bab}: ${c.judulBab}` }),
+            ],
+          }),
+          el('span', {
+            class: 'bintang-nilai',
+            text: terkunci ? '🔒' : `${'⭐'.repeat(bintang)}${'☆'.repeat(3 - bintang)}`,
+            attrs: {
+              'aria-label': terkunci ? t('🌫️ Tertutup kabut') : t('Bintang: {stars} dari 3', { stars: bintang }),
+            },
+          }),
+        ],
+      });
+    });
+  const benarFinal = progress.finalBagian.reduce((a, b) => a + b, 0);
+  const final = el('li', {
+    class: `bintang-item final ${progress.puncakLulus ? 'dapat' : ''}`,
+    children: [
+      el('div', {
+        class: 'bintang-nama',
+        children: [
+          el('strong', { text: `🗼 ${t('Mercusuar Tua')}` }),
+          el('span', { class: 'muted kecil-teks', text: t('Final · {benar}/30 benar', { benar: benarFinal }) }),
+        ],
+      }),
+      el('span', {
+        class: 'bintang-nilai',
+        text: progress.puncakLulus ? t('✅ Lulus') : isPuncakUnlocked(progress) ? t('🔓 Terbuka') : '🔒',
+      }),
+    ],
+  });
+  const tutup = el('button', { class: 'btn block', text: t('Tutup'), attrs: { type: 'button' } });
+  const hasil = el('button', { class: 'btn secondary block', text: t('🎓 Hasil Belajar'), attrs: { type: 'button' } });
+  const overlay = el('div', {
+    class: 'overlay dialog-overlay',
+    attrs: { role: 'dialog', 'aria-modal': 'true' },
+    children: [
+      el('div', {
+        class: 'dialog-panel tas-panel bintang-panel',
+        children: [
+          el('h3', {
+            text: t('⭐ Bintang Belajar ({total}/{maks})', { total: totalStars(progress), maks: maxStars() }),
+          }),
+          el('p', {
+            class: 'muted',
+            text: t('3 benar = ⭐⭐⭐. Ulangi tantangan di Tempat Uji untuk menambah bintang.'),
+          }),
+          el('ol', { class: 'tas-grid bintang-daftar', children: [...baris, final] }),
+          el('div', { class: 'stack', children: [tutup, hasil] }),
+        ],
+      }),
+    ],
+  });
+  let lepasEsc = (): void => {};
+  const tutupBintang = (): void => {
     overlay.remove();
+    lepasEsc();
+    lepas();
     if (session) session.sibuk = false;
+  };
+  const lepas = jadikanModalAktif(tutupBintang);
+  lepasEsc = pasangTutupUmum(overlay, tutupBintang);
+  tutup.addEventListener('click', () => {
+    sfx.click();
+    tutupBintang();
+  });
+  hasil.addEventListener('click', () => {
+    sfx.click();
+    tutupBintang();
+    navigate('result');
   });
   app.append(overlay);
+  tutup.focus({ preventScroll: true });
 }
 
 function stopNoktahWorld(): void {
+  // Tutup modal yang terbuka lewat fungsi tutupnya (melepas pendengar & jeda).
+  tutupModalAktif();
   if (session) {
     klien?.kirimPosisi(null, 0, 0, 0);
     session.cleanup();
@@ -842,25 +1045,65 @@ function stopNoktahWorld(): void {
 function openMenu(): void {
   if (!session || session.sibuk) return;
   session.sibuk = true;
-  const menu = el('div', { class: 'overlay dialog-overlay' });
+  const menu = el('div', { class: 'overlay dialog-overlay', attrs: { role: 'dialog', 'aria-modal': 'true' } });
   const close = (): void => {
     menu.remove();
+    lepasEsc();
+    lepas();
     if (session) session.sibuk = false;
   };
+  const lepas = jadikanModalAktif(close);
+  const lepasEsc = pasangTutupUmum(menu, close);
   const c = session.cerita;
   const tombol = (teks: string, aksi: () => void, kelas = 'btn block'): HTMLElement =>
-    el('button', { class: kelas, text: teks, attrs: { type: 'button' }, on: { click: () => { sfx.click(); close(); aksi(); } } });
+    el('button', {
+      class: kelas,
+      text: teks,
+      attrs: { type: 'button' },
+      on: {
+        click: () => {
+          sfx.click();
+          close();
+          aksi();
+        },
+      },
+    });
   menu.append(
     el('div', {
-      class: 'dialog-panel',
+      class: 'dialog-panel menu-panel',
       children: [
         el('h3', { text: `${c.alat.emoji} ${c.tempat}` }),
         el('p', { class: 'muted', text: `${c.bab} · ${c.judulBab}` }),
-        el('p', { text: teksMisi(c, tahapMisi(progress, c.kode)) }),
-        tombol('📖 Petunjuk Kontrol', () => navigate('howto')),
-        tombol('🗺️ Kembali ke Peta', () => navigate('map'), 'btn secondary block'),
-        tombol('🎓 Hasil Belajar', () => navigate('result'), 'btn secondary block'),
-        tombol('✖️ Tutup', () => {}, 'btn ghost block'),
+        el('p', { class: 'menu-misi', text: teksMisi(c, tahapMisi(progress, c.kode)) }),
+        el('div', {
+          class: 'menu-tombol',
+          children: [
+            // Di arena: petunjuk tampil sebagai modal, dunia tetap dijeda di tempatnya.
+            tombol(t('📖 Petunjuk Kontrol'), () => {
+              if (session) session.sibuk = true;
+              bukaPetunjukModal(app, () => {
+                if (session) session.sibuk = false;
+              });
+            }),
+            tombol(
+              t('⚙️ Pengaturan'),
+              () => {
+                // Dunia tetap dijeda selama panel pengaturan terbuka.
+                if (session) session.sibuk = true;
+                bukaPengaturan(app, {
+                  onTutup: () => {
+                    if (session) session.sibuk = false;
+                  },
+                });
+              },
+              'btn secondary block',
+            ),
+            tombol(t('🗺️ Kembali ke Peta'), () => navigate('map'), 'btn secondary block'),
+            tombol(t('🎓 Hasil Belajar'), () => navigate('result'), 'btn secondary block'),
+            tombol(t('🏠 Kembali ke Menu Utama'), () => navigate('intro'), 'btn secondary block'),
+            tombol(t('✖️ Tutup'), () => {}, 'btn ghost block'),
+          ],
+        }),
       ],
     }),
   );
@@ -878,31 +1121,136 @@ function renderEmergencyScreen(): void {
         el('div', {
           class: 'card',
           children: [
-            el('div', { class: 'hero', children: [el('div', { class: 'emoji', text: '🖥️' }), el('h1', { text: 'Perangkat Belum Mendukung 3D' })] }),
-            el('p', { text: 'Survival Sains dimainkan dalam tampilan 3D. Peramban di perangkat ini belum mengaktifkan WebGL.' }),
-            el('p', { class: 'muted', text: 'Saran: coba Chrome terbaru, aktifkan akselerasi perangkat keras, atau gunakan perangkat lain.' }),
+            el('div', {
+              class: 'hero',
+              children: [
+                el('div', { class: 'emoji', text: '🖥️' }),
+                el('h1', { text: t('Perangkat Belum Mendukung 3D') }),
+              ],
+            }),
+            el('p', {
+              text: t(
+                'Survival Sains dimainkan dalam tampilan 3D. Peramban di perangkat ini belum mengaktifkan WebGL.',
+              ),
+            }),
+            el('p', {
+              class: 'muted',
+              text: t('Saran: coba Chrome terbaru, aktifkan akselerasi perangkat keras, atau gunakan perangkat lain.'),
+            }),
           ],
         }),
         el('div', {
           class: 'stack',
           children: [
-            el('button', { class: 'btn block', text: '🔄 Coba Lagi', attrs: { type: 'button' }, on: { click: () => navigate('map') } }),
-            el('button', { class: 'btn ghost block', text: '🗺️ Daftar Balai (tanpa 3D)', attrs: { type: 'button' }, on: { click: () => mount(app, renderMap(ctx)) } }),
+            el('button', {
+              class: 'btn block',
+              text: t('🔄 Coba Lagi'),
+              attrs: { type: 'button' },
+              on: { click: () => navigate('map') },
+            }),
+            el('button', {
+              class: 'btn ghost block',
+              text: t('🗺️ Daftar Balai (tanpa 3D)'),
+              attrs: { type: 'button' },
+              on: { click: () => mount(app, renderMap(ctx)) },
+            }),
           ],
         }),
       ],
     }),
   );
-  updateMuteButton();
 }
 
 /* ---------- Titik masuk ---------- */
 function boot(): void {
   // HP/tablet: layar penuh otomatis sejak ketukan pertama, tegak maupun mendatar.
   pasangLayarPenuhOtomatis(new URLSearchParams(window.location.search).get('layarpenuh') === '1');
+  // Bahasa dokumen mengikuti pilihan pemain (pembaca layar & tanda hubung).
+  document.documentElement.lang = BAHASA;
+  aturPenyimpanPosisi(posisiSaatIni);
+  aturAksiKelas({ progres: () => progress, gabung: gabungKelas, keluar: keluarKelas });
   if (!bankReady()) return;
-  updateMuteButton();
+  // Mode Guru punya alamat sendiri (domain/modeguru), tidak tampil di beranda siswa.
+  if (halamanModeGuru()) {
+    document.title = 'Mode Guru · Survival Sains';
+    navigate('guru');
+    return;
+  }
+  if (pulihkanPosisi()) return;
   navigate('intro');
+}
+
+/**
+ * Berpindah ke profil lain (kelas atau main sendiri): profil sekarang diparkir
+ * di perangkat, lalu menu utama digambar ulang untuk profil baru.
+ */
+function gantiProfil(baru: Progress, pesan: string): void {
+  parkirProfil(progress);
+  tutupKlien();
+  progress = baru;
+  saveProgress(progress);
+  window.dispatchEvent(new Event('profil-berganti'));
+  navigate('intro');
+  if (progress.token) aktifkanKlien();
+  showToast(pesan, 3000);
+}
+
+function gabungKelas(profil: Progress): void {
+  gantiProfil(
+    profil,
+    t('✅ Bergabung dengan Kelas {token} sebagai {nama}', { token: profil.token ?? '', nama: profil.playerName }),
+  );
+}
+
+function keluarKelas(): void {
+  const sendiri = ambilProfilSendiri() ?? profilSendiriBaru(progress);
+  gantiProfil(sendiri, t('🎒 Kembali ke Bermain Sendiri'));
+}
+
+/**
+ * Apakah halaman dibuka sebagai Mode Guru: `domain/modeguru` (server dengan
+ * fallback SPA), `?mode=guru` (diteruskan oleh public/modeguru/index.html di
+ * hosting statis), atau `#modeguru`.
+ */
+function halamanModeGuru(): boolean {
+  const { pathname, search, hash } = window.location;
+  return (
+    /\/modeguru\/?$/i.test(pathname) ||
+    new URLSearchParams(search).get('mode') === 'guru' ||
+    hash.toLowerCase() === '#modeguru'
+  );
+}
+
+/** Posisi pemain sekarang: di dalam balai, di peta, atau null (layar biasa). */
+function posisiSaatIni(): PosisiLanjut | null {
+  if (session) {
+    const p = session.world.posisiPemain();
+    return { layar: 'noktah', noktah: session.kode, posisi: { ...p, yaw: session.world.yawKamera() } };
+  }
+  if (petaSession) return { layar: 'map', dari: petaDari };
+  return null;
+}
+
+/**
+ * Setelah ganti bahasa, kembalikan pemain ke tempat semula (bukan ke menu
+ * utama). Mengembalikan true bila ada posisi yang dipulihkan.
+ */
+function pulihkanPosisi(): boolean {
+  const data = ambilPosisiTersimpan() as PosisiLanjut | null;
+  if (!data || typeof data !== 'object') return false;
+  // Suara (TTS) baru boleh berbunyi setelah sentuhan pertama sesudah dimuat ulang.
+  window.addEventListener('pointerdown', () => bukaKunciSuara(), { once: true });
+  const pesan = t('🌐 Bahasa: {nama}', { nama: BAHASA === 'en' ? 'English' : 'Bahasa Indonesia' });
+  if (data.layar === 'noktah' && getNoktah(data.noktah) && isBalaiUnlocked(progress, data.noktah)) {
+    navigate('noktah', { noktah: data.noktah, posisi: data.posisi });
+    showToast(pesan, 2400);
+    return true;
+  }
+  if (data.layar === 'map') {
+    navigate('map', { dari: data.dari ?? undefined, pesan });
+    return true;
+  }
+  return false;
 }
 boot();
 

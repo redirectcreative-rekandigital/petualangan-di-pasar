@@ -2,25 +2,26 @@ import type { BalaiId, NoktahId, Progress, BalaiProgress, AnswerRecord, Stars, P
 import { URUTAN_BALAI, balaiSebelum, FINAL_BAGIAN } from '../data/cerita';
 import { SEMUA_BALAI, NOKTAH, noktahMateri, getNoktah } from '../data/balai';
 import { isBalaiPassed, starsForCorrect } from './scoring';
+import { t } from './bahasa';
 
 const STORAGE_KEY = 'survival-sains:progress:v1';
 
 export const APP_INFO = {
   judul: 'Survival Sains',
-  subjudul: 'Petualangan bertahan hidup dengan ilmu IPA untuk Kelas 5 SD/MI',
+  subjudul: t('Petualangan bertahan hidup dengan ilmu IPA untuk Kelas 5 SD/MI'),
   pembuat: 'Rosyitania Yudha Astari, S.Pd',
-  sekolah: 'Guru SD Muhammadiyah Wonorejo Polokarto',
-  jenjang: 'Kelas 5 SD/MI',
-  mapel: 'IPA (Ilmu Pengetahuan Alam)',
+  sekolah: t('Guru SD Muhammadiyah Wonorejo Polokarto'),
+  jenjang: t('Kelas 5 SD/MI'),
+  mapel: t('IPA (Ilmu Pengetahuan Alam)'),
   platformAi: 'Claude (Anthropic) untuk ide, naskah, kode, dan pengujian',
-  konteks: 'Penguatan materi IPA kelas 5: cahaya, bunyi, ekosistem, rantai makanan, simbiosis, kelestarian, magnet, listrik, dan bumi',
+  konteks: t('Penguatan materi IPA kelas 5: cahaya, bunyi, ekosistem, rantai makanan, simbiosis, kelestarian, magnet, listrik, dan bumi'),
   nilaiKarakter:
-    'Rasa ingin tahu yang santun dan sayang pada alam. Alam adalah tanda kebesaran Allah, dan manusia adalah khalifah penjaga bumi.',
+    t('Rasa ingin tahu yang santun dan sayang pada alam. Alam adalah tanda kebesaran Allah, dan manusia adalah khalifah penjaga bumi.'),
   tujuan: [
-    'Memahami 9 bab IPA kelas 5 lewat 11 Halaman Cerita bergambar dan interaktif.',
-    'Menerapkan konsep IPA untuk memecahkan masalah bertahan hidup di setiap balai.',
-    'Menjawab soal pilihan ganda dengan umpan balik dan petunjuk yang merujuk ke cerita.',
-    'Menyelesaikan Final di Mercusuar Tua (30 soal) dengan batas lulus 70%.',
+    t('Memahami 9 bab IPA kelas 5 lewat 11 Halaman Cerita bergambar dan interaktif.'),
+    t('Menerapkan konsep IPA untuk memecahkan masalah bertahan hidup di setiap balai.'),
+    t('Menjawab soal pilihan ganda dengan umpan balik dan petunjuk yang merujuk ke cerita.'),
+    t('Menyelesaikan Final di Mercusuar Tua (30 soal) dengan batas lulus 70%.'),
   ],
 } as const;
 
@@ -32,8 +33,8 @@ export const NOKTAH_LIST = NOKTAH;
 
 /** Nama karakter pemain berdasarkan pilihan jenis kelamin. */
 export const KARAKTER: Record<PlayerGender, { label: string; emoji: string; warna: number }> = {
-  'laki-laki': { label: 'Laki-laki', emoji: '👦', warna: 0x2563eb },
-  perempuan: { label: 'Perempuan (Hijab)', emoji: '🧕', warna: 0xd946a6 },
+  'laki-laki': { label: t('Laki-laki'), emoji: '👦', warna: 0x2563eb },
+  perempuan: { label: t('Perempuan (Hijab)'), emoji: '🧕', warna: 0xd946a6 },
 };
 
 export function balaiKey(id: BalaiId): string {
@@ -172,7 +173,8 @@ export function resetProgress(): Progress {
   return fresh;
 }
 
-function mergeProgress(partial: Partial<Progress>): Progress {
+/** Merapikan progres dari penyimpanan (mengisi bagian yang hilang). */
+export function mergeProgress(partial: Partial<Progress>): Progress {
   const gender: PlayerGender = partial.gender === 'perempuan' ? 'perempuan' : 'laki-laki';
   const base = createDefaultProgress(partial.playerName ?? '', gender);
   const balai: Record<string, BalaiProgress> = { ...base.balai };
@@ -208,7 +210,12 @@ function mergeProgress(partial: Partial<Progress>): Progress {
     warnaBaju: typeof partial.warnaBaju === 'number' ? partial.warnaBaju : undefined,
     warnaBawahan: typeof partial.warnaBawahan === 'number' ? partial.warnaBawahan : undefined,
     warnaHijab: typeof partial.warnaHijab === 'number' ? partial.warnaHijab : undefined,
+    kostum:
+      partial.kostum && typeof partial.kostum === 'object'
+        ? { preset: typeof partial.kostum.preset === 'string' ? partial.kostum.preset : undefined, warna: partial.kostum.warna && typeof partial.kostum.warna === 'object' ? { ...partial.kostum.warna } : undefined }
+        : undefined,
     token: typeof partial.token === 'string' && partial.token ? partial.token : undefined,
+    idSiswa: typeof partial.idSiswa === 'string' && partial.idSiswa ? partial.idSiswa : undefined,
     prologSelesai: Boolean(partial.prologSelesai),
     misi: partial.misi && typeof partial.misi === 'object' ? { ...partial.misi } : {},
     alat: Array.isArray(partial.alat) ? partial.alat.filter((k) => typeof k === 'string') : [],

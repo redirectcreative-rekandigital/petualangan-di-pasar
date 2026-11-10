@@ -1,11 +1,12 @@
+import { lokalkan } from '../core/bahasa';
 import type { MateriKode, PlayerGender } from '../../shared/types';
 import type { BusanaNusantara } from '../world/karakter';
 
 /**
  * Naskah cerita "Survival Sains".
  *
- * Pemain, anggota termuda Kapal Ekspedisi Sains, terdampar di Pulau Nusa
- * Kawruh setelah badai. Untuk pulang, ia harus menyalakan Mercusuar Tua di
+ * Pemain, anggota termuda Kapal Ekspedisi Sains, terdampar di Pulau Wonorejo
+ * setelah badai. Untuk pulang, ia harus menyalakan Mercusuar Tua di
  * puncak pulau. Sembilan Penjaga pulau masing-masing menyimpan bekal ilmu dan
  * satu alat survival. Balai dibuka berurutan mengikuti bab buku IPA kelas 5.
  *
@@ -122,12 +123,12 @@ const IBU_PERTIWI = tokoh('Ibu Pertiwi', 'perempuan', 'Penjaga Puncak Bumi', '�
 });
 
 /** Narator & kapten kapal (prolog/epilog). */
-export const NARATOR: TokohCerita = tokoh('Narator', 'perempuan', 'Pencerita', '📜', 0x1e3a8a, 0x1e3a8a, 0xffffff, {
+const NARATOR_ASLI: TokohCerita = tokoh('Narator', 'perempuan', 'Pencerita', '📜', 0x1e3a8a, 0x1e3a8a, 0xffffff, {
   pitch: 1,
   rate: 0.95,
 });
 
-export const KAPTEN: TokohCerita = tokoh('Kapten Bahari', 'laki-laki', 'Kapten Kapal Ekspedisi', '🧭', 0x1d4ed8, 0x1e293b, 0xffffff, {
+const KAPTEN_ASLI: TokohCerita = tokoh('Kapten Bahari', 'laki-laki', 'Kapten Kapal Ekspedisi', '🧭', 0x1d4ed8, 0x1e293b, 0xffffff, {
   pitch: 0.75,
   rate: 1,
 });
@@ -136,7 +137,8 @@ export const KAPTEN: TokohCerita = tokoh('Kapten Bahari', 'laki-laki', 'Kapten K
 /* Naskah per balai (urutan bab buku)                                  */
 /* ------------------------------------------------------------------ */
 
-export const CERITA: CeritaBalai[] = [
+/** Naskah asli (Bahasa Indonesia); dipakai dasbor guru. */
+export const CERITA_ASLI: CeritaBalai[] = [
   {
     kode: 'F01',
     urutan: 1,
@@ -149,7 +151,7 @@ export const CERITA: CeritaBalai[] = [
     misi: [
       { siapa: 'penjaga', teks: "Assalamu'alaikum, {nama}. Alhamdulillah, kamu sudah sadar." },
       { siapa: 'pemain', teks: "Wa'alaikumussalam. Di mana aku? Gelap sekali di sini." },
-      { siapa: 'penjaga', teks: 'Ombak membawamu ke Pulau Nusa Kawruh. Kamu ada di dalam Goa Sinar.' },
+      { siapa: 'penjaga', teks: 'Ombak membawamu ke Pulau Wonorejo. Kamu ada di dalam Goa Sinar.' },
       { siapa: 'penjaga', teks: 'Untuk pulang, nyalakan Mercusuar Tua di puncak pulau. Kapal penyelamat akan melihatnya.' },
       { siapa: 'penjaga', teks: 'Tapi pertama, kita harus keluar dari goa gelap ini. Hanya ada satu berkas cahaya di sana.' },
     ],
@@ -561,7 +563,7 @@ const BUSANA_PENJAGA: Record<string, BusanaNusantara> = {
 };
 
 // Potret ilustrasi tiap tokoh: penjaga-<kode>, cantrik-<kode>; Ibu Pertiwi satu potret.
-for (const c of CERITA) {
+for (const c of CERITA_ASLI) {
   const k = c.kode.toLowerCase();
   c.penjaga.gambar = c.kode.startsWith('E') ? 'penjaga-e' : `penjaga-${k}`;
   c.cantrik.gambar = `cantrik-${k}`;
@@ -569,6 +571,11 @@ for (const c of CERITA) {
   // Cantrik laki-laki memakai udeng batik seperti di potretnya.
   if (c.cantrik.gender === 'laki-laki') c.cantrik.busana = { kepala: 'udeng', warnaKepala: 0x7c4a1e };
 }
+
+/** Naskah sesuai bahasa pilihan pemain (lihat core/bahasa.ts). */
+export const CERITA: CeritaBalai[] = lokalkan(CERITA_ASLI);
+export const NARATOR: TokohCerita = lokalkan(NARATOR_ASLI);
+export const KAPTEN: TokohCerita = lokalkan(KAPTEN_ASLI);
 
 /* ------------------------------------------------------------------ */
 /* Prolog, Final, Epilog                                               */
@@ -581,14 +588,14 @@ export interface AdeganCutscene {
   siapa?: 'narator' | 'kapten';
 }
 
-export const CUTSCENE_BADAI: AdeganCutscene[] = [
+const CUTSCENE_BADAI_ASLI: AdeganCutscene[] = [
   { latar: 'kapal', teks: 'Kapal Ekspedisi Sains berlayar membawa para penjelajah muda untuk mengamati alam Nusantara.', siapa: 'narator' },
   { latar: 'badai', teks: 'Semua berpegangan! Badai besar datang!', siapa: 'kapten' },
   { latar: 'ombak', teks: 'Ombak raksasa menghantam kapal. Penjelajah termuda terlempar ke laut.', siapa: 'narator' },
   { latar: 'putih', teks: 'Lalu, semuanya menjadi sunyi...', siapa: 'narator' },
 ];
 
-export const EPILOG: AdeganCutscene[] = [
+const EPILOG_ASLI: AdeganCutscene[] = [
   { latar: 'mercusuar', teks: 'Lampu Mercusuar Tua menyala terang, menyorot laut yang gelap.', siapa: 'narator' },
   { latar: 'kapal-datang', teks: 'Kami melihat cahayanya! Itu penjelajah kita! Alhamdulillah!', siapa: 'kapten' },
   { latar: 'pantai', teks: 'Sembilan Penjaga melambai dari pantai. Ilmu yang kamu pelajari telah menyelamatkanmu.', siapa: 'narator' },
@@ -604,7 +611,7 @@ export interface BagianFinal {
   selesai: string;
 }
 
-export const FINAL_BAGIAN: BagianFinal[] = [
+const FINAL_BAGIAN_ASLI: BagianFinal[] = [
   {
     nama: 'Bagian 1',
     tempat: 'Lantai Bawah',
@@ -638,6 +645,10 @@ export const FINAL_BAGIAN: BagianFinal[] = [
     selesai: 'Lampu mercusuar siap dinyalakan!',
   },
 ];
+
+export const CUTSCENE_BADAI: AdeganCutscene[] = lokalkan(CUTSCENE_BADAI_ASLI);
+export const EPILOG: AdeganCutscene[] = lokalkan(EPILOG_ASLI);
+export const FINAL_BAGIAN: BagianFinal[] = lokalkan(FINAL_BAGIAN_ASLI);
 
 /** Batas lulus Final: 21 dari 30 (70%). */
 export const BATAS_LULUS_FINAL = 21;

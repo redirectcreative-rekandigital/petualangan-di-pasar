@@ -6,6 +6,7 @@ import type {
   PosisiPemain,
   ProgresSiswa,
 } from '../../shared/net';
+import { t } from '../core/bahasa';
 
 /**
  * Klien jaringan untuk mode multiplayer.
@@ -21,6 +22,8 @@ import type {
 
 export interface OpsiKlien {
   token: string;
+  /** ID tetap profil siswa: satu siswa = satu baris di dasbor guru. */
+  idSiswa?: string;
   nama: string;
   gender: PlayerGender;
   /** Warna pakaian pilihan (dikirim saat join agar teman melihat tampilan sama). */
@@ -83,6 +86,15 @@ export function onlineTersedia(): boolean {
   return serverHttpUrl().length > 0;
 }
 
+/** Pesan galat dari server (selalu Bahasa Indonesia) diterjemahkan untuk siswa. */
+function pesanServer(p: string): string {
+  const peta: Record<string, string> = {
+    'Token tidak ditemukan. Minta token yang benar ke gurumu.': t('Token tidak ditemukan. Minta token yang benar ke gurumu.'),
+    'Ruang sudah penuh (maksimum 40 siswa).': t('Ruang sudah penuh (maksimum 40 siswa).'),
+  };
+  return peta[p] ?? p;
+}
+
 export class KlienMultiplayer {
   private ws: WebSocket | null = null;
   private opsi: OpsiKlien;
@@ -105,7 +117,7 @@ export class KlienMultiplayer {
     const url = serverWsUrl();
     if (!url) {
       this.opsi.onStatus?.('galat');
-      this.opsi.onKabar?.('Mode online belum dikonfigurasi. Bermain sendiri saja, ya.');
+      this.opsi.onKabar?.(t('Mode online belum dikonfigurasi. Bermain sendiri saja, ya.'));
       return;
     }
     this.opsi.onStatus?.('menghubungkan');
@@ -123,6 +135,7 @@ export class KlienMultiplayer {
       this.kirim({
         t: 'join',
         token: this.opsi.token,
+        idSiswa: this.opsi.idSiswa,
         nama: this.opsi.nama,
         gender: this.opsi.gender,
         warnaBaju: this.opsi.warnaBaju,
@@ -148,9 +161,13 @@ export class KlienMultiplayer {
         this.opsi.onPemain(this.terakhirPosisi);
       } else if (msg.t === 'galat') {
         this.opsi.onStatus?.('galat');
-        this.opsi.onKabar?.(msg.pesan);
+        this.opsi.onKabar?.(pesanServer(msg.pesan));
       } else if (msg.t === 'kabar') {
-        this.opsi.onKabar?.(msg.teks);
+        this.opsi.onKabar?.(
+          msg.kode === 'nama-ganda'
+            ? t('Nama "{nama}" sedang dipakai siswa lain di kelas ini. Minta gurumu memastikan, ya.', { nama: msg.nama ?? '' })
+            : msg.teks,
+        );
       }
     });
 
@@ -191,6 +208,26 @@ export class KlienMultiplayer {
     this.selesai = true;
     this.ws?.close();
     this.ws = null;
+  }
+}
+
+/** Hasil pengecekan token sebelum siswa bergabung ke kelas. */
+export type HasilCekToken = { ok: true; namaDipakai: boolean } | { ok: false; pesan: string };
+
+/** Memastikan token kelas ada & belum penuh, serta apakah nama sedang dipakai. */
+export async function cekTokenKelas(token: string, nama: string, idSiswa?: string): Promise<HasilCekToken> {
+  const base = serverHttpUrl();
+  if (!base) return { ok: false, pesan: t('Mode online belum dikonfigurasi. Bermain sendiri saja, ya.') };
+  try {
+    const q = new URLSearchParams({ nama, id: idSiswa ?? '' });
+    const res = await fetch(`${base}/api/sesi/${encodeURIComponent(token)}/cek?${q.toString()}`);
+    if (res.status === 404) return { ok: false, pesan: t('Token tidak ditemukan. Minta token yang benar ke gurumu.') };
+    if (!res.ok) return { ok: false, pesan: t('Server kelas sedang bermasalah. Coba lagi sebentar, ya.') };
+    const data = (await res.json()) as { penuh?: boolean; namaDipakai?: boolean };
+    if (data.penuh) return { ok: false, pesan: t('Ruang sudah penuh (maksimum 40 siswa).') };
+    return { ok: true, namaDipakai: Boolean(data.namaDipakai) };
+  } catch {
+    return { ok: false, pesan: t('Tidak bisa menghubungi server kelas. Periksa internet atau minta gurumu menyalakan server.') };
   }
 }
 

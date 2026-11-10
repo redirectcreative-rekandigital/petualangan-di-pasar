@@ -215,6 +215,12 @@ export interface Progress {
   warnaBawahan?: number;
   /** Warna hijab (hex, khusus perempuan). Bila kosong, memakai warna bawaan. */
   warnaHijab?: number;
+  /**
+   * Kostum avatar GLB (lihat src/world/kostum.ts): preset + warna per bagian.
+   * Disimpan per profil. `warnaBaju/Bawahan/Hijab` diturunkan dari sini untuk
+   * karakter prosedural (cadangan, ikon peta, teman multiplayer).
+   */
+  kostum?: { preset?: string; warna?: Record<string, string> };
   /** Apakah pemain sudah melewati layar pembuka (cover, karakter, nama). */
   introDone: boolean;
   coins: number;
@@ -228,6 +234,8 @@ export interface Progress {
   completedAt?: string;
   /** Token kelas untuk mode multiplayer (kosong = singleplayer). */
   token?: string;
+  /** ID tetap profil kelas di perangkat ini (dikirim ke server saat bergabung). */
+  idSiswa?: string;
   /** Prolog di balai pertama sudah ditonton. */
   prologSelesai: boolean;
   /** Tahap misi per kode balai. */

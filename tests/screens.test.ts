@@ -59,13 +59,14 @@ describe('layar pembuka (intro)', async () => {
     expect(node.textContent).toContain('Kartu Anggota Ekspedisi');
     expect(node.querySelectorAll('.pilih-karakter').length).toBe(2);
 
-    // Karakter -> atur pakaian.
+    // Karakter -> atur kostum (8 gaya + 6 bagian berwarna).
     const lanjut = Array.from(node.querySelectorAll('button')).find((b) => b.textContent?.includes('Lanjut'));
     lanjut?.dispatchEvent(new MouseEvent('click'));
-    expect(node.textContent).toContain('Atur Pakaian');
-    expect(node.querySelectorAll('.warna-baris').length).toBe(2); // pria: baju + celana
+    expect(node.textContent).toContain('Atur Kostum');
+    expect(node.querySelectorAll('.kostum-preset').length).toBe(8);
+    expect(node.querySelectorAll('.kostum-bagian').length).toBe(6);
 
-    // Atur pakaian -> nama.
+    // Atur kostum -> nama.
     const lanjut2 = Array.from(node.querySelectorAll('button')).find((b) => b.textContent?.includes('Lanjut'));
     lanjut2?.dispatchEvent(new MouseEvent('click'));
     expect(node.textContent).toContain('Nama & Mode Bermain');
@@ -152,7 +153,7 @@ describe('layar pembuka (intro)', async () => {
     expect(node.querySelector<HTMLInputElement>('.token-input')?.classList.contains('salah')).toBe(true);
   });
 
-  it('menyimpan warna baju, celana, dan hijab yang dipilih', async () => {
+  it('menyimpan kostum (gaya + warna per bagian) yang dipilih', async () => {
     const progress = createDefaultProgress();
     const { ctx, nav } = makeCtx(progress);
     const node = renderIntro(ctx);
@@ -166,16 +167,23 @@ describe('layar pembuka (intro)', async () => {
       .find((b) => b.textContent?.includes('Lanjut'))
       ?.dispatchEvent(new MouseEvent('click'));
 
-    // Langkah warna: perempuan punya 3 baris (baju, gamis, hijab).
-    expect(node.textContent).toContain('Atur Pakaian');
-    expect(node.querySelectorAll('.warna-baris').length).toBe(3);
-    expect(node.querySelectorAll('.warna-baris')[2]?.textContent).toContain('Hijab');
+    // Langkah kostum perempuan: 8 gaya, 6 bagian (termasuk Kerudung).
+    expect(node.textContent).toContain('Atur Kostum');
+    expect(node.querySelectorAll('.kostum-preset').length).toBe(8);
+    expect(node.querySelector('.kostum-bagian[data-bagian="kerudung"]')?.textContent).toContain('Kerudung');
+    // Bawaan: Krem Klasik terpilih, tombol reset tersembunyi.
+    expect(node.querySelector('.kostum-preset.dipilih')?.textContent).toContain('Krem Klasik');
+    expect(node.querySelector<HTMLButtonElement>('.kostum-reset')?.hidden).toBe(true);
 
-    // Pilih warna terakhir pada tiap baris agar berbeda dari bawaan.
-    for (const baris of Array.from(node.querySelectorAll('.warna-baris'))) {
-      const opsi = Array.from(baris.querySelectorAll('.warna-tombol'));
-      opsi[opsi.length - 1]?.dispatchEvent(new MouseEvent('click'));
-    }
+    // Pilih gaya Hijau Mint, lalu ganti warna kerudung (swatch terakhir: Abu).
+    Array.from(node.querySelectorAll('.kostum-preset'))
+      .find((b) => b.textContent?.includes('Hijau Mint'))
+      ?.dispatchEvent(new MouseEvent('click'));
+    const kerudung = Array.from(node.querySelectorAll('.kostum-bagian[data-bagian="kerudung"] .kostum-swatch'));
+    kerudung[kerudung.length - 1]?.dispatchEvent(new MouseEvent('click'));
+    expect(kerudung[kerudung.length - 1]?.classList.contains('dipilih')).toBe(true);
+    expect(node.querySelector('.kostum-preset.dipilih')?.textContent).toContain('Hijau Mint');
+    expect(node.querySelector<HTMLButtonElement>('.kostum-reset')?.hidden).toBe(false);
 
     Array.from(node.querySelectorAll('button'))
       .find((b) => b.textContent?.includes('Lanjut'))
@@ -191,12 +199,14 @@ describe('layar pembuka (intro)', async () => {
     expect(nav).toHaveBeenCalledWith('noktah', { noktah: 'F01', prolog: true });
     const p = ctx.getProgress();
     expect(p.gender).toBe('perempuan');
-    expect(p.warnaBaju).toBe(0x3fbfa0);
-    expect(p.warnaBawahan).toBe(0x6b4f3a);
-    expect(p.warnaHijab).toBe(0x9b6bd6);
+    expect(p.kostum).toEqual({ preset: 'hijau-mint', warna: { kerudung: '#b9bcc2' } });
+    // Warna turunan untuk karakter prosedural (cadangan, ikon peta, teman kelas).
+    expect(p.warnaBaju).toBe(0xe5f6ee);
+    expect(p.warnaBawahan).toBe(0x2f5a4a);
+    expect(p.warnaHijab).toBe(0xb9bcc2);
   });
 
-  it('pria tidak menampilkan pilihan hijab', async () => {
+  it('pria tidak menampilkan pilihan kerudung', async () => {
     const progress = createDefaultProgress();
     const { ctx } = makeCtx(progress);
     const node = renderIntro(ctx);
@@ -207,9 +217,10 @@ describe('layar pembuka (intro)', async () => {
     Array.from(node.querySelectorAll('button'))
       .find((b) => b.textContent?.includes('Lanjut'))
       ?.dispatchEvent(new MouseEvent('click'));
-    expect(node.querySelectorAll('.warna-baris').length).toBe(2);
-    expect(node.textContent).toContain('Warna Celana');
-    expect(node.textContent).not.toContain('Warna Hijab');
+    expect(node.querySelectorAll('.kostum-bagian').length).toBe(6);
+    expect(node.textContent).toContain('Celana');
+    expect(node.textContent).toContain('Peci');
+    expect(node.textContent).not.toContain('Kerudung');
   });
 });
 

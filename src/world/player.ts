@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { buatKarakter, type KarakterRig } from './karakter';
 import { cobaAvatarGlb } from './avatarModel';
 import type { PlayerGender } from '../../shared/types';
+import type { PilihanKostum } from './kostum';
 
 /**
  * Karakter pemain low-poly. Bentuknya dibuat oleh `karakter.ts` (bergaya kartun,
@@ -22,6 +23,10 @@ export interface PlayerBundle {
   animate: (speed: number, elapsed: number) => void;
   /** Mulai melompat. `false` bila diabaikan karena masih di udara. */
   lompat: () => boolean;
+  /** Gerak tubuh saat berinteraksi (klip `Interact` pada avatar GLB). */
+  interaksi: () => void;
+  /** Klip animasi avatar GLB yang sedang main (null bila memakai karakter prosedural). */
+  infoAnimasi: () => { klip: string; timeScale: number } | null;
   /** Memajukan fisika lompat (gravitasi) tiap frame. `true` pada frame mendarat. */
   updateLompat: (dt: number) => boolean;
   /** Apakah pemain sedang di udara. */
@@ -37,9 +42,12 @@ export interface PlayerBundle {
 /** Penampilan pemain (gender + warna pakaian pilihan). */
 export interface Penampilan {
   gender: PlayerGender;
+  /** Warna untuk karakter prosedural (cadangan bila GLB tidak ada). */
   warnaPakaian?: number;
   warnaBawahan?: number;
   warnaHijab?: number;
+  /** Kostum avatar GLB (preset + warna per bagian). */
+  kostum?: PilihanKostum;
 }
 
 export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'): PlayerBundle {
@@ -81,6 +89,9 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
   const lompat = (): boolean => {
     if (tinggi > 0 || kecepatanY !== 0) return false;
     kecepatanY = KECEPATAN_LOMPAT;
+    // Klip Jump dipadatkan sepanjang waktu di udara (+ sedikit untuk mendarat),
+    // supaya kaki menyentuh tanah bersamaan dengan fisika lompatnya.
+    glb?.mainkanSekali('Jump', WAKTU_DI_UDARA + 0.2);
     return true;
   };
 
@@ -134,7 +145,7 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
   };
 
   const cobaPakaiGlb = async (renderer?: THREE.WebGLRenderer): Promise<boolean> => {
-    const model = await cobaAvatarGlb(opsi.gender, renderer);
+    const model = await cobaAvatarGlb(opsi.gender, renderer, opsi.kostum);
     if (!model) return false;
     glb = model;
     // Sembunyikan karakter prosedural, tampilkan model GLB di grup yang sama.
@@ -159,6 +170,8 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
     faceDirection,
     animate: (speed, elapsed) => animate(tinggi > 0 ? 0 : speed, elapsed),
     lompat,
+    interaksi: () => glb?.mainkanSekali('Interact'),
+    infoAnimasi: () => glb?.infoAnimasi() ?? null,
     updateLompat,
     diUdara: () => tinggi > 0,
     cobaPakaiGlb,
@@ -169,3 +182,5 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
 /** Kecepatan awal lompat (satuan/detik) dan gravitasi: puncak ±1,1 satuan, ±0,6 detik di udara. */
 const KECEPATAN_LOMPAT = 6.6;
 const GRAVITASI = 20;
+/** Lama di udara satu lompatan (detik): naik + turun. */
+const WAKTU_DI_UDARA = (2 * KECEPATAN_LOMPAT) / GRAVITASI;

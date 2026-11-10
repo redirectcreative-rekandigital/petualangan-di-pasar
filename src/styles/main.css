@@ -755,6 +755,14 @@ body.world-mode #app {
   background: rgba(255, 255, 255, 0.9);
   color: var(--hijau-900);
 }
+/* Tombol ☰ di dunia balai: pojok kanan atas, tegak maupun mendatar. */
+.hud-3d .hud-menu-kanan {
+  position: absolute;
+  top: max(10px, env(safe-area-inset-top));
+  right: max(10px, env(safe-area-inset-right));
+  pointer-events: auto;
+  font-size: 1.3rem;
+}
 .btn-action.hidden {
   display: none;
 }
@@ -847,18 +855,151 @@ body.world-mode #app {
 }
 
 /* ---- Tombol bisu global ---- */
-.mute-btn {
+/* Banner logo sekolah & mitra di bawah tombol Kembali (halaman Tentang Game). */
+.tentang-footer {
+  background: var(--putih);
+  border-radius: var(--radius);
+  box-shadow: var(--bayangan);
+  padding: 10px 12px;
+}
+.tentang-footer img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* ---------- 👥 Gabung Kelas / Ganti Siswa ---------- */
+.kelas-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.kelas-panel h3,
+.kelas-panel p {
+  margin: 0;
+}
+.kelas-panel .card {
+  margin: 0;
+}
+.kelas-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.kelas-pesan:empty {
+  display: none;
+}
+.kelas-pesan {
+  font-size: 0.9rem;
+  font-weight: 600;
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+}
+.kelas-pesan.galat {
+  background: var(--merah-100);
+  color: #991b1b;
+}
+.kelas-pesan.peringatan {
+  background: var(--oranye-100);
+  color: #92400e;
+}
+/* Kartu "Bermain sebagai ... · Kelas ..." di menu utama. */
+.kelas-kartu {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 10px 14px;
+  text-align: center;
+  border: 2px solid var(--hijau-500);
+  background: var(--hijau-100);
+}
+.kelas-kartu strong {
+  color: var(--hijau-900);
+  font-size: 1.05rem;
+}
+.atur-status {
+  margin: 0;
+  font-weight: 700;
+}
+
+/* Panel ⚙️ Pengaturan: bahasa, suara narasi, kecepatan bicara, efek suara. */
+.atur-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.atur-panel h3 {
+  margin: 0;
+}
+.atur-baris {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.atur-grup {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(96px, 1fr));
+  gap: 8px;
+}
+.atur-pilihan {
+  min-height: var(--tap);
+  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--garis);
+  background: var(--putih);
+  color: var(--teks);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+.atur-pilihan.aktif {
+  border-color: var(--hijau-500);
+  background: var(--hijau-100);
+  color: var(--hijau-900);
+}
+.atur-pilihan.aktif::before {
+  content: '✓ ';
+}
+.atur-pilihan:focus-visible {
+  outline: 3px solid var(--oranye-500);
+  outline-offset: 2px;
+}
+.atur-panel .kecil-teks {
+  margin: -6px 0 0;
+}
+.atur-panel .card.jujur {
+  margin: 0;
+}
+
+/* Tombol ✕ merah untuk menutup materi/percakapan/soal: pojok kanan atas. */
+.tutup-x {
   position: fixed;
   top: max(8px, env(safe-area-inset-top));
-  right: 8px;
-  z-index: 70;
-  min-height: 40px;
-  padding: 8px 12px;
-  background: var(--putih);
+  right: max(8px, env(safe-area-inset-right));
+  z-index: 71;
+  width: 42px;
+  height: 42px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #dc2626;
+  color: #fff;
+  border: 2px solid #fff;
   box-shadow: var(--bayangan);
-  border: 1px solid var(--garis);
-  border-radius: 999px;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+  line-height: 1;
+}
+.tutup-x:hover {
+  background: #b91c1c;
+}
+.tutup-x:active {
+  transform: scale(0.92);
+}
+.tutup-x:focus-visible {
+  outline: 3px solid #fca5a5;
+  outline-offset: 2px;
 }
 
 @media (max-width: 480px) {
@@ -895,6 +1036,13 @@ body.world-mode #app {
 
 .cover-hero {
   padding-top: clamp(14px, 6vh, 44px);
+}
+
+/* Kolom judul, sapaan, tombol, dan catatan kaki: beri jarak antarbagian. */
+.cover-isi {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .cover-emoji {
@@ -1366,3 +1514,175 @@ body.world-mode #app {
 
 
 
+
+/* Petunjuk di kolom token memakai jarak huruf biasa (angkanya tetap renggang). */
+.token-input::placeholder {
+  letter-spacing: normal;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+/* ==================== 👕 ATUR KOSTUM (avatar GLB) ==================== */
+.kostum-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.kostum-kepala {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 32px;
+}
+.kostum-reset {
+  min-height: 32px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+}
+.kostum-reset[hidden] {
+  display: none;
+}
+.kostum-sub {
+  margin-top: 4px;
+}
+/* Slide horizontal: geser jari, atau tombol ‹ › di kiri-kanan. */
+.kostum-slide {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+}
+.kostum-jalur {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding: 0 4px;
+  padding: 4px 2px 6px;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.kostum-jalur::-webkit-scrollbar {
+  display: none;
+}
+.kostum-panah {
+  flex: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--garis);
+  background: var(--putih);
+  box-shadow: var(--bayangan);
+  font-size: 1.3rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--hijau-900);
+  display: grid;
+  place-items: center;
+}
+.kostum-panah:active {
+  transform: scale(0.92);
+}
+/* Kartu gaya (preset): 4 titik warna + nama. */
+.kostum-preset {
+  flex: none;
+  scroll-snap-align: start;
+  width: 112px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 8px;
+  border-radius: 14px;
+  border: 2px solid var(--garis);
+  background: var(--putih);
+  box-shadow: var(--bayangan);
+  color: var(--teks);
+}
+.kostum-preset.dipilih {
+  border-color: var(--hijau-500);
+  background: var(--hijau-100);
+}
+.kostum-preset.dipilih.diubah::after {
+  content: '✏️';
+  font-size: 0.7rem;
+  line-height: 1;
+}
+.kostum-titik-baris {
+  display: flex;
+}
+.kostum-titik {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+}
+.kostum-titik + .kostum-titik {
+  margin-left: -6px;
+}
+.kostum-preset-nama {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+  line-height: 1.2;
+}
+/* Swatch warna per bagian. */
+.kostum-swatch {
+  flex: none;
+  scroll-snap-align: start;
+  width: 64px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  background: none;
+  color: var(--teks);
+}
+.kostum-bulatan {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15), var(--bayangan);
+}
+.kostum-swatch.dipilih {
+  border-color: var(--hijau-500);
+  background: var(--hijau-100);
+}
+.kostum-swatch.dipilih .kostum-bulatan {
+  box-shadow: 0 0 0 3px #fff, 0 0 0 5px var(--hijau-500);
+}
+.kostum-swatch-nama {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.15;
+}
+.kostum-preset:focus-visible,
+.kostum-swatch:focus-visible,
+.kostum-panah:focus-visible {
+  outline: 3px solid var(--oranye-500);
+  outline-offset: 2px;
+}
+.kostum-bagian .warna-label {
+  margin-bottom: 2px;
+}
+.kostum-peringatan:empty {
+  display: none;
+}
+.kostum-peringatan {
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--oranye-100);
+  color: #92400e;
+  font-size: 0.85rem;
+  font-weight: 600;
+}

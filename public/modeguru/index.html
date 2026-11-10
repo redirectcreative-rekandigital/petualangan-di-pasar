@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex" />
+    <title>Mode Guru · Survival Sains</title>
+    <!--
+      Alamat khusus Mode Guru: domain/modeguru/
+      Halaman ini hanya meneruskan ke aplikasi utama dengan ?mode=guru, sehingga
+      tetap berfungsi di hosting statis (mis. GitHub Pages) yang tidak punya
+      fallback SPA. Beranda siswa tidak menampilkan tombol Mode Guru.
+    -->
+    <meta http-equiv="refresh" content="0; url=../?mode=guru" />
+    <script>
+      window.location.replace('../?mode=guru');
+    </script>
+  </head>
+  <body style="font-family: system-ui, sans-serif; background: #fff7e6; color: #1f2937; padding: 24px">
+    <p>Membuka Mode Guru… Bila tidak terbuka otomatis, <a href="../?mode=guru">ketuk di sini</a>.</p>
+  </body>
+</html>

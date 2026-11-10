@@ -22,7 +22,7 @@ export default defineConfig({
         name: 'Survival Sains',
         short_name: 'Survival Sains',
         description:
-          'Survival Sains - game petualangan IPA kelas 5 SD/MI: terdampar di Pulau Nusa Kawruh, pelajari 9 bab IPA bersama 9 penjaga, lalu nyalakan Mercusuar Tua.',
+          'Survival Sains - game petualangan IPA kelas 5 SD/MI: terdampar di Pulau Wonorejo, pelajari 9 bab IPA bersama 9 penjaga, lalu nyalakan Mercusuar Tua.',
         theme_color: '#1f6f4a',
         background_color: '#fff7e6',
         // Dipasang di layar utama: tampil penuh tanpa bilah status/navigasi.

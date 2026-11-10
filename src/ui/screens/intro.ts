@@ -8,17 +8,17 @@ import { bukaKunciSuara } from '../../core/suara';
 import { showLoading } from '../loading';
 import { urlGambar } from '../../core/gambar';
 import { createKarakterPreview, type KarakterPreview } from '../components/karakterPreview';
-import {
-  PALET_PILIHAN,
-  warnaBawaan,
-  type BagianWarna,
-  type PilihanWarna,
-} from '../../world/karakter';
+import { BAGIAN, PRESET, hitungWarna, rasioKontras, type Bagian, type PilihanKostum } from '../../world/kostum';
+import { kostumDari, warnaTurunan } from '../../core/kostumPemain';
 import type { PlayerGender } from '../../../shared/types';
 import type { ScreenContext } from './context';
+import { t } from '../../core/bahasa';
+import { bukaPengaturan } from '../pengaturan';
+import { bukaGabungKelas } from '../gabungKelas';
+import { belumMulai, buatIdSiswa } from '../../core/profil';
 
 /**
- * Layar pembuka: cover → pilih karakter → pilih warna pakaian → isi nama &
+ * Layar pembuka: cover → pilih karakter → atur kostum (gaya + warna) → isi nama &
  * mode (sendiri/multiplayer) → cutscene badai → balai pertama (prolog).
  */
 export function renderIntro(ctx: ScreenContext): HTMLElement {
@@ -32,25 +32,12 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
   let namaDraft = progress.playerName;
   let tokenDraft = progress.token ?? '';
 
-  // Warna pilihan per gender. Disimpan terpisah agar berganti karakter tidak
-  // menghapus warna yang sudah dipilih untuk karakter lain.
-  const warnaBajuDraft: Record<PlayerGender, number> = {
-    'laki-laki': progress.warnaBaju ?? warnaBawaan('laki-laki', 'baju'),
-    perempuan: progress.gender === 'perempuan' && progress.warnaBaju
-      ? progress.warnaBaju
-      : warnaBawaan('perempuan', 'baju'),
+  // Kostum pilihan per gender. Disimpan terpisah agar berganti karakter tidak
+  // menghapus kostum yang sudah dipilih untuk karakter lain.
+  const kostumDraft: Record<PlayerGender, PilihanKostum> = {
+    'laki-laki': progress.gender === 'laki-laki' ? kostumDari(progress) : {},
+    perempuan: progress.gender === 'perempuan' ? kostumDari(progress) : {},
   };
-  const warnaBawahanDraft: Record<PlayerGender, number> = {
-    'laki-laki': progress.gender === 'laki-laki' && progress.warnaBawahan
-      ? progress.warnaBawahan
-      : warnaBawaan('laki-laki', 'bawahan'),
-    perempuan: progress.gender === 'perempuan' && progress.warnaBawahan
-      ? progress.warnaBawahan
-      : warnaBawaan('perempuan', 'bawahan'),
-  };
-  let warnaHijabDraft = progress.gender === 'perempuan' && progress.warnaHijab
-    ? progress.warnaHijab
-    : warnaBawaan('perempuan', 'hijab');
 
   // Pratinjau 3D aktif (dibuang sebelum kartu dibangun ulang / layar berganti).
   let preview: KarakterPreview | null = null;
@@ -64,10 +51,13 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
   function renderCover(): void {
     const progressKini = ctx.getProgress();
     const adaProgres = adaProgresTersimpan(progressKini);
+    // Profil yang karakternya sudah dipilih tapi petualangannya belum dimulai
+    // (mis. baru bergabung ke kelas): mulai dengan cerita badai.
+    const segar = adaProgres && belumMulai(progressKini);
 
     const mulai = el('button', {
       class: 'btn block',
-      text: adaProgres ? '▶️ Lanjutkan Petualangan' : '▶️ Mulai Petualangan',
+      text: adaProgres && !segar ? t('▶️ Lanjutkan Petualangan') : t('▶️ Mulai Petualangan'),
       attrs: { type: 'button' },
       on: {
         click: () => {
@@ -78,7 +68,13 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
             const next = { ...ctx.getProgress(), introDone: true };
             ctx.setProgress(next);
             ctx.persist();
-            masukPermainan();
+            if (segar) {
+              lepasPreview();
+              (mulai as HTMLButtonElement).disabled = true;
+              void putarCutscene(document.body, CUTSCENE_BADAI).then(() => masukPermainan());
+            } else {
+              masukPermainan();
+            }
             return;
           }
           langkah = 'karakter';
@@ -90,15 +86,15 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
     const mulaiBaru = adaProgres
       ? el('button', {
           class: 'btn warn block',
-          text: '🔄 Mulai dari Awal',
+          text: t('🔄 Mulai dari Awal'),
           attrs: { type: 'button' },
           on: {
             click: () => {
               sfx.click();
               const dlg = showDialog({
                 tokoh: 'Kapten Bahari',
-                teks: 'Mulai dari awal akan menghapus semua bintang, alat, dan catatan belajarmu. Yakin mau mulai baru?',
-                aksi: 'Ya, mulai dari awal',
+                teks: t('Mulai dari awal akan menghapus semua bintang, alat, dan catatan belajarmu. Yakin mau mulai baru?'),
+                aksi: t('Ya, mulai dari awal'),
                 onBatal: () => {},
                 onAksi: () => {
                   ctx.reset();
@@ -115,18 +111,29 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
     const petunjuk = el('button', {
       class: 'btn secondary block',
-      text: '📖 Petunjuk Bermain',
+      text: t('📖 Petunjuk Bermain'),
       attrs: { type: 'button' },
       on: {
         click: () => {
           sfx.click();
-          ctx.navigate('howto');
+          ctx.navigate('howto', { dari: 'intro' });
+        },
+      },
+    });
+    const pengaturan = el('button', {
+      class: 'btn ghost block',
+      text: t('⚙️ Pengaturan'),
+      attrs: { type: 'button' },
+      on: {
+        click: () => {
+          sfx.click();
+          bukaPengaturan(document.body);
         },
       },
     });
     const tentang = el('button', {
       class: 'btn ghost block',
-      text: 'ℹ️ Tentang Karya',
+      text: t('ℹ️ Tentang Game'),
       attrs: { type: 'button' },
       on: {
         click: () => {
@@ -135,24 +142,40 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
         },
       },
     });
-    const guru = el('button', {
-      class: 'btn ghost block',
-      text: '👩‍🏫 Mode Guru',
-      attrs: { type: 'button' },
-      on: {
-        click: () => {
-          sfx.click();
-          ctx.navigate('guru');
-        },
-      },
-    });
+    // Gabung kelas (dari Bermain Sendiri) atau ganti siswa (perangkat dipakai bergantian).
+    const tombolKelas = progressKini.token
+      ? el('button', {
+          class: 'btn ghost block',
+          text: t('🔄 Bukan saya — ganti siswa'),
+          attrs: { type: 'button' },
+          on: { click: () => { sfx.click(); bukaGabungKelas(document.body, { jenis: 'ganti' }); } },
+        })
+      : adaProgres
+        ? el('button', {
+            class: 'btn secondary block',
+            text: t('👥 Gabung Kelas'),
+            attrs: { type: 'button' },
+            on: { click: () => { sfx.click(); bukaGabungKelas(document.body, { jenis: 'gabung' }); } },
+          })
+        : null;
+
+    // Kartu identitas saat bermain di kelas.
+    const kartuKelas = progressKini.token
+      ? el('div', {
+          class: 'card kelas-kartu',
+          children: [
+            el('span', { class: 'label-kecil', text: t('👥 Bermain sebagai') }),
+            el('strong', { text: `${progressKini.playerName || t('Penjelajah')} · ${t('Kelas {token}', { token: progressKini.token })}` }),
+          ],
+        })
+      : null;
 
     // Sapaan singkat bila melanjutkan.
     const sapaan =
-      adaProgres && progressKini.playerName
+      adaProgres && !segar && !progressKini.token && progressKini.playerName
         ? el('p', {
             class: 'muted center-text',
-            text: `Halo lagi, ${progressKini.playerName}! Lanjutkan petualanganmu, ya.`,
+            text: t('Halo lagi, {playerName}! Lanjutkan petualanganmu, ya.', { playerName: progressKini.playerName }),
           })
         : null;
 
@@ -160,7 +183,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
     const emojiSampul = el('div', { class: 'emoji cover-emoji', text: '🏝️' });
     void urlGambar('sampul').then((url) => {
       if (!url) return;
-      const img = el('img', { class: 'sampul-gambar', attrs: { src: url, alt: 'Pulau Nusa Kawruh dengan Mercusuar Tua di puncaknya' } });
+      const img = el('img', { class: 'sampul-gambar', attrs: { src: url, alt: t('Pulau Wonorejo dengan Mercusuar Tua di puncaknya') } });
       sampul.replaceChildren(img);
       sampul.classList.add('dengan-gambar');
       emojiSampul.remove();
@@ -178,12 +201,12 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
               emojiSampul,
               el('h1', { class: 'cover-judul', text: APP_INFO.judul }),
               el('p', { class: 'subjudul', text: APP_INFO.subjudul }),
-              el('p', { class: 'muted', text: `${APP_INFO.pembuat} · ${APP_INFO.sekolah}` }),
             ],
           }),
+          kartuKelas,
           sapaan,
-          el('div', { class: 'stack cover-tombol', children: [mulai, mulaiBaru, petunjuk, tentang, guru] }),
-          el('p', { class: 'footer-note', text: 'Lomba Game Edukasi Berbasis AI · Guru Muhammadiyah se-Cabang Blimbing 2026' }),
+          el('div', { class: 'stack cover-tombol', children: [mulai, mulaiBaru, tombolKelas, petunjuk, pengaturan, tentang] }),
+          el('p', { class: 'footer-note', text: t('Game Edukasi IPA · {jenjang} · © 2026', { jenjang: APP_INFO.jenjang }) }),
         ],
       }),
     ]);
@@ -191,16 +214,9 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
   function renderKarakter(): void {
     lepasPreview();
-    // Dua pratinjau 3D: satu untuk tiap pilihan.
-    const previewL = createKarakterPreview('laki-laki', {
-      warnaPakaian: warnaBajuDraft['laki-laki'],
-      warnaBawahan: warnaBawahanDraft['laki-laki'],
-    });
-    const previewP = createKarakterPreview('perempuan', {
-      warnaPakaian: warnaBajuDraft.perempuan,
-      warnaBawahan: warnaBawahanDraft.perempuan,
-      warnaHijab: warnaHijabDraft,
-    });
+    // Dua pratinjau 3D (avatar GLB asli dengan kostum masing-masing).
+    const previewL = createKarakterPreview('laki-laki', {}, { kostum: kostumDraft['laki-laki'] });
+    const previewP = createKarakterPreview('perempuan', {}, { kostum: kostumDraft.perempuan });
     preview = {
       canvas: previewL.canvas,
       setGender: () => {},
@@ -220,7 +236,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
         children: [
           prev.canvas,
           el('div', { class: 'karakter-label', text: info.label }),
-          el('div', { class: 'karakter-tagline', text: g === 'perempuan' ? 'Berhijab & gamis' : 'Bercelana panjang' }),
+          el('div', { class: 'karakter-tagline', text: g === 'perempuan' ? t('Berhijab & gamis') : t('Bercelana panjang') }),
         ],
       });
       card.addEventListener('click', () => {
@@ -233,7 +249,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
     const lanjut = el('button', {
       class: 'btn block',
-      text: 'Lanjut →',
+      text: t('Lanjut →'),
       attrs: { type: 'button' },
       on: {
         click: () => {
@@ -245,113 +261,153 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
     });
 
     replace([
-      el('div', { class: 'topbar', children: [el('h2', { text: 'Kartu Anggota Ekspedisi' })] }),
-      el('p', { class: 'muted center-text intro-ket', text: 'Siapa penjelajah termuda Kapal Ekspedisi Sains? Pilih karaktermu.' }),
+      el('div', { class: 'topbar', children: [el('h2', { text: t('Kartu Anggota Ekspedisi') })] }),
+      el('p', { class: 'muted center-text intro-ket', text: t('Siapa penjelajah termuda Kapal Ekspedisi Sains? Pilih karaktermu.') }),
       el('div', { class: 'pilih-karakter-row', children: [kartu('laki-laki', previewL), kartu('perempuan', previewP)] }),
       el('div', { class: 'stack intro-aksi', children: [lanjut] }),
     ]);
   }
 
-  /** Langkah kustomisasi warna: baju, bawahan (celana/rok), dan hijab. */
+  /**
+   * Langkah kostum: 8 gaya (preset) dalam satu slide, lalu warna per bagian
+   * (tiap bagian satu baris slide). Pilihan langsung tampil di avatar GLB tanpa
+   * menggambar ulang layar, sehingga pratinjau tidak berkedip.
+   */
   function renderWarna(): void {
     lepasPreview();
-    const previewSatu = createKarakterPreview(gender, {
-      warnaPakaian: warnaBajuDraft[gender],
-      warnaBawahan: warnaBawahanDraft[gender],
-      warnaHijab: gender === 'perempuan' ? warnaHijabDraft : undefined,
-    });
-    preview = {
-      canvas: previewSatu.canvas,
-      setGender: () => {},
-      setWarna: (w) => previewSatu.setWarna(w),
-      dispose: () => previewSatu.dispose(),
-    };
+    const g = gender;
+    const previewSatu = createKarakterPreview(g, {}, { kostum: kostumDraft[g] });
+    preview = previewSatu;
     previewSatu.canvas.classList.add('preview-besar');
 
-    const segarkanPreview = (): void => {
-      previewSatu.setWarna({
-        warnaPakaian: warnaBajuDraft[gender],
-        warnaBawahan: warnaBawahanDraft[gender],
-        warnaHijab: gender === 'perempuan' ? warnaHijabDraft : undefined,
+    const pilihan = (): PilihanKostum => kostumDraft[g];
+    const warnaKini = (): Record<string, string> => hitungWarna(g, pilihan()).bagian;
+    const presetKini = (): string => hitungWarna(g, pilihan()).preset;
+
+    /** Slide horizontal dengan tombol ‹ › (geser jari juga bisa). */
+    const slide = (label: string, isi: HTMLElement[]): HTMLElement => {
+      const jalur = el('div', { class: 'kostum-jalur', attrs: { role: 'group', 'aria-label': label }, children: isi });
+      const geser = (arah: number): void => jalur.scrollBy({ left: arah * jalur.clientWidth * 0.8, behavior: 'smooth' });
+      return el('div', {
+        class: 'kostum-slide',
+        children: [
+          el('button', {
+            class: 'kostum-panah',
+            text: '‹',
+            attrs: { type: 'button', 'aria-label': t('Geser ke kiri') },
+            on: { click: () => geser(-1) },
+          }),
+          jalur,
+          el('button', {
+            class: 'kostum-panah',
+            text: '›',
+            attrs: { type: 'button', 'aria-label': t('Geser ke kanan') },
+            on: { click: () => geser(1) },
+          }),
+        ],
       });
     };
 
-    /** Baris pilihan warna untuk satu bagian. */
-    const barisWarna = (
-      label: string,
-      bagian: BagianWarna,
-      ambil: () => number,
-      pasang: (nilai: number) => void,
-      daftar: PilihanWarna[],
-    ): HTMLElement => {
-      const tombol: HTMLElement[] = daftar.map((p) => {
-        const aktif = ambil() === p.nilai;
-        const b = el('button', {
-          class: `warna-tombol ${aktif ? 'dipilih' : ''}`,
+    const peringatan = el('p', { class: 'kostum-peringatan', attrs: { role: 'status', 'aria-live': 'polite' } });
+    const tombolReset = el('button', {
+      class: 'btn ghost kecil kostum-reset',
+      text: t('↺ Kembali ke warna gaya'),
+      attrs: { type: 'button' },
+    });
+
+    // ---- Gaya (preset) ----
+    const kartuPreset = PRESET[g].map((p) => {
+      const titik = BAGIAN[g]
+        .slice(0, 4)
+        .map((b) => el('span', { class: 'kostum-titik', attrs: { style: `background:${p.warna[b.id] ?? '#ccc'}` } }));
+      const btn = el('button', {
+        class: 'kostum-preset',
+        attrs: { type: 'button', 'data-preset': p.id, 'aria-pressed': 'false' },
+        children: [
+          el('span', { class: 'kostum-titik-baris', attrs: { 'aria-hidden': 'true' }, children: titik }),
+          el('span', { class: 'kostum-preset-nama', text: t(p.nama) }),
+        ],
+      });
+      btn.addEventListener('click', () => {
+        sfx.click();
+        kostumDraft[g] = { preset: p.id };
+        perbarui();
+      });
+      return btn;
+    });
+
+    // ---- Warna per bagian ----
+    const barisBagian = BAGIAN[g].map((info) => {
+      const tombol = info.swatch.map((w) =>
+        el('button', {
+          class: 'kostum-swatch',
           attrs: {
             type: 'button',
-            'aria-pressed': aktif ? 'true' : 'false',
-            'aria-label': `${label}: ${p.nama}`,
-            title: p.nama,
-            'data-bagian': bagian,
+            'data-hex': w.hex,
+            'aria-pressed': 'false',
+            'aria-label': `${t(info.label)}: ${t(w.nama)}`,
+            title: t(w.nama),
           },
-        });
-        const bulatan = el('span', {
-          class: 'warna-bulatan',
-          attrs: { style: `background:#${p.nilai.toString(16).padStart(6, '0')}` },
-        });
-        b.append(bulatan, el('span', { class: 'warna-nama', text: p.nama }));
-        b.addEventListener('click', () => {
-          sfx.click();
-          pasang(p.nilai);
-          sfx.click();
-          renderLangkah();
-        });
-        return b;
-      });
-
-      return el('div', {
-        class: 'warna-baris',
-        children: [el('div', { class: 'warna-label', text: label }), el('div', { class: 'warna-opsi', children: tombol })],
-      });
-    };
-
-    const baju = barisWarna(
-      '👕 Warna Baju',
-      'baju',
-      () => warnaBajuDraft[gender],
-      (n) => {
-        warnaBajuDraft[gender] = n;
-      },
-      PALET_PILIHAN[gender].baju,
-    );
-
-    const bawahan = barisWarna(
-      gender === 'perempuan' ? '👗 Warna Gamis/Rok' : '👖 Warna Celana',
-      'bawahan',
-      () => warnaBawahanDraft[gender],
-      (n) => {
-        warnaBawahanDraft[gender] = n;
-      },
-      PALET_PILIHAN[gender].bawahan,
-    );
-
-    const hijab =
-      gender === 'perempuan'
-        ? barisWarna(
-            '🧕 Warna Hijab',
-            'hijab',
-            () => warnaHijabDraft,
-            (n) => {
-              warnaHijabDraft = n;
+          children: [
+            el('span', { class: 'kostum-bulatan', attrs: { style: `background:${w.hex}` } }),
+            el('span', { class: 'kostum-swatch-nama', text: t(w.nama) }),
+          ],
+          on: {
+            click: () => {
+              sfx.click();
+              const p = pilihan();
+              kostumDraft[g] = { preset: p.preset, warna: { ...p.warna, [info.id]: w.hex } };
+              perbarui();
             },
-            PALET_PILIHAN.perempuan.hijab,
-          )
-        : null;
+          },
+        }),
+      );
+      return el('div', {
+        class: 'kostum-bagian warna-baris',
+        attrs: { 'data-bagian': info.id },
+        children: [el('div', { class: 'warna-label', text: t(info.label) }), slide(t(info.label), tombol)],
+      });
+    });
+
+    tombolReset.addEventListener('click', () => {
+      sfx.click();
+      kostumDraft[g] = { preset: presetKini() };
+      perbarui();
+    });
+
+    /** Tandai gaya & warna yang aktif, perbarui avatar, dan cek kontras. */
+    function perbarui(): void {
+      const warna = warnaKini();
+      const idPreset = presetKini();
+      const adaUbahan = Object.keys(pilihan().warna ?? {}).length > 0;
+      for (const b of kartuPreset) {
+        const aktif = b.dataset.preset === idPreset;
+        b.classList.toggle('dipilih', aktif);
+        b.classList.toggle('diubah', aktif && adaUbahan);
+        b.setAttribute('aria-pressed', aktif ? 'true' : 'false');
+      }
+      for (const baris of barisBagian) {
+        const id = baris.dataset.bagian as Bagian;
+        for (const sw of Array.from(baris.querySelectorAll<HTMLElement>('.kostum-swatch'))) {
+          const aktif = sw.dataset.hex?.toLowerCase() === warna[id]?.toLowerCase();
+          sw.classList.toggle('dipilih', aktif);
+          sw.setAttribute('aria-pressed', aktif ? 'true' : 'false');
+        }
+      }
+      tombolReset.hidden = !adaUbahan;
+      // Baju/tunik vs aksen terlalu mirip: aksennya tidak terlihat.
+      const utama = warna[g === 'perempuan' ? 'tunik' : 'baju'];
+      const aksen = warna.aksen;
+      peringatan.textContent =
+        utama && aksen && rasioKontras(utama, aksen) < 1.8
+          ? t('⚠️ Warna baju dan aksen terlalu mirip, aksennya jadi kurang terlihat.')
+          : '';
+      previewSatu.setKostum?.(pilihan());
+    }
 
     const lanjut = el('button', {
       class: 'btn block',
-      text: 'Lanjut →',
+      text: t('Lanjut →'),
       attrs: { type: 'button' },
       on: {
         click: () => {
@@ -364,7 +420,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
     const kembali = el('button', {
       class: 'btn ghost block',
-      text: '← Ganti Karakter',
+      text: t('← Ganti Karakter'),
       attrs: { type: 'button' },
       on: {
         click: () => {
@@ -376,15 +432,27 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
     });
 
     replace([
-      el('div', { class: 'topbar', children: [el('h2', { text: 'Atur Pakaian' })] }),
-      el('p', { class: 'muted center-text intro-ket', text: 'Pilih warna pakaian penjelajahmu.' }),
+      el('div', { class: 'topbar', children: [el('h2', { text: t('Atur Kostum') })] }),
+      el('p', { class: 'muted center-text intro-ket', text: t('Pilih gaya kostum, lalu atur warna tiap bagian bila ingin.') }),
       el('div', { class: 'warna-panggung', children: [previewSatu.canvas] }),
-      baju,
-      bawahan,
-      hijab,
+      el('div', {
+        class: 'kostum-panel',
+        children: [
+          el('div', {
+            class: 'kostum-kepala',
+            children: [el('span', { class: 'label-kecil', text: t('🎨 Gaya Kostum') }), tombolReset],
+          }),
+          slide(t('🎨 Gaya Kostum'), kartuPreset),
+          el('span', { class: 'label-kecil kostum-sub', text: t('✏️ Warna per bagian') }),
+          ...barisBagian,
+          peringatan,
+        ],
+      }),
       el('div', { class: 'stack intro-aksi', children: [lanjut, kembali] }),
     ]);
-    segarkanPreview();
+    perbarui();
+    // Gulirkan slide gaya ke kartu yang aktif.
+    kartuPreset.find((b) => b.classList.contains('dipilih'))?.scrollIntoView?.({ block: 'nearest', inline: 'center' });
   }
 
   function renderNama(): void {
@@ -392,10 +460,10 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       class: 'isian',
       attrs: {
         type: 'text',
-        placeholder: 'Tulis nama panggilanmu',
+        placeholder: t('Tulis nama panggilanmu'),
         value: namaDraft,
         maxlength: '20',
-        'aria-label': 'Nama panggilan',
+        'aria-label': t('Nama panggilan'),
         autocomplete: 'off',
       },
     });
@@ -405,10 +473,10 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       attrs: {
         type: 'text',
         inputmode: 'numeric',
-        placeholder: 'Token 4 angka dari guru',
+        placeholder: t('Token 4 angka dari guru'),
         value: tokenDraft,
         maxlength: '4',
-        'aria-label': 'Token kelas',
+        'aria-label': t('Token kelas'),
         autocomplete: 'off',
       },
     });
@@ -416,17 +484,17 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
     const pilihanMode = el('div', {
       class: 'pilih-mode',
       children: [
-        modeKartu('single', '🎒 Bermain Sendiri', 'Tanpa internet, progres di perangkat ini'),
-        modeKartu('multi', '👥 Multiplayer Kelas', 'Masuk dengan token dari guru'),
+        modeKartu('single', t('🎒 Bermain Sendiri'), t('Tanpa internet, progres di perangkat ini')),
+        modeKartu('multi', t('👥 Multiplayer Kelas'), t('Masuk dengan token dari guru')),
       ],
     });
 
     const blokToken = el('div', {
       class: 'card token-blok',
       children: [
-        el('span', { class: 'label-kecil', text: 'Token kelas (4 angka)' }),
+        el('span', { class: 'label-kecil', text: t('Token kelas (4 angka)') }),
         inputToken,
-        el('p', { class: 'muted kecil-teks', text: 'Minta token ini ke gurumu sebelum bermain bersama.' }),
+        el('p', { class: 'muted kecil-teks', text: t('Minta token ini ke gurumu sebelum bermain bersama.') }),
       ],
     });
 
@@ -450,7 +518,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
     const mulai = el('button', {
       class: 'btn block',
-      text: '🌊 Mulai Bertahan Hidup',
+      text: t('🌊 Mulai Bertahan Hidup'),
       attrs: { type: 'button' },
       on: {
         click: () => {
@@ -474,11 +542,13 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
             ...ctx.getProgress(),
             playerName: nama,
             gender,
-            warnaBaju: warnaBajuDraft[gender],
-            warnaBawahan: warnaBawahanDraft[gender],
-            warnaHijab: gender === 'perempuan' ? warnaHijabDraft : undefined,
+            // Kostum GLB per profil + tiga warna turunan untuk karakter prosedural.
+            kostum: kostumDraft[gender],
+            ...warnaTurunan(gender, kostumDraft[gender]),
             introDone: true,
             token: token || undefined,
+            // Profil kelas mendapat ID tetap (dipakai lagi bila token sama).
+            idSiswa: token ? (ctx.getProgress().token === token ? ctx.getProgress().idSiswa : undefined) ?? buatIdSiswa() : undefined,
           };
           ctx.setProgress(next);
           ctx.persist();
@@ -506,7 +576,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
 
     const kembali = el('button', {
       class: 'btn ghost block',
-      text: '← Ganti Karakter',
+      text: t('← Ganti Karakter'),
       attrs: { type: 'button' },
       on: {
         click: () => {
@@ -518,8 +588,8 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
     });
 
     replace([
-      el('div', { class: 'topbar', children: [el('h2', { text: 'Nama & Mode Bermain' })] }),
-      el('p', { class: 'muted center-text intro-ket', text: 'Nama ini dipakai untuk sertifikat digital dan daftar kelas.' }),
+      el('div', { class: 'topbar', children: [el('h2', { text: t('Nama & Mode Bermain') })] }),
+      el('p', { class: 'muted center-text intro-ket', text: t('Nama ini dipakai untuk sertifikat digital dan daftar kelas.') }),
       el('div', {
         class: 'card kartu-nama',
         children: [
@@ -539,7 +609,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
     lepasPreview();
     const p = ctx.getProgress();
     if (!p.prologSelesai) {
-      showLoading(document.getElementById('app') ?? document.body, { pesan: 'Kamu mulai sadar...', tip: 'Gelap... ada cahaya tipis dari atas.' }, () => {
+      showLoading(document.getElementById('app') ?? document.body, { pesan: t('Kamu mulai sadar...'), tip: t('Gelap... ada cahaya tipis dari atas.') }, () => {
         ctx.navigate('noktah', { noktah: 'F01', prolog: true });
       });
       return;

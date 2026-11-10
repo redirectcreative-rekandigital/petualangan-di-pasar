@@ -39,6 +39,15 @@ const ruang = new Map();
 const koneksi = new Map();
 
 let seqPemain = 0;
+/** Format ID siswa dari perangkat (lihat src/core/profil.ts): "s-" + 8–32 huruf/angka. */
+const ID_SISWA_VALID = /^s-[a-z0-9]{8,32}$/;
+
+/** Apakah nama ini sedang dipakai siswa lain (ID berbeda) yang online di ruang. */
+function namaDipakaiLain(r, nama, idKecuali) {
+  const n = String(nama).trim().toLowerCase();
+  return [...r.siswa.values()].some((s) => s.id !== idKecuali && s.online && s.nama.trim().toLowerCase() === n);
+}
+
 function idPemainBaru() {
   seqPemain += 1;
   return `p${seqPemain}-${Math.random().toString(36).slice(2, 8)}`;
@@ -144,32 +153,48 @@ wss.on('connection', (ws) => {
         ws.send(JSON.stringify({ t: 'galat', pesan: 'Token tidak ditemukan. Minta token yang benar ke gurumu.' }));
         return;
       }
-      if (r.siswa.size >= MAKS_PEMAIN_PER_RUANG) {
+      // ID tetap dari profil siswa di perangkat: satu siswa = satu baris di
+      // dasbor guru, walau halaman dimuat ulang atau perangkat dipakai bergantian.
+      const idDiminta = typeof msg.idSiswa === 'string' && ID_SISWA_VALID.test(msg.idSiswa) ? msg.idSiswa : null;
+      const lama = idDiminta ? r.siswa.get(idDiminta) : undefined;
+      if (!lama && r.siswa.size >= MAKS_PEMAIN_PER_RUANG) {
         ws.send(JSON.stringify({ t: 'galat', pesan: 'Ruang sudah penuh (maksimum 40 siswa).' }));
         return;
       }
-      idSaya = idPemainBaru();
-      const siswa = {
-        id: idSaya,
-        nama: String(msg.nama || 'Siswa').slice(0, 24),
+      const nama = String(msg.nama || 'Siswa').slice(0, 24);
+      idSaya = idDiminta ?? idPemainBaru();
+      const tampilan = {
+        nama,
         gender: msg.gender === 'perempuan' ? 'perempuan' : 'laki-laki',
         warnaBaju: typeof msg.warnaBaju === 'number' ? msg.warnaBaju : undefined,
         warnaBawahan: typeof msg.warnaBawahan === 'number' ? msg.warnaBawahan : undefined,
         warnaHijab: typeof msg.warnaHijab === 'number' ? msg.warnaHijab : undefined,
-        online: true,
-        joinedAt: new Date().toISOString(),
-        lastSeen: new Date().toISOString(),
-        noktah: null,
-        x: 0,
-        z: 0,
-        rot: 0,
-        sapa: undefined,
-        progress: progresKosong(String(msg.nama || 'Siswa'), msg.gender),
-        ws,
       };
-      r.siswa.set(idSaya, siswa);
+      if (lama) {
+        // Siswa yang sama tersambung lagi: pakai baris lama, tutup koneksi lamanya.
+        if (lama.ws && lama.ws !== ws && lama.ws.readyState === 1) lama.ws.close();
+        Object.assign(lama, tampilan, { online: true, ws, lastSeen: new Date().toISOString() });
+      } else {
+        r.siswa.set(idSaya, {
+          id: idSaya,
+          ...tampilan,
+          online: true,
+          joinedAt: new Date().toISOString(),
+          lastSeen: new Date().toISOString(),
+          noktah: null,
+          x: 0,
+          z: 0,
+          rot: 0,
+          sapa: undefined,
+          progress: progresKosong(nama, msg.gender),
+          ws,
+        });
+      }
       koneksi.set(idSaya, { ws, token });
       ws.send(JSON.stringify({ t: 'selamat', id: idSaya, token }));
+      if (namaDipakaiLain(r, nama, idSaya)) {
+        ws.send(JSON.stringify({ t: 'kabar', kode: 'nama-ganda', teks: `Nama "${nama}" sedang dipakai siswa lain di kelas ini. Minta gurumu memastikan, ya.`, nama }));
+      }
       return;
     }
 
@@ -215,8 +240,9 @@ wss.on('connection', (ws) => {
   ws.on('close', () => {
     if (!idSaya) return;
     const info = koneksi.get(idSaya);
+    // Koneksi lama yang sudah digantikan (siswa tersambung lagi) diabaikan.
+    if (!info || info.ws !== ws) return;
     koneksi.delete(idSaya);
-    if (!info) return;
     const r = ruang.get(info.token);
     if (!r) return;
     const siswa = r.siswa.get(idSaya);
@@ -260,10 +286,25 @@ async function sajikanStatis(req, res) {
   }
 
   try {
-    const s = await stat(filePath);
-    if (s.isDirectory()) throw new Error('dir');
-    const data = await readFile(filePath);
-    res.writeHead(200, { 'content-type': MIME[path.extname(filePath)] || 'application/octet-stream' });
+    let s = await stat(filePath);
+    let berkas = filePath;
+    if (s.isDirectory()) {
+      // Folder tanpa garis miring (mis. /modeguru): arahkan ke /modeguru/ agar
+      // alamat relatif di dalamnya benar. Folder ber-index.html: sajikan index-nya.
+      const index = path.join(filePath, 'index.html');
+      if (!existsSync(index)) throw new Error('dir');
+      if (!urlPath.endsWith('/')) {
+        const q = (req.url || '').includes('?') ? (req.url || '').slice((req.url || '').indexOf('?')) : '';
+        res.writeHead(301, { location: `${urlPath}/${q}` });
+        res.end();
+        return;
+      }
+      berkas = index;
+      s = await stat(berkas);
+    }
+    void s;
+    const data = await readFile(berkas);
+    res.writeHead(200, { 'content-type': MIME[path.extname(berkas)] || 'application/octet-stream' });
     res.end(data);
   } catch {
     // Fallback SPA: kirim index.html untuk rute yang tidak dikenal.
@@ -290,6 +331,24 @@ const server = http.createServer(async (req, res) => {
     const r = buatRuang(token, body.guru);
     ruang.set(token, r);
     kirimJson(res, 200, { token, guru: r.guru, dibuatPada: r.dibuatPada });
+    return;
+  }
+
+  // Cek token sebelum siswa bergabung: ada? penuh? nama sedang dipakai?
+  const cocokCek = urlPath.match(/^\/api\/sesi\/([^/]+)\/cek$/);
+  if (cocokCek && req.method === 'GET') {
+    const r = ruang.get(decodeURIComponent(cocokCek[1]).trim());
+    if (!r) {
+      kirimJson(res, 404, { pesan: 'Token tidak ditemukan. Minta token yang benar ke gurumu.' });
+      return;
+    }
+    const q = new URL(req.url || '/', 'http://x').searchParams;
+    const idSiswa = q.get('id') || '';
+    kirimJson(res, 200, {
+      ada: true,
+      penuh: !r.siswa.has(idSiswa) && r.siswa.size >= MAKS_PEMAIN_PER_RUANG,
+      namaDipakai: namaDipakaiLain(r, q.get('nama') || '', idSiswa),
+    });
     return;
   }
 

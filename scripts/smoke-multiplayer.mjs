@@ -18,8 +18,8 @@ try {
   const ctxGuru = await browser.newContext({ viewport: { width: 412, height: 915 } });
   const guru = await ctxGuru.newPage();
   guru.on('pageerror', (e) => errors.push(`guru pageerror: ${e.message}`));
-  await guru.goto(BASE, { waitUntil: 'networkidle' });
-  await guru.locator('button', { hasText: 'Mode Guru' }).click();
+  // Mode Guru punya alamat sendiri (tidak ada tombolnya di beranda siswa).
+  await guru.goto(new URL('modeguru/', BASE).href, { waitUntil: 'networkidle' });
   await guru.locator('button', { hasText: 'Buat Sesi Kelas' }).click();
   await guru.waitForSelector('.token-besar', { timeout: 8000 });
   const token = (await guru.locator('.token-besar').textContent()).trim();
@@ -68,10 +68,16 @@ try {
   // --- 3. Keduanya masuk Lembah Gema (F02) dan saling lihat ---
   await a.p.evaluate(() => window.__survivalSains?.masukBalai?.('F02'));
   await b.p.evaluate(() => window.__survivalSains?.masukBalai?.('F02'));
-  await a.p.waitForTimeout(2500);
-
-  const temanA = await a.p.evaluate(() => window.__survivalSains?.online?.());
-  const temanB = await b.p.evaluate(() => window.__survivalSains?.online?.());
+  // Tunggu sampai saling terlihat (dunia balai + avatar GLB perlu waktu dimuat,
+  // terutama di browser uji tanpa GPU).
+  let temanA = null;
+  let temanB = null;
+  for (let i = 0; i < 40; i++) {
+    await a.p.waitForTimeout(500);
+    temanA = await a.p.evaluate(() => window.__survivalSains?.online?.());
+    temanB = await b.p.evaluate(() => window.__survivalSains?.online?.());
+    if (temanA?.teman >= 1 && temanB?.teman >= 1) break;
+  }
   log(`teman Ani: ${JSON.stringify(temanA)} | teman Budi: ${JSON.stringify(temanB)}`);
   if (!temanA || temanA.teman < 1) throw new Error('Ani tidak melihat Budi');
   if (!temanB || temanB.teman < 1) throw new Error('Budi tidak melihat Ani');

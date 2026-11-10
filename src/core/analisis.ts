@@ -1,6 +1,6 @@
 import type { ProgresSiswa } from '../../shared/net';
 import type { Question } from '../../shared/types';
-import { CERITA, URUTAN_BALAI } from '../data/cerita';
+import { CERITA_ASLI as CERITA, URUTAN_BALAI } from '../data/cerita';
 
 /**
  * Analisis hasil belajar untuk dasbor guru (fungsi murni, mudah diuji).

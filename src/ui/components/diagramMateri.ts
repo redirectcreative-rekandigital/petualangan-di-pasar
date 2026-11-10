@@ -1,5 +1,6 @@
 import { el } from './dom';
 import type { DiagramMateri } from '../../../shared/types';
+import { t } from '../../core/bahasa';
 
 /** Ikon dekoratif berdasarkan bentuk diagram (disederhanakan). */
 const IKON: Record<string, string> = {
@@ -17,48 +18,63 @@ const IKON: Record<string, string> = {
   kitab: '📖',
 };
 
+let nomorDiagram = 0;
+
 /**
- * Diagram materi interaktif: deretan bagian yang bisa diketuk, lalu panel
- * kecil menampilkan fungsi bagian tersebut. Tidak memakai SVG rumit agar
- * ringan dan tetap jalan di perangkat kelas bawah.
+ * Diagram materi interaktif berbentuk dropdown (akordeon): setiap bagian
+ * adalah tombol, dan penjelasan fungsinya terbuka tepat di bawah tombol itu.
+ * Hanya satu bagian terbuka sekaligus agar mudah dibaca anak.
+ * Memakai <details>/<summary> bawaan: ringan, bisa dipakai keyboard &
+ * pembaca layar, tanpa SVG rumit.
  */
 export function renderDiagramMateri(diagram: DiagramMateri): HTMLElement {
   const ikon = IKON[diagram.bentuk] ?? '🔎';
+  nomorDiagram += 1;
+  const grup = `diagram-${nomorDiagram}`;
 
-  const detailJudul = el('strong', { text: '' });
-  const detailFungsi = el('p', { class: 'muted', text: 'Ketuk salah satu bagian untuk melihat fungsinya.' });
-  const detail = el('div', {
-    class: 'card info',
-    attrs: { style: 'margin-top:10px', 'aria-live': 'polite' },
-    children: [detailJudul, detailFungsi],
+  const daftar = el('div', {
+    class: 'diagram-daftar',
+    attrs: { role: 'group', 'aria-label': t('Bagian {judul}', { judul: diagram.judul }) },
   });
 
-  const chips = el('div', { class: 'opsi', attrs: { role: 'group', 'aria-label': `Bagian ${diagram.judul}` } });
-
-  const tombol: HTMLButtonElement[] = [];
+  const semua: HTMLDetailsElement[] = [];
   for (const b of diagram.bagian) {
-    const btn = el('button', { text: b.nama, attrs: { type: 'button' } });
-    btn.addEventListener('click', () => {
-      for (const t of tombol) t.classList.remove('dipilih');
-      btn.classList.add('dipilih');
-      detailJudul.textContent = b.nama;
-      detailFungsi.textContent = b.fungsi;
-      detailFungsi.classList.remove('muted');
+    const item = el('details', {
+      class: 'diagram-item',
+      // `name` membuat hanya satu yang terbuka (peramban baru); cadangan di bawah.
+      attrs: { name: grup },
+      children: [
+        el('summary', {
+          class: 'diagram-tombol',
+          children: [el('span', { class: 'diagram-nama', text: b.nama }), el('span', { class: 'diagram-panah', attrs: { 'aria-hidden': 'true' }, text: '▾' })],
+        }),
+        el('p', { class: 'diagram-isi', text: b.fungsi }),
+      ],
     });
-    tombol.push(btn);
-    chips.append(btn);
+    item.addEventListener('toggle', () => {
+      if (!item.open) return;
+      for (const lain of semua) if (lain !== item) lain.open = false;
+    });
+    semua.push(item);
+    daftar.append(item);
   }
 
   return el('div', {
-    class: 'card',
+    class: 'card diagram-materi',
     children: [
-      el('span', { class: 'label-kecil', text: `🔎 ${diagram.judul}` }),
       el('div', {
-        attrs: { style: 'font-size:42px;text-align:center;line-height:1;margin:6px 0 10px' },
-        children: [el('span', { attrs: { 'aria-hidden': 'true' }, text: ikon })],
+        class: 'diagram-kepala',
+        children: [
+          el('span', { class: 'diagram-ikon', attrs: { 'aria-hidden': 'true' }, text: ikon }),
+          el('div', {
+            children: [
+              el('span', { class: 'label-kecil', text: `🔎 ${diagram.judul}` }),
+              el('p', { class: 'muted kecil-teks', text: t('Ketuk salah satu bagian untuk melihat fungsinya.') }),
+            ],
+          }),
+        ],
       }),
-      chips,
-      detail,
+      daftar,
     ],
   });
 }

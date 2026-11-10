@@ -10,8 +10,10 @@ import type { Elemen, NoktahId, NoktahMeta } from '../../shared/types';
  * Peta besar 3D bergaya "peta harta karun" versi interaktif.
  *
  * Berbeda dari versi pertama yang statis, peta ini bisa DIJELAJAH:
- *   - seret (drag) untuk memutar peta (orbit yaw/pitch),
+ *   - seret satu jari / klik kiri untuk MENGGESER peta (ke balai mana pun),
+ *   - putar dua jari, atau klik kanan / Shift + seret, untuk memutar peta,
  *   - gulir roda / cubit dua jari untuk zoom,
+ *   - tombol 🎯 untuk kembali memusatkan kamera ke tujuan berikutnya,
  *   - ketuk bulat-bulat noktah untuk masuk ke dunianya.
  *
  * Bila pemain diam beberapa saat, peta berputar perlahan sendiri supaya terasa
@@ -127,7 +129,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   scene.add(new THREE.HemisphereLight(0xbfe6ff, 0x155f8f, 0.55));
 
   // --- Papan peta (kertas tua) di atas laut ---
-  // Pulau Nusa Kawruh: teras bertingkat + jalan setapak melingkar.
+  // Pulau Wonorejo: teras bertingkat + jalan setapak melingkar.
   scene.add(buatPulau3D(track));
   void buatTeksturPapan;
   void persenKeDunia;
@@ -334,6 +336,12 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   let targetJarak = 0;
   const PUSAT_PULAU = new THREE.Vector3(0, 4, 0);
   const fokus = new THREE.Vector3().copy(PUSAT_PULAU);
+  /** Fokus pilihan pemain setelah menggeser peta (null = ikuti tujuan otomatis). */
+  let fokusGeser: THREE.Vector3 | null = null;
+  /** Batas geser: titik fokus tetap di sekitar pulau, tidak lari ke laut kosong. */
+  const RADIUS_GESER = DIAMETER_PULAU / 2 + 4;
+  /** Mode seret: geser peta (bawaan) atau putar (klik kanan / Shift). */
+  let modeSeret: 'geser' | 'putar' = 'geser';
 
   let menyeret = false;
   let gerakTotal = 0;
@@ -388,10 +396,15 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
 
   /** Titik fokus yang diinginkan: tujuan saat dekat, tengah pulau saat jauh. */
   function fokusDiinginkan(): THREE.Vector3 {
+    const rasio = jarak / jarakDasar;
+    if (fokusGeser) {
+      // Sudah digeser pemain: tetap di situ, kecuali zoom paling jauh (lihat seluruh pulau).
+      const tj = Math.max(0, Math.min(1, (rasio - 0.75) / 0.2));
+      return fokusGeser.clone().lerp(PUSAT_PULAU, tj);
+    }
     const tujuan = titikBalai(options.getTujuan?.() ?? options.getPosisiPemain());
     if (!tujuan) return PUSAT_PULAU;
     tujuan.y += 2;
-    const rasio = jarak / jarakDasar;
     // 0 (dekat, ≤ 0.55) → fokus di tujuan; 1 (jauh, ≥ 0.8) → fokus di tengah pulau.
     const t = Math.max(0, Math.min(1, (rasio - 0.55) / 0.25));
     return tujuan.lerp(PUSAT_PULAU, t);
@@ -485,6 +498,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     menyeret = true;
     gerakTotal = 0;
     pointerDownAt = { x: ev.clientX, y: ev.clientY };
+    modeSeret = ev.button === 2 || ev.shiftKey ? 'putar' : 'geser';
     canvas.setPointerCapture?.(ev.pointerId);
   };
 
@@ -496,8 +510,12 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
       gerakTotal += Math.abs(dx) + Math.abs(dy);
       // Getaran kecil jari saat mengetuk tidak memutar peta.
       if (gerakTotal > 10) {
-        targetYaw = yaw = yaw - dx * 0.006;
-        targetPitch = pitch = Math.max(0.3, Math.min(1.3, pitch + dy * 0.004));
+        if (modeSeret === 'putar') {
+          targetYaw = yaw = yaw - dx * 0.006;
+          targetPitch = pitch = Math.max(0.3, Math.min(1.3, pitch + dy * 0.004));
+        } else {
+          geserPeta(dx, dy);
+        }
         canvas.style.cursor = 'grabbing';
       }
       return;
@@ -524,6 +542,34 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     menyeret = false;
   };
 
+  /**
+   * Menggeser titik fokus sejajar permukaan peta mengikuti jari: peta ikut
+   * bergerak bersama jari, seperti menggeser peta di HP.
+   */
+  function geserPeta(dx: number, dy: number): void {
+    const h = canvas.clientHeight || window.innerHeight;
+    const d = batasJarak(jarak);
+    // Satuan dunia per piksel layar pada jarak kamera saat ini.
+    const perPiksel = (2 * d * Math.tan((camera.fov * Math.PI) / 360)) / h;
+    const kanan = { x: Math.cos(yaw), z: -Math.sin(yaw) };
+    const maju = { x: -Math.sin(yaw), z: -Math.cos(yaw) };
+    const cp = Math.max(0.3, Math.min(1.3, pitch));
+    // Gerak vertikal di layar diperpanjang karena papan dilihat miring.
+    const faktorMaju = 1 / Math.max(0.45, Math.sin(cp));
+    const baru = (fokusGeser ?? fokus).clone();
+    baru.x += -kanan.x * dx * perPiksel + maju.x * dy * perPiksel * faktorMaju;
+    baru.z += -kanan.z * dx * perPiksel + maju.z * dy * perPiksel * faktorMaju;
+    const r = Math.hypot(baru.x, baru.z);
+    if (r > RADIUS_GESER) {
+      baru.x *= RADIUS_GESER / r;
+      baru.z *= RADIUS_GESER / r;
+    }
+    baru.y = PUSAT_PULAU.y;
+    fokusGeser = baru;
+    // Langsung ikut jari (tanpa redaman) agar terasa responsif.
+    fokus.copy(baru);
+  }
+
   const zoomKe = (faktor: number): void => {
     targetJarak = batasJarak(targetJarak * faktor);
   };
@@ -533,11 +579,13 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     zoomKe(ev.deltaY > 0 ? 1.12 : 0.89);
   };
 
-  // Cubit dua jari (pinch) untuk zoom pada layar sentuh.
+  // Dua jari: cubit (pinch) untuk zoom, putar (twist) untuk memutar peta.
   let jarakCubit: number | null = null;
+  let sudutCubit: number | null = null;
   const onTouchStart = (ev: TouchEvent): void => {
     if (ev.touches.length === 2) {
       jarakCubit = jarakAntar(ev.touches);
+      sudutCubit = sudutAntar(ev.touches);
     }
   };
   const onTouchMove = (ev: TouchEvent): void => {
@@ -546,12 +594,28 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
       const rasio = jarakCubit / now;
       jarakCubit = now;
       zoomKe(rasio);
+      const sudut = sudutAntar(ev.touches);
+      if (sudutCubit !== null) {
+        let beda = sudut - sudutCubit;
+        while (beda > Math.PI) beda -= Math.PI * 2;
+        while (beda < -Math.PI) beda += Math.PI * 2;
+        // Abaikan getaran kecil agar cubit biasa tidak ikut memutar.
+        if (Math.abs(beda) > 0.004) targetYaw = yaw = yaw - beda;
+      }
+      sudutCubit = sudut;
       ev.preventDefault();
     }
   };
   const onTouchEnd = (): void => {
     jarakCubit = null;
+    sudutCubit = null;
   };
+
+  function sudutAntar(t: TouchList): number {
+    const a = t[0] as Touch;
+    const b = t[1] as Touch;
+    return Math.atan2(b.clientY - a.clientY, b.clientX - a.clientX);
+  }
 
   function jarakAntar(t: TouchList): number {
     const a = t[0] as Touch;
@@ -565,6 +629,9 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   canvas.addEventListener('pointercancel', onPointerCancel);
   canvas.addEventListener('pointerleave', () => setHover(null));
   canvas.addEventListener('wheel', onWheel, { passive: false });
+  // Klik kanan dipakai untuk memutar peta, bukan membuka menu peramban.
+  const onContextMenu = (ev: Event): void => ev.preventDefault();
+  canvas.addEventListener('contextmenu', onContextMenu);
   canvas.addEventListener('touchstart', onTouchStart, { passive: true });
   canvas.addEventListener('touchmove', onTouchMove, { passive: false });
   canvas.addEventListener('touchend', onTouchEnd);
@@ -673,6 +740,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     canvas.removeEventListener('pointerup', onPointerUp);
     canvas.removeEventListener('pointercancel', onPointerCancel);
     canvas.removeEventListener('wheel', onWheel);
+    canvas.removeEventListener('contextmenu', onContextMenu);
     canvas.removeEventListener('touchstart', onTouchStart);
     canvas.removeEventListener('touchmove', onTouchMove);
     canvas.removeEventListener('touchend', onTouchEnd);
@@ -690,6 +758,8 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     },
     zoom: zoomKe,
     fokusTujuan: () => {
+      // Lepas fokus geseran pemain: kamera kembali mengikuti tujuan berikutnya.
+      fokusGeser = null;
       targetJarak = jarakDasar * JARAK_DEKAT;
       targetPitch = 0.95;
       hadapTujuan();

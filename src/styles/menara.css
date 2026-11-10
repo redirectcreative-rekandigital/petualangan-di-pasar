@@ -454,7 +454,7 @@ body.mode-menara .vn-overlay {
   body.mode-menara .vn-aksi {
     grid-template-columns: 1fr;
   }
-  /* Kotak setinggi layar: kepala kotak memberi ruang untuk tombol bisu 🔊 global. */
+  /* Kotak setinggi layar: kepala kotak memberi ruang untuk tombol ✕ di kanan atas. */
   body.mode-menara .vn-kepala {
     padding-right: 52px;
   }

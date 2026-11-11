@@ -63,6 +63,8 @@ export interface ProgresSiswa {
   jawaban?: Array<{ q: string; k: string; b: boolean; p: string[]; n: number }>;
   /** Nilai Final terbaik per bagian (4 bagian). */
   finalBagian?: number[];
+  /** Nilai resmi (percobaan pertama, skor bertingkat). balai: 0..3 per kode; final: 0..30 atau null; akhir: 0..100. */
+  nilai?: { balai: Record<string, number>; final: number | null; akhir: number };
 }
 
 /** Satu baris siswa pada dasbor guru. */

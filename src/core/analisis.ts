@@ -60,7 +60,11 @@ export interface StatSoal {
 export function statistikSoal(siswa: SiswaRingkas[], bank: Question[]): StatSoal[] {
   const peta = new Map<string, { dijawab: number; benar: number; pertama: number; percobaan: number; salah: Map<string, number> }>();
   for (const s of siswa) {
+    // Satu siswa dihitung sekali per soal: jawaban pertamanya (latihan ulang diabaikan).
+    const sudah = new Set<string>();
     for (const j of s.progress.jawaban ?? []) {
+      if (sudah.has(j.q)) continue;
+      sudah.add(j.q);
       const q = bank.find((x) => x.id === j.q);
       if (!q) continue;
       const st = peta.get(j.q) ?? { dijawab: 0, benar: 0, pertama: 0, percobaan: 0, salah: new Map<string, number>() };
@@ -114,7 +118,8 @@ export function statistikMateri(siswa: SiswaRingkas[]): StatMateri[] {
     let benar = 0;
     let lulus = 0;
     for (const s of siswa) {
-      const jawab = (s.progress.jawaban ?? []).filter((j) => j.k === kode);
+      // Soal Final (id 'final…') berkode materi sama; jangan dicampur ke persen bab.
+      const jawab = (s.progress.jawaban ?? []).filter((j) => j.k === kode && !j.q.startsWith('final'));
       dijawab += jawab.length;
       benar += jawab.filter((j) => j.b).length;
       if ((s.progress.bintang?.[kode] ?? 0) >= 1) lulus += 1;
@@ -161,6 +166,7 @@ export function barisCsvSiswa(s: SiswaRingkas): string[] {
     kolom.push(
       String(p.bintang?.[kode] ?? 0),
       LABEL_STATUS[statusBalai(p, kode)].teks,
+      String(persenBalai(p, kode) ?? ''),
       String(Math.round(p.bacaan?.[kode]?.detik ?? 0)),
       jawab.length > 0 ? `${benar}/${jawab.length}` : '',
     );
@@ -169,5 +175,22 @@ export function barisCsvSiswa(s: SiswaRingkas): string[] {
 }
 
 export function kepalaCsvBalai(): string[] {
-  return URUTAN_BALAI.flatMap((k) => [`${k}_bintang`, `${k}_status`, `${k}_baca_detik`, `${k}_benar`]);
+  return URUTAN_BALAI.flatMap((k) => [`${k}_bintang`, `${k}_status`, `${k}_nilai_awal`, `${k}_baca_detik`, `${k}_benar`]);
+}
+
+/** KKM bawaan; guru dapat mengubahnya di dasbor. */
+export const KKM_BAWAAN = 70;
+
+/** Nilai balai 0..100 dari skor bertingkat percobaan pertama; null bila belum dikerjakan. */
+export function persenBalai(p: ProgresSiswa, kode: string): number | null {
+  const skor = p.nilai?.balai?.[kode];
+  return skor === undefined ? null : Math.round((skor / 3) * 100);
+}
+
+/** Balai yang sudah dikerjakan tetapi nilai awalnya di bawah KKM ("belum tuntas"). */
+export function balaiBelumTuntas(p: ProgresSiswa, kkm: number): string[] {
+  return URUTAN_BALAI.filter((k) => {
+    const n = persenBalai(p, k);
+    return n !== null && n < kkm;
+  });
 }

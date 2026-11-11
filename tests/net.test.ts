@@ -63,3 +63,14 @@ describe('progres menyimpan token kelas', () => {
     expect(loadProgress().token).toBeUndefined();
   });
 });
+
+describe('nilai resmi dalam ringkasan', () => {
+  it('dihitung dari jawaban pertama, tidak terpotong batas 400', () => {
+    const p = createDefaultProgress('Ani', 'perempuan');
+    const rec = (questionId: string, correct: boolean, percobaan: number): AnswerRecord => ({ questionId, balai: 'F01', kodeMateri: 'F01', correct, usedHint: false, percobaan });
+    p.answers = [rec('a', true, 1), rec('b', true, 2), rec('c', false, 3), ...Array.from({ length: 450 }, () => rec('a', true, 1))];
+    const r = ringkasProgres(p, null);
+    expect(r.nilai?.balai.F01).toBe(1.5);
+    expect(r.nilai?.final).toBeNull();
+  });
+});

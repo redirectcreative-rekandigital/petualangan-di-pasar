@@ -1,5 +1,7 @@
 import type { NoktahId, Progress, Stars } from '../../shared/types';
 import type { ProgresSiswa } from '../../shared/net';
+import { nilaiResmi } from '../core/scoring';
+import { URUTAN_BALAI } from '../data/cerita';
 
 /**
  * Meringkas progres lokal menjadi bentuk ringkas untuk dikirim ke server
@@ -58,5 +60,7 @@ export function ringkasProgres(progress: Progress, noktah: NoktahId | null = nul
       n: a.percobaan ?? (a.correct ? 1 : 3),
     })),
     finalBagian: progress.finalBagian ?? [],
+    // Dihitung dari SEMUA jawaban (bukan 400 terakhir) agar percobaan pertama tidak terpotong.
+    nilai: nilaiResmi(progress.answers, URUTAN_BALAI),
   };
 }

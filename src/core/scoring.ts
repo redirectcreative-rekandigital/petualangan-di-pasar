@@ -11,12 +11,62 @@ export const RULES = {
   coinsCorrect: 10,
 } as const;
 
-/** Bintang per balai: 3 benar = 3, 2 = 2, 1 = 1, 0 = 0. */
-export function starsForCorrect(correct: number): Stars {
-  if (correct >= 3) return 3;
-  if (correct >= 2) return 2;
-  if (correct >= 1) return 1;
+/** Skor satu soal: benar di kesempatan ke-1 = 1, ke-2 = 0,5, ke-3 = 0,25; salah = 0. */
+export function skorSoal(correct: boolean, percobaan = 1): number {
+  if (!correct) return 0;
+  return [1, 0.5, 0.25][percobaan - 1] ?? 0.25;
+}
+
+/** Jumlah skor bertingkat sekumpulan jawaban. */
+export function skorJawaban(answers: Array<{ correct: boolean; percobaan?: number }>): number {
+  return answers.reduce((s, a) => s + skorSoal(a.correct, a.percobaan), 0);
+}
+
+/** Bintang per balai dari skor bertingkat (maks 3,0): 3,0 = 3 · ≥2 = 2 · ≥1 = 1. */
+export function starsForSkor(skor: number): Stars {
+  if (skor >= 3) return 3;
+  if (skor >= 2) return 2;
+  if (skor >= 1) return 1;
   return 0;
+}
+
+export interface NilaiResmi {
+  /** Skor bertingkat percobaan pertama per kode balai (0..3). */
+  balai: Record<string, number>;
+  /** Skor bertingkat percobaan pertama Final (0..30), null bila belum pernah. */
+  final: number | null;
+  /** Nilai akhir 0..100 = rata nilai balai 60% + Final 40%. */
+  akhir: number;
+}
+
+/**
+ * Nilai resmi = percobaan pertama saja: 3 jawaban pertama tiap balai dan
+ * jawaban pertama tiap soal Final. Latihan ulang tidak mengubahnya.
+ */
+export function nilaiResmi(
+  answers: Array<{ questionId: string; balai: string; correct: boolean; percobaan?: number }>,
+  kodeBalai: readonly string[],
+): NilaiResmi {
+  const balai: Record<string, number> = {};
+  const jumlah: Record<string, number> = {};
+  const finalDilihat = new Set<string>();
+  let final = 0;
+  for (const a of answers) {
+    if (a.balai === 'FINAL') {
+      if (finalDilihat.has(a.questionId)) continue;
+      finalDilihat.add(a.questionId);
+      final += skorSoal(a.correct, a.percobaan);
+      continue;
+    }
+    if ((jumlah[a.balai] ?? 0) >= RULES.questionsPerBalai) continue;
+    jumlah[a.balai] = (jumlah[a.balai] ?? 0) + 1;
+    balai[a.balai] = (balai[a.balai] ?? 0) + skorSoal(a.correct, a.percobaan);
+  }
+  const rataBalai = kodeBalai.length
+    ? (kodeBalai.reduce((s, k) => s + (balai[k] ?? 0), 0) / (kodeBalai.length * RULES.questionsPerBalai)) * 100
+    : 0;
+  const persenFinal = (final / RULES.questionsPuncak) * 100;
+  return { balai, final: finalDilihat.size ? final : null, akhir: Math.round(0.6 * rataBalai + 0.4 * persenFinal) };
 }
 
 /** Balai dianggap lulus bila mendapat minimal 1 bintang. */

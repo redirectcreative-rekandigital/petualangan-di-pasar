@@ -1,7 +1,7 @@
 import type { BalaiId, NoktahId, Progress, BalaiProgress, AnswerRecord, Stars, PlayerGender, TahapMisi, CatatanBaca } from '../../shared/types';
 import { URUTAN_BALAI, balaiSebelum, FINAL_BAGIAN } from '../data/cerita';
 import { SEMUA_BALAI, NOKTAH, noktahMateri, getNoktah } from '../data/balai';
-import { isBalaiPassed, starsForCorrect } from './scoring';
+import { isBalaiPassed, skorJawaban, starsForSkor } from './scoring';
 import { t } from './bahasa';
 
 const STORAGE_KEY = 'survival-sains:progress:v1';
@@ -249,7 +249,8 @@ export function applyBalaiResult(
   total: number,
   answers: AnswerRecord[],
 ): Progress {
-  const stars = starsForCorrect(correct);
+  // Jawaban kosong (uji/pintasan) memakai `correct` sebagai skor.
+  const stars = starsForSkor(answers.length ? skorJawaban(answers) : correct);
   const key = balaiKey(kode);
   const current = progress.balai[key] ?? emptyBalaiProgress();
   const updated: BalaiProgress = {

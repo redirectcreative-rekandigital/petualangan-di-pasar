@@ -46,7 +46,7 @@ import { renderGuru } from './ui/screens/guru';
 import { renderFinal } from './ui/screens/final';
 import { sfx } from './core/sound';
 import { pasangLayarPenuhOtomatis } from './core/layarPenuh';
-import { starsForCorrect } from './core/scoring';
+import { skorJawaban, starsForSkor } from './core/scoring';
 import type { ScreenContext, ScreenName } from './ui/screens/context';
 import type { NoktahId, Progress, TahapMisi } from '../shared/types';
 import { t, BAHASA, aturPenyimpanPosisi, ambilPosisiTersimpan } from './core/bahasa';
@@ -768,7 +768,7 @@ async function tantanganBalai(): Promise<void> {
     if (p.tertutup()) return;
     hasilBenar = hasil.benar;
     jawaban = hasil.jawaban;
-    const bintang = starsForCorrect(hasil.benar);
+    const bintang = starsForSkor(skorJawaban(hasil.jawaban));
     if (bintang >= 1) {
       for (const b of c.lulus)
         await p.bicara(b.siapa === 'pemain' ? 'pemain' : c.penjaga, isiNama(b.teks, progress.playerName));
@@ -780,7 +780,7 @@ async function tantanganBalai(): Promise<void> {
 
   const sebelumLulus = tahap === 3;
   let next = applyBalaiResult(progress, c.kode, hasilBenar, meta.soalPerMain, jawaban);
-  const bintang = starsForCorrect(hasilBenar);
+  const bintang = starsForSkor(jawaban.length ? skorJawaban(jawaban) : hasilBenar);
   if (bintang >= 1) {
     next = setTahapMisi(tambahAlat(next, c.kode), c.kode, 3);
     if (c.kode === URUTAN_BALAI[0]) next = { ...next, prologSelesai: true };

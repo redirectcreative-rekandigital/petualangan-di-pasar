@@ -13,6 +13,9 @@ import {
   barisCsvSiswa,
   kepalaCsvBalai,
   LABEL_STATUS,
+  KKM_BAWAAN,
+  persenBalai,
+  balaiBelumTuntas,
 } from '../../core/analisis';
 import type { ScreenContext } from './context';
 
@@ -25,6 +28,19 @@ import type { ScreenContext } from './context';
  */
 
 const KUNCI_TOKEN = 'survival-sains:token-guru';
+const KUNCI_KKM = 'survival-sains:kkm-guru';
+
+/** KKM guru (disimpan di perangkat guru); nilai tidak valid jatuh ke bawaan. */
+let kkm = bacaKkm();
+
+function bacaKkm(): number {
+  try {
+    const n = Number(localStorage.getItem(KUNCI_KKM));
+    return n >= 1 && n <= 100 ? Math.round(n) : KKM_BAWAAN;
+  } catch {
+    return KKM_BAWAAN;
+  }
+}
 
 interface StateGuru {
   token: string | null;
@@ -220,6 +236,31 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
       }),
     );
 
+    const inputKkm = el('input', {
+      class: 'isian',
+      attrs: { type: 'number', min: '1', max: '100', value: String(kkm), 'aria-label': 'KKM', style: 'width:5rem' },
+    });
+    inputKkm.addEventListener('change', () => {
+      const n = Math.round(Number(inputKkm.value));
+      kkm = n >= 1 && n <= 100 ? n : KKM_BAWAAN;
+      try {
+        localStorage.setItem(KUNCI_KKM, String(kkm));
+      } catch {
+        /* abaikan */
+      }
+      gambar();
+    });
+    anak.push(
+      el('div', {
+        class: 'card',
+        children: [
+          el('span', { class: 'label-kecil', text: 'KKM (batas tuntas, 1–100)' }),
+          inputKkm,
+          el('p', { class: 'muted kecil-teks', text: 'Nilai resmi = percobaan pertama. Jawaban benar di kesempatan ke-2 dan ke-3 hanya dihitung separuh dan seperempat. Latihan ulang tidak mengubah nilai.' }),
+        ],
+      }),
+    );
+
     anak.push(
       el('div', {
         class: 'row-tombol',
@@ -335,6 +376,8 @@ function kartuSiswa(s: RosterSiswa): HTMLElement {
           el('span', { text: `⭐ ${bintang}` }),
           el('span', { text: `🎯 ${persen}%` }),
           el('span', { text: `❌ ${salah}` }),
+          el('span', { text: `📝 ${p.nilai ? p.nilai.akhir : '-'}` }),
+          ...(balaiBelumTuntas(p, kkm).length ? [el('span', { class: 'miskonsepsi', text: `⚠️ ${balaiBelumTuntas(p, kkm).length} belum tuntas` })] : []),
         ],
       }),
     ],
@@ -433,6 +476,7 @@ function detailSiswa(s: RosterSiswa): HTMLElement {
         el('td', { text: `${c?.urutan}. ${c?.judulBab ?? k}` }),
         el('td', { text: LABEL_STATUS[st].ikon }),
         el('td', { text: '⭐'.repeat(p.bintang?.[k] ?? 0) || '-' }),
+        el('td', { text: persenBalai(p, k) === null ? '-' : `${persenBalai(p, k)}${(persenBalai(p, k) ?? 100) < kkm ? ' ⚠️' : ''}` }),
         el('td', { text: p.bacaan?.[k] ? `${Math.round(p.bacaan[k]?.detik ?? 0)} dtk` : '-' }),
         el('td', { text: jawab.length ? `${jawab.filter((j) => j.b).length}/${jawab.length}` : '-' }),
       ],
@@ -444,7 +488,7 @@ function detailSiswa(s: RosterSiswa): HTMLElement {
       el('table', {
         class: 'matriks detail',
         children: [
-          el('thead', { children: [el('tr', { children: ['Bab', 'Status', 'Bintang', 'Baca', 'Benar'].map((h) => el('th', { text: h })) })] }),
+          el('thead', { children: [el('tr', { children: ['Bab', 'Status', 'Bintang', 'Nilai awal', 'Baca', 'Benar'].map((h) => el('th', { text: h })) })] }),
           el('tbody', { children: baris }),
         ],
       }),
@@ -455,7 +499,7 @@ function detailSiswa(s: RosterSiswa): HTMLElement {
     class: 'card',
     children: [
       el('h3', { text: `${s.gender === 'perempuan' ? '👧' : '👦'} ${s.nama}` }),
-      el('p', { class: 'muted', text: `Alat ${p.alat ?? 0}/11 · Final ${final}/30 · ${p.puncakLulus ? 'Mercusuar menyala ✅' : 'Belum lulus Final'}` }),
+      el('p', { class: 'muted', text: `Nilai akhir ${p.nilai?.akhir ?? '-'} (KKM ${kkm}) · Alat ${p.alat ?? 0}/11 · Final terbaik ${final}/30 · Final nilai awal ${p.nilai?.final ?? '-'}/30 · ${p.puncakLulus ? 'Mercusuar menyala ✅' : 'Belum lulus Final'}` }),
       tabel,
       el('span', { class: 'label-kecil', text: '💡 Rekomendasi' }),
       el('ul', { class: 'tujuan', children: rekomendasi(p).map((r) => el('li', { text: r })) }),
@@ -496,7 +540,7 @@ function hapusTokenGuru(): void {
 /* ------------------------------------------------------------------ */
 
 function eksporCsv(siswa: RosterSiswa[], token: string): void {
-  const kepala = ['nama', 'gender', 'online', 'posisi', 'alat', 'total_bintang', 'total_benar', 'total_soal', 'persen_benar', 'jumlah_salah', 'final_benar', 'final_lulus', 'terakhir_dilihat', ...kepalaCsvBalai()];
+  const kepala = ['nama', 'gender', 'online', 'posisi', 'alat', 'total_bintang', 'total_benar', 'total_soal', 'persen_benar', 'jumlah_salah', 'final_benar', 'final_lulus', 'nilai_akhir', 'final_nilai_awal', 'kkm', 'balai_belum_tuntas', 'terakhir_dilihat', ...kepalaCsvBalai()];
   const baris = siswa.map((s) => {
     const p = s.progress;
     const bintang = Object.values(p.bintang ?? {}).reduce<number>((a, b) => a + b, 0);
@@ -514,6 +558,10 @@ function eksporCsv(siswa: RosterSiswa[], token: string): void {
       String(p.soalSalah?.length ?? 0),
       String((p.finalBagian ?? []).reduce((a, b) => a + b, 0)),
       p.puncakLulus ? 'ya' : 'tidak',
+      p.nilai ? String(p.nilai.akhir) : '',
+      p.nilai?.final == null ? '' : String(p.nilai.final),
+      String(kkm),
+      balaiBelumTuntas(p, kkm).join(' '),
       s.lastSeen,
       ...barisCsvSiswa(s),
     ];

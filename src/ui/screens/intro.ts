@@ -260,11 +260,24 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       },
     });
 
+    const kembali = el('button', {
+      class: 'btn ghost block',
+      text: t('← Kembali'),
+      attrs: { type: 'button' },
+      on: {
+        click: () => {
+          sfx.click();
+          langkah = 'cover';
+          renderLangkah();
+        },
+      },
+    });
+
     replace([
       el('div', { class: 'topbar', children: [el('h2', { text: t('Kartu Anggota Ekspedisi') })] }),
       el('p', { class: 'muted center-text intro-ket', text: t('Siapa penjelajah termuda Kapal Ekspedisi Sains? Pilih karaktermu.') }),
       el('div', { class: 'pilih-karakter-row', children: [kartu('laki-laki', previewL), kartu('perempuan', previewP)] }),
-      el('div', { class: 'stack intro-aksi', children: [lanjut] }),
+      el('div', { class: 'stack intro-aksi', children: [lanjut, kembali] }),
     ]);
   }
 

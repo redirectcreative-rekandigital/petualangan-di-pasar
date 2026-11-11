@@ -82,6 +82,22 @@ try {
   if (!temanA || temanA.teman < 1) throw new Error('Ani tidak melihat Budi');
   if (!temanB || temanB.teman < 1) throw new Error('Budi tidak melihat Ani');
 
+  // --- 3b. Kendali guru: jeda menutup layar siswa, pengumuman muncul ---
+  const kunci = await guru.evaluate(() => localStorage.getItem('survival-sains:kunci-guru'));
+  const kendali = (aksi, ekstra = {}) =>
+    fetch(new URL(`api/sesi/${token}/kendali`, BASE), {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ kunci, aksi, ...ekstra }),
+    });
+  await kendali('jeda', { nilai: true });
+  await a.p.waitForSelector('#jeda-guru', { timeout: 5000 });
+  await kendali('umum', { teks: 'Lihat ke depan, ya' });
+  await a.p.locator('text=Lihat ke depan, ya').first().waitFor({ timeout: 5000 });
+  await kendali('jeda', { nilai: false });
+  await a.p.waitForSelector('#jeda-guru', { state: 'detached', timeout: 5000 });
+  log('jeda + pengumuman tampil di layar siswa, lalu dilepas');
+
   // --- 4. Dasbor guru menampilkan 2 siswa ---
   await guru.waitForTimeout(3500);
   const matriks = await guru.locator('.matriks tbody tr').count();

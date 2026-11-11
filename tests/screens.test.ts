@@ -260,7 +260,7 @@ describe('petunjuk', () => {
     const { ctx } = makeCtx(progress);
     const node = renderHowto(ctx);
     const langkah = node.querySelectorAll('.langkah');
-    expect(langkah.length).toBe(6);
+    expect(langkah.length).toBe(7);
   });
 });
 

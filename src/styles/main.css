@@ -508,6 +508,18 @@ table.tabel-data tr:last-child td {
   border-bottom: none;
 }
 
+/* Tabel petunjuk bermain: teks panjang dibungkus agar muat di layar HP tanpa geser. */
+table.tabel-data.tabel-petunjuk th,
+table.tabel-data.tabel-petunjuk td {
+  white-space: normal;
+  text-align: left;
+  vertical-align: top;
+  padding: 8px 10px;
+}
+table.tabel-data.tabel-petunjuk tbody th {
+  width: 40%;
+}
+
 /* ---------- Judul / info ---------- */
 
 .meta-baris {

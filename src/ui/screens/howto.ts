@@ -10,45 +10,93 @@ interface Langkah {
   isi: string;
 }
 
+/** Alur permainan dari awal sampai pulang (urutan sesuai layar sebenarnya). */
 const LANGKAH: Langkah[] = [
   {
-    ikon: '🌊',
-    judul: t('1. Terdampar di pulau'),
-    isi: t('Badai membawamu ke Pulau Wonorejo. Untuk pulang, nyalakan Mercusuar Tua di puncak pulau.'),
+    ikon: '🪪',
+    judul: t('1. Buat kartu penjelajah'),
+    isi: t('Tekan ▶️ Mulai Petualangan, pilih karakter, atur warna kostum, lalu isi nama. Pilih 🎒 Bermain Sendiri, atau 👥 Multiplayer Kelas dengan token 4 angka dari guru. Tekan 🌊 Mulai Bertahan Hidup.'),
   },
   {
-    ikon: '🕹️',
-    judul: t('2. Berjalan dan melihat'),
-    isi: t('Di HP, geser joystick kiri untuk berjalan dan geser jari di sisi kanan untuk memutar kamera. Di laptop pakai W A S D dan mouse.'),
+    ikon: '🌊',
+    judul: t('2. Terdampar di pulau'),
+    isi: t('Badai membawamu ke Pulau Wonorejo (tekan Lewati ⏭ bila ingin melewati cerita pembuka). Kamu terbangun di Goa Sinar. Untuk pulang, nyalakan Mercusuar Tua di puncak pulau.'),
   },
   {
     ikon: '💬',
     judul: t('3. Terima misi dari Penjaga'),
-    isi: t('Ikuti panah kuning. Dekati Penjaga lalu tekan tombol A (atau E) untuk bercakap dan menerima misi.'),
+    isi: t('Ikuti panah kuning dan cincin di tanah. Dekati Penjaga sampai muncul tombol 💬 Bicara di atas kepalanya, lalu ketuk tombol itu (atau tekan E).'),
   },
   {
     ikon: '📖',
     judul: t('4. Baca Halaman Cerita'),
-    isi: t('Cantrik akan membacakan cerita bergambar tentang materi IPA. Selesaikan tantangan kecil di akhir cerita.'),
+    isi: t('Datangi Cantrik dan ketuk 📖 Baca Cerita. Ikuti cerita bergambar dengan tombol Lanjut ▶ dan selesaikan tantangan kecil di dalamnya.'),
   },
   {
     ikon: '🔥',
     judul: t('5. Jawab tantangan di Tempat Uji'),
-    isi: t('Penjaga memberi 3 soal pilihan ganda. Setiap soal punya 3 hati ❤️ (nyawa). Tiap jawaban salah, satu hati hilang. Bila salah, tekan "Ingat cerita" untuk melihat petunjuk.'),
+    isi: t('Tempat Uji terkunci 🔒 sampai cerita selesai dibaca. Ketuk 🔥 Tantangan: Penjaga memberi 3 soal, tiap soal punya 3 hati ❤️. Bila salah, pilih 🔁 Coba lagi atau 📖 Ingat cerita. Tiap jawaban benar menyalakan satu obor.'),
+  },
+  {
+    ikon: '🗺️',
+    judul: t('6. Pulang ke peta, buka balai berikutnya'),
+    isi: t('Kamu mendapat satu alat survival 🎒. Lewati gerbang (🗺️ Ke Peta) untuk kembali ke peta. Kabut di balai berikutnya tersibak; ketuk nama balai itu atau tombol ▶ di atas peta.'),
   },
   {
     ikon: '🗼',
-    judul: t('6. Kumpulkan 11 alat, nyalakan mercusuar'),
-    isi: t('Setiap balai memberi satu alat survival dan membuka jalan ke balai berikutnya. Dengan 11 alat, Mercusuar Tua terbuka untuk Final (30 soal).'),
+    judul: t('7. Nyalakan Mercusuar Tua'),
+    isi: t('Dengan 11 alat, Mercusuar Tua terbuka. Ketuk 🚪 Buka Pintu, naiki tangga, dan buka pintu tiap lantai dengan menjawab soal. Di Puncak Lampu, ketuk 💡 Nyalakan Lampu. Lulus = 🎓 sertifikat.'),
   },
 ];
 
 const KONTROL = (): Array<[string, string, string]> => [
   [t('Jalan'), t('Joystick kiri'), t('W A S D / panah')],
   [t('Putar kamera'), t('Geser jari kanan'), t('Seret mouse')],
-  [t('Interaksi / bicara'), t('Tombol A'), 'E'],
+  [t('Lompat'), t('Tombol ⤴️ Lompat'), t('Spasi')],
+  [t('Lari'), t('Tombol 🏃 di dekat joystick'), '-'],
+  [t('Interaksi / bicara'), t('Tombol aksi di atas tokoh'), 'E'],
   [t('Menu'), t('Tombol ☰'), 'H / Esc'],
-  [t('Tas survival'), t('Tombol 🎒'), '-'],
+];
+
+/** Tombol di layar dan kegunaannya, per layar. */
+const TOMBOL = (): Array<{ judul: string; baris: Array<[string, string]> }> => [
+  {
+    judul: t('🏠 Di Beranda'),
+    baris: [
+      [t('▶️ Mulai / Lanjutkan Petualangan'), t('Mulai baru, atau lanjut dari kemajuan terakhir.')],
+      [t('🔄 Mulai dari Awal'), t('Menghapus semua bintang, alat, dan catatan belajar (ada konfirmasi).')],
+      [t('👥 Gabung Kelas'), t('Masuk kelas guru dengan token 4 angka.')],
+      [t('📖 Petunjuk Bermain'), t('Membuka halaman ini.')],
+      [t('⚙️ Pengaturan'), t('Bahasa, suara narasi, kecepatan bicara, efek suara, dan mode bermain.')],
+      [t('ℹ️ Tentang Game'), t('Info game dan pembuatnya.')],
+    ],
+  },
+  {
+    judul: t('🗺️ Di Peta Pulau'),
+    baris: [
+      [t('▶ (nama tujuan)'), t('Langsung menuju balai tujuan berikutnya.')],
+      [t('Nama balai di peta'), t('Ketuk untuk masuk. Balai berkabut belum terbuka.')],
+      [t('🎒 Tas'), t('Alat survival yang sudah terkumpul (dari 11).')],
+      [t('⭐ Bintang'), t('Bintang yang didapat di tiap balai.')],
+      [t('➕ ➖'), t('Perbesar / perkecil peta (bisa juga cubit dua jari).')],
+      [t('🎯'), t('Kembali menyorot tujuan berikutnya.')],
+      [t('☰ Menu'), t('Petunjuk, Pengaturan, Hasil Belajar, Menu Utama.')],
+    ],
+  },
+  {
+    judul: t('🏡 Di Balai & Mercusuar'),
+    baris: [
+      [t('📜 Misi'), t('Tugasmu sekarang dan 4 langkah misi: Misi, Cerita, Tantangan, Pulang. Bertanda titik bila ada tugas baru.')],
+      [t('Tombol aksi'), t('Muncul di atas tokoh atau tempat terdekat: 💬 Bicara, 📖 Baca Cerita, 🔥 Tantangan, 🗺️ Ke Peta.')],
+      [t('⤴️ Lompat'), t('Melompat.')],
+      [t('🏃 Kunci lari'), t('Muncul saat berjalan. Ketuk agar tokoh berlari (🔒); ketuk lagi untuk berjalan biasa.')],
+      [t('📷 Kamera'), t('Ganti sudut pandang: Normal → Dekat → Tangan (seperti mata tokoh).')],
+      [t('🎒 Tas'), t('Alat survival yang sudah terkumpul.')],
+      [t('⭐ Bintang'), t('Bintang yang didapat di tiap balai.')],
+      [t('😊 Sapa · 👥'), t('Hanya di Multiplayer Kelas: kirim emoji ke teman, dan jumlah teman yang sedang online.')],
+      [t('☰ Menu'), t('Petunjuk Kontrol, Pengaturan, Kembali ke Peta, Hasil Belajar, Menu Utama.')],
+    ],
+  },
 ];
 
 /** Asal pembukaan layar petunjuk: menentukan tujuan tombol Kembali. */
@@ -126,36 +174,29 @@ export function bukaPetunjukModal(host: HTMLElement, onTutup?: () => void): void
   tombolTutup.focus({ preventScroll: true });
 }
 
-/** Isi petunjuk: langkah bermain, tabel kontrol, aturan singkat, dan tips. */
-function isiPetunjuk(): HTMLElement[] {
-  const tabelKontrol = el('div', {
+/** Tabel sederhana: kolom pertama jadi judul baris. */
+function tabel(kepala: string[], baris: string[][]): HTMLElement {
+  return el('div', {
     class: 'tabel-wrap',
     children: [
       el('table', {
-        class: 'tabel-data',
+        class: 'tabel-data tabel-petunjuk',
         children: [
-          el('thead', {
-            children: [
-              el('tr', {
-                children: [
-                  el('th', { text: t('Aksi'), attrs: { scope: 'col' } }),
-                  el('th', { text: t('HP'), attrs: { scope: 'col' } }),
-                  el('th', { text: t('Laptop'), attrs: { scope: 'col' } }),
-                ],
-              }),
-            ],
-          }),
+          el('thead', { children: [el('tr', { children: kepala.map((k) => el('th', { text: k, attrs: { scope: 'col' } })) })] }),
           el('tbody', {
-            children: KONTROL().map(([aksi, hp, desktop]) =>
-              el('tr', {
-                children: [el('th', { text: aksi, attrs: { scope: 'row' } }), el('td', { text: hp }), el('td', { text: desktop })],
-              }),
+            children: baris.map(([judul, ...sel]) =>
+              el('tr', { children: [el('th', { text: judul ?? '', attrs: { scope: 'row' } }), ...sel.map((s) => el('td', { text: s }))] }),
             ),
           }),
         ],
       }),
     ],
   });
+}
+
+/** Isi petunjuk: alur bermain, tabel kontrol, tombol per layar, aturan singkat, dan tips. */
+function isiPetunjuk(): HTMLElement[] {
+  const tabelKontrol = tabel([t('Aksi'), t('HP'), t('Laptop')], KONTROL());
 
   return [
       el('div', {
@@ -174,6 +215,12 @@ function isiPetunjuk(): HTMLElement[] {
         class: 'card',
         children: [el('span', { class: 'label-kecil', text: t('🎮 Kontrol') }), tabelKontrol],
       }),
+      ...TOMBOL().map((bagian) =>
+        el('div', {
+          class: 'card',
+          children: [el('span', { class: 'label-kecil', text: bagian.judul }), tabel([t('Tombol'), t('Kegunaan')], bagian.baris)],
+        }),
+      ),
       el('div', {
         class: 'card info',
         children: [

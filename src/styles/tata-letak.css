@@ -362,26 +362,6 @@
     gap: 10px;
   }
 
-  /* ---------- Sampul: gambar kiri, judul & tombol kanan ---------- */
-  .intro-screen[data-langkah='cover'] {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    gap: 20px;
-    align-items: center;
-    min-height: calc(100dvh - 20px);
-  }
-  .intro-screen[data-langkah='cover'] .sampul {
-    margin: 0;
-    border-radius: var(--radius);
-    height: calc(100dvh - 20px);
-    box-shadow: var(--bayangan);
-  }
-  .intro-screen[data-langkah='cover'] .sampul-gambar {
-    height: 100%;
-  }
-  .intro-screen[data-langkah='cover'] .sampul:not(.dengan-gambar) {
-    display: none;
-  }
   .cover-isi {
     display: flex;
     flex-direction: column;
@@ -1049,4 +1029,64 @@ body:has(.dialog-overlay) .hud-menu-kanan {
   display: flex;
   justify-content: space-between;
   gap: 8px;
+}
+
+/* ================================================================== */
+/* Sampul layar penuh (intro.ts): <picture> memilih gambar tegak atau   */
+/* mendatar; tanpa kartu menu, tombol melayang di bawah tengah.        */
+/* ================================================================== */
+.sampul-full {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #f6d58e;
+}
+.sampul-full .sampul-gambar {
+  display: block;
+  width: 100vw;
+  height: 100dvh;
+  object-fit: cover;
+  /* Layar lebih lebar dari 16:9 memotong atas-bawah: jaga logo, korbankan pantai di balik tombol. */
+  object-position: center top;
+}
+.intro-screen[data-langkah='cover'] .cover-isi {
+  position: fixed;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 1;
+  transform: translateX(-50%);
+  width: min(460px, calc(100vw - 32px));
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  gap: 10px;
+  padding: 0;
+}
+/* Logo & judul sudah ada di gambar: teks judul hanya untuk pembaca layar. */
+.intro-screen[data-langkah='cover'] .cover-hero {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.intro-screen[data-langkah='cover'] :is(.cover-isi > .muted, .footer-note) {
+  color: var(--putih);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+}
+/* Tombol ghost/secondary bawaan transparan: diberi latar agar terbaca di atas gambar. */
+.intro-screen[data-langkah='cover'] .cover-tombol .btn:is(.ghost, .secondary) {
+  background: rgba(255, 253, 247, 0.92);
+}
+@media (orientation: landscape) {
+  .intro-screen[data-langkah='cover'] .cover-isi {
+    width: min(620px, calc(100vw - 32px));
+  }
+  .intro-screen[data-langkah='cover'] .cover-tombol {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .intro-screen[data-langkah='cover'] .cover-tombol > :first-child {
+    grid-column: 1 / -1;
+  }
 }

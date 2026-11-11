@@ -3,6 +3,7 @@ import { sfx, isMuted, setMuted } from '../core/sound';
 import { BAHASA, gantiBahasa, t, type Bahasa } from '../core/bahasa';
 import {
   adaSuaraIndonesia,
+  namaSuaraTerpilih,
   berhenti,
   kecepatanSuara,
   setKecepatanSuara,
@@ -167,6 +168,9 @@ export function bukaPengaturan(host: HTMLElement, opsi: OpsiPengaturan = {}): vo
       },
     });
     bagian.push(narasi, kecepatan, coba);
+    // Memudahkan guru mengecek tiap HP: suara mana yang benar-benar dipakai.
+    const namaSuara = namaSuaraTerpilih();
+    if (namaSuara) bagian.push(el('p', { class: 'atur-status', text: t('Sekarang memakai: {suara}', { suara: namaSuara }) }));
     if (adaSuaraIndonesia() === false) {
       bagian.push(
         el('p', {

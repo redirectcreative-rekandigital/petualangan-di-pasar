@@ -65,22 +65,51 @@ function sintesis(): SpeechSynthesis | null {
   return 'speechSynthesis' in window ? window.speechSynthesis : null;
 }
 
-/** Mencari suara untuk bahasa aktif (id-ID atau en-*) yang tersedia di perangkat. */
-function cariSuara(): SpeechSynthesisVoice | null {
-  const s = sintesis();
-  if (!s) return null;
-  const daftar = s.getVoices();
-  if (daftar.length === 0) return null;
-  sudahCari = true;
-  const lang = (v: SpeechSynthesisVoice): string => v.lang.toLowerCase().replace('_', '-');
-  const cocok = daftar.filter((v) => lang(v).startsWith(BAHASA));
-  if (BAHASA === 'en') {
+/**
+ * Memilih suara untuk sebuah bahasa dari daftar suara perangkat (murni, mudah diuji).
+ * Android lama menamai bahasa Indonesia `in-ID` / `in_ID` (kode ISO lama), bukan `id-ID`.
+ */
+export function pilihSuara(daftar: readonly SpeechSynthesisVoice[], bahasa: 'id' | 'en'): SpeechSynthesisVoice | null {
+  const kode = (v: SpeechSynthesisVoice): string => v.lang.toLowerCase().replace('_', '-').split('-')[0] ?? '';
+  const cocok = daftar.filter((v) => (bahasa === 'id' ? kode(v) === 'id' || kode(v) === 'in' : kode(v) === 'en'));
+  if (bahasa === 'en') {
     // Utamakan en-US, lalu en-GB, lalu suara Inggris lain.
     const urut = [...cocok].sort((a, b) => skorInggris(b) - skorInggris(a));
     return urut[0] ?? null;
   }
   // Utamakan suara Google/online (biasanya lebih alami), lalu suara lokal.
   return cocok.find((v) => /google/i.test(v.name)) ?? cocok[0] ?? null;
+}
+
+/** Mencari suara untuk bahasa aktif. `sudahCari` hanya true bila daftar suara sudah terisi. */
+function cariSuara(): SpeechSynthesisVoice | null {
+  const s = sintesis();
+  if (!s) return null;
+  const daftar = s.getVoices();
+  if (daftar.length === 0) return null;
+  sudahCari = true;
+  return pilihSuara(daftar, BAHASA);
+}
+
+/**
+ * Menunggu daftar suara terisi (Chrome Android sering kosong di awal), paling lama 1,5 detik.
+ * Dipakai sekali; hasilnya disimpan di `suaraIndonesia`.
+ */
+let menungguSuara: Promise<void> | null = null;
+function muatSuara(): Promise<void> {
+  const s = sintesis();
+  if (!s || sudahCari) return Promise.resolve();
+  menungguSuara ??= new Promise<void>((resolve) => {
+    const selesai = (): void => {
+      suaraIndonesia = cariSuara();
+      // Batas waktu habis dengan daftar tetap kosong: anggap memang tidak ada suara.
+      sudahCari = true;
+      resolve();
+    };
+    s.addEventListener?.('voiceschanged', selesai, { once: true });
+    setTimeout(selesai, 1500);
+  });
+  return menungguSuara;
 }
 
 function skorInggris(v: SpeechSynthesisVoice): number {
@@ -94,6 +123,24 @@ if (s0) {
   s0.addEventListener?.('voiceschanged', () => {
     suaraIndonesia = cariSuara();
   });
+}
+
+/** Nama suara yang dipakai saat ini (untuk dicek di Pengaturan), atau null. */
+export function namaSuaraTerpilih(): string | null {
+  return suaraIndonesia?.name ?? null;
+}
+
+const KUNCI_PESAN_TANPA_SUARA = 'survival-sains:pesan-tanpa-suara';
+
+/** Sekali per perangkat: beri tahu UI bahwa suara bahasa aktif belum terpasang (main.ts menampilkan toast). */
+function beriTahuTanpaSuara(): void {
+  try {
+    if (localStorage.getItem(KUNCI_PESAN_TANPA_SUARA) === BAHASA) return;
+    localStorage.setItem(KUNCI_PESAN_TANPA_SUARA, BAHASA);
+  } catch {
+    /* penyimpanan diblokir: pesan bisa muncul lagi, tidak apa-apa */
+  }
+  window.dispatchEvent(new Event('suara-tidak-terpasang'));
 }
 
 /** Apakah perangkat mendukung TTS. */
@@ -134,7 +181,14 @@ export function bersihkanUntukSuara(teks: string): string {
     .trim();
 }
 
-/** Mengucapkan teks. Mengembalikan false bila suara mati/tidak tersedia. */
+/** Nomor ucapan terakhir: ucapan yang masih menunggu daftar suara dibatalkan bila ada yang lebih baru. */
+let nomorUcapan = 0;
+
+/**
+ * Mengucapkan teks. Mengembalikan false bila suara mati/tidak tersedia.
+ * Tidak pernah memakai suara bawaan HP: tanpa suara untuk bahasa aktif, teks tidak dibacakan
+ * (suara bawaan sering berbahasa Inggris sehingga teks Indonesia terdengar berlogat Inggris).
+ */
 export function ucapkan(teks: string, opsi: OpsiUcap = {}): boolean {
   const s = sintesis();
   if (!s || !aktif) {
@@ -146,12 +200,31 @@ export function ucapkan(teks: string, opsi: OpsiUcap = {}): boolean {
     opsi.onSelesai?.();
     return false;
   }
+  const nomor = ++nomorUcapan;
+  if (!sudahCari) suaraIndonesia = cariSuara();
+  if (!sudahCari) {
+    // Daftar suara belum siap: hentikan ucapan lama, tunggu sebentar, lalu bicara.
+    berhenti();
+    void muatSuara().then(() => {
+      if (nomor !== nomorUcapan) opsi.onSelesai?.();
+      else ucapkanDengan(s, bersih, opsi);
+    });
+    return true;
+  }
+  return ucapkanDengan(s, bersih, opsi);
+}
+
+function ucapkanDengan(s: SpeechSynthesis, bersih: string, opsi: OpsiUcap): boolean {
+  if (!suaraIndonesia) {
+    beriTahuTanpaSuara();
+    opsi.onSelesai?.();
+    return false;
+  }
   try {
     s.cancel();
     const u = new SpeechSynthesisUtterance(bersih);
     u.lang = kodeBahasa();
-    if (!suaraIndonesia) suaraIndonesia = cariSuara();
-    if (suaraIndonesia) u.voice = suaraIndonesia;
+    u.voice = suaraIndonesia;
     u.pitch = Math.max(0.1, Math.min(2, opsi.pitch ?? 1));
     u.rate = Math.max(0.5, Math.min(1.8, (opsi.rate ?? 0.95) * PENGALI_KECEPATAN[kecepatan]));
     u.onboundary = (ev) => {

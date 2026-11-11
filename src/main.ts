@@ -1422,6 +1422,15 @@ function pulihkanPosisi(): boolean {
   if (!data || typeof data !== 'object') return false;
   // Suara (TTS) baru boleh berbunyi setelah sentuhan pertama sesudah dimuat ulang.
   window.addEventListener('pointerdown', () => bukaKunciSuara(), { once: true });
+  // core/suara.ts: HP tanpa suara bahasa aktif tidak dibacakan; beri tahu cara memasangnya (sekali).
+  window.addEventListener('suara-tidak-terpasang', () =>
+    showToast(
+      BAHASA === 'en'
+        ? t('Suara Bahasa Inggris belum terpasang. Buka Setelan > Text-to-speech > Speech Services by Google > unduh Bahasa Inggris.')
+        : t('Suara Bahasa Indonesia belum terpasang. Buka Setelan > Text-to-speech > Speech Services by Google > unduh Bahasa Indonesia.'),
+      8000,
+    ),
+  );
   const pesan = t('🌐 Bahasa: {nama}', { nama: BAHASA === 'en' ? 'English' : 'Bahasa Indonesia' });
   if (data.layar === 'noktah' && getNoktah(data.noktah) && isBalaiUnlocked(progress, data.noktah)) {
     navigate('noktah', { noktah: data.noktah, posisi: data.posisi });

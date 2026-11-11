@@ -309,9 +309,18 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
             children: [isiUmum, tombolKendali('📢 Kirim', () => { const teks = isiUmum.value.trim(); if (teks) void kendali('umum', { teks }).then((ok) => { if (ok) isiUmum.value = ''; }); })],
           }),
           tombolKendali('🏁 Akhiri sesi', () => {
-            if (!window.confirm('Akhiri sesi? Semua siswa dilepas dan data kelas di server dihapus. Unduh CSV dulu bila perlu.')) return;
+            const nilai = st.siswa.map((s) => s.progress.nilai?.akhir).filter((n): n is number => n !== undefined);
+            const rata = nilai.length ? Math.round(nilai.reduce((x, y) => x + y, 0) / nilai.length) : 0;
+            const belum = st.siswa.filter((s) => balaiBelumTuntas(s.progress, kkm).length > 0).length;
+            const ringkasan = `${st.siswa.length} siswa · rata-rata nilai akhir ${rata} · ${belum} siswa punya balai belum tuntas (KKM ${kkm}).`;
+            if (!window.confirm(`Akhiri sesi?
+${ringkasan}
+CSV kelas diunduh otomatis. Semua siswa dilepas dan data di server dihapus.`)) return;
+            const snapshot = st.siswa;
+            const tokenAkhir = st.token ?? '';
             void kendali('akhiri').then((ok) => {
               if (!ok) return;
+              if (snapshot.length) eksporCsv(snapshot, tokenAkhir);
               window.clearInterval(st.timer);
               st.token = null;
               st.kunci = null;
@@ -319,7 +328,7 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
               hapusTokenGuru();
               hapusSimpanan(KUNCI_RAHASIA);
               hapusSimpanan(KUNCI_SALINAN);
-              showToast('Sesi diakhiri.');
+              showToast('Sesi diakhiri. CSV kelas sudah diunduh.');
               gambar();
             });
           }, 'ghost'),

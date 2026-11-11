@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { teksturRumput, ulangi } from './tekstur';
+import { modeRingan, saatRingan } from '../core/kualitas';
 
 /**
  * Pengaturan dasar scene Three.js: renderer, kamera, lampu, kabut, latar langit.
@@ -148,14 +149,15 @@ export function createScene(canvas: HTMLCanvasElement, options: SceneOptions = {
   const theme = options.theme ?? THEME_SORE_HANGAT;
   const groundSize = options.groundSize ?? 120;
 
+  const ringan = modeRingan();
   const renderer = new THREE.WebGLRenderer({
     canvas,
-    antialias: true,
+    // MSAA di layar HP rapat mahal; mode ringan cukup DPR 1.
+    antialias: !ringan,
     powerPreference: 'high-performance',
     alpha: false,
   });
-  const dpr = Math.min(window.devicePixelRatio || 1, quality.pixelRatioCap);
-  renderer.setPixelRatio(dpr);
+  renderer.setPixelRatio(ringan ? 1 : Math.min(window.devicePixelRatio || 1, quality.pixelRatioCap));
   renderer.setSize(window.innerWidth, window.innerHeight, false);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   // Tone mapping filmik: warna lebih "mahal", kontras lembut.
@@ -163,8 +165,8 @@ export function createScene(canvas: HTMLCanvasElement, options: SceneOptions = {
   renderer.toneMappingExposure = 1.0;
 
   // Bayangan lembut (PCFSoft) membuat bentuk terasa punya volume/nyata.
-  // Dimatikan bila kualitas rendah agar tetap lancar di HP kelas bawah.
-  const pakaiBayangan = quality.pixelRatioCap > 1.2;
+  // Dimatikan di mode ringan (core/kualitas.ts) agar lancar di HP kelas bawah.
+  const pakaiBayangan = !ringan;
   renderer.shadowMap.enabled = pakaiBayangan;
   if (pakaiBayangan) {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -270,11 +272,43 @@ export function createScene(canvas: HTMLCanvasElement, options: SceneOptions = {
   const updateAwan = buatAwan(scene, extra);
 
   // Beri tahu pemanggil apakah bayangan aktif (untuk mengatur castShadow objek).
+  // FPS turun di tengah permainan: resolusi & bayangan diturunkan tanpa membangun ulang dunia.
+  const lepasRingan = saatRingan(() => {
+    renderer.setPixelRatio(1);
+    renderer.setSize(window.innerWidth, window.innerHeight, false);
+    renderer.shadowMap.enabled = false;
+    sun.castShadow = false;
+  });
+
   const dispose = (): void => {
+    lepasRingan();
     window.removeEventListener('resize', handleResize);
     extra.forEach((d) => d.dispose());
-    renderer.dispose();
+    buangRenderer(renderer);
   };
 
   return { scene, renderer, camera, ground, pakaiBayangan, updateAwan, dispose };
+}
+
+/** Membuang renderer beserta konteks WebGL-nya (tanpa menunggu pemungut sampah browser). */
+export function buangRenderer(renderer: THREE.WebGLRenderer): void {
+  renderer.dispose();
+  renderer.forceContextLoss();
+}
+
+/**
+ * Pra-render: unggah semua tekstur ke GPU dan kompilasi semua shader sebelum
+ * layar loading ditutup, supaya langkah pertama pemain tidak tersendat.
+ */
+export async function siapkanRender(renderer: THREE.WebGLRenderer, scene: THREE.Scene, camera: THREE.Camera): Promise<void> {
+  const tekstur = new Set<THREE.Texture>();
+  scene.traverse((o) => {
+    const m = (o as THREE.Mesh).material;
+    for (const mat of Array.isArray(m) ? m : m ? [m] : []) {
+      for (const v of Object.values(mat)) if ((v as THREE.Texture | null)?.isTexture) tekstur.add(v as THREE.Texture);
+    }
+  });
+  for (const t of tekstur) renderer.initTexture(t);
+  await renderer.compileAsync(scene, camera);
+  renderer.render(scene, camera);
 }

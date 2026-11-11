@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import { cobaAvatarGlb, type AvatarModel } from './avatarModel';
 import { rapikanPilihan } from './kostum';
 import { TINGGI_PEMAIN } from './player';
+import { modeRingan } from '../core/kualitas';
 import type { KostumPemain, PosisiPemain } from '../../shared/net';
 
 /**
@@ -22,6 +23,8 @@ const TINGGI_LABEL = 0.35;
 const Y_LABEL = 1.95;
 export const Y_BALON = 2.5;
 const LAMA_SAPA = 2.6;
+/** Di mode ringan, avatar teman lebih jauh dari ini (m) tidak dianimasikan. */
+const JARAK_ANIMASI_RINGAN = 12;
 
 interface Tampilan {
   id: string;
@@ -143,7 +146,6 @@ export interface PengelolaPemainLain {
 
 export function createPengelolaPemainLain(
   scene: THREE.Scene,
-  renderer: THREE.WebGLRenderer,
   posisiSaya: THREE.Vector3,
 ): PengelolaPemainLain {
   const tampil = new Map<string, Tampilan>();
@@ -175,7 +177,7 @@ export function createPengelolaPemainLain(
       sapaTerakhir: 0,
     };
     // Data dari jaringan dirapikan dulu; `{}` agar tidak jatuh ke kostum simpanan perangkat ini.
-    void cobaAvatarGlb(p.gender, renderer, rapikanPilihan(p.gender, kostumTeman.get(p.id) ?? {}), TINGGI_PEMAIN).then((model) => {
+    void cobaAvatarGlb(p.gender, rapikanPilihan(p.gender, kostumTeman.get(p.id) ?? {}), TINGGI_PEMAIN).then((model) => {
       if (!model) return;
       if (t.dibuang) {
         model.dispose();
@@ -237,7 +239,9 @@ export function createPengelolaPemainLain(
         const sesaat = Math.hypot(t.group.position.x - x, t.group.position.z - z) / dt;
         t.kecepatan += (sesaat - t.kecepatan) * Math.min(1, dt * 6);
       }
-      t.model?.update(t.kecepatan, dt);
+      // Mode ringan: teman yang jauh membeku (skinning & mixer adalah biaya terbesar avatar).
+      const jauh = modeRingan() && Math.hypot(t.group.position.x - posisiSaya.x, t.group.position.z - posisiSaya.z) > JARAK_ANIMASI_RINGAN;
+      if (!jauh) t.model?.update(t.kecepatan, dt);
       t.balon.update(dt);
     }
   }

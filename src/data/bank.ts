@@ -1,5 +1,4 @@
 import { lokalkan } from '../core/bahasa';
-import { questionBankSchema } from './schema';
 import type { Question, BalaiId } from '../../shared/types';
 import H01 from './questions-ipa/H01.json';
 import H02 from './questions-ipa/H02.json';
@@ -14,18 +13,18 @@ import E02 from './questions-ipa/E02.json';
 import E03 from './questions-ipa/E03.json';
 import final from './questions-ipa/final.json';
 
+/** Seluruh soal mentah, persis seperti di berkas JSON. */
+export const SOAL_MENTAH: unknown[] = [...H01, ...H02, ...H03, ...H04, ...F01, ...F02, ...F03, ...F04, ...E01, ...E02, ...E03, ...final];
+
 /**
- * Memuat dan memvalidasi seluruh bank soal "Survival Sains".
- * Jika data tidak valid, melempar error yang jelas agar mudah diperbaiki.
+ * Memuat seluruh bank soal "Survival Sains".
+ *
+ * Bank soal ikut dibundel saat build, jadi validasi Zod (schema.ts) dijalankan
+ * di test (`tests/bank.test.ts`) dan `npm run verify:bank`, bukan di HP siswa:
+ * Zod + validasi 120 soal memperlambat start dan menambah ukuran JS awal.
  */
 export function loadQuestionBank(): Question[] {
-  const raw = [...H01, ...H02, ...H03, ...H04, ...F01, ...F02, ...F03, ...F04, ...E01, ...E02, ...E03, ...final];
-  const parsed = questionBankSchema.safeParse(raw);
-  if (!parsed.success) {
-    const message = parsed.error.issues.map((i) => i.message).join('\n');
-    throw new Error(`Bank soal tidak valid:\n${message}`);
-  }
-  return parsed.data as Question[];
+  return SOAL_MENTAH as Question[];
 }
 
 let cacheAsli: Question[] | null = null;

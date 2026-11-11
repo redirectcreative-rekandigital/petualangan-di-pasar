@@ -1808,3 +1808,20 @@ body.world-mode #app {
     columns: 1;
   }
 }
+
+/* ---- Mode ringan (core/kualitas.ts): HP lemah ---- */
+/* Blur CSS di atas kanvas 3D mahal di GPU murah: diganti warna polos. */
+html.mode-ringan .joystick-base {
+  backdrop-filter: none;
+}
+html.mode-ringan .cut-buram {
+  filter: brightness(0.75);
+}
+html.mode-ringan .cut-adegan.cut-putih.dengan-gambar .cut-ilustrasi,
+html.mode-ringan .cut-adegan.cut-putih.dengan-gambar .cut-buram {
+  filter: grayscale(0.6) brightness(1.15);
+}
+/* Halaman Cerita menutup penuh: dunia di belakangnya berhenti digambar (ui/pantauOverlay.ts). */
+html.mode-ringan .cerita-overlay {
+  background: #0f172a;
+}

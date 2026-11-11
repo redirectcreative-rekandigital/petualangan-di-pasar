@@ -4,6 +4,9 @@ import { cobaAvatarGlb, type AvatarModel } from '../../world/avatarModel';
 import type { PilihanKostum } from '../../world/kostum';
 import { warnaTurunan } from '../../core/kostumPemain';
 import type { PlayerGender } from '../../../shared/types';
+import { modeRingan } from '../../core/kualitas';
+import { isWebGLAvailable } from '../../world/webgl';
+import { buangRenderer } from '../../world/scene';
 
 /**
  * Pratinjau 3D kecil untuk layar "Pilih Karakter".
@@ -82,13 +85,43 @@ export interface OpsiPreview {
   kostum?: PilihanKostum;
 }
 
+/**
+ * Satu WebGLRenderer untuk semua pratinjau yang sedang tampil (layar pilih
+ * karakter menampilkan dua): tiap pratinjau menggambar scene-nya bergantian
+ * lalu menyalin hasilnya ke kanvas 2D miliknya. Dilepas saat pemakai terakhir pergi.
+ */
+let bersama: { renderer: THREE.WebGLRenderer; pemakai: number } | null = null;
+
+function pinjamRenderer(): THREE.WebGLRenderer {
+  if (!bersama) {
+    // Renderer lepas (tanpa kanvas terpasang). Kanvas WebGL bawaan three.js
+    // dibuat dengan `alpha: true` dan `premultipliedAlpha: false` — kombinasi
+    // yang membuat latar transparan tampil benar saat digambar di atas latar
+    // CSS. Hasil render disalin ke kanvas 2D biasa.
+    const renderer = new THREE.WebGLRenderer({ antialias: !modeRingan(), alpha: true });
+    renderer.setPixelRatio(1);
+    renderer.setClearColor(0x000000, 0);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.shadowMap.enabled = false;
+    bersama = { renderer, pemakai: 0 };
+  }
+  bersama.pemakai++;
+  return bersama.renderer;
+}
+
+function kembalikanRenderer(): void {
+  if (!bersama || --bersama.pemakai > 0) return;
+  buangRenderer(bersama.renderer);
+  bersama = null;
+}
+
 export function createKarakterPreview(
   gender: PlayerGender,
   warnaAwal: WarnaPenampilan = {},
   opsi: OpsiPreview = {},
 ): KarakterPreview {
   const canvas = document.createElement('canvas');
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = modeRingan() ? 1 : Math.min(window.devicePixelRatio || 1, 2);
   const W = Math.round(LEBAR * dpr);
   const H = Math.round(TINGGI * dpr);
   canvas.width = W;
@@ -98,27 +131,20 @@ export function createKarakterPreview(
   // pengaturan WebGL bebas dan tidak mengganggu kanvas dunia 3D.
   canvas.setAttribute('aria-hidden', 'true');
 
+  // Lingkungan uji (jsdom) / perangkat tanpa WebGL: jangan pernah menggagalkan layar.
+  if (!isWebGLAvailable()) return previewKosong();
   let renderer: THREE.WebGLRenderer;
   try {
-    // Probe dukungan WebGL dulu (lingkungan uji jsdom tidak memilikinya).
-    const uji = document.createElement('canvas');
-    const punyaWebgl = Boolean(uji.getContext('webgl2') ?? uji.getContext('webgl'));
-    if (!punyaWebgl) return previewKosong();
-    // Renderer lepas (tanpa kanvas terpasang). Kanvas WebGL bawaan three.js
-    // sudah dibuat dengan `alpha: true`, `antialias: true`, dan
-    // `premultipliedAlpha: false` — kombinasi yang membuat latar transparan
-    // tampil benar saat digambar di atas latar CSS. Hasil render disalin ke
-    // kanvas 2D biasa, sehingga tidak ada masalah dengan konteks WebGL statis.
-    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setPixelRatio(1);
-    renderer.setSize(W, H, false);
-    renderer.setClearColor(0x000000, 0);
-    renderer.outputColorSpace = THREE.SRGBColorSpace;
-    renderer.shadowMap.enabled = false;
+    renderer = pinjamRenderer();
   } catch {
-    // Perangkat/lingkungan tanpa WebGL: jangan pernah menggagalkan layar.
     return previewKosong();
   }
+  let dikembalikan = false;
+  const lepas = (): void => {
+    if (dikembalikan) return;
+    dikembalikan = true;
+    kembalikanRenderer();
+  };
   const ctx2d = canvas.getContext('2d');
 
   const scene = new THREE.Scene();
@@ -176,7 +202,7 @@ export function createKarakterPreview(
   function muatGlb(g: PlayerGender): void {
     if (!kostumKini) return;
     const nomor = ++nomorMuat;
-    void cobaAvatarGlb(g, renderer, kostumKini).then((model) => {
+    void cobaAvatarGlb(g, kostumKini).then((model) => {
       if (!model) return;
       if (nomor !== nomorMuat || !berjalan || genderKini !== g) {
         model.dispose();
@@ -221,8 +247,7 @@ export function createKarakterPreview(
     // Berhenti otomatis bila kanvas sudah tidak di DOM (layar berganti).
     if (!canvas.isConnected) {
       berjalan = false;
-      renderer.dispose();
-      renderer.forceContextLoss();
+      lepas();
       return;
     }
     // Batasi ±30 fps: tiap frame disalin dari WebGL ke kanvas 2D (cukup berat di HP murah).
@@ -265,6 +290,8 @@ export function createKarakterPreview(
       rig.group.rotation.y = Math.sin(t * 0.7) * 0.7;
       rig.idle(t, 0);
     }
+    // Renderer bersama: ukurannya disetel tiap gambar (pratinjau lain bisa berbeda ukuran).
+    if (renderer.domElement.width !== W || renderer.domElement.height !== H) renderer.setSize(W, H, false);
     renderer.render(scene, camera);
     // Salin hasil render ke kanvas 2D. Latar kanvas WebGL dibersihkan dengan
     // transparan penuh, dan `clearRect` menjaga sisa frame lama tidak tertinggal.
@@ -329,10 +356,9 @@ export function createKarakterPreview(
         rig.geometri.forEach((x) => x.dispose());
         rig.material.forEach((x) => x.dispose());
       }
-      renderer.dispose();
-      // Lepas konteks WebGL agar tidak menumpuk (browser membatasi jumlah
+      // Konteks WebGL dilepas bersama pemakai terakhir (browser membatasi jumlah
       // konteks aktif; pratinjau dibuat ulang setiap kali layar digambar).
-      renderer.forceContextLoss();
+      lepas();
     },
   };
 }

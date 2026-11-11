@@ -140,7 +140,8 @@ export function buatPulau3D(track: Track): THREE.Group {
   jalan.position.y = 0.1;
   g.add(jalan);
 
-  // --- Penghias ---
+  // --- Penghias --- (dibuat sebagai Mesh biasa, lalu digabung jadi InstancedMesh di bawah)
+  const isian = new THREE.Group();
   const batangMat = track(new THREE.MeshLambertMaterial({ color: 0x7a5230 }));
   const daunMat = track(new THREE.MeshLambertMaterial({ color: 0x2f8f46, flatShading: true }));
   const daunMudaMat = track(new THREE.MeshLambertMaterial({ color: 0x5cb85c, flatShading: true }));
@@ -183,14 +184,14 @@ export function buatPulau3D(track: Track): THREE.Group {
     batang.scale.set(s, s * 1.8, s);
     batang.position.set(x, y + 1.2 * s, z);
     batang.rotation.z = (rng() - 0.5) * 0.4;
-    g.add(batang);
+    isian.add(batang);
     for (let k = 0; k < 5; k++) {
       const p = new THREE.Mesh(pelepahGeo, kelapaMat);
       p.position.set(x, y + 2.5 * s, z);
       p.rotation.y = (k / 5) * Math.PI * 2;
       p.rotation.z = -0.4;
       p.scale.setScalar(s);
-      g.add(p);
+      isian.add(p);
     }
   });
   // Petak sawah di teras ladang.
@@ -198,19 +199,19 @@ export function buatPulau3D(track: Track): THREE.Group {
     const petak = new THREE.Mesh(petakGeo, sawahMat);
     petak.position.set(x, y + 0.05, z);
     petak.rotation.y = Math.atan2(x, z);
-    g.add(petak);
+    isian.add(petak);
   });
   // Hutan: pohon kerucut & bulat.
   tanam(14, 25.5, 70, (x, y, z, s) => {
     const batang = new THREE.Mesh(batangGeo, batangMat);
     batang.scale.setScalar(s);
     batang.position.set(x, y + 0.7 * s, z);
-    g.add(batang);
+    isian.add(batang);
     const bulat = rng() > 0.5;
     const daun = new THREE.Mesh(bulat ? bulatGeo : daunGeo, bulat ? daunMudaMat : daunMat);
     daun.scale.setScalar(s * (bulat ? 1.2 : 1));
     daun.position.set(x, y + (bulat ? 1.8 : 2.0) * s, z);
-    g.add(daun);
+    isian.add(daun);
   });
   // Batu di bukit & tebing.
   tanam(6, 13.5, 26, (x, y, z, s) => {
@@ -218,8 +219,23 @@ export function buatPulau3D(track: Track): THREE.Group {
     b.scale.set(s, s * 0.7, s);
     b.position.set(x, y + 0.3, z);
     b.rotation.y = rng() * 3;
-    g.add(b);
+    isian.add(b);
   });
+
+  // Ratusan penghias (kelapa, pohon, batu, sawah) digabung per geometri+material:
+  // ~300 draw call menjadi 7. Tampilan & posisi sama persis.
+  isian.updateMatrixWorld(true);
+  const kelompok = new Map<string, THREE.Mesh[]>();
+  for (const m of isian.children as THREE.Mesh[]) {
+    const kunci = m.geometry.uuid + (m.material as THREE.Material).uuid;
+    kelompok.set(kunci, [...(kelompok.get(kunci) ?? []), m]);
+  }
+  for (const daftar of kelompok.values()) {
+    const contoh = daftar[0] as THREE.Mesh;
+    const im = track(new THREE.InstancedMesh(contoh.geometry, contoh.material, daftar.length));
+    daftar.forEach((m, k) => im.setMatrixAt(k, m.matrix));
+    g.add(im);
+  }
 
   return g;
 }

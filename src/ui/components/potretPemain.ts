@@ -18,7 +18,7 @@ async function render(gender: PlayerGender, kostum?: PilihanKostum): Promise<str
   try {
     renderer.setSize(SISI, SISI, false);
     renderer.setClearColor(0x000000, 0);
-    const model = await cobaAvatarGlb(gender, renderer, kostum);
+    const model = await cobaAvatarGlb(gender, kostum);
     if (!model) return null;
     const scene = new THREE.Scene();
     pasangLampuPreview(scene);

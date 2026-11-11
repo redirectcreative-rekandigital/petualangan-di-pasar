@@ -4,7 +4,9 @@ import { URUTAN_BALAI } from '../data/cerita';
 import { buatPulau3D, posisiDiPulau, DIAMETER_PULAU } from './pulau';
 import { buatKios } from './kios';
 import { berkasRumah } from './asetBab';
-import { loadModel, klonModel } from './loaders';
+import { loadModel, klonModel, lepasModel } from './loaders';
+import { buangRenderer, siapkanRender } from './scene';
+import { modeRingan, saatRingan, catatFrame } from '../core/kualitas';
 import { buatKarakter, type KarakterRig } from './karakter';
 import type { Elemen, NoktahId, NoktahMeta } from '../../shared/types';
 
@@ -59,6 +61,8 @@ export interface PetaBesarHandle {
   fokusTujuan: () => void;
   /** Posisi layar (px) tiap balai, untuk uji otomatis. */
   posisiLayar: () => Array<{ kode: NoktahId; x: number; y: number }>;
+  /** Selesai saat rumah GLB termuat dan shader/tekstur sudah disiapkan (tutup loading). */
+  siap: Promise<void>;
   dispose: () => void;
 }
 
@@ -100,12 +104,15 @@ interface PulauNoktah {
   basePinY: number;
   /** Awan kabut yang menutupi balai terkunci. */
   kabut: THREE.Group;
+  /** Rumah GLB sudah terpasang (atau gagal, kios tetap tampil). */
+  siap: Promise<void>;
 }
 
 export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOptions): PetaBesarHandle {
   const pixelRatioCap = options.pixelRatioCap ?? 1.5;
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: false });
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, pixelRatioCap));
+  const ringan = modeRingan();
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !ringan, alpha: false });
+  renderer.setPixelRatio(ringan ? 1 : Math.min(window.devicePixelRatio || 1, pixelRatioCap));
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.08;
@@ -139,8 +146,20 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   // --- Laut beriak (bidang grid dengan gelombang lembut) ---
   const seaGeo = track(new THREE.PlaneGeometry(480, 480, 48, 48));
   seaGeo.rotateX(-Math.PI / 2);
-  const dasarY = seaGeo.getAttribute('position').array.slice() as Float32Array;
   const seaMat = track(new THREE.MeshLambertMaterial({ color: 0x1a6fa6, flatShading: false }));
+  // Ombak dihitung di GPU (dulu 2.401 vertex + normal dihitung ulang di CPU tiap frame).
+  const waktuLaut = { value: 0 };
+  seaMat.onBeforeCompile = (shader) => {
+    shader.uniforms.uWaktu = waktuLaut;
+    shader.vertexShader = `uniform float uWaktu;\n${shader.vertexShader}`
+      .replace(
+        '#include <beginnormal_vertex>',
+        `float fx = position.x * 0.08 + uWaktu * 1.1;
+        float fz = position.z * 0.09 + uWaktu * 0.9;
+        vec3 objectNormal = normalize(vec3(-0.028 * cos(fx), 1.0, 0.027 * sin(fz)));`,
+      )
+      .replace('#include <begin_vertex>', 'vec3 transformed = vec3(position.x, sin(fx) * 0.35 + cos(fz) * 0.3, position.z);');
+  };
   const sea = new THREE.Mesh(seaGeo, seaMat);
   sea.position.y = -1.4;
   scene.add(sea);
@@ -397,19 +416,21 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
   const batasJarak = (d: number): number => Math.max(jarakDasar * JARAK_MIN, Math.min(jarakDasar * jarakMaks(), d));
 
   /** Titik fokus yang diinginkan: tujuan saat dekat, tengah pulau saat jauh. */
+  /** Dipanggil tiap frame: hasilnya vektor bersama (tanpa alokasi), salin bila perlu disimpan. */
+  const _fokus = new THREE.Vector3();
   function fokusDiinginkan(): THREE.Vector3 {
     const rasio = jarak / jarakDasar;
     if (fokusGeser) {
       // Sudah digeser pemain: tetap di situ, kecuali zoom paling jauh (lihat seluruh pulau).
       const tj = Math.max(0, Math.min(1, (rasio - 0.75) / 0.2));
-      return fokusGeser.clone().lerp(PUSAT_PULAU, tj);
+      return _fokus.copy(fokusGeser).lerp(PUSAT_PULAU, tj);
     }
-    const tujuan = titikBalai(options.getTujuan?.() ?? options.getPosisiPemain());
-    if (!tujuan) return PUSAT_PULAU;
-    tujuan.y += 2;
+    const kode = options.getTujuan?.() ?? options.getPosisiPemain();
+    const p = kode ? posDunia[kode] : undefined;
+    if (!p) return PUSAT_PULAU;
     // 0 (dekat, ≤ 0.55) → fokus di tujuan; 1 (jauh, ≥ 0.8) → fokus di tengah pulau.
     const t = Math.max(0, Math.min(1, (rasio - 0.55) / 0.25));
-    return tujuan.lerp(PUSAT_PULAU, t);
+    return _fokus.set(p.x, p.y + 2, p.z).lerp(PUSAT_PULAU, t);
   }
 
   function terapkanKamera(): void {
@@ -662,6 +683,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
       return;
     }
     const now = performance.now();
+    catatFrame(now);
     const dt = Math.min(0.05, (now - tPrev) / 1000);
     tPrev = now;
     const t = now / 1000;
@@ -693,15 +715,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
       panahTujuan.visible = false;
     }
 
-    // Gelombang laut.
-    const pos = seaGeo.getAttribute('position') as THREE.BufferAttribute;
-    for (let i = 0; i < pos.count; i++) {
-      const bx = dasarY[i * 3] as number;
-      const bz = dasarY[i * 3 + 2] as number;
-      pos.setY(i, Math.sin(bx * 0.08 + t * 1.1) * 0.35 + Math.cos(bz * 0.09 + t * 0.9) * 0.3);
-    }
-    pos.needsUpdate = true;
-    seaGeo.computeVertexNormals();
+    waktuLaut.value = t;
 
     // Pulau: pin mengapung + bendera berkibar.
     for (const p of pulauList) {
@@ -747,9 +761,19 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     canvas.removeEventListener('touchmove', onTouchMove);
     canvas.removeEventListener('touchend', onTouchEnd);
     window.removeEventListener('resize', onResize);
+    lepasRingan();
     disposables.forEach((d) => d.dispose());
-    renderer.dispose();
+    buangRenderer(renderer);
+    // Rumah GLB hanya dipakai peta ini: lepas dari cache agar RAM tidak menumpuk.
+    for (const n of NOKTAH) {
+      const berkas = berkasRumah(n.kode);
+      if (berkas) lepasModel(berkas);
+    }
   };
+  const lepasRingan = saatRingan(() => {
+    renderer.setPixelRatio(1);
+    aturKamera();
+  });
 
   return {
     renderer,
@@ -777,6 +801,7 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
         return { kode: p.kode, x: Math.round((a.x + b.x) / 2), y: Math.round((a.y + b.y) / 2) };
       });
     },
+    siap: Promise.all(pulauList.map((p) => p.siap)).then(() => (berjalan ? siapkanRender(renderer, scene, camera) : undefined)),
     dispose,
   };
 }
@@ -795,6 +820,7 @@ function buatPulau(
   group.position.set(pos.x, 0, pos.z);
   const isFinal = n.kode === 'FINAL';
   const baseWarna = isFinal ? WARNA_FINAL : WARNA_ELEMEN[n.elemen];
+  let siap = Promise.resolve();
 
   // Dasar pulau: batu karang gelap + lapisan pasir.
   const batuGeo = track(new THREE.CylinderGeometry(isFinal ? 6.2 : 5.0, isFinal ? 7.2 : 6.0, 0.9, 16));
@@ -821,7 +847,7 @@ function buatPulau(
     // Rumah GLB bab menggantikan kios begitu termuat; bila gagal, kios tetap tampil.
     const berkas = berkasRumah(n.kode);
     if (berkas) {
-      void loadModel(berkas)
+      siap = loadModel(berkas)
         .then((gltf) => {
           const rumah = klonModel(gltf);
           rumah.traverse((o) => {
@@ -903,6 +929,7 @@ function buatPulau(
     fase: index * 0.7,
     basePinY,
     kabut,
+    siap,
   };
 }
 

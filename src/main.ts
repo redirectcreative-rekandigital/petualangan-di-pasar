@@ -26,12 +26,14 @@ import { getCerita, balaiSesudah, isiNama, CERITA, URUTAN_BALAI, type CeritaBala
 import { getQuestionBank, getQuestionsByBalai } from './data/bank';
 import { createInputManager, type InputManager } from './input/controls';
 import { isWebGLAvailable } from './world/webgl';
+import { catatFrame } from './core/kualitas';
+import { pantauOverlay } from './ui/pantauOverlay';
 import type { SceneQuality } from './world/scene';
 import type { NoktahWorldHandle, PeranNpc, PeranTitik } from './world/noktahWorld';
 import { createHud, type Hud } from './ui/hud';
 import { showToast } from './ui/dialog';
 import { pasangGambar, muatAwal } from './core/gambar';
-import { showLoading } from './ui/loading';
+import { tampilkanLoading } from './ui/loading';
 import { bukaPercakapan, type InfoPemain, type Percakapan } from './ui/percakapan';
 import { kostumDari } from './core/kostumPemain';
 import { muatModeKamera, modeBerikut, simpanModeKamera } from './world/camera';
@@ -260,15 +262,11 @@ type PosisiLanjut =
 function bukaPeta(options: Record<string, unknown> = {}): void {
   if (!bankReady()) return;
   aktifkanKlien();
-  const mulai = (): void => {
-    if (!isWebGLAvailable()) {
-      renderEmergencyScreen();
-      return;
-    }
-    void buildPeta(options);
-  };
-  if (options.dariIntro) showLoading(app, { pesan: t('Membuka peta Pulau Wonorejo...') }, mulai);
-  else mulai();
+  if (!isWebGLAvailable()) {
+    renderEmergencyScreen();
+    return;
+  }
+  void buildPeta(options);
 }
 
 async function buildPeta(options: Record<string, unknown>): Promise<void> {
@@ -279,6 +277,8 @@ async function buildPeta(options: Record<string, unknown>): Promise<void> {
   canvas.className = 'world-canvas';
   canvas.setAttribute('aria-label', 'Peta Pulau Wonorejo 3D');
   app.append(canvas);
+  // Loading bertahan sampai rumah GLB termuat dan shader siap (handle.siap).
+  const loading = tampilkanLoading(app, { pesan: String(options.pesanLoading ?? t('Membuka peta Pulau Wonorejo...')) });
 
   const { createPetaBesar } = await import('./world/petaBesar');
   const handle = createPetaBesar(canvas, {
@@ -309,6 +309,9 @@ async function buildPeta(options: Record<string, unknown>): Promise<void> {
   };
   tambahkanBarPeta();
   tambahkanZoomPeta(handle);
+  await handle.siap.catch((err: unknown) => console.error(err));
+  loading.tutup();
+  if (petaSession?.handle !== handle) return;
 
   const tujuan = balaiTujuan(progress);
   const namaTujuan = tujuan === 'FINAL' ? t('Mercusuar Tua') : (getCerita(tujuan)?.tempat ?? tujuan);
@@ -443,12 +446,10 @@ function petaKeNoktah(kode: NoktahId): void {
     petaSession = null;
   }
   if (kode === 'FINAL') {
-    showLoading(app, { pesan: t('Mendaki Mercusuar Tua...') }, () => navigate('final'));
+    navigate('final');
     return;
   }
-  // Unduh aset selama layar loading; kegagalan ditangani saat dunia dibangun.
-  void import('./world/asetBab').then((m) => m.muatAsetBab(kode)).catch(() => undefined);
-  showLoading(app, { pesan: t('Menuju {nama}...', { nama: noktah.nama }) }, () => navigate('noktah', { noktah: kode }));
+  navigate('noktah', { noktah: kode });
 }
 
 /* ================================================================== */
@@ -519,15 +520,19 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean, posisi?: Posisi
   canvas.className = 'world-canvas';
   canvas.setAttribute('aria-label', `Dunia 3D ${cerita.tempat}`);
   app.append(canvas);
+  // Loading bertahan sampai aset dimuat dan shader/tekstur disiapkan (world.siapkan).
+  const loading = tampilkanLoading(app, { pesan: t('Menuju {nama}...', { nama: getNoktah(kode)?.nama ?? cerita.tempat }) });
 
+  // Mode ringan (core/kualitas.ts) mengatur DPR & bayangan; ini batas atas kualitas penuh.
   const quality: SceneQuality = { pixelRatioCap: 1.5, fogNear: 30, fogFar: 80 };
-  if (new URLSearchParams(window.location.search).get('tanpaBayangan') === '1') quality.pixelRatioCap = 1.1;
   const idBangun = ++bangunDuniaKe;
   let aset: import('./world/asetBab').AsetBab;
+  let lepasAsetBab: typeof import('./world/asetBab').lepasAsetBab;
   let createNoktahWorld: typeof import('./world/noktahWorld').createNoktahWorld;
   try {
     const [modDunia, modAset] = await Promise.all([import('./world/noktahWorld'), import('./world/asetBab')]);
     createNoktahWorld = modDunia.createNoktahWorld;
+    lepasAsetBab = modAset.lepasAsetBab;
     aset = await modAset.muatAsetBab(kode);
   } catch (err) {
     console.error(err);
@@ -599,16 +604,21 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean, posisi?: Posisi
   let elapsed = 0;
   let tandaStat = '';
   let kunciLariSampai = 0;
+  const overlay = pantauOverlay();
   const loop = (now: number): void => {
     if (!session) return;
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     elapsed += dt;
     input.endFrame();
-    const sibuk =
-      session.sibuk ||
-      document.body.querySelector('.dialog-overlay, .vn-overlay, .cerita-overlay, .hadiah-overlay') !== null;
+    const sibuk = session.sibuk || overlay.adaOverlay();
     if (!sibuk && input.state.interactPressed) void handleInteract();
+    // Layar tertutup penuh (cutscene, Halaman Cerita di mode ringan): dunia 3D tak perlu digambar.
+    if (overlay.tertutupPenuh()) {
+      session.raf = requestAnimationFrame(loop);
+      return;
+    }
+    catatFrame(now);
     world.setPaused(sibuk);
     world.update(dt, elapsed);
     const near = world.getNearby();
@@ -636,13 +646,20 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean, posisi?: Posisi
     sibuk: false,
     cleanup: () => {
       cancelAnimationFrame(session?.raf ?? 0);
+      overlay.lepas();
       input.destroy();
       world.dispose();
       hud.destroy();
+      // Sinkron: bila dibuat async, dunia berikutnya (balai sama) bisa ikut kehilangan asetnya.
+      lepasAsetBab(kode);
     },
   };
   perbaruiMisi();
   muatAwal([cerita.penjaga.gambar, cerita.cantrik.gambar]);
+  await world.siapkan().catch((err: unknown) => console.error(err));
+  loading.tutup();
+  if (session?.world !== world) return;
+  last = performance.now();
   session.raf = requestAnimationFrame(loop);
 
   // Kembali dari ganti bahasa: letakkan pemain di tempat semula, tanpa sapaan awal.
@@ -977,7 +994,7 @@ async function keluarLewatGerbang(): Promise<void> {
     tahap === 3 && berikut
       ? t('Kabut tersibak! Jalan ke {tempat} terbuka.', { tempat: getCerita(berikut)?.tempat ?? berikut })
       : undefined;
-  showLoading(app, { pesan: t('Kembali ke peta pulau...') }, () => navigate('map', { pesan }));
+  navigate('map', { pesan, pesanLoading: t('Kembali ke peta pulau...') });
 }
 
 /* ---------- Tas survival ---------- */
@@ -1365,6 +1382,13 @@ boot();
   bank: () => getQuestionBank(),
   mode: () => (session ? 'balai-3d' : mercusuar ? 'mercusuar-3d' : petaSession ? 'peta-3d' : 'ui'),
   debug: () => session?.world.debugState() ?? mercusuar?.world.debugState() ?? null,
+  /** Statistik render untuk uji performa (scripts/ukur-performa.mjs). */
+  info: () => {
+    const r = session?.world.renderer ?? petaSession?.handle.renderer;
+    if (!r) return null;
+    const { calls, triangles } = r.info.render;
+    return { calls, triangles, ...r.info.memory, dpr: r.getPixelRatio(), bayangan: r.shadowMap.enabled, ringan: document.documentElement.classList.contains('mode-ringan') };
+  },
   progress: () => progress,
   karakter: () => KARAKTER[progress.gender],
   masukBalai: (kode: NoktahId, prolog = false) => navigate('noktah', { noktah: kode, prolog }),

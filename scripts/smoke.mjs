@@ -34,13 +34,13 @@ async function lanjutSemua(maks = 12) {
 try {
   await page.goto(BASE, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: /Mulai Petualangan/ }).click();
+  await page.getByRole('button', { name: /Lanjut/ }).first().click(); // pilih karakter
+  await page.getByRole('button', { name: /Lanjut/ }).first().click(); // kostum
+  await page.fill('input.isian', 'Uji');
+  await page.getByRole('button', { name: /Mulai Bertahan/ }).click();
   await page.waitForSelector('.cut-overlay');
   log('cutscene badai tampil');
   await page.getByRole('button', { name: /Lewati/ }).click();
-  await page.getByRole('button', { name: /Lanjut/ }).click();
-  await page.getByRole('button', { name: /Lanjut/ }).first().click();
-  await page.fill('input.isian', 'Uji');
-  await page.getByRole('button', { name: /Mulai Bertahan/ }).click();
   await page.waitForSelector('canvas.world-canvas', { timeout: 20000 });
   await page.waitForSelector('.vn-overlay', { timeout: 45000 }); // adegan Tidur-Bangun lambat di swiftshader
   log('prolog: terbangun di Goa Sinar, Mbok Sinar menyapa');

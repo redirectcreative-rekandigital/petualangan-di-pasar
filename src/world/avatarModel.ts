@@ -112,13 +112,12 @@ function bidikTulang(tulang: THREE.Object3D, anak: THREE.Object3D, tujuan: THREE
  */
 export async function cobaAvatarGlb(
   gender: PlayerGender,
-  renderer?: THREE.WebGLRenderer,
   kostum?: PilihanKostum,
   tinggiTarget = TINGGI_ACUAN,
 ): Promise<AvatarModel | null> {
   let gltf;
   try {
-    gltf = await loadModel(BERKAS[gender], renderer);
+    gltf = await loadModel(BERKAS[gender]);
   } catch {
     // Berkas belum disiapkan; bukan kesalahan, cukup pakai karakter prosedural.
     return null;

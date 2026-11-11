@@ -52,8 +52,8 @@ if (typeof globalThis.FileReader === 'undefined') {
  *   - perempuan : hijab teal, lengan panjang, celana kargo gelap (sesuai
  *                 prompt "player_female_hijab").
  *
- * Keluaran: `public/assets/models/player_male.glb` &
- *           `public/assets/models/player_female_hijab.glb`
+ * Keluaran: `aset-sumber/models/player_male.glb` &
+ *           `aset-sumber/models/player_female_hijab.glb` (lalu `npm run kompres:model`)
  *
  * Jalankan: `npm run build:avatar`
  *
@@ -62,7 +62,7 @@ if (typeof globalThis.FileReader === 'undefined') {
  * memakai jalur prosedural bila model tidak punya klip.
  */
 
-const MODEL_DIR = resolve('public/assets/models');
+const MODEL_DIR = resolve('aset-sumber/models');
 
 /* ---------------- Palet ---------------- */
 

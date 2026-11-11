@@ -19,6 +19,7 @@
     "smoke": "node scripts/smoke.mjs",
     "smoke:guru": "node scripts/smoke-guru.mjs",
     "build:avatar": "node scripts/build-avatar.mjs",
+    "kompres:model": "node scripts/kompres-model.mjs",
     "serve": "node server/index.mjs",
     "serve:dev": "npm run build && node server/index.mjs",
     "naskah": "tsx scripts/gen-naskah.ts"

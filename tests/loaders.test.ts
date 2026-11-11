@@ -74,6 +74,9 @@ vi.mock('three/examples/jsm/loaders/KTX2Loader.js', () => {
     setTranscoderPath(): this {
       return this;
     }
+    setWorkerLimit(): this {
+      return this;
+    }
     detectSupport(): this {
       return this;
     }
@@ -108,6 +111,20 @@ describe('pipeline aset 3D', () => {
     // Cache: promise yang sama dikembalikan.
     expect(loadModel('contoh.glb')).toBe(loadModel('contoh.glb'));
     void b;
+  });
+
+  it('lepasModel membuang geometri & menghapus cache', async () => {
+    const { loadModel, lepasModel } = await import('../src/world/loaders');
+    const a = await loadModel('lepas.glb');
+    const mesh = a.scene.getObjectByName('Tubuh') as THREE.SkinnedMesh;
+    let dibuang = false;
+    mesh.geometry.addEventListener('dispose', () => (dibuang = true));
+    lepasModel('lepas.glb');
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(dibuang).toBe(true);
+    // Pemuatan berikutnya membuat objek baru, bukan yang sudah dibuang.
+    expect((await loadModel('lepas.glb')).scene).not.toBe(a.scene);
   });
 
   it('mengekloning scene tanpa berbagi material, dengan rig sendiri', async () => {

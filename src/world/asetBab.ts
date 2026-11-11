@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
-import { loadModel, klonModel } from './loaders';
+import { loadModel, klonModel, lepasModel } from './loaders';
 import { buildSign } from './papan';
+import { modeRingan, saatRingan } from '../core/kualitas';
 
 /**
  * Aset GLB tiap bab (lihat docs/aset/ASET_INDEX.md): daftar berkas per bab,
@@ -101,6 +102,16 @@ export async function muatAsetBab(kode: string): Promise<AsetBab> {
   return { rumah, stasiun, arena, gerbang, obor, penjaga, cantrik, kit, glb };
 }
 
+/**
+ * Melepas berkas khas bab dari cache loader setelah dunianya dibuang (hemat RAM).
+ * Isian bersama, gerbang, dan obor dipakai semua bab, jadi tetap disimpan.
+ */
+export function lepasAsetBab(kode: string): void {
+  const d = BAB[kode];
+  if (!d) return;
+  [berkas(d.rumah), berkas(d.stasiun), berkas(d.arena), berkasNpc(d.penjaga), berkasNpc(d.cantrik), ...d.isian.map(berkas)].forEach(lepasModel);
+}
+
 export interface Pasangan {
   root: THREE.Object3D;
   mixer: THREE.AnimationMixer | null;
@@ -146,11 +157,13 @@ export function buatDuniaGlb(scene: THREE.Scene, aset: AsetBab, warna: number, t
   const antrean = new Map<string, THREE.Matrix4[]>();
   const dummy = new THREE.Object3D();
 
-  const lampu = Array.from({ length: JUMLAH_LAMPU }, () => {
+  // Mode ringan: tanpa PointLight (cahaya obor cukup dari warna emissive GLB).
+  const lampu = Array.from({ length: modeRingan() ? 0 : JUMLAH_LAMPU }, () => {
     const l = new THREE.PointLight(0xffffff, 0);
     scene.add(l);
     return l;
   });
+  track({ dispose: saatRingan(() => lampu.splice(0).forEach((l) => scene.remove(l))) });
 
   const tulisPapan = (root: THREE.Object3D, teks: string | undefined): void => {
     const papan: THREE.Object3D[] = [];
@@ -258,11 +271,13 @@ export function buatDuniaGlb(scene: THREE.Scene, aset: AsetBab, warna: number, t
     },
     update: (dt, elapsed, pemain) => {
       for (const m of mixers) m.update(dt);
-      const dekat = saran
-        .filter((s) => !s.syarat || s.syarat.visible)
-        .sort((a, b) => a.pos.distanceToSquared(pemain) - b.pos.distanceToSquared(pemain));
+      if (lampu.length === 0) return;
+      // Diurutkan di tempat: tanpa array baru tiap frame (sampah GC = patah sesaat).
+      saran.sort((a, b) => a.pos.distanceToSquared(pemain) - b.pos.distanceToSquared(pemain));
+      let j = 0;
       lampu.forEach((l, i) => {
-        const s = dekat[i];
+        while (j < saran.length && saran[j]?.syarat?.visible === false) j++;
+        const s = saran[j++];
         if (!s) {
           l.intensity = 0;
           return;

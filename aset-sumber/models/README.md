@@ -1,9 +1,14 @@
-# models/
+# aset-sumber/models/
 
-Letakkan berkas model 3D **glTF/GLB** di sini (mis. `warung.glb`, `pohon.glb`).
+Berkas model 3D **glTF/GLB asli** (belum dikompres). Folder ini **tidak ter-deploy**.
+Setelah menambah atau mengubah berkas di sini, jalankan `npm run kompres:model`: hasilnya
+(tekstur KTX2 512 px + Meshopt) ditulis ke `public/assets/models/`, yang dimuat game.
+Prasyarat: `ktx` dari [KTX-Software](https://github.com/KhronosGroup/KTX-Software/releases) ada di PATH.
+
+Folder `_backup_lama/` berisi cadangan dan tidak ikut dikompres.
 
 Panduan ekspor & optimasi (DRACO + KTX2), cara memuat, dan aturan performa ada di
-[`docs/pipeline-aset-3d.md`](../../../docs/pipeline-aset-3d.md).
+[`docs/pipeline-aset-3d.md`](../../docs/pipeline-aset-3d.md).
 
 Catatan: permainan tetap berjalan meski folder ini kosong — penghias dunia dibuat
 dari geometri dasar lewat `src/world/instancing.ts`.

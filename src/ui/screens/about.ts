@@ -89,13 +89,13 @@ export function renderAbout(ctx: ScreenContext): HTMLElement {
         ],
       }),
       el('div', { class: 'stack', children: [kembali] }),
-      // Logo sekolah & mitra (berkas: public/assets/gambar/footer.png).
+      // Logo sekolah & mitra (berkas: public/assets/gambar-hp/footer.webp; asli di aset-sumber/gambar/).
       el('div', {
         class: 'tentang-footer',
         children: [
           el('img', {
             attrs: {
-              src: `${import.meta.env.BASE_URL}assets/gambar/footer.png`,
+              src: `${import.meta.env.BASE_URL}assets/gambar-hp/footer.webp`,
               alt: t('Logo SD Muhammadiyah Wonorejo dan mitra pendidikan'),
               loading: 'lazy',
               decoding: 'async',

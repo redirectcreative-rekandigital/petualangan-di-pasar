@@ -1,10 +1,3 @@
-import kamusUi from '../i18n/en/ui.json';
-import kamusCerita from '../i18n/en/cerita.json';
-import kamusAdegan from '../i18n/en/adegan.json';
-import kamusBalai from '../i18n/en/balai.json';
-import kamusSoal from '../i18n/en/soal.json';
-import kamusKostum from '../i18n/en/kostum.json';
-
 /**
  * Pilihan bahasa game: Bahasa Indonesia (bawaan) atau English.
  *
@@ -77,15 +70,28 @@ export function gantiBahasa(b: Bahasa): void {
 
 type Kamus = Record<string, string>;
 
-/** Kamus konten (cerita, materi, soal). */
-const KAMUS_KONTEN: Kamus = {
-  ...(kamusCerita as Kamus),
-  ...(kamusAdegan as Kamus),
-  ...(kamusBalai as Kamus),
-  ...(kamusSoal as Kamus),
-};
-/** Kamus antarmuka + nama gaya/bagian/warna kostum. */
-const KAMUS_UI: Kamus = { ...(kamusKostum as Kamus), ...(kamusUi as Kamus) };
+/** Kamus konten (cerita, materi, soal). Diisi `muatKamus()`. */
+const KAMUS_KONTEN: Kamus = {};
+/** Kamus antarmuka + nama gaya/bagian/warna kostum. Diisi `muatKamus()`. */
+const KAMUS_UI: Kamus = {};
+
+/**
+ * Memuat kamus Inggris (~175 KB) hanya bila bahasa Inggris dipilih. Harus
+ * selesai sebelum modul lain memanggil `t()` (lihat src/boot.ts).
+ */
+export async function muatKamus(): Promise<void> {
+  if (BAHASA === 'id') return;
+  const [ui, cerita, adegan, balai, soal, kostum] = await Promise.all([
+    import('../i18n/en/ui.json'),
+    import('../i18n/en/cerita.json'),
+    import('../i18n/en/adegan.json'),
+    import('../i18n/en/balai.json'),
+    import('../i18n/en/soal.json'),
+    import('../i18n/en/kostum.json'),
+  ]);
+  Object.assign(KAMUS_KONTEN, cerita.default, adegan.default, balai.default, soal.default);
+  Object.assign(KAMUS_UI, kostum.default, ui.default);
+}
 
 function cari(kamus: Kamus, s: string): string | undefined {
   const v = kamus[s];

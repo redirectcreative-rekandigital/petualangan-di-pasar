@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import { createScene, type SceneQuality, type SceneTheme } from './scene';
+import { createScene, siapkanRender, type SceneQuality, type SceneTheme } from './scene';
 import { createPlayer, type PlayerBundle } from './player';
 import { createCameraController, titikKeLayar, type ModeKamera } from './camera';
 import { BAB, berkasNpc, buatNpc, type NpcGlb } from './asetBab';
-import { loadModel } from './loaders';
+import { loadModel, lepasModel } from './loaders';
 import { buildTag } from './papan';
 import type { InputManager } from '../input/controls';
 import type { Progress } from '../../shared/types';
@@ -11,6 +11,7 @@ import { kostumDari } from '../core/kostumPemain';
 import { FINAL_BAGIAN } from '../data/cerita';
 import { sfx } from '../core/sound';
 import { t } from '../core/bahasa';
+import { modeRingan, saatRingan } from '../core/kualitas';
 
 /**
  * Bagian dalam Mercusuar Tua (Final). Empat lantai bundar dihubungkan tangga
@@ -87,6 +88,8 @@ export function tinggiPermukaan(x: number, z: number, y: number, k: KeadaanPintu
 export type Dekat = { jenis: 'masuk' | 'peta' | 'lampu' } | { jenis: 'pintu'; lantai: number };
 
 export interface MercusuarHandle {
+  /** Pra-render: tunggu avatar & NPC, unggah tekstur, kompilasi shader. */
+  siapkan: () => Promise<void>;
   update: (dt: number, elapsed: number) => void;
   setPaused: (v: boolean) => void;
   getNearby: () => Dekat | null;
@@ -202,11 +205,14 @@ export function createMercusuarWorld(opsi: {
   for (let i = 1; i < N; i++) pagarLantai(i * TINGGI_LANTAI, SAMBUNG, DUA_PI - SAMBUNG);
 
   /* ---------- Lampu ruangan & kilat ---------- */
-  for (let i = 0; i < N; i++) {
+  // Mode ringan: satu lampu yang ikut lantai pemain, bukan satu per lantai.
+  const lampuLantai = Array.from({ length: modeRingan() ? 1 : N }, (_, i) => {
     const l = new THREE.PointLight(0xffc27a, 14, 14, 1.4);
     l.position.set(0, i * TINGGI_LANTAI + 3, 0);
     scene.add(l);
-  }
+    return l;
+  });
+  track({ dispose: saatRingan(() => lampuLantai.splice(1).forEach((l) => scene.remove(l))) });
   const kilat = new THREE.AmbientLight(0xdbeafe, 0);
   scene.add(kilat);
   let kilatBerikut = 4;
@@ -278,11 +284,14 @@ export function createMercusuarWorld(opsi: {
 
   /* ---------- Penjaga tiap lantai ---------- */
   const npc: Array<{ lantai: number; rig: NpcGlb }> = [];
+  const berkasPenjaga: string[] = [];
+  const muatPenjaga: Promise<unknown>[] = [];
   FINAL_BAGIAN.forEach((b, i) => {
     b.penjaga.forEach((nama, j) => {
       const berkas = BAB[b.kode[j] ?? '']?.penjaga;
       if (!berkas) return;
-      void loadModel(berkasNpc(berkas)).then((gltf) => {
+      berkasPenjaga.push(berkasNpc(berkas));
+      const janji = loadModel(berkasNpc(berkas)).then((gltf) => {
         if (dibuang) return;
         const rig = buatNpc(gltf, track);
         rig.group.position.copy(pos(2.6, 0.5 + j * 0.45, i * TINGGI_LANTAI));
@@ -296,6 +305,7 @@ export function createMercusuarWorld(opsi: {
         scene.add(rig.group);
         npc.push({ lantai: i, rig });
       }).catch(() => undefined);
+      muatPenjaga.push(janji);
     });
   });
 
@@ -306,7 +316,7 @@ export function createMercusuarWorld(opsi: {
   player.setPosition(awal.x, awal.z);
   player.faceDirection(1, 0, 1);
   scene.add(player.group);
-  void player.cobaPakaiGlb(renderer);
+  const glbPemain = player.cobaPakaiGlb();
   const cam = createCameraController(camera);
   // Kamera di belakang pemain (sisi -x), menghadap menara.
   cam.setYaw(-Math.PI / 2);
@@ -357,6 +367,7 @@ export function createMercusuarWorld(opsi: {
 
     const diDalam = Math.hypot(p.x, p.z) < R_DINDING;
     const tampakLantai = (i: number): boolean => i * TINGGI_LANTAI <= p.y + 2.9;
+    if (lampuLantai.length === 1) (lampuLantai[0] as THREE.PointLight).position.y = Math.floor(p.y / TINGGI_LANTAI) * TINGGI_LANTAI + 3;
     for (const n of npc) {
       n.rig.group.visible = diDalam && tampakLantai(n.lantai);
       n.rig.update(dt, 0);
@@ -391,6 +402,10 @@ export function createMercusuarWorld(opsi: {
   };
 
   return {
+    siapkan: async () => {
+      await Promise.all([glbPemain, ...muatPenjaga]);
+      await siapkanRender(renderer, scene, camera);
+    },
     update,
     setPaused: (v) => {
       paused = v;
@@ -453,6 +468,7 @@ export function createMercusuarWorld(opsi: {
       cam.dispose();
       disposables.forEach((d) => d.dispose());
       disposeScene();
+      berkasPenjaga.forEach(lepasModel);
     },
   };
 }

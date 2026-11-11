@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { createScene, type SceneQuality, QUALITY_HIGH, THEME_ZONA } from './scene';
+import { createScene, siapkanRender, type SceneQuality, QUALITY_HIGH, THEME_ZONA } from './scene';
 import { createPlayer, type PlayerBundle } from './player';
 import { createCameraController, titikKeLayar, type CameraController, type FokusKamera, type ModeKamera } from './camera';
 import { resolveAll, clampToMap } from './collision';
@@ -84,6 +84,8 @@ export interface NoktahWorldHandle {
   letakkanPemain: (pos: { x: number; z: number; rot: number; yaw?: number }) => void;
   /** Pintasan uji: letakkan pemain di dekat sebuah titik. */
   pindahKe: (peran: PeranTitik) => boolean;
+  /** Pra-render: tunggu avatar, unggah tekstur & kompilasi shader sebelum loading ditutup. */
+  siapkan: () => Promise<void>;
   debugState: () => {
     x: number;
     z: number;
@@ -205,6 +207,9 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   scene.add(penjagaRig.group);
   const posPenjaga = new THREE.Vector3();
   const targetPenjaga = new THREE.Vector3();
+  // Vektor kerja yang dipakai ulang tiap frame (tanpa sampah untuk GC).
+  const _arah = new THREE.Vector3();
+  const _layar = new THREE.Vector3();
 
   /* ---------------- Ruang Cerita: panggung + Cantrik ---------------- */
   const ruang = new THREE.Group();
@@ -304,11 +309,11 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     : tata.muncul;
   player.setPosition(awal.x, awal.z);
   scene.add(player.group);
-  const glbPemain = player.cobaPakaiGlb(renderer);
+  const glbPemain = player.cobaPakaiGlb();
   const camCtrl: CameraController = createCameraController(camera);
   camCtrl.setYaw(Math.atan2(-(tata.penjaga.x - awal.x), -(tata.penjaga.z - awal.z)));
 
-  const pemainLain: PengelolaPemainLain = createPengelolaPemainLain(scene, renderer, player.position);
+  const pemainLain: PengelolaPemainLain = createPengelolaPemainLain(scene, player.position);
   const balonSaya = track(buatBalonSapa());
   balonSaya.sprite.position.y = Y_BALON;
   player.group.add(balonSaya.sprite);
@@ -342,14 +347,14 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   terapkanTahap(tahap, true);
 
   function titikTujuan(): Titik {
-    if (tahap === 0) return { x: posPenjaga.x, z: posPenjaga.z };
+    if (tahap === 0) return posPenjaga;
     if (tahap === 1) return posCantrik;
-    if (tahap === 2) return { x: tata.uji.x, z: tata.uji.z };
+    if (tahap === 2) return tata.uji;
     return tata.gerbang;
   }
 
   function posisiTitik(peran: PeranTitik): Titik {
-    if (peran === 'penjaga') return { x: posPenjaga.x, z: posPenjaga.z };
+    if (peran === 'penjaga') return posPenjaga;
     if (peran === 'cantrik') return posCantrik;
     if (peran === 'uji') return tata.uji;
     return tata.gerbang;
@@ -449,7 +454,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     const jarakPenjaga = posPenjaga.distanceTo(targetPenjaga);
     if (jarakPenjaga > 0.05) {
       const langkah = Math.min(jarakPenjaga, dt * JALAN_NPC);
-      const arah = targetPenjaga.clone().sub(posPenjaga).normalize();
+      const arah = _arah.subVectors(targetPenjaga, posPenjaga).normalize();
       posPenjaga.addScaledVector(arah, langkah);
       penjagaRig.group.position.copy(posPenjaga);
       penjagaRig.group.rotation.y = Math.atan2(arah.x, arah.z);
@@ -459,7 +464,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
       hadapkan(penjagaRig, posPenjaga, dt);
     }
     cantrikRig.update(dt, 0);
-    hadapkan(cantrikRig, new THREE.Vector3(posCantrik.x, 0, posCantrik.z), dt);
+    hadapkan(cantrikRig, posCantrik, dt);
     buku.position.y = 1.7 + Math.sin(elapsed * 1.7) * 0.08;
     buku.rotation.y += dt * 0.8;
 
@@ -486,7 +491,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     renderer.render(scene, camera);
   };
 
-  function hadapkan(rig: NpcGlb, pos: THREE.Vector3, dt: number): void {
+  function hadapkan(rig: NpcGlb, pos: Titik, dt: number): void {
     const d = Math.hypot(player.position.x - pos.x, player.position.z - pos.z);
     if (d > 7) return;
     const target = Math.atan2(player.position.x - pos.x, player.position.z - pos.z);
@@ -536,7 +541,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
       const titik = nearby.peran === 'uji' && tahap >= 2 ? { x: posPenjaga.x, z: posPenjaga.z } : posisiTitik(nearby.peran);
       const atas = nearby.peran === 'gerbang' ? 3.4 : nearby.peran === 'uji' && tahap < 2 ? 2.6 : 2.1;
       const kanvas = renderer.domElement;
-      return titikKeLayar(new THREE.Vector3(titik.x, atas, titik.z).project(camera), kanvas.clientWidth, kanvas.clientHeight);
+      return titikKeLayar(_layar.set(titik.x, atas, titik.z).project(camera), kanvas.clientWidth, kanvas.clientHeight);
     },
     npcInteraksi: (peran) => (peran === 'penjaga' ? penjagaRig : cantrikRig).interaksi(),
     // Adegan Tidur/Bangun harus terlihat utuh, apa pun mode kamera pilihan pemain.
@@ -552,6 +557,12 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
       player.faceDirection(Math.sin(pos.rot), Math.cos(pos.rot), 1);
       if (pos.yaw !== undefined) camCtrl.setYaw(pos.yaw);
       nearby = cariDekat();
+    },
+    siapkan: async () => {
+      await glbPemain;
+      // Satu frame update menempatkan kamera & pose sebelum shader dikompilasi.
+      update(0, 0);
+      await siapkanRender(renderer, scene, camera);
     },
     pindahKe: (peran) => {
       const p = posisiTitik(peran);

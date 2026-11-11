@@ -9,7 +9,6 @@ import type {
   NoktahMeta,
   TokohMateri,
 } from '../../shared/types';
-import { noktahListSchema } from './schema';
 import { CERITA, URUTAN_BALAI, getCerita } from './cerita';
 
 /**
@@ -826,12 +825,3 @@ export function noktahMateri(): NoktahMeta[] {
   return NOKTAH.filter((n) => n.kode !== 'FINAL');
 }
 
-/** Memvalidasi daftar noktah saat modul dimuat. */
-export function validateNoktah(): NoktahMeta[] {
-  const parsed = noktahListSchema.safeParse(NOKTAH);
-  if (!parsed.success) {
-    const message = parsed.error.issues.map((i) => i.message).join('\n');
-    throw new Error(`Daftar noktah tidak valid:\n${message}`);
-  }
-  return parsed.data as NoktahMeta[];
-}

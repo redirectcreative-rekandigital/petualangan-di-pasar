@@ -40,7 +40,7 @@ export interface PlayerBundle {
    * Coba ganti model dengan avatar GLB bila tersedia di `public/assets/models/`.
    * Bila berkas tidak ada, pemain tetap memakai karakter prosedural.
    */
-  cobaPakaiGlb: (renderer?: THREE.WebGLRenderer) => Promise<boolean>;
+  cobaPakaiGlb: () => Promise<boolean>;
   dispose: () => void;
 }
 
@@ -149,12 +149,14 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
     rig.langkah(speed, elapsed);
   };
 
-  const cobaPakaiGlb = async (renderer?: THREE.WebGLRenderer): Promise<boolean> => {
-    const model = await cobaAvatarGlb(opsi.gender, renderer, opsi.kostum, TINGGI_PEMAIN);
+  const cobaPakaiGlb = async (): Promise<boolean> => {
+    const model = await cobaAvatarGlb(opsi.gender, opsi.kostum, TINGGI_PEMAIN);
     if (!model) return false;
     glb = model;
-    // Sembunyikan karakter prosedural, tampilkan model GLB di grup yang sama.
-    group.visible = false;
+    // Karakter prosedural tidak dipakai lagi: lepas dari scene & GPU (hemat RAM).
+    akar.remove(group);
+    rig.geometri.forEach((g) => g.dispose());
+    rig.material.forEach((m) => m.dispose());
     akar.add(model.group);
     akar.traverse((o) => {
       o.castShadow = true;

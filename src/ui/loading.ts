@@ -27,8 +27,21 @@ const TIPS: string[] = [
 
 /** Menampilkan overlay loading singkat lalu memanggil `onSelesai`. */
 export function showLoading(root: HTMLElement, options: LoadingOptions, onSelesai: () => void): void {
+  mount(root);
+  const loading = tampilkanLoading(root, options);
+  window.setTimeout(() => {
+    loading.tutup();
+    window.setTimeout(onSelesai, 220);
+  }, options.durasi ?? 900);
+}
+
+/**
+ * Overlay loading yang bertahan sampai `tutup()` dipanggil: dipakai saat
+ * dunia 3D dibangun, supaya loading baru hilang setelah aset dimuat dan
+ * shader/tekstur siap (lihat `siapkanRender`).
+ */
+export function tampilkanLoading(root: HTMLElement, options: LoadingOptions): { tutup: () => void } {
   const tip = options.tip ?? TIPS[Math.floor(Math.random() * TIPS.length)] ?? '';
-  const durasi = options.durasi ?? 900;
 
   const overlay = el('div', {
     class: 'overlay loading-overlay',
@@ -46,9 +59,11 @@ export function showLoading(root: HTMLElement, options: LoadingOptions, onSelesa
     ],
   });
 
-  mount(root, overlay);
-  window.setTimeout(() => {
-    overlay.classList.add('selesai');
-    window.setTimeout(onSelesai, 220);
-  }, durasi);
+  root.append(overlay);
+  return {
+    tutup: () => {
+      overlay.classList.add('selesai');
+      window.setTimeout(() => overlay.remove(), 220);
+    },
+  };
 }

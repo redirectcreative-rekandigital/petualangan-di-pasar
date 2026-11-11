@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { getQuestionBank } from '../src/data/bank';
+import { getQuestionBank, SOAL_MENTAH } from '../src/data/bank';
+import { questionBankSchema, noktahListSchema } from '../src/data/schema';
 import { checkAnswer } from '../src/core/scoring';
 import { NOKTAH, SEMUA_BALAI, noktahMateri } from '../src/data/balai';
 import { genderPenjaga } from '../src/world/karakter';
@@ -10,6 +11,14 @@ import { genderPenjaga } from '../src/world/karakter';
 
 describe('bank soal IPA', () => {
   const bank = getQuestionBank();
+
+  // Validasi skema hanya di test/build (tidak lagi di HP siswa, lihat data/bank.ts).
+  it('lolos skema Zod (soal & daftar noktah)', () => {
+    const soal = questionBankSchema.safeParse(SOAL_MENTAH);
+    expect(soal.success ? [] : soal.error.issues).toEqual([]);
+    const noktah = noktahListSchema.safeParse(NOKTAH);
+    expect(noktah.success ? [] : noktah.error.issues).toEqual([]);
+  });
 
   it('memuat 120 soal (90 balai + 30 puncak)', () => {
     expect(bank.length).toBe(120);

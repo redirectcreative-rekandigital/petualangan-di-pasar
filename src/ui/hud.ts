@@ -224,6 +224,7 @@ export function createHud(handlers: HudHandlers): Hud {
   const actions = el('div', { class: 'hud-actions', children: [tasBtn, lompatBtn, sapaBtn, kameraBtn] });
   // Tombol ☰ berdiri sendiri di pojok kanan atas.
   const root = el('div', { class: 'hud-3d', children: [kiriAtas, menuBtn, joystickHost, barSapa, actions, interactBtn] });
+  let posisiAksi = '';
 
   return {
     root,
@@ -232,7 +233,9 @@ export function createHud(handlers: HudHandlers): Hud {
       if (interactBtn.textContent !== label) interactBtn.textContent = label;
     },
     setInteractPos: (x, y) => {
-      interactBtn.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(-50%, -100%)`;
+      // Dipanggil tiap frame: tulis gaya hanya bila posisinya berubah (hemat hitung ulang layout).
+      const posisi = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(-50%, -100%)`;
+      if (posisi !== posisiAksi) interactBtn.style.transform = posisiAksi = posisi;
     },
     setModeKamera: (label) => {
       kameraLabel.textContent = label;
@@ -240,7 +243,7 @@ export function createHud(handlers: HudHandlers): Hud {
     setKunciLari: (tampil, terkunci) => {
       kunciLariBtn.classList.toggle('hidden', !tampil);
       kunciLariBtn.classList.toggle('terkunci', terkunci);
-      kunciLariBtn.setAttribute('aria-pressed', String(terkunci));
+      if (kunciLariBtn.getAttribute('aria-pressed') !== String(terkunci)) kunciLariBtn.setAttribute('aria-pressed', String(terkunci));
       const ikon = terkunci ? '🔒' : '🏃';
       if (kunciLariBtn.textContent !== ikon) kunciLariBtn.textContent = ikon;
     },

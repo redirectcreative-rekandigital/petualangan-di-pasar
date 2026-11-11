@@ -16,6 +16,9 @@ import { putarCutscene } from './cutscene';
 import type { Question } from '../../shared/types';
 import type { ScreenContext } from './screens/context';
 import { t } from '../core/bahasa';
+import { catatFrame } from '../core/kualitas';
+import { tampilkanLoading } from './loading';
+import { pantauOverlay } from './pantauOverlay';
 
 /**
  * Final "Malam Badai di Mercusuar Tua" sebagai dunia 3D: pemain membuka pintu
@@ -238,13 +241,20 @@ export function bukaMercusuar(opsi: {
   let last = performance.now();
   let elapsed = 0;
   let kunciLariSampai = 0;
+  let ditutup = false;
+  const overlay = pantauOverlay();
   const loop = (now: number): void => {
     const dt = Math.min(0.05, (now - last) / 1000);
     last = now;
     elapsed += dt;
     input.endFrame();
-    const sibuk = sesi.sibuk || document.body.querySelector('.dialog-overlay, .vn-overlay, .cerita-overlay, .hadiah-overlay') !== null;
+    const sibuk = sesi.sibuk || overlay.adaOverlay();
     if (!sibuk && input.state.interactPressed) void interaksi();
+    if (overlay.tertutupPenuh()) {
+      raf = requestAnimationFrame(loop);
+      return;
+    }
+    catatFrame(now);
     world.setPaused(sibuk);
     world.update(dt, elapsed);
     hud.setInteractVisible(world.getNearby() !== null && !sibuk, labelAksi());
@@ -260,13 +270,25 @@ export function bukaMercusuar(opsi: {
     world,
     interaksi,
     cleanup: () => {
+      ditutup = true;
       cancelAnimationFrame(raf);
+      overlay.lepas();
       input.destroy();
       world.dispose();
       hud.destroy();
     },
   };
   perbaruiMisi();
-  raf = requestAnimationFrame(loop);
+  // Loading bertahan sampai avatar & penjaga termuat dan shader siap.
+  const loading = tampilkanLoading(app, { pesan: t('Mendaki Mercusuar Tua...') });
+  void world
+    .siapkan()
+    .catch((err: unknown) => console.error(err))
+    .then(() => {
+      loading.tutup();
+      if (ditutup) return;
+      last = performance.now();
+      raf = requestAnimationFrame(loop);
+    });
   return sesi;
 }

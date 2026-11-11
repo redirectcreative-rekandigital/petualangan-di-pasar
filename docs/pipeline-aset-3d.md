@@ -28,7 +28,8 @@ kode utama. Hanya diunduh saat dibutuhkan.
    - Centang **+Y Up**, skala 1.0.
    - Tanpa kamera/lampu bawaan.
 4. (Opsional) Kompresi mesh tambahan dengan **Meshopt** — sudah didukung loader.
-5. Simpan berkas ke `public/assets/models/` (mis. `warung.glb`, `pohon.glb`).
+5. Simpan berkas asli ke `aset-sumber/models/` (mis. `warung.glb`, `pohon.glb`), lalu jalankan
+   `npm run kompres:model` (KTX2 512 px + Meshopt) yang menulis hasilnya ke `public/assets/models/`.
 
 ## Cara memakai di kode
 

@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import type { SceneTheme } from './scene';
 import type { ColliderBox } from './mapConfig';
 import type { DuniaGlb } from './asetBab';
+import { modeRingan, saatRingan } from '../core/kualitas';
 
 /**
  * Latar khas tiap balai: suasana langit/tanah + penghias bertema materi dari
@@ -165,7 +166,8 @@ export function bangunLatar(kode: string, scene: THREE.Scene, dunia: DuniaGlb, t
       scene.add(sinar);
       const lampu = new THREE.PointLight(0xffd27a, 18, 14, 1.6);
       lampu.position.set(ruang.x, 4, ruang.z);
-      scene.add(lampu);
+      if (!modeRingan()) scene.add(lampu);
+      track({ dispose: saatRingan(() => scene.remove(lampu)) });
       animasi.push((t) => {
         (sinar.material as THREE.MeshBasicMaterial).opacity = 0.15 + Math.sin(t * 1.3) * 0.04;
       });

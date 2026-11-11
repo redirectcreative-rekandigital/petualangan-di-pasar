@@ -1,0 +1,379 @@
+{
+ "bab": "Bab 4 - H02 rantai makanan - Ladang dan Lumbung",
+ "versi": "v001",
+ "skala": "meter (player ~1.6 m)",
+ "orientasi": "glTF +Y atas, depan +Z, origin bawah-tengah",
+ "sumber_tata_letak": "bundle live noktahWorld-7R3ahhes.js, layout ke[0] dicermin X (urutan 4)",
+ "npc": {
+  "Ki Lumbung (penjaga, L)": "NPC 03 kakek_padi",
+  "Cantrik Walang (P)": "NPC 14 cantrik_belalang"
+ },
+ "aset_bersama_dipakai": [
+  "aset_bersama/gerbang_peta",
+  "aset_bersama/jalan_lebar (lurus, skala Y = panjang/3)",
+  "aset_goa_sinar/tiang_obor",
+  "aset_goa_sinar/pagar_kayu",
+  "aset_goa_sinar/semak",
+  "aset_bersama/pohon (10)",
+  "aset_goa_sinar/batu_kecil"
+ ],
+ "aset": [
+  {
+   "nama": "rumah_ladang",
+   "versi": "v001",
+   "glb": "rumah_ladang/export/rumah_ladang_v001.glb",
+   "blend": "rumah_ladang/source/rumah_ladang_v001.blend",
+   "tris": 2500,
+   "ukuran_file_kb": 152.3,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.214,
+    5.755,
+    5.327
+   ],
+   "node": [
+    "Rumah_Ladang",
+    "Papan_Nama"
+   ],
+   "material": [
+    "Aksen_H02",
+    "Aksen_H02_Gelap",
+    "Batu_Abu",
+    "Besi",
+    "Emas",
+    "Jerami",
+    "Jerami_Gelap",
+    "Karung",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Merah_Bendera",
+    "Padi_Kuning",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "kios() rumah penjaga (roof = accent)",
+   "accent": "Aksen_H02",
+   "notes": "rumah Ki Lumbung: atap hijau-limau, karung beras, bakul, tampah, cangkul"
+  },
+  {
+   "nama": "lumbung_padi",
+   "versi": "v001",
+   "glb": "lumbung_padi/export/lumbung_padi_v001.glb",
+   "blend": "lumbung_padi/source/lumbung_padi_v001.blend",
+   "tris": 848,
+   "ukuran_file_kb": 49.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    3.2,
+    4.747,
+    3.622
+   ],
+   "node": [
+    "Lumbung_Padi"
+   ],
+   "material": [
+    "Batu_Abu",
+    "Jerami",
+    "Jerami_Gelap",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Padi_Kuning"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "landmark tempat Ki Lumbung menunggu (lumbung) di samping arena uji",
+   "notes": "panggung 4 tiang + piringan penahan tikus, atap ijuk 2 susun, tangga, ikatan padi"
+  },
+  {
+   "nama": "stasiun_rantai_makanan",
+   "versi": "v001",
+   "glb": "stasiun_rantai_makanan/export/stasiun_rantai_makanan_v001.glb",
+   "blend": "stasiun_rantai_makanan/source/stasiun_rantai_makanan_v001.blend",
+   "tris": 972,
+   "ukuran_file_kb": 58.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.029,
+    1.06,
+    2.029
+   ],
+   "node": [
+    "Stasiun_Rantai_Makanan"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Aksen_H02",
+    "Amber_Aksen",
+    "Batu_Abu",
+    "Benua",
+    "Bunga_Oranye",
+    "Bunga_Putih",
+    "Emas",
+    "Hijau_Evakuasi",
+    "Jalan_Pasir",
+    "Jerami_Gelap",
+    "Kayu_Gelap",
+    "Padi_Kuning",
+    "Pink_Telinga",
+    "Strata_5"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "Qi() story station (rantai makanan: padi > tikus > ular > elang, 3 panah)",
+   "accent": "Aksen_H02"
+  },
+  {
+   "nama": "panggung_uji",
+   "versi": "v001",
+   "glb": "panggung_uji/export/panggung_uji_v001.glb",
+   "blend": "panggung_uji/source/panggung_uji_v001.blend",
+   "tris": 1400,
+   "ukuran_file_kb": 81.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.921,
+    2.247,
+    5.852
+   ],
+   "node": [
+    "Arena_Uji",
+    "Cincin_Aksen",
+    "Pagar_Uji",
+    "Api_1_Mati",
+    "Api_1_Nyala",
+    "Cahaya_Api_1",
+    "Api_2_Mati",
+    "Api_2_Nyala",
+    "Cahaya_Api_2",
+    "Api_3_Mati",
+    "Api_3_Nyala",
+    "Cahaya_Api_3"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Aksen_H02",
+    "Api",
+    "Api_Inti",
+    "Api_Mati",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Pagar_Uji"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Api_1_Kedip",
+    "Api_2_Kedip",
+    "Api_3_Kedip"
+   ],
+   "replaces": "Hi() test arena",
+   "states": "Api_k_Mati default visible / Api_k_Nyala hide on load, show per correct answer; Pagar_Uji hidden when opened; Cincin_Aksen glows when opened",
+   "accent": "Aksen_H02"
+  },
+  {
+   "nama": "petak_ladang",
+   "versi": "v001",
+   "glb": "petak_ladang/export/petak_ladang_v001.glb",
+   "blend": "petak_ladang/source/petak_ladang_v001.blend",
+   "tris": 504,
+   "ukuran_file_kb": 31.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    9.1,
+    0.7,
+    4.15
+   ],
+   "node": [
+    "Petak_Ladang_A",
+    "Petak_Ladang_B"
+   ],
+   "material": [
+    "Daun_Pohon_Muda",
+    "Jerami",
+    "Padi",
+    "Padi_Kuning",
+    "Tanah_Ladang"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Petak_Ladang_A",
+    "Petak_Ladang_B"
+   ],
+   "tris_each": {
+    "Petak_Ladang_A": 252,
+    "Petak_Ladang_B": 252
+   },
+   "replaces": "field tiles 4x0.15x4 (#c4d25a / #e0c84a) with crop cones, 4.5 m grid outside r13"
+  },
+  {
+   "nama": "orang_orangan_sawah",
+   "versi": "v001",
+   "glb": "orang_orangan_sawah/export/orang_orangan_sawah_v001.glb",
+   "blend": "orang_orangan_sawah/source/orang_orangan_sawah_v001.blend",
+   "tris": 248,
+   "ukuran_file_kb": 17.9,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    1.36,
+    2.1,
+    0.84
+   ],
+   "node": [
+    "Orang_Orangan_Sawah"
+   ],
+   "material": [
+    "Biru_Tiang",
+    "Jerami",
+    "Karung",
+    "Kayu_Gelap",
+    "Merah_Bendera"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "scarecrow (field dressing)"
+  },
+  {
+   "nama": "jerami",
+   "versi": "v001",
+   "glb": "jerami/export/jerami_v001.glb",
+   "blend": "jerami/source/jerami_v001.blend",
+   "tris": 272,
+   "ukuran_file_kb": 18.2,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    3.9,
+    1.22,
+    0.764
+   ],
+   "node": [
+    "Jerami_Tumpuk",
+    "Jerami_Satu"
+   ],
+   "material": [
+    "Jerami",
+    "Jerami_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Jerami_Tumpuk",
+    "Jerami_Satu"
+   ],
+   "tris_each": {
+    "Jerami_Tumpuk": 204,
+    "Jerami_Satu": 68
+   },
+   "replaces": "hay bales dressing"
+  },
+  {
+   "nama": "lantai_ladang",
+   "versi": "v001",
+   "glb": "lantai_ladang/export/lantai_ladang_v001.glb",
+   "blend": "lantai_ladang/source/lantai_ladang_v001.blend",
+   "tris": 102,
+   "ukuran_file_kb": 7.1,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.0,
+    0.3,
+    4.0
+   ],
+   "node": [
+    "lantai_ladang"
+   ],
+   "material": [
+    "Rumput_H02",
+    "Rumput_H02_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "ground plane (grass #a9cf5c), tile 4x4 m, top 0.06"
+  },
+  {
+   "nama": "kit_ladang",
+   "versi": "v001",
+   "glb": "kit_ladang/export/kit_ladang_v001.glb",
+   "blend": "kit_ladang/source/kit_ladang_v001.blend",
+   "tris": 1126,
+   "ukuran_file_kb": 73.3,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    9.2,
+    2.11,
+    28.075
+   ],
+   "node": [
+    "Petak_Ladang_A",
+    "Petak_Ladang_B",
+    "Orang_Orangan_Sawah",
+    "Jerami_Satu",
+    "Jerami_Tumpuk",
+    "lantai_ladang"
+   ],
+   "material": [
+    "Biru_Tiang",
+    "Daun_Pohon_Muda",
+    "Jerami",
+    "Jerami.001",
+    "Jerami.002",
+    "Jerami_Gelap",
+    "Karung",
+    "Kayu_Gelap",
+    "Merah_Bendera",
+    "Padi",
+    "Padi_Kuning",
+    "Rumput_H02",
+    "Rumput_H02_Gelap",
+    "Tanah_Ladang"
+   ],
+   "validator": "0 error / 0 warning",
+   "tris_each": {
+    "Petak_Ladang_A": 252,
+    "Petak_Ladang_B": 252,
+    "Orang_Orangan_Sawah": 248,
+    "Jerami_Satu": 68,
+    "Jerami_Tumpuk": 204,
+    "lantai_ladang": 102
+   },
+   "groups": {
+    "petak_ladang": [
+     "Petak_Ladang_A",
+     "Petak_Ladang_B"
+    ],
+    "orang_orangan_sawah": [
+     "Orang_Orangan_Sawah"
+    ],
+    "jerami": [
+     "Jerami_Satu",
+     "Jerami_Tumpuk"
+    ],
+    "lantai_ladang": [
+     "lantai_ladang"
+    ]
+   }
+  }
+ ],
+ "overview": [
+  "overview_scene.png",
+  "overview_uji.png",
+  "overview_rumah.png"
+ ],
+ "kelemahan": [
+  "hewan di stasiun (tikus/ular/elang) sangat simbolik, skala kecil",
+  "petak ladang tidak bisa disambung mulus (tile 4x4 dengan pematang)"
+ ],
+ "koordinat_kode": {
+  "muncul": [
+   0,
+   17
+  ],
+  "penjaga": [
+   5,
+   9
+  ],
+  "cerita": [
+   11,
+   -3
+  ],
+  "uji": [
+   -10,
+   -4
+  ],
+  "gerbang": [
+   -14,
+   13
+  ],
+  "rumah": [
+   0,
+   -13
+  ]
+ }
+}

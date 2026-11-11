@@ -1,0 +1,710 @@
+{
+ "version": "v001",
+ "skeleton": "19 bones, same names as player_boy/player_girl",
+ "fps": 30,
+ "units": "metres, +Y up in glTF, faces +Z",
+ "npcs": [
+  {
+   "num": "01",
+   "name": "kakek_lentera",
+   "type": "penjaga",
+   "body": "elder",
+   "file": "penjaga_01_lentera/export/npc_penjaga_lentera_v001.glb",
+   "blend": "penjaga_01_lentera/source/npc_penjaga_lentera_v001.blend",
+   "clips": [
+    "Idle",
+    "Walk",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Walk",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 7112,
+   "bytes": 539124,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_lantern@RightHand"
+   ],
+   "height_m": 1.771,
+   "walk_speed_mps": 0.5,
+   "concept": "konsep/01_kakek_lentera.png",
+   "reference": "reference/01_01M735F8ERJ77NVAMY9NZE3CCY.jpg"
+  },
+  {
+   "num": "02",
+   "name": "nenek_kupu",
+   "type": "penjaga",
+   "body": "elder",
+   "file": "02_nenek_kupu/export/npc_nenek_kupu_v001.glb",
+   "blend": "02_nenek_kupu/source/npc_nenek_kupu_v001.blend",
+   "clips": [
+    "Idle",
+    "Walk",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Walk",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5602,
+   "bytes": 445736,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_branch_butterfly@RightHand"
+   ],
+   "height_m": 1.793,
+   "walk_speed_mps": 0.5,
+   "concept": "konsep/02_nenek_kupu.png",
+   "reference": "reference/02_01M735F8ES68324XX0917ZJCV6.jpg"
+  },
+  {
+   "num": "03",
+   "name": "kakek_padi",
+   "type": "penjaga",
+   "body": "elder",
+   "file": "03_kakek_padi/export/npc_kakek_padi_v001.glb",
+   "blend": "03_kakek_padi/source/npc_kakek_padi_v001.blend",
+   "clips": [
+    "Idle",
+    "Walk",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Walk",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5144,
+   "bytes": 462844,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_rice_sheaf@RightHand"
+   ],
+   "height_m": 1.848,
+   "walk_speed_mps": 0.5,
+   "concept": "konsep/03_kakek_padi.png",
+   "reference": "reference/03_01M735F8GYPKH1ZT1J0QA3YXXJ.jpg"
+  },
+  {
+   "num": "04",
+   "name": "ibu_bunga",
+   "type": "penjaga",
+   "body": "adult",
+   "file": "04_ibu_bunga/export/npc_ibu_bunga_v001.glb",
+   "blend": "04_ibu_bunga/source/npc_ibu_bunga_v001.blend",
+   "clips": [
+    "Idle",
+    "Walk",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Walk",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 6558,
+   "bytes": 471168,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_bouquet@RightHand"
+   ],
+   "height_m": 1.744,
+   "walk_speed_mps": 0.5,
+   "concept": "konsep/04_ibu_bunga.png",
+   "reference": "reference/04_01M735F7E1JEHHTP45HE0FD2N3.jpg"
+  },
+  {
+   "num": "05",
+   "name": "kakek_bibit",
+   "type": "penjaga",
+   "body": "elder",
+   "file": "05_kakek_bibit/export/npc_kakek_bibit_v001.glb",
+   "blend": "05_kakek_bibit/source/npc_kakek_bibit_v001.blend",
+   "clips": [
+    "Idle",
+    "Walk",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Walk",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 6196,
+   "bytes": 509940,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_pot_seedling@RightHand",
+    "Prop_cane@LeftHand"
+   ],
+   "height_m": 1.771,
+   "walk_speed_mps": 0.5,
+   "concept": "konsep/05_kakek_bibit.png",
+   "reference": "reference/05_01M735F8RNBRW0MMEDSP9XHEA5.jpg"
+  },
+  {
+   "num": "06",
+   "name": "cantrik_batu",
+   "type": "cantrik",
+   "body": "child",
+   "file": "06_cantrik_batu/export/npc_cantrik_batu_v001.glb",
+   "blend": "06_cantrik_batu/source/npc_cantrik_batu_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5064,
+   "bytes": 450876,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_stone@LeftHand",
+    "Prop_hammer_small@RightHand"
+   ],
+   "height_m": 1.585,
+   "walk_speed_mps": null,
+   "concept": "konsep/06_cantrik_batu.png",
+   "reference": "reference/06_01M735F8DG0HP8H6EDN3D48JT2.jpg"
+  },
+  {
+   "num": "07",
+   "name": "cantrik_awan",
+   "type": "cantrik",
+   "body": "child",
+   "file": "07_cantrik_awan/export/npc_cantrik_awan_v001.glb",
+   "blend": "07_cantrik_awan/source/npc_cantrik_awan_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5882,
+   "bytes": 454924,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_jar@RightHand"
+   ],
+   "height_m": 1.845,
+   "walk_speed_mps": null,
+   "concept": "konsep/07_cantrik_awan.png",
+   "reference": "reference/07_01M735FVF6XJXNSHWFA893PNBZ.jpg"
+  },
+  {
+   "num": "08",
+   "name": "cantrik_peta",
+   "type": "cantrik",
+   "body": "child",
+   "file": "08_cantrik_peta/export/npc_cantrik_peta_v001.glb",
+   "blend": "08_cantrik_peta/source/npc_cantrik_peta_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5392,
+   "bytes": 470260,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_map@RightHand"
+   ],
+   "height_m": 1.585,
+   "walk_speed_mps": null,
+   "concept": "konsep/08_cantrik_peta.png",
+   "reference": "reference/08_01M735FW03C1PXFR68K3BE1H35.jpg"
+  },
+  {
+   "num": "09",
+   "name": "cantrik_prisma",
+   "type": "cantrik",
+   "body": "child",
+   "file": "09_cantrik_prisma/export/npc_cantrik_prisma_v001.glb",
+   "blend": "09_cantrik_prisma/source/npc_cantrik_prisma_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 4884,
+   "bytes": 449884,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_prism@RightHand"
+   ],
+   "height_m": 1.585,
+   "walk_speed_mps": null,
+   "concept": "konsep/09_cantrik_prisma.png",
+   "reference": "reference/09_01M735FWSTZ1EY9KDZ5QY632FW.jpg"
+  },
+  {
+   "num": "10",
+   "name": "cantrik_garpu_tala",
+   "type": "cantrik",
+   "body": "child",
+   "file": "10_cantrik_garpu_tala/export/npc_cantrik_garpu_tala_v001.glb",
+   "blend": "10_cantrik_garpu_tala/source/npc_cantrik_garpu_tala_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 4974,
+   "bytes": 419444,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_tuning_fork@RightHand"
+   ],
+   "height_m": 1.63,
+   "walk_speed_mps": null,
+   "concept": "konsep/10_cantrik_garpu_tala.png",
+   "reference": "reference/10_01M735FXKSG5DKF0ZFHTNQQ8NK.jpg"
+  },
+  {
+   "num": "11",
+   "name": "cantrik_magnet",
+   "type": "cantrik",
+   "body": "child",
+   "file": "11_cantrik_magnet/export/npc_cantrik_magnet_v001.glb",
+   "blend": "11_cantrik_magnet/source/npc_cantrik_magnet_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 4952,
+   "bytes": 449700,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_magnet@RightHand"
+   ],
+   "height_m": 1.585,
+   "walk_speed_mps": null,
+   "concept": "konsep/11_cantrik_magnet.png",
+   "reference": "reference/11_01M735FYNK9YNX2JY84D9K3DQ5.jpg"
+  },
+  {
+   "num": "12",
+   "name": "cantrik_lampu",
+   "type": "cantrik",
+   "body": "child",
+   "file": "12_cantrik_lampu/export/npc_cantrik_lampu_v001.glb",
+   "blend": "12_cantrik_lampu/source/npc_cantrik_lampu_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5258,
+   "bytes": 428876,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_battery@LeftHand",
+    "Prop_bulb@RightHand"
+   ],
+   "height_m": 1.63,
+   "walk_speed_mps": null,
+   "concept": "konsep/12_cantrik_lampu.png",
+   "reference": "reference/12_01M735FYYKAXY86B4EZJS0FW03.jpg"
+  },
+  {
+   "num": "13",
+   "name": "cantrik_kaca_pembesar",
+   "type": "cantrik",
+   "body": "child",
+   "file": "13_cantrik_kaca_pembesar/export/npc_cantrik_kaca_pembesar_v001.glb",
+   "blend": "13_cantrik_kaca_pembesar/source/npc_cantrik_kaca_pembesar_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5112,
+   "bytes": 455548,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_magnifier@RightHand",
+    "Prop_leaf@LeftHand"
+   ],
+   "height_m": 1.585,
+   "walk_speed_mps": null,
+   "concept": "konsep/13_cantrik_kaca_pembesar.png",
+   "reference": "reference/13_01M735FZMN2Y5WVGKA0QZ6RJGA.jpg"
+  },
+  {
+   "num": "14",
+   "name": "cantrik_belalang",
+   "type": "cantrik",
+   "body": "child",
+   "file": "14_cantrik_belalang/export/npc_cantrik_belalang_v001.glb",
+   "blend": "14_cantrik_belalang/source/npc_cantrik_belalang_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5006,
+   "bytes": 429748,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_notebook@RightHand"
+   ],
+   "height_m": 1.63,
+   "walk_speed_mps": null,
+   "concept": "konsep/14_cantrik_belalang.png",
+   "reference": "reference/14_01M735G0NCMXM00TQ450NFTHMZ.jpg"
+  },
+  {
+   "num": "15",
+   "name": "cantrik_kenikir",
+   "type": "cantrik",
+   "body": "child",
+   "file": "15_cantrik_kenikir/export/npc_cantrik_kenikir_v001.glb",
+   "blend": "15_cantrik_kenikir/source/npc_cantrik_kenikir_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5388,
+   "bytes": 458712,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_marigold@RightHand"
+   ],
+   "height_m": 1.585,
+   "walk_speed_mps": null,
+   "concept": "konsep/15_cantrik_kenikir.png",
+   "reference": "reference/15_01M735G1AF8QBPWH26XNBNWGRS.jpg"
+  },
+  {
+   "num": "16",
+   "name": "cantrik_kecambah",
+   "type": "cantrik",
+   "body": "child",
+   "file": "16_cantrik_kecambah/export/npc_cantrik_kecambah_v001.glb",
+   "blend": "16_cantrik_kecambah/source/npc_cantrik_kecambah_v001.blend",
+   "clips": [
+    "Idle",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5054,
+   "bytes": 423380,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_soil_sprout@RightHand"
+   ],
+   "height_m": 1.63,
+   "walk_speed_mps": null,
+   "concept": "konsep/16_cantrik_kecambah.png",
+   "reference": "reference/16_01M735G22MT04FBK307JMR3CE2.jpg"
+  },
+  {
+   "num": "17",
+   "name": "ibu_batu",
+   "type": "penjaga",
+   "body": "adult",
+   "file": "17_ibu_batu/export/npc_ibu_batu_v001.glb",
+   "blend": "17_ibu_batu/source/npc_ibu_batu_v001.blend",
+   "clips": [
+    "Idle",
+    "Walk",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Walk",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5682,
+   "bytes": 460124,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_stone_sprout@RightHand"
+   ],
+   "height_m": 1.744,
+   "walk_speed_mps": 0.5,
+   "concept": "konsep/17_ibu_batu.png",
+   "reference": "reference/17_01M735G2CP3T8MC6M4NC58FGSH.jpg"
+  },
+  {
+   "num": "18",
+   "name": "nenek_pelita",
+   "type": "penjaga",
+   "body": "elder",
+   "file": "18_nenek_pelita/export/npc_nenek_pelita_v001.glb",
+   "blend": "18_nenek_pelita/source/npc_nenek_pelita_v001.blend",
+   "clips": [
+    "Idle",
+    "Walk",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Walk",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5502,
+   "bytes": 440632,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_pelita@RightHand"
+   ],
+   "height_m": 1.793,
+   "walk_speed_mps": 0.5,
+   "concept": "konsep/18_nenek_pelita.png",
+   "reference": "reference/18_01M735G39J5RAGAJAJ6KWVC9GD.jpg"
+  },
+  {
+   "num": "19",
+   "name": "kakek_kentongan",
+   "type": "penjaga",
+   "body": "elder",
+   "file": "19_kakek_kentongan/export/npc_kakek_kentongan_v001.glb",
+   "blend": "19_kakek_kentongan/source/npc_kakek_kentongan_v001.blend",
+   "clips": [
+    "Idle",
+    "Walk",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Walk",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 5628,
+   "bytes": 498164,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_kentongan@RightHand"
+   ],
+   "height_m": 1.721,
+   "walk_speed_mps": 0.5,
+   "concept": "konsep/19_kakek_kentongan.png",
+   "reference": "reference/19_01M735G3M9JBB8YZETZRZB44J3.jpg"
+  },
+  {
+   "num": "20",
+   "name": "kakek_pandai_besi",
+   "type": "penjaga",
+   "body": "elder",
+   "file": "20_kakek_pandai_besi/export/npc_kakek_pandai_besi_v001.glb",
+   "blend": "20_kakek_pandai_besi/source/npc_kakek_pandai_besi_v001.blend",
+   "clips": [
+    "Idle",
+    "Walk",
+    "Talk",
+    "Interact"
+   ],
+   "loop_clips": [
+    "Idle",
+    "Walk",
+    "Talk"
+   ],
+   "once_clips": [
+    "Interact"
+   ],
+   "tris": 6144,
+   "bytes": 523112,
+   "validator_errors": 0,
+   "validator_warnings": [
+    "NODE_SKINNED_MESH_NON_ROOT"
+   ],
+   "bones": 19,
+   "props": [
+    "Prop_hammer@RightHand"
+   ],
+   "height_m": 1.721,
+   "walk_speed_mps": 0.5,
+   "concept": "konsep/20_kakek_pandai_besi.png",
+   "reference": "reference/20_01M735G4Y37S869MY8GHA4M2VM.jpg"
+  }
+ ]
+}

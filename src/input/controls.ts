@@ -15,6 +15,8 @@ export interface InputState {
   menuPressed: boolean;
   /** Tombol lompat (Spasi / tombol ⤴️) ditekan pada frame ini. */
   jumpPressed: boolean;
+  /** Lari sedang dikunci lewat tombol kecil di atas joystick. */
+  lari: boolean;
 }
 
 export interface InputManager {
@@ -27,6 +29,8 @@ export interface InputManager {
   endFrame: () => void;
   /** Meminta lompat (dari tombol HUD). Diproses pada frame berikutnya. */
   pressJump: () => void;
+  /** Mengunci atau melepas lari. */
+  toggleLari: () => void;
   destroy: () => void;
 }
 
@@ -41,6 +45,7 @@ export function createInputManager(): InputManager {
     interactPressed: false,
     menuPressed: false,
     jumpPressed: false,
+    lari: false,
   };
   let orbitYaw = 0;
   let orbitPitch = 0;
@@ -256,6 +261,9 @@ export function createInputManager(): InputManager {
     },
     pressJump: () => {
       jumpQueued = true;
+    },
+    toggleLari: () => {
+      state.lari = !state.lari;
     },
     destroy,
   };

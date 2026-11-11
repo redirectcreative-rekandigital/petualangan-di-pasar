@@ -1,0 +1,367 @@
+{
+ "bab": "Bab 6 - H04 konservasi / pelestarian - Persemaian",
+ "versi": "v001",
+ "skala": "meter (player ~1.6 m)",
+ "orientasi": "glTF +Y atas, depan +Z, origin bawah-tengah",
+ "sumber_tata_letak": "bundle live noktahWorld-7R3ahhes.js, layout ke[2] dicermin X (urutan 6)",
+ "npc": {
+  "Eyang Wana (penjaga, L)": "NPC 05 kakek_bibit",
+  "Cantrik Tunas (P)": "NPC 16 cantrik_kecambah"
+ },
+ "aset_bersama_dipakai": [
+  "aset_bersama/gerbang_peta",
+  "aset_bersama/jalan_lebar (lurus, skala Y = panjang/3)",
+  "aset_goa_sinar/tiang_obor",
+  "aset_goa_sinar/pagar_kayu",
+  "aset_goa_sinar/semak",
+  "aset_bersama/tunggul (x<0, hutan gundul)",
+  "aset_bersama/pohon (x>0)",
+  "aset_goa_sinar/batu_kecil"
+ ],
+ "aset": [
+  {
+   "nama": "rumah_persemaian",
+   "versi": "v001",
+   "glb": "rumah_persemaian/export/rumah_persemaian_v001.glb",
+   "blend": "rumah_persemaian/source/rumah_persemaian_v001.blend",
+   "tris": 2912,
+   "ukuran_file_kb": 174.9,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.214,
+    5.75,
+    5.327
+   ],
+   "node": [
+    "Rumah_Persemaian",
+    "Papan_Nama"
+   ],
+   "material": [
+    "Air_Danau",
+    "Aksen_H04",
+    "Aksen_H04_Gelap",
+    "Api_Mati",
+    "Batu_Abu",
+    "Benua",
+    "Biru_Magnet",
+    "Bunga_Merah",
+    "Emas",
+    "Karung",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Kuning_Lebah",
+    "Laut",
+    "Merah_Bendera",
+    "Polybag",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "kios() rumah penjaga (roof = accent)",
+   "accent": "Aksen_H04",
+   "notes": "rumah Eyang Wana: atap hijau tua, rak bibit polybag, gembor, 3 tong pilah sampah (merah/kuning/biru)"
+  },
+  {
+   "nama": "jembatan_rusak",
+   "versi": "v001",
+   "glb": "jembatan_rusak/export/jembatan_rusak_v001.glb",
+   "blend": "jembatan_rusak/source/jembatan_rusak_v001.blend",
+   "tris": 836,
+   "ukuran_file_kb": 52.3,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.814,
+    1.3,
+    6.4
+   ],
+   "node": [
+    "Jembatan_Rusak"
+   ],
+   "material": [
+    "Air_Kolam",
+    "Batu_Abu",
+    "Karung",
+    "Kayu_Gelap",
+    "Kayu_Papan",
+    "Tanah_Goa"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "landmark jembatan rusak (tempat Eyang Wana menunggu), di samping arena",
+   "notes": "sungai kecil kering-berbatu, jembatan papan patah di tengah; panjang 4.8 m (sumbu X)"
+  },
+  {
+   "nama": "stasiun_persemaian",
+   "versi": "v001",
+   "glb": "stasiun_persemaian/export/stasiun_persemaian_v001.glb",
+   "blend": "stasiun_persemaian/source/stasiun_persemaian_v001.blend",
+   "tris": 1006,
+   "ukuran_file_kb": 59.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.029,
+    0.813,
+    2.029
+   ],
+   "node": [
+    "Stasiun_Persemaian"
+   ],
+   "material": [
+    "Air_Danau",
+    "Aksen_H04",
+    "Api_Mati",
+    "Batu_Abu",
+    "Benua",
+    "Biru_Magnet",
+    "Bunga_Merah",
+    "Emas",
+    "Jalan_Pasir",
+    "Kayu_Jati",
+    "Kuning_Lebah",
+    "Laut",
+    "Strata_1",
+    "Tanah_Ladang",
+    "Terakota"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "wi() story station (konservasi: bedeng bibit, 3 tong pilah, gembor, pagar kecil)",
+   "accent": "Aksen_H04"
+  },
+  {
+   "nama": "panggung_uji",
+   "versi": "v001",
+   "glb": "panggung_uji/export/panggung_uji_v001.glb",
+   "blend": "panggung_uji/source/panggung_uji_v001.blend",
+   "tris": 1400,
+   "ukuran_file_kb": 81.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.921,
+    2.247,
+    5.852
+   ],
+   "node": [
+    "Arena_Uji",
+    "Cincin_Aksen",
+    "Pagar_Uji",
+    "Api_1_Mati",
+    "Api_1_Nyala",
+    "Cahaya_Api_1",
+    "Api_2_Mati",
+    "Api_2_Nyala",
+    "Cahaya_Api_2",
+    "Api_3_Mati",
+    "Api_3_Nyala",
+    "Cahaya_Api_3"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Aksen_H04",
+    "Api",
+    "Api_Inti",
+    "Api_Mati",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Pagar_Uji"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Api_1_Kedip",
+    "Api_2_Kedip",
+    "Api_3_Kedip"
+   ],
+   "replaces": "Hi() test arena",
+   "states": "Api_k_Mati default visible / Api_k_Nyala hide on load, show per correct answer; Pagar_Uji hidden when opened; Cincin_Aksen glows when opened",
+   "accent": "Aksen_H04"
+  },
+  {
+   "nama": "bibit_pot",
+   "versi": "v001",
+   "glb": "bibit_pot/export/bibit_pot_v001.glb",
+   "blend": "bibit_pot/source/bibit_pot_v001.blend",
+   "tris": 100,
+   "ukuran_file_kb": 9.1,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    1.7,
+    1.33,
+    0.52
+   ],
+   "node": [
+    "Bibit_Pot_A",
+    "Bibit_Pot_B"
+   ],
+   "material": [
+    "Batang",
+    "Benua",
+    "Daun_Pohon_Muda",
+    "Terakota"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Bibit_Pot_A",
+    "Bibit_Pot_B"
+   ],
+   "tris_each": {
+    "Bibit_Pot_A": 40,
+    "Bibit_Pot_B": 60
+   },
+   "replaces": "12 seedling pots (#b45309 + cone #4ade80) at x -6..0, z 13-14.2"
+  },
+  {
+   "nama": "bedengan",
+   "versi": "v001",
+   "glb": "bedengan/export/bedengan_v001.glb",
+   "blend": "bedengan/source/bedengan_v001.blend",
+   "tris": 344,
+   "ukuran_file_kb": 21.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.4,
+    0.628,
+    1.0
+   ],
+   "node": [
+    "Bedengan"
+   ],
+   "material": [
+    "Benua",
+    "Kayu_Jati",
+    "Polybag",
+    "Tanah_Ladang"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "seedbed (persemaian dressing)"
+  },
+  {
+   "nama": "tumpukan_kayu",
+   "versi": "v001",
+   "glb": "tumpukan_kayu/export/tumpukan_kayu_v001.glb",
+   "blend": "tumpukan_kayu/source/tumpukan_kayu_v001.blend",
+   "tris": 280,
+   "ukuran_file_kb": 13.8,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    1.82,
+    0.66,
+    0.94
+   ],
+   "node": [
+    "Tumpukan_Kayu"
+   ],
+   "material": [
+    "Batang",
+    "Kayu_Papan"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "log pile (H04 dressing; also usable as tebangan)"
+  },
+  {
+   "nama": "lantai_persemaian",
+   "versi": "v001",
+   "glb": "lantai_persemaian/export/lantai_persemaian_v001.glb",
+   "blend": "lantai_persemaian/source/lantai_persemaian_v001.blend",
+   "tris": 102,
+   "ukuran_file_kb": 7.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.0,
+    0.3,
+    4.0
+   ],
+   "node": [
+    "lantai_persemaian"
+   ],
+   "material": [
+    "Rumput_H04",
+    "Rumput_H04_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "ground plane (grass #a3a36a), tile 4x4 m, top 0.06"
+  },
+  {
+   "nama": "kit_persemaian",
+   "versi": "v001",
+   "glb": "kit_persemaian/export/kit_persemaian_v001.glb",
+   "blend": "kit_persemaian/source/kit_persemaian_v001.blend",
+   "tris": 826,
+   "ukuran_file_kb": 50.7,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.76,
+    1.33,
+    26.26
+   ],
+   "node": [
+    "Bibit_Pot_A",
+    "Bibit_Pot_B",
+    "Bedengan",
+    "Tumpukan_Kayu",
+    "lantai_persemaian"
+   ],
+   "material": [
+    "Batang",
+    "Batang.001",
+    "Benua",
+    "Benua.001",
+    "Daun_Pohon_Muda",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Polybag",
+    "Rumput_H04",
+    "Rumput_H04_Gelap",
+    "Tanah_Ladang",
+    "Terakota"
+   ],
+   "validator": "0 error / 0 warning",
+   "tris_each": {
+    "Bibit_Pot_A": 40,
+    "Bibit_Pot_B": 60,
+    "Bedengan": 344,
+    "Tumpukan_Kayu": 280,
+    "lantai_persemaian": 102
+   },
+   "groups": {
+    "bibit_pot": [
+     "Bibit_Pot_A",
+     "Bibit_Pot_B"
+    ],
+    "bedengan": [
+     "Bedengan"
+    ],
+    "tumpukan_kayu": [
+     "Tumpukan_Kayu"
+    ],
+    "lantai_persemaian": [
+     "lantai_persemaian"
+    ]
+   }
+  }
+ ],
+ "overview": [
+  "overview_scene.png",
+  "overview_uji.png",
+  "overview_rumah.png"
+ ],
+ "kelemahan": [
+  "rumah_persemaian 2912 tris (mepet 3k)",
+  "jembatan rusak statis (tidak ada state \"diperbaiki\"; kalau perlu, buat v002)"
+ ],
+ "koordinat_kode": {
+  "muncul": [
+   12,
+   15
+  ],
+  "penjaga": [
+   7,
+   6
+  ],
+  "cerita": [
+   -9,
+   6
+  ],
+  "uji": [
+   0,
+   -9
+  ],
+  "gerbang": [
+   -14,
+   -12
+  ],
+  "rumah": [
+   11,
+   -12
+  ]
+ }
+}

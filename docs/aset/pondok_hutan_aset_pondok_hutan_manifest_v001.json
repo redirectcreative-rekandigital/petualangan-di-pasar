@@ -1,0 +1,326 @@
+{
+ "bab": "Bab 3 - H01 ekosistem - Pondok Tepi Hutan",
+ "versi": "v001",
+ "skala": "meter (player ~1.6 m)",
+ "orientasi": "glTF +Y atas, depan +Z, origin bawah-tengah",
+ "sumber_tata_letak": "bundle live noktahWorld-7R3ahhes.js, layout ke[2] (urutan 3)",
+ "npc": {
+  "Nini Rimba (penjaga, P)": "NPC 02 nenek_kupu",
+  "Cantrik Lumut (L)": "NPC 13 cantrik_kaca_pembesar"
+ },
+ "aset_bersama_dipakai": [
+  "aset_bersama/gerbang_peta",
+  "aset_bersama/jalan_lebar (lurus, skala Y = panjang/3)",
+  "aset_goa_sinar/tiang_obor",
+  "aset_goa_sinar/pagar_kayu",
+  "aset_goa_sinar/semak",
+  "aset_bersama/pohon (26 pohon cincin r14-21)",
+  "aset_bersama/kolam (Kolam_Besar di cerita+(4,4); Kolam_Kecil = kolam kedua di samping arena = \"tepi kolam\")",
+  "aset_bersama/tunggul",
+  "aset_bersama/batang_kayu",
+  "aset_goa_sinar/batu_kecil"
+ ],
+ "aset": [
+  {
+   "nama": "pondok_rimba",
+   "versi": "v001",
+   "glb": "pondok_rimba/export/pondok_rimba_v001.glb",
+   "blend": "pondok_rimba/source/pondok_rimba_v001.blend",
+   "tris": 2896,
+   "ukuran_file_kb": 173.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.214,
+    5.75,
+    5.327
+   ],
+   "node": [
+    "Pondok_Rimba",
+    "Papan_Nama"
+   ],
+   "material": [
+    "Aksen_H01",
+    "Aksen_H01_Gelap",
+    "Bambu",
+    "Bambu_Ruas",
+    "Batu_Abu",
+    "Daun",
+    "Daun_Gelap",
+    "Daun_Pohon_Muda",
+    "Emas",
+    "Kaca",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Merah_Bendera",
+    "Putih",
+    "Terakota"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "kios() rumah penjaga (roof = accent)",
+   "accent": "Aksen_H01",
+   "notes": "rumah Nini Rimba: lantai panggung kayu di atas umpak batu, atap genteng hijau, dinding bambu separuh, ramuan tergantung, meja + buku catatan"
+  },
+  {
+   "nama": "stasiun_ekosistem",
+   "versi": "v001",
+   "glb": "stasiun_ekosistem/export/stasiun_ekosistem_v001.glb",
+   "blend": "stasiun_ekosistem/source/stasiun_ekosistem_v001.blend",
+   "tris": 888,
+   "ukuran_file_kb": 56.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.029,
+    1.575,
+    2.029
+   ],
+   "node": [
+    "Stasiun_Ekosistem"
+   ],
+   "material": [
+    "Air_Kolam",
+    "Aksen_H01",
+    "Batang",
+    "Batu_Abu",
+    "Bunga_Merah",
+    "Daun_Pohon",
+    "Daun_Pohon_Muda",
+    "Emas",
+    "Jalan_Pasir",
+    "Kayu_Gelap",
+    "Krem",
+    "Laut",
+    "Matahari",
+    "Putih",
+    "Teratai"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "pi() story station (ekosistem: pohon, kolam mini, jamur, matahari, rumput)",
+   "accent": "Aksen_H01"
+  },
+  {
+   "nama": "panggung_uji",
+   "versi": "v001",
+   "glb": "panggung_uji/export/panggung_uji_v001.glb",
+   "blend": "panggung_uji/source/panggung_uji_v001.blend",
+   "tris": 1400,
+   "ukuran_file_kb": 81.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.921,
+    2.247,
+    5.852
+   ],
+   "node": [
+    "Arena_Uji",
+    "Cincin_Aksen",
+    "Pagar_Uji",
+    "Api_1_Mati",
+    "Api_1_Nyala",
+    "Cahaya_Api_1",
+    "Api_2_Mati",
+    "Api_2_Nyala",
+    "Cahaya_Api_2",
+    "Api_3_Mati",
+    "Api_3_Nyala",
+    "Cahaya_Api_3"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Aksen_H01",
+    "Api",
+    "Api_Inti",
+    "Api_Mati",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Pagar_Uji"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Api_1_Kedip",
+    "Api_2_Kedip",
+    "Api_3_Kedip"
+   ],
+   "replaces": "Hi() test arena",
+   "states": "Api_k_Mati default visible / Api_k_Nyala hide on load, show per correct answer; Pagar_Uji hidden when opened; Cincin_Aksen glows when opened",
+   "accent": "Aksen_H01"
+  },
+  {
+   "nama": "jamur",
+   "versi": "v001",
+   "glb": "jamur/export/jamur_v001.glb",
+   "blend": "jamur/source/jamur_v001.blend",
+   "tris": 432,
+   "ukuran_file_kb": 32.2,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.888,
+    0.99,
+    0.968
+   ],
+   "node": [
+    "Jamur_A",
+    "Jamur_B"
+   ],
+   "material": [
+    "Bunga_Merah",
+    "Bunga_Oranye",
+    "Krem",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Jamur_A",
+    "Jamur_B"
+   ],
+   "tris_each": {
+    "Jamur_A": 324,
+    "Jamur_B": 108
+   },
+   "replaces": "mushroom dressing (code pi jamur #ef4444)"
+  },
+  {
+   "nama": "batu_lumut",
+   "versi": "v001",
+   "glb": "batu_lumut/export/batu_lumut_v001.glb",
+   "blend": "batu_lumut/source/batu_lumut_v001.blend",
+   "tris": 300,
+   "ukuran_file_kb": 23.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    6.655,
+    0.819,
+    1.348
+   ],
+   "node": [
+    "Batu_Lumut_A",
+    "Batu_Lumut_B",
+    "Batu_Lumut_C"
+   ],
+   "material": [
+    "Batu_Abu",
+    "Daun_Pohon_Muda"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Batu_Lumut_A",
+    "Batu_Lumut_B",
+    "Batu_Lumut_C"
+   ],
+   "tris_each": {
+    "Batu_Lumut_A": 100,
+    "Batu_Lumut_B": 100,
+    "Batu_Lumut_C": 100
+   },
+   "replaces": "forest rocks with moss"
+  },
+  {
+   "nama": "lantai_hutan",
+   "versi": "v001",
+   "glb": "lantai_hutan/export/lantai_hutan_v001.glb",
+   "blend": "lantai_hutan/source/lantai_hutan_v001.blend",
+   "tris": 102,
+   "ukuran_file_kb": 7.1,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.0,
+    0.3,
+    4.0
+   ],
+   "node": [
+    "lantai_hutan"
+   ],
+   "material": [
+    "Rumput_H01",
+    "Rumput_H01_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "ground plane (grass #7fc46a), tile 4x4 m, top 0.06"
+  },
+  {
+   "nama": "kit_hutan",
+   "versi": "v001",
+   "glb": "kit_hutan/export/kit_hutan_v001.glb",
+   "blend": "kit_hutan/source/kit_hutan_v001.blend",
+   "tris": 834,
+   "ukuran_file_kb": 62.3,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    7.807,
+    0.99,
+    18.484
+   ],
+   "node": [
+    "Jamur_A",
+    "Jamur_B",
+    "Batu_Lumut_A",
+    "Batu_Lumut_B",
+    "Batu_Lumut_C",
+    "lantai_hutan"
+   ],
+   "material": [
+    "Batu_Abu",
+    "Bunga_Merah",
+    "Bunga_Oranye",
+    "Daun_Pohon_Muda",
+    "Krem",
+    "Putih",
+    "Rumput_H01",
+    "Rumput_H01_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "tris_each": {
+    "Jamur_A": 324,
+    "Jamur_B": 108,
+    "Batu_Lumut_A": 100,
+    "Batu_Lumut_B": 100,
+    "Batu_Lumut_C": 100,
+    "lantai_hutan": 102
+   },
+   "groups": {
+    "jamur": [
+     "Jamur_A",
+     "Jamur_B"
+    ],
+    "batu_lumut": [
+     "Batu_Lumut_A",
+     "Batu_Lumut_B",
+     "Batu_Lumut_C"
+    ],
+    "lantai_hutan": [
+     "lantai_hutan"
+    ]
+   }
+  }
+ ],
+ "overview": [
+  "overview_scene.png",
+  "overview_uji.png",
+  "overview_rumah.png"
+ ],
+ "kelemahan": [
+  "rumah pondok_rimba 2896 tris (mepet budget 3k) karena dinding bambu",
+  "jamur/batu lumut sangat sederhana (low-poly sengaja)",
+  "kolam adalah mesh datar tanpa animasi air"
+ ],
+ "koordinat_kode": {
+  "muncul": [
+   -12,
+   15
+  ],
+  "penjaga": [
+   -7,
+   6
+  ],
+  "cerita": [
+   9,
+   6
+  ],
+  "uji": [
+   0,
+   -9
+  ],
+  "gerbang": [
+   14,
+   -12
+  ],
+  "rumah": [
+   -11,
+   -12
+  ]
+ }
+}

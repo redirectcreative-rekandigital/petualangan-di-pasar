@@ -1,0 +1,475 @@
+{
+ "bab": "Bab 2 - F02 Bunyi dan Pendengaran - Lembah Gema",
+ "versi": "v001",
+ "skala": "meter (player ~1.6 m)",
+ "orientasi": "glTF +Y atas, depan +Z, origin bawah-tengah",
+ "sumber_tata_letak": "bundle live noktahWorld-7R3ahhes.js, layout ke[1] (urutan 2)",
+ "npc": {
+  "Ki Gaung (penjaga)": "NPC 19 kakek_kentongan",
+  "Cantrik Gendhing": "NPC 10 cantrik_garpu_tala",
+  "Mbok Sinar (Bab 1)": "NPC 18 nenek_pelita"
+ },
+ "aset": [
+  {
+   "nama": "balai_gema",
+   "versi": "v001",
+   "glb": "/workspace/aset_lembah_gema/balai_gema/export/balai_gema_v001.glb",
+   "blend": "/workspace/aset_lembah_gema/balai_gema/source/balai_gema_v001.blend",
+   "tris": 2216,
+   "ukuran_file_kb": 128.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.214,
+    5.75,
+    5.327
+   ],
+   "node": [
+    "Balai_Gema",
+    "Papan_Nama"
+   ],
+   "material": [
+    "Batu_Lavender",
+    "Batu_Lavender_Gelap",
+    "Emas",
+    "Genteng_Ungu",
+    "Genteng_Ungu_Gelap",
+    "Hitam",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Kulit_Bedug",
+    "Merah_Bendera",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "notes": "Papan_Nama = blank plank for in-game text",
+   "replaces": "kios rumah + sign Ha(tempat) + emblem",
+   "budget_tris": 3000
+  },
+  {
+   "nama": "stasiun_bunyi",
+   "versi": "v001",
+   "glb": "/workspace/aset_lembah_gema/stasiun_bunyi/export/stasiun_bunyi_v001.glb",
+   "blend": "/workspace/aset_lembah_gema/stasiun_bunyi/source/stasiun_bunyi_v001.blend",
+   "tris": 1728,
+   "ukuran_file_kb": 94.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.029,
+    2.335,
+    2.029
+   ],
+   "node": [
+    "Stasiun_Bunyi",
+    "Gelombang_Bunyi",
+    "Cahaya_Stasiun"
+   ],
+   "material": [
+    "Abu_Gelap",
+    "Batu_Lavender_Gelap",
+    "Emas",
+    "Gelombang",
+    "Gong_Tengah",
+    "Hitam",
+    "Jalan_Pasir",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Kulit_Bedug",
+    "Logam",
+    "Ungu_Aksen"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Gelombang_Denyut (loop 1.0 s, node Gelombang_Bunyi)"
+   ],
+   "nodes_toggle": [
+    "Gelombang_Bunyi"
+   ],
+   "replaces": "fi() disc + Di() props (gong, mallet, horn box, 3 sound-wave rings)",
+   "budget_tris": 3000
+  },
+  {
+   "nama": "batu_gema",
+   "versi": "v001",
+   "glb": "/workspace/aset_lembah_gema/batu_gema/export/batu_gema_v001.glb",
+   "blend": "/workspace/aset_lembah_gema/batu_gema/source/batu_gema_v001.blend",
+   "tris": 756,
+   "ukuran_file_kb": 40.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.422,
+    1.573,
+    1.249
+   ],
+   "node": [
+    "Batu_Gema"
+   ],
+   "material": [
+    "Batu_Lavender",
+    "Kuning_Ukir"
+   ],
+   "validator": "0 error / 0 warning",
+   "notes": "landmark: tempat Cantrik Gendhing menunggu (cerita spot). Ukiran kuning di muka depan (+Z)",
+   "budget_tris": 3000
+  },
+  {
+   "nama": "panggung_uji",
+   "versi": "v001",
+   "glb": "/workspace/aset_lembah_gema/panggung_uji/export/panggung_uji_v001.glb",
+   "blend": "/workspace/aset_lembah_gema/panggung_uji/source/panggung_uji_v001.blend",
+   "tris": 1400,
+   "ukuran_file_kb": 81.2,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.921,
+    2.244,
+    5.852
+   ],
+   "node": [
+    "Arena_Uji",
+    "Cincin_Aksen",
+    "Pagar_Uji",
+    "Api_1_Mati",
+    "Api_1_Nyala",
+    "Cahaya_Api_1",
+    "Api_2_Mati",
+    "Api_2_Nyala",
+    "Cahaya_Api_2",
+    "Api_3_Mati",
+    "Api_3_Nyala",
+    "Cahaya_Api_3"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Api",
+    "Api_Inti",
+    "Api_Mati",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Pagar_Uji",
+    "Ungu_Aksen"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Api_1_Kedip",
+    "Api_2_Kedip",
+    "Api_3_Kedip"
+   ],
+   "replaces": "Hi() test arena",
+   "states": "per post k=1..3: Api_k_Mati (default visible) / Api_k_Nyala (hide on load, show per correct answer); Pagar_Uji hidden when opened; Cincin_Aksen glows when opened",
+   "accent": "Ungu_Aksen",
+   "budget_tris": 3000
+  },
+  {
+   "nama": "tebing_lembah",
+   "versi": "v001",
+   "glb": "/workspace/aset_lembah_gema/tebing_lembah/export/tebing_lembah_v001.glb",
+   "blend": "/workspace/aset_lembah_gema/tebing_lembah/source/tebing_lembah_v001.blend",
+   "tris": 672,
+   "ukuran_file_kb": 39.7,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    22.979,
+    14.065,
+    3.844
+   ],
+   "node": [
+    "tebing_lembah_a",
+    "tebing_lembah_b",
+    "tebing_lembah_c"
+   ],
+   "material": [
+    "Tebing",
+    "Tebing_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "tebing_lembah_a",
+    "tebing_lembah_b",
+    "tebing_lembah_c"
+   ],
+   "tris_each": {
+    "tebing_lembah_a": 192,
+    "tebing_lembah_b": 240,
+    "tebing_lembah_c": 240
+   },
+   "notes": "tebing: sisi panjang (6.5 m) sepanjang X, muka depan +Z",
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "batu_lembah",
+   "versi": "v001",
+   "glb": "/workspace/aset_lembah_gema/batu_lembah/export/batu_lembah_v001.glb",
+   "blend": "/workspace/aset_lembah_gema/batu_lembah/source/batu_lembah_v001.blend",
+   "tris": 240,
+   "ukuran_file_kb": 17.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.205,
+    0.681,
+    1.418
+   ],
+   "node": [
+    "batu_lembah_a",
+    "batu_lembah_b",
+    "batu_lembah_c"
+   ],
+   "material": [
+    "Batu_Lembah"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "batu_lembah_a",
+    "batu_lembah_b",
+    "batu_lembah_c"
+   ],
+   "tris_each": {
+    "batu_lembah_a": 80,
+    "batu_lembah_b": 80,
+    "batu_lembah_c": 80
+   },
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "lantai_lembah",
+   "versi": "v001",
+   "glb": "/workspace/aset_lembah_gema/lantai_lembah/export/lantai_lembah_v001.glb",
+   "blend": "/workspace/aset_lembah_gema/lantai_lembah/source/lantai_lembah_v001.blend",
+   "tris": 102,
+   "ukuran_file_kb": 7.1,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.0,
+    0.3,
+    4.0
+   ],
+   "node": [
+    "lantai_lembah"
+   ],
+   "material": [
+    "Rumput_Sage",
+    "Rumput_Sage_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "lantai_lembah"
+   ],
+   "tris_each": {
+    "lantai_lembah": 102
+   },
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "rumpun_bambu",
+   "versi": "v001",
+   "glb": "/workspace/aset_lembah_gema/rumpun_bambu/export/rumpun_bambu_v001.glb",
+   "blend": "/workspace/aset_lembah_gema/rumpun_bambu/source/rumpun_bambu_v001.blend",
+   "tris": 360,
+   "ukuran_file_kb": 21.2,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    1.416,
+    4.422,
+    1.349
+   ],
+   "node": [
+    "rumpun_bambu"
+   ],
+   "material": [
+    "Bambu_Hijau",
+    "Bambu_Hijau_Ruas",
+    "Daun"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "rumpun_bambu"
+   ],
+   "tris_each": {
+    "rumpun_bambu": 360
+   },
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "kit_lembah",
+   "versi": "v001",
+   "glb": "/workspace/aset_lembah_gema/kit_lembah/export/kit_lembah_v001.glb",
+   "blend": "/workspace/aset_lembah_gema/kit_lembah/source/kit_lembah_v001.blend",
+   "tris": 1578,
+   "ukuran_file_kb": 98.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    22.979,
+    14.065,
+    35.456
+   ],
+   "node": [
+    "tebing_lembah_a",
+    "tebing_lembah_b",
+    "tebing_lembah_c",
+    "batu_lembah_a",
+    "batu_lembah_b",
+    "batu_lembah_c",
+    "lantai_lembah",
+    "rumpun_bambu",
+    "jalan_lebar_lurus",
+    "jalan_lebar_belok",
+    "jalan_lebar_pertigaan"
+   ],
+   "material": [
+    "Bambu_Hijau",
+    "Bambu_Hijau_Ruas",
+    "Batu_Lembah",
+    "Daun",
+    "Jalan_Pasir",
+    "Rumput_Sage",
+    "Rumput_Sage_Gelap",
+    "Tebing",
+    "Tebing_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "tris_each": {
+    "tebing_lembah_a": 192,
+    "tebing_lembah_b": 240,
+    "tebing_lembah_c": 240,
+    "batu_lembah_a": 80,
+    "batu_lembah_b": 80,
+    "batu_lembah_c": 80,
+    "lantai_lembah": 102,
+    "rumpun_bambu": 360,
+    "jalan_lebar_lurus": 44,
+    "jalan_lebar_belok": 68,
+    "jalan_lebar_pertigaan": 92
+   },
+   "groups": {
+    "tebing_lembah": [
+     "tebing_lembah_a",
+     "tebing_lembah_b",
+     "tebing_lembah_c"
+    ],
+    "batu_lembah": [
+     "batu_lembah_a",
+     "batu_lembah_b",
+     "batu_lembah_c"
+    ],
+    "lantai_lembah": [
+     "lantai_lembah"
+    ],
+    "rumpun_bambu": [
+     "rumpun_bambu"
+    ],
+    "jalan_lebar": [
+     "jalan_lebar_lurus",
+     "jalan_lebar_belok",
+     "jalan_lebar_pertigaan"
+    ]
+   }
+  },
+  {
+   "nama": "gerbang_peta",
+   "versi": "v001",
+   "glb": "/workspace/aset_bersama/gerbang_peta/export/gerbang_peta_v001.glb",
+   "blend": "/workspace/aset_bersama/gerbang_peta/source/gerbang_peta_v001.blend",
+   "tris": 428,
+   "ukuran_file_kb": 29.3,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.76,
+    4.5,
+    0.96
+   ],
+   "node": [
+    "Gerbang_Peta",
+    "Portal",
+    "Papan_Gerbang"
+   ],
+   "material": [
+    "Atap_Gerbang",
+    "Bata_Gerbang",
+    "Kayu_Gelap",
+    "Kayu_Papan",
+    "Portal_Cyan"
+   ],
+   "validator": "0 error / 0 warning",
+   "nodes_toggle": [
+    "Portal"
+   ],
+   "notes": "Portal: alpha blend 0.45 + emissive cyan; animate material.opacity like code (0.22..0.45)",
+   "replaces": "_i() gerbang (all chapters)",
+   "budget_tris": 3000
+  },
+  {
+   "nama": "jalan_lebar",
+   "versi": "v001",
+   "glb": "/workspace/aset_bersama/jalan_lebar/export/jalan_lebar_v001.glb",
+   "blend": "/workspace/aset_bersama/jalan_lebar/source/jalan_lebar_v001.blend",
+   "tris": 204,
+   "ukuran_file_kb": 13.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    9.8,
+    0.04,
+    3.0
+   ],
+   "node": [
+    "jalan_lebar_lurus",
+    "jalan_lebar_belok",
+    "jalan_lebar_pertigaan"
+   ],
+   "material": [
+    "Jalan_Pasir"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "jalan_lebar_lurus",
+    "jalan_lebar_belok",
+    "jalan_lebar_pertigaan"
+   ],
+   "tris_each": {
+    "jalan_lebar_lurus": 44,
+    "jalan_lebar_belok": 68,
+    "jalan_lebar_pertigaan": 92
+   },
+   "notes": "path 2.2 m wide (= code path planes), cell 3x3 m, 4 cm thick; lurus can be scaled along Z for long runs",
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "panggung_bundar",
+   "versi": "v002",
+   "glb": "/workspace/aset_goa_sinar/panggung_bundar/export/panggung_bundar_v002.glb",
+   "blend": "/workspace/aset_goa_sinar/panggung_bundar/source/panggung_bundar_v002.blend",
+   "tris": 1400,
+   "ukuran_file_kb": 81.2,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.921,
+    2.244,
+    5.852
+   ],
+   "node": [
+    "Arena_Uji",
+    "Cincin_Aksen",
+    "Pagar_Uji",
+    "Api_1_Mati",
+    "Api_1_Nyala",
+    "Cahaya_Api_1",
+    "Api_2_Mati",
+    "Api_2_Nyala",
+    "Cahaya_Api_2",
+    "Api_3_Mati",
+    "Api_3_Nyala",
+    "Cahaya_Api_3"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Amber_Aksen",
+    "Api",
+    "Api_Inti",
+    "Api_Mati",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Pagar_Uji"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Api_1_Kedip",
+    "Api_2_Kedip",
+    "Api_3_Kedip"
+   ],
+   "replaces": "Hi() test arena",
+   "states": "per post k=1..3: Api_k_Mati (default visible) / Api_k_Nyala (hide on load, show per correct answer); Pagar_Uji hidden when opened; Cincin_Aksen glows when opened",
+   "accent": "Amber_Aksen",
+   "budget_tris": 3000
+  }
+ ]
+}

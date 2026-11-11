@@ -1,0 +1,367 @@
+{
+ "bab": "Bab 8 - F04 listrik - Sungai Kincir",
+ "versi": "v001",
+ "skala": "meter (player ~1.6 m)",
+ "orientasi": "glTF +Y atas, depan +Z, origin bawah-tengah",
+ "sumber_tata_letak": "bundle live noktahWorld-7R3ahhes.js, layout ke[1] (urutan 8)",
+ "npc": {
+  "Mbah Kilat (penjaga, L)": "NPC 01 penjaga_lentera (kakek_lentera)",
+  "Cantrik Dinamo (P)": "NPC 12 cantrik_lampu"
+ },
+ "aset_bersama_dipakai": [
+  "aset_bersama/gerbang_peta",
+  "aset_bersama/jalan_lebar (lurus, skala Y = panjang/3)",
+  "aset_goa_sinar/tiang_obor",
+  "aset_goa_sinar/pagar_kayu",
+  "aset_goa_sinar/semak",
+  "aset_bersama/pohon (10)",
+  "aset_goa_sinar/batu_kecil"
+ ],
+ "aset": [
+  {
+   "nama": "rumah_kincir",
+   "versi": "v001",
+   "glb": "rumah_kincir/export/rumah_kincir_v001.glb",
+   "blend": "rumah_kincir/source/rumah_kincir_v001.blend",
+   "tris": 2464,
+   "ukuran_file_kb": 149.8,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.214,
+    5.75,
+    5.327
+   ],
+   "node": [
+    "Rumah_Kincir",
+    "Papan_Nama",
+    "Cahaya_Lampu"
+   ],
+   "material": [
+    "Abu_Gelap",
+    "Aksen_F04",
+    "Aksen_F04_Gelap",
+    "Batu_Abu",
+    "Bohlam",
+    "Emas",
+    "Kabel",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Kuning_Lebah",
+    "Logam",
+    "Merah_Bendera",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "kios() rumah penjaga (roof = accent)",
+   "accent": "Aksen_F04",
+   "notes": "rumah Mbah Kilat: atap biru, dinamo + kabel, lampu tiang menyala (emissive + light hint). Kincir air besar = aset terpisah kincir_air"
+  },
+  {
+   "nama": "kincir_air",
+   "versi": "v001",
+   "glb": "kincir_air/export/kincir_air_v001.glb",
+   "blend": "kincir_air/source/kincir_air_v001.blend",
+   "tris": 1044,
+   "ukuran_file_kb": 63.9,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.05,
+    5.462,
+    5.762
+   ],
+   "node": [
+    "Kincir_Rangka",
+    "Roda_Kincir"
+   ],
+   "material": [
+    "Batang",
+    "Besi",
+    "Kayu_Gelap",
+    "Kayu_Papan",
+    "Strata_1"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Kincir_Putar (loop 8 s, 240 f @30fps)"
+   ],
+   "replaces": "water wheel (torus r2.4 #8a5a32 + 8 paddles #a16207) at (-8, 2.6, -18.5), rotating",
+   "notes": "Roda_Kincir berputar pada sumbu X (Blender) = sumbu X glTF; pivot di hub tinggi 2.6 m. Taruh di tepi sungai, separuh roda tercelup."
+  },
+  {
+   "nama": "gardu_listrik",
+   "versi": "v001",
+   "glb": "gardu_listrik/export/gardu_listrik_v001.glb",
+   "blend": "gardu_listrik/source/gardu_listrik_v001.blend",
+   "tris": 508,
+   "ukuran_file_kb": 32.8,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.076,
+    2.545,
+    2.872
+   ],
+   "node": [
+    "Gardu_Listrik"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Abu_Gelap",
+    "Beton",
+    "Kabel",
+    "Kuning_Lebah",
+    "Logam",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "landmark gardu (tempat Mbah Kilat menunggu), di samping arena",
+   "notes": "rumah gardu beton + pintu besi + tanda bahaya petir, trafo bersirip, pagar besi"
+  },
+  {
+   "nama": "tiang_listrik",
+   "versi": "v001",
+   "glb": "tiang_listrik/export/tiang_listrik_v001.glb",
+   "blend": "tiang_listrik/source/tiang_listrik_v001.blend",
+   "tris": 136,
+   "ukuran_file_kb": 10.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    1.6,
+    6.0,
+    0.63
+   ],
+   "node": [
+    "Tiang_Listrik",
+    "Kabel_Ujung_1",
+    "Kabel_Ujung_2",
+    "Kabel_Ujung_3"
+   ],
+   "material": [
+    "Abu_Gelap",
+    "Beton",
+    "Bohlam",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "power pole (dressing; kabel antar tiang dibuat programmer pakai Kabel_Ujung_k)"
+  },
+  {
+   "nama": "stasiun_listrik",
+   "versi": "v001",
+   "glb": "stasiun_listrik/export/stasiun_listrik_v001.glb",
+   "blend": "stasiun_listrik/source/stasiun_listrik_v001.blend",
+   "tris": 764,
+   "ukuran_file_kb": 46.9,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.029,
+    0.849,
+    2.029
+   ],
+   "node": [
+    "Stasiun_Listrik",
+    "Cahaya_Bohlam"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Abu_Gelap",
+    "Aksen_F04",
+    "Api_Mati",
+    "Batu_Abu",
+    "Bohlam",
+    "Bunga_Oranye",
+    "Emas",
+    "Jalan_Pasir",
+    "Kabel",
+    "Kuning_Lebah",
+    "Papan_Sirkuit"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "yi() story station (listrik: papan rangkaian, baterai, bohlam menyala, kabel, saklar, petir)",
+   "accent": "Aksen_F04"
+  },
+  {
+   "nama": "panggung_uji",
+   "versi": "v001",
+   "glb": "panggung_uji/export/panggung_uji_v001.glb",
+   "blend": "panggung_uji/source/panggung_uji_v001.blend",
+   "tris": 1400,
+   "ukuran_file_kb": 81.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.921,
+    2.247,
+    5.852
+   ],
+   "node": [
+    "Arena_Uji",
+    "Cincin_Aksen",
+    "Pagar_Uji",
+    "Api_1_Mati",
+    "Api_1_Nyala",
+    "Cahaya_Api_1",
+    "Api_2_Mati",
+    "Api_2_Nyala",
+    "Cahaya_Api_2",
+    "Api_3_Mati",
+    "Api_3_Nyala",
+    "Cahaya_Api_3"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Aksen_F04",
+    "Api",
+    "Api_Inti",
+    "Api_Mati",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Pagar_Uji"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Api_1_Kedip",
+    "Api_2_Kedip",
+    "Api_3_Kedip"
+   ],
+   "replaces": "Hi() test arena",
+   "states": "Api_k_Mati default visible / Api_k_Nyala hide on load, show per correct answer; Pagar_Uji hidden when opened; Cincin_Aksen glows when opened",
+   "accent": "Aksen_F04"
+  },
+  {
+   "nama": "sungai",
+   "versi": "v001",
+   "glb": "sungai/export/sungai_v001.glb",
+   "blend": "sungai/source/sungai_v001.blend",
+   "tris": 444,
+   "ukuran_file_kb": 31.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    9.0,
+    0.263,
+    4.862
+   ],
+   "node": [
+    "Sungai_Lurus",
+    "Sungai_Batu"
+   ],
+   "material": [
+    "Air_Kolam",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Tanah_Goa"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Sungai_Lurus",
+    "Sungai_Batu"
+   ],
+   "tris_each": {
+    "Sungai_Lurus": 272,
+    "Sungai_Batu": 172
+   },
+   "replaces": "river plane 46x4.5 at z=-19 (#38bdf8): tile 4 m panjang (X) x 4.5 m lebar, ulangi 12x",
+   "notes": "air top 0.1 m; Sungai_Batu = varian dengan batu di tengah aliran"
+  },
+  {
+   "nama": "lantai_sungai",
+   "versi": "v001",
+   "glb": "lantai_sungai/export/lantai_sungai_v001.glb",
+   "blend": "lantai_sungai/source/lantai_sungai_v001.blend",
+   "tris": 102,
+   "ukuran_file_kb": 7.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.0,
+    0.3,
+    4.0
+   ],
+   "node": [
+    "lantai_sungai"
+   ],
+   "material": [
+    "Rumput_F04",
+    "Rumput_F04_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "ground plane (grass #86c46a), tile 4x4 m, top 0.06"
+  },
+  {
+   "nama": "kit_sungai",
+   "versi": "v001",
+   "glb": "kit_sungai/export/kit_sungai_v001.glb",
+   "blend": "kit_sungai/source/kit_sungai_v001.blend",
+   "tris": 682,
+   "ukuran_file_kb": 47.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    9.0,
+    6.0,
+    20.434
+   ],
+   "node": [
+    "Sungai_Batu",
+    "Sungai_Lurus",
+    "Tiang_Listrik",
+    "lantai_sungai"
+   ],
+   "material": [
+    "Abu_Gelap",
+    "Air_Kolam",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Beton",
+    "Bohlam",
+    "Putih",
+    "Rumput_F04",
+    "Rumput_F04_Gelap",
+    "Tanah_Goa"
+   ],
+   "validator": "0 error / 0 warning",
+   "tris_each": {
+    "Sungai_Batu": 172,
+    "Sungai_Lurus": 272,
+    "Tiang_Listrik": 136,
+    "lantai_sungai": 102
+   },
+   "groups": {
+    "sungai": [
+     "Sungai_Batu",
+     "Sungai_Lurus"
+    ],
+    "tiang_listrik": [
+     "Tiang_Listrik"
+    ],
+    "lantai_sungai": [
+     "lantai_sungai"
+    ]
+   }
+  }
+ ],
+ "overview": [
+  "overview_scene.png",
+  "overview_uji.png",
+  "overview_rumah.png"
+ ],
+ "kelemahan": [
+  "kabel antar tiang listrik tidak dimodelkan (pakai empty Kabel_Ujung_k + garis di kode)",
+  "air sungai statis (tanpa UV/scroll)"
+ ],
+ "koordinat_kode": {
+  "muncul": [
+   0,
+   17
+  ],
+  "penjaga": [
+   6,
+   7
+  ],
+  "cerita": [
+   0,
+   -6
+  ],
+  "uji": [
+   -12,
+   -9
+  ],
+  "gerbang": [
+   -14,
+   12
+  ],
+  "rumah": [
+   11,
+   -12
+  ]
+ }
+}

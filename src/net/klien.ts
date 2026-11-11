@@ -3,6 +3,7 @@ import { SAPAAN_EMOJI } from '../../shared/net';
 import type {
   PesanKlien,
   PesanServer,
+  KostumPemain,
   PosisiPemain,
   ProgresSiswa,
 } from '../../shared/net';
@@ -30,6 +31,7 @@ export interface OpsiKlien {
   warnaBaju?: number;
   warnaBawahan?: number;
   warnaHijab?: number;
+  kostum?: KostumPemain;
   onPemain: (daftar: PosisiPemain[]) => void;
   onKabar?: (teks: string) => void;
   onStatus?: (status: StatusKlien) => void;
@@ -108,7 +110,6 @@ export class KlienMultiplayer {
   private opsi: OpsiKlien;
   private selesai = false;
   private antre: string[] = [];
-  private timerSapa = 0;
   private timerUlang = 0;
   private pernahMasuk = false;
 
@@ -151,6 +152,7 @@ export class KlienMultiplayer {
         warnaBaju: this.opsi.warnaBaju,
         warnaBawahan: this.opsi.warnaBawahan,
         warnaHijab: this.opsi.warnaHijab,
+        kostum: this.opsi.kostum,
       });
       for (const teks of this.antre) ws.send(teks);
       this.antre = [];
@@ -222,9 +224,7 @@ export class KlienMultiplayer {
   /** Kirim sapaan emoji. */
   kirimSapa(emoji: string): void {
     if (!SAPAAN_EMOJI.includes(emoji as (typeof SAPAAN_EMOJI)[number])) return;
-    window.clearTimeout(this.timerSapa);
     this.kirim({ t: 'sapa', emoji });
-    this.timerSapa = window.setTimeout(() => this.kirim({ t: 'sapa', emoji: '' }), 2600);
   }
 
   /** Kirim ringkasan progres (untuk dasbor guru). */

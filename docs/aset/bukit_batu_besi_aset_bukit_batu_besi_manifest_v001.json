@@ -1,0 +1,322 @@
+{
+ "bab": "Bab 7 - F03 magnet - Bukit Batu Besi",
+ "versi": "v001",
+ "skala": "meter (player ~1.6 m)",
+ "orientasi": "glTF +Y atas, depan +Z, origin bawah-tengah",
+ "sumber_tata_letak": "bundle live noktahWorld-7R3ahhes.js, layout ke[0] (urutan 7)",
+ "npc": {
+  "Empu Wesi (penjaga, L)": "NPC 20 kakek_pandai_besi",
+  "Cantrik Kutub (L)": "NPC 11 cantrik_magnet"
+ },
+ "aset_bersama_dipakai": [
+  "aset_bersama/gerbang_peta",
+  "aset_bersama/jalan_lebar (lurus, skala Y = panjang/3)",
+  "aset_goa_sinar/tiang_obor",
+  "aset_goa_sinar/pagar_kayu",
+  "aset_goa_sinar/semak"
+ ],
+ "aset": [
+  {
+   "nama": "bengkel_empu",
+   "versi": "v001",
+   "glb": "bengkel_empu/export/bengkel_empu_v001.glb",
+   "blend": "bengkel_empu/source/bengkel_empu_v001.blend",
+   "tris": 2274,
+   "ukuran_file_kb": 140.2,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.214,
+    5.75,
+    5.327
+   ],
+   "node": [
+    "Bengkel_Empu",
+    "Papan_Nama",
+    "Cahaya_Tungku"
+   ],
+   "material": [
+    "Abu_Gelap",
+    "Air_Danau",
+    "Aksen_F03",
+    "Aksen_F03_Gelap",
+    "Bara",
+    "Bata_Gerbang",
+    "Batu_Goa_Gelap",
+    "Besi",
+    "Emas",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Merah_Bendera",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "kios() rumah penjaga (roof = accent)",
+   "accent": "Aksen_F03",
+   "notes": "rumah/bengkel Empu Wesi: atap merah, umpak batu gelap, tungku bara (emissive) + light hint, landasan, rak besi, ember celup"
+  },
+  {
+   "nama": "magnet_raksasa",
+   "versi": "v001",
+   "glb": "magnet_raksasa/export/magnet_raksasa_v001.glb",
+   "blend": "magnet_raksasa/source/magnet_raksasa_v001.blend",
+   "tris": 432,
+   "ukuran_file_kb": 28.1,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.568,
+    2.615,
+    3.812
+   ],
+   "node": [
+    "Magnet_Raksasa"
+   ],
+   "material": [
+    "Batu_Karat",
+    "Besi",
+    "Biru_Magnet",
+    "Merah_Magnet",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "giant magnet (two 2.4x3x2 boxes red/blue) at r16-19 facing centre",
+   "notes": "magnet batang merah (U) / biru (S) di atas gundukan batu karat, paku besi menempel di kedua kutub"
+  },
+  {
+   "nama": "bukit_puncak",
+   "versi": "v001",
+   "glb": "bukit_puncak/export/bukit_puncak_v001.glb",
+   "blend": "bukit_puncak/source/bukit_puncak_v001.blend",
+   "tris": 468,
+   "ukuran_file_kb": 32.3,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.378,
+    4.505,
+    5.093
+   ],
+   "node": [
+    "Bukit_Puncak"
+   ],
+   "material": [
+    "Abu_Gelap",
+    "Batu_Besi",
+    "Batu_Karat",
+    "Batu_Plinth",
+    "Merah_Bendera"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "landmark puncak bukit (tempat Empu Wesi menunggu), di samping arena",
+   "notes": "bukit batu 5.5x4.5x2.2 m, anak tangga batu di depan (-Y Blender / +Z glTF), bendera merah di puncak"
+  },
+  {
+   "nama": "stasiun_magnet",
+   "versi": "v001",
+   "glb": "stasiun_magnet/export/stasiun_magnet_v001.glb",
+   "blend": "stasiun_magnet/source/stasiun_magnet_v001.blend",
+   "tris": 840,
+   "ukuran_file_kb": 44.7,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.029,
+    0.985,
+    2.029
+   ],
+   "node": [
+    "Stasiun_Magnet"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Abu_Gelap",
+    "Aksen_F03",
+    "Biru_Magnet",
+    "Bunga_Putih",
+    "Emas",
+    "Jalan_Pasir",
+    "Merah_Magnet",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "xi() story station (magnet: tapal kuda, kompas, magnet batang, serbuk besi)",
+   "accent": "Aksen_F03"
+  },
+  {
+   "nama": "panggung_uji",
+   "versi": "v001",
+   "glb": "panggung_uji/export/panggung_uji_v001.glb",
+   "blend": "panggung_uji/source/panggung_uji_v001.blend",
+   "tris": 1400,
+   "ukuran_file_kb": 81.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.921,
+    2.247,
+    5.852
+   ],
+   "node": [
+    "Arena_Uji",
+    "Cincin_Aksen",
+    "Pagar_Uji",
+    "Api_1_Mati",
+    "Api_1_Nyala",
+    "Cahaya_Api_1",
+    "Api_2_Mati",
+    "Api_2_Nyala",
+    "Cahaya_Api_2",
+    "Api_3_Mati",
+    "Api_3_Nyala",
+    "Cahaya_Api_3"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Aksen_F03",
+    "Api",
+    "Api_Inti",
+    "Api_Mati",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Pagar_Uji"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Api_1_Kedip",
+    "Api_2_Kedip",
+    "Api_3_Kedip"
+   ],
+   "replaces": "Hi() test arena",
+   "states": "Api_k_Mati default visible / Api_k_Nyala hide on load, show per correct answer; Pagar_Uji hidden when opened; Cincin_Aksen glows when opened",
+   "accent": "Aksen_F03"
+  },
+  {
+   "nama": "batu_besi",
+   "versi": "v001",
+   "glb": "batu_besi/export/batu_besi_v001.glb",
+   "blend": "batu_besi/source/batu_besi_v001.blend",
+   "tris": 348,
+   "ukuran_file_kb": 24.7,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    7.366,
+    0.929,
+    1.422
+   ],
+   "node": [
+    "Batu_Besi_A",
+    "Batu_Besi_B",
+    "Batu_Besi_C"
+   ],
+   "material": [
+    "Batu_Besi",
+    "Batu_Karat",
+    "Besi"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Batu_Besi_A",
+    "Batu_Besi_B",
+    "Batu_Besi_C"
+   ],
+   "tris_each": {
+    "Batu_Besi_A": 116,
+    "Batu_Besi_B": 116,
+    "Batu_Besi_C": 116
+   },
+   "replaces": "20 rocks (#7f4a3a / #6b6b6b, scale 1-2.8, r13-20.5)"
+  },
+  {
+   "nama": "lantai_bukit",
+   "versi": "v001",
+   "glb": "lantai_bukit/export/lantai_bukit_v001.glb",
+   "blend": "lantai_bukit/source/lantai_bukit_v001.blend",
+   "tris": 102,
+   "ukuran_file_kb": 6.9,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.0,
+    0.3,
+    4.0
+   ],
+   "node": [
+    "lantai_bukit"
+   ],
+   "material": [
+    "Rumput_F03",
+    "Rumput_F03_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "ground plane (grass #9b8e86), tile 4x4 m, top 0.06"
+  },
+  {
+   "nama": "kit_bukit",
+   "versi": "v001",
+   "glb": "kit_bukit/export/kit_bukit_v001.glb",
+   "blend": "kit_bukit/source/kit_bukit_v001.blend",
+   "tris": 450,
+   "ukuran_file_kb": 31.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    8.03,
+    0.929,
+    10.707
+   ],
+   "node": [
+    "Batu_Besi_A",
+    "Batu_Besi_B",
+    "Batu_Besi_C",
+    "lantai_bukit"
+   ],
+   "material": [
+    "Batu_Besi",
+    "Batu_Karat",
+    "Besi",
+    "Rumput_F03",
+    "Rumput_F03_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "tris_each": {
+    "Batu_Besi_A": 116,
+    "Batu_Besi_B": 116,
+    "Batu_Besi_C": 116,
+    "lantai_bukit": 102
+   },
+   "groups": {
+    "batu_besi": [
+     "Batu_Besi_A",
+     "Batu_Besi_B",
+     "Batu_Besi_C"
+    ],
+    "lantai_bukit": [
+     "lantai_bukit"
+    ]
+   }
+  }
+ ],
+ "overview": [
+  "overview_scene.png",
+  "overview_uji.png",
+  "overview_rumah.png"
+ ],
+ "kelemahan": [
+  "huruf N/S pada magnet raksasa dibuat dari balok (kasar)",
+  "tidak ada pohon (sesuai kode F03: pohon 0)"
+ ],
+ "koordinat_kode": {
+  "muncul": [
+   0,
+   17
+  ],
+  "penjaga": [
+   -5,
+   9
+  ],
+  "cerita": [
+   -11,
+   -3
+  ],
+  "uji": [
+   10,
+   -4
+  ],
+  "gerbang": [
+   14,
+   13
+  ],
+  "rumah": [
+   0,
+   -13
+  ]
+ }
+}

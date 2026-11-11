@@ -20,11 +20,11 @@ import { terapkanKostum, muatKostum, buangMaterialKostum, type PilihanKostum } f
  *   - menghadap sumbu **+Z** (arah wajah),
  *   - berdiri di titik asal dengan **kaki di y = 0**,
  *   - tinggi sekitar **2.6 satuan** (skala akan dinormalkan otomatis bila beda),
- *   - klip animasi: `Idle`, `Walk`, `Run` (berulang) dan `Jump`, `Interact`
- *     (sekali main). Semua klip "di tempat" (tanpa perpindahan akar).
+ *   - klip animasi: `Idle`, `Walk`, `Run` (berulang) dan `Jump`, `Interact`,
+ *     `Tidur`, `Bangun` (sekali main). Semua klip "di tempat" (tanpa perpindahan akar).
  */
 
-export type KlipSekali = 'Jump' | 'Interact';
+export type KlipSekali = 'Jump' | 'Interact' | 'Tidur' | 'Bangun';
 type KlipJalan = 'Idle' | 'Walk' | 'Run';
 
 export interface AvatarModel {
@@ -42,6 +42,13 @@ export interface AvatarModel {
   update: (kecepatan: number, dt: number) => void;
   /** Memainkan klip sekali (`Jump` saat melompat, `Interact` saat berinteraksi). */
   mainkanSekali: (nama: KlipSekali, durasi?: number) => void;
+  /** Tidur lalu Bangun, selesai saat crossfade ke Idle dimulai. */
+  adeganBangun: () => Promise<void>;
+  /**
+   * Sudut mata: kepala disembunyikan dan kedua tangan diangkat ke depan kamera.
+   * `null` memulihkan kepala. Dipanggil tiap frame setelah kamera diperbarui.
+   */
+  poseOrangPertama: (kamera: THREE.PerspectiveCamera | null) => void;
   /** Mengganti warna kostum langsung (tanpa memuat ulang model). */
   setKostum: (pilihan: PilihanKostum) => void;
   /** Klip yang sedang dominan & lajunya (untuk uji/debug). */
@@ -67,14 +74,36 @@ const TINGGI_ACUAN = 2.6;
 
 /**
  * Kecepatan langkah klip pada skala ASLI model (meter/detik): pada kecepatan
- * ini kaki menapak tanpa meluncur. Dikalikan skala normalisasi (±1,56) menjadi
- * ±1,1 (Walk) dan ±2,7 (Run) satuan dunia/detik.
+ * ini kaki menapak tanpa meluncur. Dikalikan skala normalisasi model.
  */
 const LANGKAH_ASLI = { Walk: 0.71, Run: 1.75 } as const;
 
 /** Batas laju klip agar tidak terlalu lambat (kaku) atau terlalu cepat. */
 const TIMESCALE_MIN = 0.6;
 const TIMESCALE_MAKS = 3;
+
+/**
+ * Letak tangan di ruang kamera (m) pada mode Tangan dan besar ayunan saat berjalan.
+ * Lengan model hanya 0,37 m sehingga tangan dekat kamera: `skala` mengecilkannya agar tidak memenuhi layar.
+ */
+const POSE_TANGAN = { x: 0.2, y: -0.15, z: -0.3, ayun: 0.02, skala: 0.55 };
+
+const _pangkal = new THREE.Vector3();
+const _ujung = new THREE.Vector3();
+const _arah = new THREE.Vector3();
+const _putar = new THREE.Quaternion();
+const _induk = new THREE.Quaternion();
+
+/** Memutar `tulang` agar garis ke `anak` searah `tujuan` (dunia), tanpa bergantung sumbu lokal rig. */
+function bidikTulang(tulang: THREE.Object3D, anak: THREE.Object3D, tujuan: THREE.Vector3): void {
+  if (!tulang.parent) return;
+  tulang.getWorldPosition(_pangkal);
+  anak.getWorldPosition(_ujung);
+  _putar.setFromUnitVectors(_arah.subVectors(_ujung, _pangkal).normalize(), tujuan);
+  tulang.parent.getWorldQuaternion(_induk);
+  tulang.quaternion.premultiply(_induk).premultiply(_putar).premultiply(_induk.invert());
+  tulang.updateWorldMatrix(false, true);
+}
 
 /**
  * Memuat model avatar bila berkasnya ada.
@@ -85,6 +114,7 @@ export async function cobaAvatarGlb(
   gender: PlayerGender,
   renderer?: THREE.WebGLRenderer,
   kostum?: PilihanKostum,
+  tinggiTarget = TINGGI_ACUAN,
 ): Promise<AvatarModel | null> {
   let gltf;
   try {
@@ -116,7 +146,7 @@ export async function cobaAvatarGlb(
   const kotak = new THREE.Box3().setFromObject(isi);
   const ukuran = kotak.getSize(new THREE.Vector3());
   const tinggiAsli = ukuran.y || 1;
-  const skala = TINGGI_ACUAN / tinggiAsli;
+  const skala = tinggiTarget / tinggiAsli;
   pemutar.scale.setScalar(skala);
   // Setelah diskalakan, geser supaya alas model tepat di y = 0.
   pemutar.position.y = -kotak.min.y * skala;
@@ -134,13 +164,13 @@ export async function cobaAvatarGlb(
   // Kecepatan langkah klip dalam satuan dunia (sudah dikali skala).
   const langkahWalk = LANGKAH_ASLI.Walk * skala;
   const langkahRun = LANGKAH_ASLI.Run * skala;
-  // Di atas kecepatan ini pakai Run, di bawahnya Walk (titik tengah kedua langkah).
-  const batasLari = (langkahWalk + langkahRun) / 2;
+  // Run hanya di atas kecepatan tercepat Walk, jadi berjalan biasa tidak pernah memicunya.
+  const batasLari = langkahWalk * TIMESCALE_MAKS * 1.1;
 
   const mixer = gltf.animations.length > 0 ? new THREE.AnimationMixer(isi) : null;
   const klip: Partial<Record<KlipJalan | KlipSekali, THREE.AnimationClip>> = {};
   for (const a of gltf.animations) {
-    if (a.name === 'Idle' || a.name === 'Walk' || a.name === 'Run' || a.name === 'Jump' || a.name === 'Interact') klip[a.name] = a;
+    if (a.name === 'Idle' || a.name === 'Walk' || a.name === 'Run' || a.name === 'Jump' || a.name === 'Interact' || a.name === 'Tidur' || a.name === 'Bangun') klip[a.name] = a;
   }
 
   let aktif: THREE.AnimationAction | null = null;
@@ -170,8 +200,16 @@ export async function cobaAvatarGlb(
     // Paksa klip jalan dipilih & di-fade-in ulang pada frame berikutnya.
     aktifNama = '';
   };
+  let selesaiBangun: (() => void) | null = null;
   mixer?.addEventListener('finished', (ev) => {
-    if (sekali && ev.action === sekali.aksi) selesaiSekali();
+    if (!sekali || ev.action !== sekali.aksi) return;
+    if (sekali.nama === 'Tidur') {
+      mainkanSekali('Bangun');
+      return;
+    }
+    const tadi = sekali.nama;
+    selesaiSekali();
+    if (tadi === 'Bangun') selesaiBangun?.();
   });
 
   const mainkanSekali = (nama: KlipSekali, durasi?: number): void => {
@@ -191,13 +229,61 @@ export async function cobaAvatarGlb(
     sekali = { nama, aksi };
   };
 
+  const kepala = isi.getObjectByName('Head') ?? null;
+  const skalaKepala = kepala?.scale.clone() ?? new THREE.Vector3(1, 1, 1);
+  const lengan = (['Left', 'Right'] as const).map((sisi) => ({
+    // Tangan kiri tokoh tampil di sisi kiri layar karena kamera menghadap searah tokoh.
+    arah: sisi === 'Left' ? -1 : 1,
+    atas: isi.getObjectByName(`${sisi}UpperArm`),
+    bawah: isi.getObjectByName(`${sisi}LowerArm`),
+    tangan: isi.getObjectByName(`${sisi}Hand`),
+  }));
+  let kecepatanKini = 0;
+  let faseAyun = 0;
+  let kepalaDisembunyikan = false;
+  const titikTangan = new THREE.Vector3();
+  const arahLengan = new THREE.Vector3();
+
+  const poseOrangPertama: AvatarModel['poseOrangPertama'] = (kamera) => {
+    if (!kamera) {
+      if (kepalaDisembunyikan) {
+        kepala?.scale.copy(skalaKepala);
+        for (const { tangan } of lengan) tangan?.scale.setScalar(1);
+      }
+      kepalaDisembunyikan = false;
+      return;
+    }
+    kepalaDisembunyikan = true;
+    kepala?.scale.setScalar(0.001);
+    kamera.updateMatrixWorld();
+    group.updateWorldMatrix(true, true);
+    const ayun = Math.sin(faseAyun) * Math.min(1, kecepatanKini / 2) * POSE_TANGAN.ayun;
+    // Layar tegak sempit: tangan dirapatkan agar tidak keluar dari sisi layar.
+    const lebar = THREE.MathUtils.clamp(POSE_TANGAN.x * kamera.aspect * 0.5, 0.06, POSE_TANGAN.x);
+    for (const { arah, atas, bawah, tangan } of lengan) {
+      if (!atas || !bawah || !tangan) continue;
+      tangan.scale.setScalar(POSE_TANGAN.skala);
+      kamera.localToWorld(titikTangan.set(arah * lebar, POSE_TANGAN.y + ayun * arah, POSE_TANGAN.z + ayun * arah));
+      atas.getWorldPosition(_pangkal);
+      // Sedikit ke bawah agar siku menekuk, bukan lengan lurus.
+      arahLengan.subVectors(titikTangan, _pangkal).normalize();
+      arahLengan.y -= 0.35;
+      bidikTulang(atas, bawah, arahLengan.normalize());
+      bawah.getWorldPosition(_pangkal);
+      bidikTulang(bawah, tangan, arahLengan.subVectors(titikTangan, _pangkal).normalize());
+    }
+  };
+
   return {
     group,
-    tinggi: TINGGI_ACUAN,
+    tinggi: tinggiTarget,
+    poseOrangPertama,
     setHadap: (radian) => {
       pemutar.rotation.y = radian;
     },
     update: (kecepatan, dt) => {
+      kecepatanKini = kecepatan;
+      faseAyun += dt * Math.min(9, kecepatan * 3.5);
       if (!mixer) return;
       // Mulai berjalan saat Interact masih main: hentikan Interact agar tidak meluncur.
       if (sekali?.nama === 'Interact' && kecepatan > 0.15) selesaiSekali();
@@ -213,6 +299,17 @@ export async function cobaAvatarGlb(
       mixer.update(dt);
     },
     mainkanSekali,
+    adeganBangun: () =>
+      new Promise((resolve) => {
+        if (!klip.Tidur || !klip.Bangun) {
+          resolve();
+          return;
+        }
+        selesaiBangun = resolve;
+        mainkanSekali('Tidur');
+        // Klip 4 detik dimulai dari tengah: cukup 2 detik berbaring sebelum bangun.
+        if (sekali) sekali.aksi.time = 2;
+      }),
     setKostum: pasangKostum,
     infoAnimasi: () => {
       const a = sekali?.aksi ?? aktif;

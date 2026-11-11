@@ -60,6 +60,19 @@ function previewKosong(): KarakterPreview {
   };
 }
 
+/** Lampu hangat senada tema "Sore Hangat"; dipakai juga oleh potret percakapan. */
+export function pasangLampuPreview(scene: THREE.Scene): void {
+  scene.add(new THREE.AmbientLight(0xffffff, 0.85));
+  const sun = new THREE.DirectionalLight(0xffe0b8, 2.2);
+  sun.position.set(2.5, 5, 3.5);
+  scene.add(sun);
+  // Cahaya isi dari sisi seberang agar sisi gelap karakter tidak pekat.
+  const isi = new THREE.DirectionalLight(0xcfe4ff, 0.6);
+  isi.position.set(-3, 2, -2);
+  scene.add(isi);
+  scene.add(new THREE.HemisphereLight(0xffe4bd, 0x6b7a4a, 0.85));
+}
+
 export interface OpsiPreview {
   /**
    * Bila diisi, pratinjau memakai avatar GLB asli (animasi Idle) dengan kostum
@@ -130,17 +143,7 @@ export function createKarakterPreview(
     camera.lookAt(0, pusat.y, pusat.z);
   }
 
-  // Lampu hangat senada tema "Sore Hangat".
-  scene.add(new THREE.AmbientLight(0xffffff, 0.85));
-  const sun = new THREE.DirectionalLight(0xffe0b8, 2.2);
-  sun.position.set(2.5, 5, 3.5);
-  scene.add(sun);
-  // Cahaya isi dari sisi seberang agar sisi gelap karakter tidak pekat.
-  const isi = new THREE.DirectionalLight(0xcfe4ff, 0.6);
-  isi.position.set(-3, 2, -2);
-  scene.add(isi);
-  const hemi = new THREE.HemisphereLight(0xffe4bd, 0x6b7a4a, 0.85);
-  scene.add(hemi);
+  pasangLampuPreview(scene);
 
   let rig: KarakterRig | null = null;
   let glb: AvatarModel | null = null;

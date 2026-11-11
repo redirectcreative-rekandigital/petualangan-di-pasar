@@ -100,6 +100,20 @@ src/
 server/ shared/ tests/ scripts/ docs/
 ```
 
+## Mode Guru
+
+Buka `/modeguru/`, buat sesi, bagikan token 4 digit (atau tampilkan layar **Proyektor** dengan QR).
+
+- **Nilai resmi** = percobaan pertama. Benar di kesempatan ke-1/2/3 bernilai 1 / 0,5 / 0,25. Bintang
+  balai: 3,0 = 3★, ≥2 = 2★, ≥1 = 1★ (1★ membuka balai berikutnya). Nilai akhir 0-100 = rata balai
+  60% + Final 40%. KKM bawaan 70, bisa diubah di dasbor (tersimpan di browser guru).
+- **Kendali** (butuh kunci rahasia yang otomatis tersimpan di browser guru): kunci kelas, jeda semua,
+  pengumuman, ubah nama, keluarkan siswa, akhiri sesi.
+- **Server restart**: dasbor membangun ulang ruang dengan token + kunci + salinan siswa dari browser
+  guru; siswa tersambung ulang otomatis dan mengirim ulang progres.
+- Melihat dasbor hanya butuh token (belum ada PIN). Jangan bagikan token ke luar kelas.
+- Uji asap: `npm run build && npm run smoke:guru`.
+
 ## Privasi
 
 Mode sendiri tidak mengirim data ke mana pun; progres disimpan di perangkat. Mode kelas mengirim

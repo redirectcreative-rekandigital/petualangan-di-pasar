@@ -17,12 +17,14 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "smoke": "node scripts/smoke.mjs",
+    "smoke:guru": "node scripts/smoke-guru.mjs",
     "build:avatar": "node scripts/build-avatar.mjs",
     "serve": "node server/index.mjs",
     "serve:dev": "npm run build && node server/index.mjs",
     "naskah": "tsx scripts/gen-naskah.ts"
   },
   "dependencies": {
+    "qrcode-generator": "^2.0.4",
     "three": "^0.182.0",
     "ws": "^8.22.1",
     "zod": "^4.1.12"

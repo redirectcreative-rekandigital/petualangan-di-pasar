@@ -1686,3 +1686,87 @@ body.world-mode #app {
   font-size: 0.85rem;
   font-weight: 600;
 }
+
+/* ---------- Tampilan Proyektor (Mode Guru) ---------- */
+.proyektor {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 1.15rem;
+}
+.proyektor-keluar {
+  align-self: flex-end;
+}
+.proyektor-gabung {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  text-align: center;
+}
+.proyektor-token {
+  font-size: clamp(4rem, 14vw, 9rem);
+  font-weight: 800;
+  letter-spacing: 0.5rem;
+  line-height: 1;
+  color: var(--hijau-900);
+}
+.proyektor-qr {
+  width: clamp(140px, 22vw, 260px);
+  background: var(--putih);
+  padding: 8px;
+  border-radius: var(--radius-sm);
+}
+.proyektor-qr svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.proyektor-ringkas {
+  text-align: center;
+  font-weight: 700;
+}
+.proyektor-kabar {
+  background: var(--oranye-100);
+  border: 2px solid var(--oranye-500);
+  border-radius: var(--radius);
+  padding: 10px 16px;
+  text-align: center;
+  font-weight: 800;
+  font-size: 1.4rem;
+}
+.proyektor-kabar p {
+  margin: 4px 0;
+}
+.proyektor-baris {
+  display: grid;
+  grid-template-columns: minmax(6.5rem, 12rem) minmax(3rem, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0;
+}
+.proyektor-baris .bar-isi {
+  display: block;
+  height: 18px;
+}
+.proyektor-angka {
+  font-weight: 700;
+  text-align: right;
+}
+.proyektor-papan {
+  columns: 2;
+  margin: 8px 0 0;
+  padding-left: 0;
+  list-style: none;
+  font-weight: 700;
+}
+.proyektor-papan li {
+  break-inside: avoid;
+  margin: 4px 0;
+}
+@media (max-width: 600px) {
+  .proyektor-papan {
+    columns: 1;
+  }
+}

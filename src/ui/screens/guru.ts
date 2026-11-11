@@ -17,6 +17,7 @@ import {
   persenBalai,
   balaiBelumTuntas,
 } from '../../core/analisis';
+import { kabarBaik, layarProyektor, type KabarKelas } from './proyektor';
 import type { ScreenContext } from './context';
 
 /**
@@ -59,6 +60,8 @@ interface StateGuru {
   kunci: string | null;
   terkunci: boolean;
   jeda: boolean;
+  proyektor: boolean;
+  kabar: KabarKelas[];
 }
 
 export function renderGuru(_ctx: ScreenContext): HTMLElement {
@@ -74,6 +77,8 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
     kunci: bacaSimpanan(KUNCI_RAHASIA),
     terkunci: false,
     jeda: false,
+    proyektor: false,
+    kabar: [],
   };
 
   const root = el('section', { class: 'screen' });
@@ -115,6 +120,7 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
         st.siswa = [];
       } else {
         st.pesan = null;
+        st.kabar = [...st.kabar.filter((k) => k.sampai > Date.now()), ...kabarBaik(st.siswa, res.siswa)].slice(-6);
         st.siswa = res.siswa;
         st.terkunci = res.terkunci;
         st.jeda = res.jeda;
@@ -199,6 +205,21 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
       ];
     }
 
+    if (st.proyektor) {
+      return [
+        layarProyektor({
+          token: st.token,
+          siswa: st.siswa,
+          kabar: st.kabar,
+          urlGame: new URL(window.location.pathname.replace(/modeguru\/?$/i, '') || './', window.location.href).href,
+          keluar: () => {
+            st.proyektor = false;
+            gambar();
+          },
+        }),
+      ];
+    }
+
     // Sudah punya token: tampilkan token besar + daftar siswa.
     const anak: HTMLElement[] = [
       headerGuru(),
@@ -223,6 +244,12 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
                     );
                   },
                 },
+              }),
+              el('button', {
+                class: 'btn kecil secondary',
+                text: '📽️ Proyektor',
+                attrs: { type: 'button' },
+                on: { click: () => { sfx.click(); st.proyektor = true; gambar(); } },
               }),
               el('button', {
                 class: 'btn kecil ghost',
@@ -261,7 +288,7 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
     };
     const tombolKendali = (teks: string, klik: () => void, gaya = 'secondary'): HTMLElement =>
       el('button', { class: `btn kecil ${gaya}`, text: teks, attrs: { type: 'button' }, on: { click: () => { sfx.click(); klik(); } } });
-    const isiUmum = el('input', { class: 'isian', attrs: { type: 'text', maxlength: '120', placeholder: 'Tulis pengumuman untuk semua siswa' } });
+    const isiUmum = el('input', { class: 'isian', attrs: { type: 'text', maxlength: '120', placeholder: 'Tulis pengumuman', style: 'flex:1 1 12rem' } });
     anak.push(
       el('div', {
         class: 'card',
@@ -374,6 +401,25 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
           on: { click: () => { sfx.click(); st.tab = id; gambar(); } },
         });
       anak.push(el('div', { class: 'guru-tabs', children: [tabTombol('kelas', '📊 Kelas'), tabTombol('soal', '❓ Soal'), tabTombol('siswa', '🧒 Siswa')] }));
+      const perhatian = st.siswa.filter((s) => URUTAN_BALAI.some((k) => statusBalai(s.progress, k) === 'bantuan') || balaiBelumTuntas(s.progress, kkm).length > 0);
+      if (st.tab === 'kelas' && perhatian.length) {
+        anak.push(
+          el('div', {
+            class: 'card warn',
+            children: [
+              el('span', { class: 'label-kecil', text: `🆘 Perlu perhatian (${perhatian.length})` }),
+              ...perhatian.map((s) =>
+                el('button', {
+                  class: 'btn kecil ghost block',
+                  text: `${s.nama} · ${s.online ? 'online' : 'offline'} · ${URUTAN_BALAI.filter((k) => statusBalai(s.progress, k) === 'bantuan').length} balai butuh bantuan, ${balaiBelumTuntas(s.progress, kkm).length} belum tuntas`,
+                  attrs: { type: 'button' },
+                  on: { click: () => { sfx.click(); st.tab = 'siswa'; st.dipilih = s.id; gambar(); } },
+                }),
+              ),
+            ],
+          }),
+        );
+      }
       if (st.tab === 'kelas') anak.push(...tabKelas(st.siswa));
       else if (st.tab === 'soal') anak.push(...tabSoal(st.siswa));
       else {

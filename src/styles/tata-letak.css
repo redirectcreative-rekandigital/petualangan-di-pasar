@@ -1086,7 +1086,8 @@ body:has(.dialog-overlay) .hud-menu-kanan {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
-  .intro-screen[data-langkah='cover'] .cover-tombol > :first-child {
+  /* Tombol pertama dan tombol terakhir yang sendirian di barisnya: selebar penuh. */
+  .intro-screen[data-langkah='cover'] .cover-tombol > :is(:first-child, :last-child:nth-child(even)) {
     grid-column: 1 / -1;
   }
 }

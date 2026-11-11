@@ -14,6 +14,7 @@ import type { ScreenContext } from './context';
 import { t } from '../../core/bahasa';
 import { bukaPengaturan } from '../pengaturan';
 import { bukaGabungKelas } from '../gabungKelas';
+import { jadikanModalAktif, pasangTutupUmum } from '../modal';
 import { belumMulai, buatIdSiswa } from '../../core/profil';
 
 /**
@@ -141,6 +142,32 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
         },
       },
     });
+    // Petunjuk, Pengaturan, Tentang dibungkus satu tombol "Lainnya" agar sampul tidak penuh tombol.
+    const lainnya = el('button', {
+      class: 'btn ghost block',
+      text: t('☰ Lainnya'),
+      attrs: { type: 'button', 'aria-haspopup': 'dialog' },
+      on: {
+        click: () => {
+          sfx.click();
+          const menu = el('div', { class: 'overlay dialog-overlay', attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': t('☰ Lainnya') } });
+          const tutup = (): void => {
+            menu.remove();
+            lepasEsc();
+            lepas();
+          };
+          const lepas = jadikanModalAktif(tutup);
+          const lepasEsc = pasangTutupUmum(menu, tutup);
+          const batal = el('button', { class: 'btn ghost block', text: t('✖️ Tutup'), attrs: { type: 'button' }, on: { click: () => { sfx.click(); tutup(); } } });
+          const tombol = el('div', { class: 'menu-tombol', children: [petunjuk, pengaturan, tentang, batal] });
+          // Tombol mana pun ditekan: tutup menu ini dulu (Pengaturan membuka modalnya sendiri).
+          tombol.addEventListener('click', tutup, { capture: true });
+          menu.append(el('div', { class: 'dialog-panel menu-panel', children: [el('h3', { text: t('☰ Lainnya') }), tombol] }));
+          document.body.append(menu);
+          petunjuk.focus({ preventScroll: true });
+        },
+      },
+    });
     // Gabung kelas (dari Bermain Sendiri) atau ganti siswa (perangkat dipakai bergantian).
     const tombolKelas = progressKini.token
       ? el('button', {
@@ -203,7 +230,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
           }),
           kartuKelas,
           sapaan,
-          el('div', { class: 'stack cover-tombol', children: [mulai, mulaiBaru, tombolKelas, petunjuk, pengaturan, tentang] }),
+          el('div', { class: 'stack cover-tombol', children: [mulai, mulaiBaru, tombolKelas, lainnya] }),
           el('p', { class: 'footer-note', text: t('Game Edukasi IPA · {jenjang} · © 2026', { jenjang: APP_INFO.jenjang }) }),
         ],
       }),

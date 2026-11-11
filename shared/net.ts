@@ -21,10 +21,16 @@ import type { Elemen, NoktahId, PlayerGender, Stars } from './types';
 export interface BuatSesiRequest {
   /** Nama guru (opsional, untuk ditampilkan di dasbor). */
   guru?: string;
+  /** Pemulihan setelah server restart: token + kunci lama (dan salinan daftar siswa). */
+  token?: string;
+  kunci?: string;
+  siswa?: BarisSiswa[];
 }
 
 export interface BuatSesiResponse {
   token: string;
+  /** Kunci rahasia guru untuk kendali kelas; disimpan di browser guru. */
+  kunci: string;
   guru: string;
   dibuatPada: string;
 }
@@ -127,7 +133,14 @@ export type PesanServer =
   /** Daftar pemain yang berada di noktah yang sama (untuk digambar). */
   | { t: 'pemain'; daftar: PosisiPemain[] }
   /** Kabar untuk siswa. `kode` dipakai klien untuk menerjemahkan pesan. */
-  | { t: 'kabar'; teks: string; kode?: 'nama-ganda'; nama?: string };
+  | { t: 'kabar'; teks: string; kode?: 'nama-ganda'; nama?: string }
+  /** Guru menjeda/melanjutkan seluruh kelas. */
+  | { t: 'jeda'; nilai: boolean }
+  /** Pengumuman guru (maks 120 huruf). */
+  | { t: 'umum'; teks: string }
+  /** Guru mengeluarkan siswa ini / mengakhiri sesi. */
+  | { t: 'dikeluarkan' }
+  | { t: 'selesai' };
 
 /** Rentang emoji sapaan yang diizinkan (aman untuk anak). */
 export const SAPAAN_EMOJI = ['👋', '👍', '😀', '🎉', '❤️', '🙌'] as const;

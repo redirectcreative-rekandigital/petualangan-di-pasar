@@ -2,7 +2,7 @@ import { el } from '../components/dom';
 import { sfx } from '../../core/sound';
 import { APP_INFO } from '../../core/state';
 import { showToast } from '../dialog';
-import { ambilSesiGuru, buatSesiGuru, onlineTersedia, type RosterSiswa } from '../../net/klien';
+import { ambilSesiGuru, buatSesiGuru, kendaliGuru, onlineTersedia, type RosterSiswa } from '../../net/klien';
 import { getQuestionBankAsli as getQuestionBank } from '../../data/bank';
 import { CERITA_ASLI as CERITA, URUTAN_BALAI } from '../../data/cerita';
 import {
@@ -29,6 +29,11 @@ import type { ScreenContext } from './context';
 
 const KUNCI_TOKEN = 'survival-sains:token-guru';
 const KUNCI_KKM = 'survival-sains:kkm-guru';
+const KUNCI_RAHASIA = 'survival-sains:kunci-guru';
+const KUNCI_SALINAN = 'survival-sains:salinan-kelas-guru';
+
+/** Pengumuman cepat satu ketukan. */
+const PENGUMUMAN_CEPAT = ['⏰ 5 menit lagi', '👀 Lihat ke depan', '💾 Simpan dan selesai', '🙋 Angkat tangan kalau butuh bantuan'];
 
 /** KKM guru (disimpan di perangkat guru); nilai tidak valid jatuh ke bawaan. */
 let kkm = bacaKkm();
@@ -51,6 +56,9 @@ interface StateGuru {
   jalan: boolean;
   tab: 'kelas' | 'soal' | 'siswa';
   dipilih: string | null;
+  kunci: string | null;
+  terkunci: boolean;
+  jeda: boolean;
 }
 
 export function renderGuru(_ctx: ScreenContext): HTMLElement {
@@ -63,6 +71,9 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
     jalan: true,
     tab: 'kelas',
     dipilih: null,
+    kunci: bacaSimpanan(KUNCI_RAHASIA),
+    terkunci: false,
+    jeda: false,
   };
 
   const root = el('section', { class: 'screen' });
@@ -91,11 +102,23 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
     void ambilSesiGuru(st.token).then((res) => {
       if (!st.jalan) return;
       if ('pesan' in res) {
+        // Server restart: bangun ulang ruang dengan token + kunci + salinan siswa dari browser ini.
+        if (res.pesan === 'Sesi tidak ditemukan.' && st.kunci) {
+          void buatSesiGuru(st.guru, { token: st.token!, kunci: st.kunci, siswa: bacaSalinan() }).then((r) => {
+            if ('pesan' in r) st.pesan = r.pesan;
+            else showToast('Sesi dipulihkan setelah server menyala ulang.');
+            gambar();
+          });
+          return;
+        }
         st.pesan = res.pesan;
         st.siswa = [];
       } else {
         st.pesan = null;
         st.siswa = res.siswa;
+        st.terkunci = res.terkunci;
+        st.jeda = res.jeda;
+        if (res.siswa.length) simpanSimpanan(KUNCI_SALINAN, JSON.stringify(res.siswa));
       }
       gambar();
     });
@@ -150,7 +173,10 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
                 return;
               }
               st.token = res.token;
+              st.kunci = res.kunci;
               simpanTokenGuru(res.token);
+              simpanSimpanan(KUNCI_RAHASIA, res.kunci);
+              hapusSimpanan(KUNCI_SALINAN);
               gambar();
               mulaiPolling();
             });
@@ -207,8 +233,11 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
                     sfx.click();
                     window.clearInterval(st.timer);
                     st.token = null;
+                    st.kunci = null;
                     st.siswa = [];
                     hapusTokenGuru();
+                    hapusSimpanan(KUNCI_RAHASIA);
+                    hapusSimpanan(KUNCI_SALINAN);
                     gambar();
                   },
                 },
@@ -222,6 +251,54 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
     if (st.pesan) {
       anak.push(el('p', { class: 'muted center-text', text: st.pesan }));
     }
+
+    const kendali = async (aksi: Parameters<typeof kendaliGuru>[2], data: Parameters<typeof kendaliGuru>[3] = {}): Promise<boolean> => {
+      if (!st.token || !st.kunci) return false;
+      const galat = await kendaliGuru(st.token, st.kunci, aksi, data);
+      if (galat) showToast(galat);
+      else segarkan();
+      return !galat;
+    };
+    const tombolKendali = (teks: string, klik: () => void, gaya = 'secondary'): HTMLElement =>
+      el('button', { class: `btn kecil ${gaya}`, text: teks, attrs: { type: 'button' }, on: { click: () => { sfx.click(); klik(); } } });
+    const isiUmum = el('input', { class: 'isian', attrs: { type: 'text', maxlength: '120', placeholder: 'Tulis pengumuman untuk semua siswa' } });
+    anak.push(
+      el('div', {
+        class: 'card',
+        children: [
+          el('span', { class: 'label-kecil', text: 'Kendali kelas' }),
+          el('div', {
+            class: 'row-tombol',
+            children: [
+              tombolKendali(st.terkunci ? '🔓 Buka kunci kelas' : '🔒 Kunci kelas', () => void kendali('kunci', { nilai: !st.terkunci })),
+              tombolKendali(st.jeda ? '▶️ Lanjutkan' : '⏸️ Jeda semua', () => void kendali('jeda', { nilai: !st.jeda }), st.jeda ? '' : 'secondary'),
+            ],
+          }),
+          st.terkunci ? el('p', { class: 'muted kecil-teks', text: 'Kelas dikunci: siswa baru tidak bisa bergabung (yang sudah masuk tetap bisa).' }) : el('span'),
+          el('span', { class: 'label-kecil', text: 'Pengumuman ke layar siswa' }),
+          el('div', { class: 'row-tombol', children: PENGUMUMAN_CEPAT.map((teks) => tombolKendali(teks, () => void kendali('umum', { teks }))) }),
+          el('div', {
+            class: 'row-tombol',
+            children: [isiUmum, tombolKendali('📢 Kirim', () => { const teks = isiUmum.value.trim(); if (teks) void kendali('umum', { teks }).then((ok) => { if (ok) isiUmum.value = ''; }); })],
+          }),
+          tombolKendali('🏁 Akhiri sesi', () => {
+            if (!window.confirm('Akhiri sesi? Semua siswa dilepas dan data kelas di server dihapus. Unduh CSV dulu bila perlu.')) return;
+            void kendali('akhiri').then((ok) => {
+              if (!ok) return;
+              window.clearInterval(st.timer);
+              st.token = null;
+              st.kunci = null;
+              st.siswa = [];
+              hapusTokenGuru();
+              hapusSimpanan(KUNCI_RAHASIA);
+              hapusSimpanan(KUNCI_SALINAN);
+              showToast('Sesi diakhiri.');
+              gambar();
+            });
+          }, 'ghost'),
+        ],
+      }),
+    );
 
     const ringkas = ringkasKelas(st.siswa);
     anak.push(
@@ -304,7 +381,16 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
         if (pilih) {
           anak.push(
             el('button', { class: 'btn kecil ghost', text: '← Semua siswa', attrs: { type: 'button' }, on: { click: () => { st.dipilih = null; gambar(); } } }),
-            detailSiswa(pilih),
+            detailSiswa(pilih, {
+              ubahNama: () => {
+                const nama = window.prompt('Nama baru untuk siswa ini:', pilih.nama)?.trim();
+                if (nama && nama.length >= 2) void kendali('nama', { id: pilih.id, nama });
+              },
+              keluarkan: () => {
+                if (!window.confirm(`Keluarkan ${pilih.nama} dari kelas? Siswa ini tidak bisa bergabung lagi.`)) return;
+                void kendali('keluarkan', { id: pilih.id }).then((ok) => { if (ok) { st.dipilih = null; gambar(); } });
+              },
+            }),
           );
         } else {
           const daftar = el('div', { class: 'daftar-siswa' });
@@ -465,7 +551,7 @@ function tabSoal(siswa: RosterSiswa[]): HTMLElement[] {
   ];
 }
 
-function detailSiswa(s: RosterSiswa): HTMLElement {
+function detailSiswa(s: RosterSiswa, aksi: { ubahNama: () => void; keluarkan: () => void }): HTMLElement {
   const p = s.progress;
   const baris = URUTAN_BALAI.map((k) => {
     const c = CERITA.find((x) => x.kode === k);
@@ -501,6 +587,13 @@ function detailSiswa(s: RosterSiswa): HTMLElement {
       el('h3', { text: `${s.gender === 'perempuan' ? '👧' : '👦'} ${s.nama}` }),
       el('p', { class: 'muted', text: `Nilai akhir ${p.nilai?.akhir ?? '-'} (KKM ${kkm}) · Alat ${p.alat ?? 0}/11 · Final terbaik ${final}/30 · Final nilai awal ${p.nilai?.final ?? '-'}/30 · ${p.puncakLulus ? 'Mercusuar menyala ✅' : 'Belum lulus Final'}` }),
       tabel,
+      el('div', {
+        class: 'row-tombol',
+        children: [
+          el('button', { class: 'btn kecil secondary', text: '✏️ Ubah nama', attrs: { type: 'button' }, on: { click: aksi.ubahNama } }),
+          el('button', { class: 'btn kecil ghost', text: '🚪 Keluarkan', attrs: { type: 'button' }, on: { click: aksi.keluarkan } }),
+        ],
+      }),
       el('span', { class: 'label-kecil', text: '💡 Rekomendasi' }),
       el('ul', { class: 'tujuan', children: rekomendasi(p).map((r) => el('li', { text: r })) }),
     ],
@@ -510,6 +603,39 @@ function detailSiswa(s: RosterSiswa): HTMLElement {
 /* ------------------------------------------------------------------ */
 /* Token guru (disimpan di perangkat guru)                             */
 /* ------------------------------------------------------------------ */
+
+function bacaSimpanan(kunci: string): string | null {
+  try {
+    return localStorage.getItem(kunci);
+  } catch {
+    return null;
+  }
+}
+
+function simpanSimpanan(kunci: string, nilai: string): void {
+  try {
+    localStorage.setItem(kunci, nilai);
+  } catch {
+    /* abaikan */
+  }
+}
+
+function hapusSimpanan(kunci: string): void {
+  try {
+    localStorage.removeItem(kunci);
+  } catch {
+    /* abaikan */
+  }
+}
+
+function bacaSalinan(): RosterSiswa[] {
+  try {
+    const data = JSON.parse(bacaSimpanan(KUNCI_SALINAN) ?? '[]') as unknown;
+    return Array.isArray(data) ? (data as RosterSiswa[]) : [];
+  } catch {
+    return [];
+  }
+}
 
 function bacaTokenGuru(): string | null {
   try {

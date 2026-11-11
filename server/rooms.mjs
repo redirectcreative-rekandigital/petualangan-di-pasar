@@ -7,7 +7,17 @@
  * basis data eksternal yang dibutuhkan.
  */
 
-import { randomInt } from 'node:crypto';
+import { randomInt, randomBytes, timingSafeEqual } from 'node:crypto';
+
+export function buatKunci() {
+  return randomBytes(16).toString('hex');
+}
+
+export function kunciCocok(r, kunci) {
+  const a = Buffer.from(String(kunci || ''));
+  const b = Buffer.from(r.kunci);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
 
 /** Rentang token 4 digit: 1000..9999 (angka saja, mudah diketik anak). */
 const TOKEN_MIN = 1000;
@@ -27,9 +37,15 @@ export function buatTokenAcak(yangDipakai) {
 }
 
 /** Membuat struktur ruang kosong. */
-export function buatRuang(token, guru) {
+export function buatRuang(token, guru, kunci) {
   return {
     token,
+    /** Kunci rahasia guru: hanya pemegangnya boleh menjalankan kendali. */
+    kunci,
+    terkunci: false,
+    jeda: false,
+    /** ID siswa yang dikeluarkan guru (tidak boleh bergabung lagi). */
+    dikeluarkan: new Set(),
     guru: guru || 'Guru',
     dibuatPada: new Date().toISOString(),
     /** Map id-pemain → data siswa. */

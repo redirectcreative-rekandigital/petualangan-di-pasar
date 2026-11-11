@@ -99,7 +99,26 @@ function aktifkanKlien(): void {
       if (status === 'tersambung') kirimProgresKeServer();
     },
     onKabar: (teks) => showToast(teks),
+    onJeda: tampilkanJeda,
+    onUmum: (teks) => showToast(`📢 ${teks}`, 8000),
+    onBerakhir: (alasan) => {
+      showToast(alasan === 'selesai' ? t('Sesi kelas diakhiri guru. Terima kasih sudah belajar!') : t('Kamu dikeluarkan dari kelas ini oleh gurumu.'), 8000);
+      if (alasan === 'dikeluarkan') progress = { ...progress, token: undefined };
+      saveProgress(progress);
+    },
   });
+}
+
+/** Lapisan jeda dari guru: menutup layar dan menahan sentuhan; jawaban yang sedang dikerjakan tidak hilang. */
+function tampilkanJeda(jeda: boolean): void {
+  document.getElementById('jeda-guru')?.remove();
+  if (!jeda) return;
+  const o = document.createElement('div');
+  o.id = 'jeda-guru';
+  o.setAttribute('role', 'alert');
+  o.style.cssText = 'position:fixed;inset:0;z-index:99999;display:grid;place-items:center;text-align:center;padding:24px;background:rgba(15,23,42,.94);color:#fff;font:700 1.6rem system-ui,sans-serif;touch-action:none';
+  o.textContent = t('👀 Lihat ke depan, ya. Gurumu sedang menjelaskan.');
+  document.body.append(o);
 }
 
 function tutupKlien(): void {

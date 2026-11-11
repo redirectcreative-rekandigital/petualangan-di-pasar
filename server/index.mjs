@@ -25,6 +25,8 @@ import { WebSocketServer } from 'ws';
 import {
   buatTokenAcak,
   buatRuang,
+  buatKunci,
+  kunciCocok,
   progresKosong,
 } from './rooms.mjs';
 import { MAKS_PEMAIN_PER_RUANG } from '../shared/net.mjs';
@@ -101,7 +103,7 @@ function daftarSiswa(token) {
   }));
   // Urutkan: online dulu, lalu nama.
   siswa.sort((a, b) => Number(b.online) - Number(a.online) || a.nama.localeCompare(b.nama));
-  return { token: r.token, guru: r.guru, dibuatPada: r.dibuatPada, jumlahSiswa: siswa.length, siswa };
+  return { token: r.token, guru: r.guru, dibuatPada: r.dibuatPada, terkunci: r.terkunci, jeda: r.jeda, jumlahSiswa: siswa.length, siswa };
 }
 
 /* ================================================================== */
@@ -157,11 +159,20 @@ wss.on('connection', (ws) => {
       // dasbor guru, walau halaman dimuat ulang atau perangkat dipakai bergantian.
       const idDiminta = typeof msg.idSiswa === 'string' && ID_SISWA_VALID.test(msg.idSiswa) ? msg.idSiswa : null;
       const lama = idDiminta ? r.siswa.get(idDiminta) : undefined;
+      if (idDiminta && r.dikeluarkan.has(idDiminta)) {
+        ws.send(JSON.stringify({ t: 'galat', pesan: 'Kamu dikeluarkan dari kelas ini oleh gurumu.' }));
+        return;
+      }
+      if (!lama && r.terkunci) {
+        ws.send(JSON.stringify({ t: 'galat', pesan: 'Kelas sedang dikunci oleh gurumu.' }));
+        return;
+      }
       if (!lama && r.siswa.size >= MAKS_PEMAIN_PER_RUANG) {
         ws.send(JSON.stringify({ t: 'galat', pesan: 'Ruang sudah penuh (maksimum 40 siswa).' }));
         return;
       }
-      const nama = String(msg.nama || 'Siswa').slice(0, 24);
+      // Nama yang diubah guru tetap dipakai walau siswa bergabung lagi.
+      const nama = lama?.namaTetap ? lama.nama : String(msg.nama || 'Siswa').slice(0, 24);
       idSaya = idDiminta ?? idPemainBaru();
       const tampilan = {
         nama,
@@ -192,6 +203,7 @@ wss.on('connection', (ws) => {
       }
       koneksi.set(idSaya, { ws, token });
       ws.send(JSON.stringify({ t: 'selamat', id: idSaya, token }));
+      if (r.jeda) ws.send(JSON.stringify({ t: 'jeda', nilai: true }));
       if (namaDipakaiLain(r, nama, idSaya)) {
         ws.send(JSON.stringify({ t: 'kabar', kode: 'nama-ganda', teks: `Nama "${nama}" sedang dipakai siswa lain di kelas ini. Minta gurumu memastikan, ya.`, nama }));
       }
@@ -326,11 +338,31 @@ const server = http.createServer(async (req, res) => {
   // --- REST API ---
   if (urlPath === '/api/sesi' && req.method === 'POST') {
     const body = await bacaBody(req);
-    const dipakai = new Set(ruang.keys());
-    const token = buatTokenAcak(dipakai);
-    const r = buatRuang(token, body.guru);
+    // Pemulihan setelah server restart: guru mengirim token + kunci lamanya (dan salinan daftar siswa).
+    const tokenLama = /^\d{4}$/.test(String(body.token)) ? String(body.token) : null;
+    const ada = tokenLama ? ruang.get(tokenLama) : undefined;
+    if (ada && kunciCocok(ada, body.kunci)) {
+      kirimJson(res, 200, { token: ada.token, guru: ada.guru, dibuatPada: ada.dibuatPada, kunci: ada.kunci });
+      return;
+    }
+    const pulihkan = Boolean(tokenLama) && !ada && /^[0-9a-f]{32}$/.test(String(body.kunci));
+    const token = pulihkan ? tokenLama : buatTokenAcak(new Set(ruang.keys()));
+    const kunci = pulihkan ? String(body.kunci) : buatKunci();
+    const r = buatRuang(token, body.guru, kunci);
+    if (pulihkan && Array.isArray(body.siswa)) {
+      for (const s of body.siswa.slice(0, MAKS_PEMAIN_PER_RUANG)) {
+        if (!s || !ID_SISWA_VALID.test(String(s.id))) continue;
+        const nama = String(s.nama || 'Siswa').slice(0, 24);
+        const gender = s.gender === 'perempuan' ? 'perempuan' : 'laki-laki';
+        r.siswa.set(s.id, {
+          id: s.id, nama, gender, online: false, joinedAt: String(s.joinedAt || new Date().toISOString()),
+          lastSeen: String(s.lastSeen || new Date().toISOString()), noktah: null, x: 0, z: 0, rot: 0, sapa: undefined, ws: null,
+          progress: s.progress && typeof s.progress === 'object' ? s.progress : progresKosong(nama, gender),
+        });
+      }
+    }
     ruang.set(token, r);
-    kirimJson(res, 200, { token, guru: r.guru, dibuatPada: r.dibuatPada });
+    kirimJson(res, 200, { token, guru: r.guru, dibuatPada: r.dibuatPada, kunci });
     return;
   }
 
@@ -348,8 +380,69 @@ const server = http.createServer(async (req, res) => {
       ada: true,
       penuh: !r.siswa.has(idSiswa) && r.siswa.size >= MAKS_PEMAIN_PER_RUANG,
       namaDipakai: namaDipakaiLain(r, q.get('nama') || '', idSiswa),
+      terkunci: r.terkunci && !r.siswa.has(idSiswa),
+      dikeluarkan: r.dikeluarkan.has(idSiswa),
     });
     return;
+  }
+
+  // Kendali guru (butuh kunci rahasia): kunci kelas, jeda, pengumuman, keluarkan, ubah nama, akhiri.
+  const cocokKendali = urlPath.match(/^\/api\/sesi\/([^/]+)\/kendali$/);
+  if (cocokKendali && req.method === 'POST') {
+    const r = ruang.get(decodeURIComponent(cocokKendali[1]).trim());
+    const body = await bacaBody(req);
+    if (!r) return kirimJson(res, 404, { pesan: 'Sesi tidak ditemukan.' });
+    if (!kunciCocok(r, body.kunci)) return kirimJson(res, 403, { pesan: 'Kunci guru tidak cocok.' });
+    const kirimSemua = (obj) => {
+      const teks = JSON.stringify(obj);
+      for (const s of r.siswa.values()) if (s.ws && s.ws.readyState === 1) s.ws.send(teks);
+    };
+    const siswa = r.siswa.get(String(body.id || ''));
+    switch (body.aksi) {
+      case 'kunci':
+        r.terkunci = Boolean(body.nilai);
+        break;
+      case 'jeda':
+        r.jeda = Boolean(body.nilai);
+        kirimSemua({ t: 'jeda', nilai: r.jeda });
+        break;
+      case 'umum': {
+        const teks = String(body.teks || '').trim().slice(0, 120);
+        if (!teks) return kirimJson(res, 400, { pesan: 'Pengumuman kosong.' });
+        kirimSemua({ t: 'umum', teks });
+        break;
+      }
+      case 'keluarkan':
+        if (!siswa) return kirimJson(res, 404, { pesan: 'Siswa tidak ditemukan.' });
+        r.dikeluarkan.add(siswa.id);
+        if (siswa.ws && siswa.ws.readyState === 1) {
+          siswa.ws.send(JSON.stringify({ t: 'dikeluarkan' }));
+          siswa.ws.close();
+        }
+        koneksi.delete(siswa.id);
+        r.siswa.delete(siswa.id);
+        if (siswa.noktah) siarkanPemainNoktah(r.token, siswa.noktah);
+        break;
+      case 'nama': {
+        const nama = String(body.nama || '').trim().slice(0, 24);
+        if (!siswa || nama.length < 2) return kirimJson(res, 400, { pesan: 'Siswa atau nama tidak valid.' });
+        siswa.nama = nama;
+        siswa.namaTetap = true;
+        siswa.progress = { ...siswa.progress, playerName: nama };
+        break;
+      }
+      case 'akhiri':
+        kirimSemua({ t: 'selesai' });
+        for (const s of r.siswa.values()) {
+          koneksi.delete(s.id);
+          if (s.ws && s.ws.readyState === 1) s.ws.close();
+        }
+        ruang.delete(r.token);
+        break;
+      default:
+        return kirimJson(res, 400, { pesan: 'Aksi tidak dikenal.' });
+    }
+    return kirimJson(res, 200, { ok: true });
   }
 
   if (urlPath.startsWith('/api/sesi/') && req.method === 'GET') {

@@ -33,6 +33,12 @@ export interface OpsiKlien {
   onPemain: (daftar: PosisiPemain[]) => void;
   onKabar?: (teks: string) => void;
   onStatus?: (status: StatusKlien) => void;
+  /** Guru menjeda (true) atau melanjutkan (false) kelas. */
+  onJeda?: (jeda: boolean) => void;
+  /** Pengumuman dari guru. */
+  onUmum?: (teks: string) => void;
+  /** Siswa dikeluarkan atau sesi diakhiri: klien berhenti menyambung ulang. */
+  onBerakhir?: (alasan: 'dikeluarkan' | 'selesai') => void;
 }
 
 export type StatusKlien = 'menghubungkan' | 'tersambung' | 'terputus' | 'galat';
@@ -91,6 +97,8 @@ function pesanServer(p: string): string {
   const peta: Record<string, string> = {
     'Token tidak ditemukan. Minta token yang benar ke gurumu.': t('Token tidak ditemukan. Minta token yang benar ke gurumu.'),
     'Ruang sudah penuh (maksimum 40 siswa).': t('Ruang sudah penuh (maksimum 40 siswa).'),
+    'Kelas sedang dikunci oleh gurumu.': t('Kelas sedang dikunci oleh gurumu.'),
+    'Kamu dikeluarkan dari kelas ini oleh gurumu.': t('Kamu dikeluarkan dari kelas ini oleh gurumu.'),
   };
   return peta[p] ?? p;
 }
@@ -101,6 +109,8 @@ export class KlienMultiplayer {
   private selesai = false;
   private antre: string[] = [];
   private timerSapa = 0;
+  private timerUlang = 0;
+  private pernahMasuk = false;
 
   idSaya = '';
   /** Token ruang yang sedang dipakai (untuk memeriksa koneksi bisa dipakai ulang). */
@@ -155,11 +165,26 @@ export class KlienMultiplayer {
       }
       if (msg.t === 'selamat') {
         this.idSaya = msg.id;
+        this.pernahMasuk = true;
       } else if (msg.t === 'pemain') {
         // Buang diri sendiri dari daftar yang digambar.
         this.terakhirPosisi = msg.daftar.filter((p) => p.id !== this.idSaya);
         this.opsi.onPemain(this.terakhirPosisi);
+      } else if (msg.t === 'jeda') {
+        this.opsi.onJeda?.(msg.nilai);
+      } else if (msg.t === 'umum') {
+        this.opsi.onUmum?.(msg.teks);
+      } else if (msg.t === 'dikeluarkan' || msg.t === 'selesai') {
+        this.selesai = true;
+        this.opsi.onJeda?.(false);
+        this.opsi.onBerakhir?.(msg.t);
       } else if (msg.t === 'galat') {
+        // Server baru restart dan ruang belum dipulihkan guru: coba lagi, jangan menyerah.
+        if (this.pernahMasuk && msg.pesan.startsWith('Token tidak ditemukan')) {
+          this.opsi.onStatus?.('terputus');
+          this.ws?.close();
+          return;
+        }
         this.opsi.onStatus?.('galat');
         this.opsi.onKabar?.(pesanServer(msg.pesan));
       } else if (msg.t === 'kabar') {
@@ -171,9 +196,12 @@ export class KlienMultiplayer {
       }
     });
 
+    // Putus (mis. server restart): sambung ulang tiap 3 detik; progres dikirim ulang oleh onStatus('tersambung').
     ws.addEventListener('close', () => {
-      if (this.selesai) return;
+      if (this.selesai || this.ws !== ws) return;
       this.opsi.onStatus?.('terputus');
+      window.clearTimeout(this.timerUlang);
+      this.timerUlang = window.setTimeout(() => this.hubungkan(), 3000);
     });
     ws.addEventListener('error', () => {
       this.opsi.onStatus?.('terputus');
@@ -206,6 +234,7 @@ export class KlienMultiplayer {
 
   tutup(): void {
     this.selesai = true;
+    window.clearTimeout(this.timerUlang);
     this.ws?.close();
     this.ws = null;
   }
@@ -223,7 +252,9 @@ export async function cekTokenKelas(token: string, nama: string, idSiswa?: strin
     const res = await fetch(`${base}/api/sesi/${encodeURIComponent(token)}/cek?${q.toString()}`);
     if (res.status === 404) return { ok: false, pesan: t('Token tidak ditemukan. Minta token yang benar ke gurumu.') };
     if (!res.ok) return { ok: false, pesan: t('Server kelas sedang bermasalah. Coba lagi sebentar, ya.') };
-    const data = (await res.json()) as { penuh?: boolean; namaDipakai?: boolean };
+    const data = (await res.json()) as { penuh?: boolean; namaDipakai?: boolean; terkunci?: boolean; dikeluarkan?: boolean };
+    if (data.dikeluarkan) return { ok: false, pesan: t('Kamu dikeluarkan dari kelas ini oleh gurumu.') };
+    if (data.terkunci) return { ok: false, pesan: t('Kelas sedang dikunci oleh gurumu.') };
     if (data.penuh) return { ok: false, pesan: t('Ruang sudah penuh (maksimum 40 siswa).') };
     return { ok: true, namaDipakai: Boolean(data.namaDipakai) };
   } catch {
@@ -232,17 +263,20 @@ export async function cekTokenKelas(token: string, nama: string, idSiswa?: strin
 }
 
 /** Membuat ruang guru lewat REST; mengembalikan token 4 digit. */
-export async function buatSesiGuru(guru: string): Promise<{ token: string } | { pesan: string }> {
+export async function buatSesiGuru(
+  guru: string,
+  pulihkan?: { token: string; kunci: string; siswa: RosterSiswa[] },
+): Promise<{ token: string; kunci: string } | { pesan: string }> {
   const base = serverHttpUrl();
   if (!base) return { pesan: 'Server online belum dikonfigurasi.' };
   try {
     const res = await fetch(`${base}/api/sesi`, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ guru }),
+      body: JSON.stringify({ guru, ...pulihkan }),
     });
     if (!res.ok) return { pesan: `Server menolak (${res.status}).` };
-    return (await res.json()) as { token: string };
+    return (await res.json()) as { token: string; kunci: string };
   } catch {
     return { pesan: 'Tidak bisa menghubungi server. Pastikan server online menyala.' };
   }
@@ -250,7 +284,7 @@ export async function buatSesiGuru(guru: string): Promise<{ token: string } | { 
 
 /** Mengambil data ruang (daftar siswa + progres) untuk dasbor guru. */
 export async function ambilSesiGuru(token: string): Promise<
-  | { token: string; guru: string; dibuatPada: string; jumlahSiswa: number; siswa: RosterSiswa[] }
+  | { token: string; guru: string; dibuatPada: string; terkunci: boolean; jeda: boolean; jumlahSiswa: number; siswa: RosterSiswa[] }
   | { pesan: string }
 > {
   const base = serverHttpUrl();
@@ -262,6 +296,28 @@ export async function ambilSesiGuru(token: string): Promise<
     return await res.json();
   } catch {
     return { pesan: 'Tidak bisa menghubungi server.' };
+  }
+}
+
+/** Kendali kelas oleh guru (butuh kunci rahasia dari buatSesiGuru). Mengembalikan pesan galat bila gagal. */
+export async function kendaliGuru(
+  token: string,
+  kunci: string,
+  aksi: 'kunci' | 'jeda' | 'umum' | 'keluarkan' | 'nama' | 'akhiri',
+  data: { nilai?: boolean; teks?: string; id?: string; nama?: string } = {},
+): Promise<string | null> {
+  const base = serverHttpUrl();
+  if (!base) return 'Server online belum dikonfigurasi.';
+  try {
+    const res = await fetch(`${base}/api/sesi/${encodeURIComponent(token)}/kendali`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ kunci, aksi, ...data }),
+    });
+    if (res.ok) return null;
+    return ((await res.json()) as { pesan?: string }).pesan ?? `Server menolak (${res.status}).`;
+  } catch {
+    return 'Tidak bisa menghubungi server.';
   }
 }
 

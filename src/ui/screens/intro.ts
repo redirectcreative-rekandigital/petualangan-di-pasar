@@ -6,7 +6,6 @@ import { putarCutscene } from '../cutscene';
 import { CUTSCENE_BADAI } from '../../data/cerita';
 import { bukaKunciSuara } from '../../core/suara';
 import { showLoading } from '../loading';
-import { urlGambar } from '../../core/gambar';
 import { createKarakterPreview, type KarakterPreview } from '../components/karakterPreview';
 import { BAGIAN, PRESET, hitungWarna, rasioKontras, type Bagian, type PilihanKostum } from '../../world/kostum';
 import { kostumDari, warnaTurunan } from '../../core/kostumPemain';
@@ -179,17 +178,17 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
           })
         : null;
 
+    // Sampul layar penuh: browser memilih gambar tegak/mendatar sendiri, juga saat layar diputar.
+    const base = import.meta.env.BASE_URL;
     const sampul = el('div', { class: 'sampul' });
-    const emojiSampul = el('div', { class: 'emoji cover-emoji', text: '🏝️' });
-    void urlGambar('sampul').then((url) => {
-      if (!url) return;
-      const img = el('img', { class: 'sampul-gambar', attrs: { src: url, alt: t('Pulau Wonorejo dengan Mercusuar Tua di puncaknya') } });
-      sampul.replaceChildren(img);
-      sampul.classList.add('dengan-gambar');
-      emojiSampul.remove();
-    });
-    // `cover-isi` membungkus judul + tombol: di layar mendatar ia menjadi kolom
-    // kanan, sementara gambar sampul mengisi kolom kiri.
+    sampul.innerHTML = `
+      <picture class="sampul-full">
+        <source media="(orientation: landscape)" type="image/webp" srcset="${base}assets/sampul-landscape.webp">
+        <source media="(orientation: landscape)" srcset="${base}assets/sampul-landscape.jpg">
+        <source type="image/webp" srcset="${base}assets/sampul-portrait.webp">
+        <img src="${base}assets/sampul-portrait.jpg" alt="Survival Sains Education" class="sampul-gambar">
+      </picture>`;
+    // `cover-isi` membungkus judul + tombol, melayang di bawah tengah di atas gambar.
     replace([
       sampul,
       el('div', {
@@ -198,7 +197,6 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
           el('header', {
             class: 'hero cover-hero',
             children: [
-              emojiSampul,
               el('h1', { class: 'cover-judul', text: APP_INFO.judul }),
               el('p', { class: 'subjudul', text: APP_INFO.subjudul }),
             ],
@@ -260,11 +258,24 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
       },
     });
 
+    const kembali = el('button', {
+      class: 'btn ghost block',
+      text: t('← Kembali'),
+      attrs: { type: 'button' },
+      on: {
+        click: () => {
+          sfx.click();
+          langkah = 'cover';
+          renderLangkah();
+        },
+      },
+    });
+
     replace([
       el('div', { class: 'topbar', children: [el('h2', { text: t('Kartu Anggota Ekspedisi') })] }),
       el('p', { class: 'muted center-text intro-ket', text: t('Siapa penjelajah termuda Kapal Ekspedisi Sains? Pilih karaktermu.') }),
       el('div', { class: 'pilih-karakter-row', children: [kartu('laki-laki', previewL), kartu('perempuan', previewP)] }),
-      el('div', { class: 'stack intro-aksi', children: [lanjut] }),
+      el('div', { class: 'stack intro-aksi', children: [lanjut, kembali] }),
     ]);
   }
 

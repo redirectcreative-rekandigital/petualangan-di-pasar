@@ -55,7 +55,7 @@ const KONTROL = (): Array<[string, string, string]> => [
   [t('Lompat'), t('Tombol ⤴️ Lompat'), t('Spasi')],
   [t('Lari'), t('Tombol 🏃 di dekat joystick'), '-'],
   [t('Interaksi / bicara'), t('Tombol aksi di atas tokoh'), 'E'],
-  [t('Menu'), t('Tombol ☰'), 'H / Esc'],
+  [t('Menu'), t('Tombol ☰'), 'H'],
 ];
 
 /** Tombol di layar dan kegunaannya, per layar. */

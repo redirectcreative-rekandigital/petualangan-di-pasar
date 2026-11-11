@@ -1126,16 +1126,6 @@ g[class^='anim-'] {
   from { transform: scale(1); }
   to { transform: scale(1.06); }
 }
-.sampul.dengan-gambar {
-  box-shadow: none;
-}
-.sampul-gambar {
-  display: block;
-  width: 100%;
-  height: clamp(260px, 62vh, 520px);
-  object-fit: cover;
-  object-position: center 30%;
-}
 
 /* Isi buku tidak boleh menyusut: kotak ber-overflow:hidden (ringkasan,
    diagram) bisa terjepit menjadi garis tipis di dalam kolom flex. */

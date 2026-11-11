@@ -51,6 +51,8 @@ export function bukaMercusuar(opsi: {
   onMenu: () => void;
   onTas: () => void;
   onBintang: () => void;
+  /** Dipanggil sekali setelah dunia siap dimainkan (loading ditutup), mis. untuk panduan awal. */
+  onSiap?: () => void;
 }): SesiMercusuar {
   const { app, ctx } = opsi;
   const canvas = document.createElement('canvas');
@@ -250,6 +252,7 @@ export function bukaMercusuar(opsi: {
     input.endFrame();
     const sibuk = sesi.sibuk || overlay.adaOverlay();
     if (!sibuk && input.state.interactPressed) void interaksi();
+    if (!sibuk && input.state.menuPressed) opsi.onMenu();
     if (overlay.tertutupPenuh()) {
       raf = requestAnimationFrame(loop);
       return;
@@ -289,6 +292,7 @@ export function bukaMercusuar(opsi: {
       if (ditutup) return;
       last = performance.now();
       raf = requestAnimationFrame(loop);
+      opsi.onSiap?.();
     });
   return sesi;
 }

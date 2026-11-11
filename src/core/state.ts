@@ -1,4 +1,4 @@
-import type { BalaiId, NoktahId, Progress, BalaiProgress, AnswerRecord, Stars, PlayerGender, TahapMisi, CatatanBaca } from '../../shared/types';
+import type { BalaiId, NoktahId, Progress, BalaiProgress, AnswerRecord, Stars, PlayerGender, TahapMisi, CatatanBaca, IdPanduan } from '../../shared/types';
 import { URUTAN_BALAI, balaiSebelum, FINAL_BAGIAN } from '../data/cerita';
 import { SEMUA_BALAI, NOKTAH, noktahMateri, getNoktah } from '../data/balai';
 import { isBalaiPassed, skorJawaban, starsForSkor } from './scoring';
@@ -139,6 +139,7 @@ export function createDefaultProgress(playerName = '', gender: PlayerGender = 'l
     alat: [],
     bacaan: {},
     finalBagian: [0, 0, 0, 0],
+    panduan: [],
   };
 }
 
@@ -221,7 +222,23 @@ export function mergeProgress(partial: Partial<Progress>): Progress {
     alat: Array.isArray(partial.alat) ? partial.alat.filter((k) => typeof k === 'string') : [],
     bacaan: partial.bacaan && typeof partial.bacaan === 'object' ? { ...partial.bacaan } : {},
     finalBagian: Array.isArray(partial.finalBagian) ? partial.finalBagian.map((n) => Number(n) || 0) : [0, 0, 0, 0],
+    panduan: Array.isArray(partial.panduan) ? partial.panduan.filter((x): x is IdPanduan => typeof x === 'string') : [],
   };
+}
+
+/* ---------- Panduan awal (sorotan tombol) ---------- */
+
+export function sudahPanduan(progress: Progress, id: IdPanduan): boolean {
+  return progress.panduan?.includes(id) ?? false;
+}
+
+export function tandaiPanduan(progress: Progress, id: IdPanduan): Progress {
+  return sudahPanduan(progress, id) ? progress : { ...progress, panduan: [...(progress.panduan ?? []), id] };
+}
+
+/** "Ulangi Panduan": semua panduan muncul lagi saat layarnya dikunjungi. */
+export function ulangPanduan(progress: Progress): Progress {
+  return { ...progress, panduan: [] };
 }
 
 function clampStars(value: unknown): Stars {

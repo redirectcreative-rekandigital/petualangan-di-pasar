@@ -362,26 +362,6 @@
     gap: 10px;
   }
 
-  /* ---------- Sampul: gambar kiri, judul & tombol kanan ---------- */
-  .intro-screen[data-langkah='cover'] {
-    display: grid;
-    grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
-    gap: 20px;
-    align-items: center;
-    min-height: calc(100dvh - 20px);
-  }
-  .intro-screen[data-langkah='cover'] .sampul {
-    margin: 0;
-    border-radius: var(--radius);
-    height: calc(100dvh - 20px);
-    box-shadow: var(--bayangan);
-  }
-  .intro-screen[data-langkah='cover'] .sampul-gambar {
-    height: 100%;
-  }
-  .intro-screen[data-langkah='cover'] .sampul:not(.dengan-gambar) {
-    display: none;
-  }
   .cover-isi {
     display: flex;
     flex-direction: column;
@@ -958,6 +938,155 @@ body:has(.dialog-overlay) .hud-menu-kanan {
   /* Tombol yang sendirian di baris terakhir (jumlah ganjil) dilebarkan
      selebar panel agar grid tetap rapi. */
   .menu-tombol > :last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ================================================================== */
+/* Bilah tujuan 👉 "habis ini ngapain" (ui/hud.ts buatBilahTujuan)     */
+/* ================================================================== */
+.bilah-tujuan {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: min(320px, calc(100vw - 100px));
+  padding: 6px 12px 6px 9px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(20, 83, 45, 0.88);
+  color: var(--putih);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: left;
+  box-shadow: var(--bayangan);
+  cursor: pointer;
+  pointer-events: auto;
+}
+.bilah-tujuan-ikon {
+  flex: none;
+}
+.bilah-tujuan.ciut {
+  padding: 6px 9px;
+}
+.bilah-tujuan.ciut .bilah-tujuan-teks {
+  display: none;
+}
+/* Di peta: tepat di bawah bilah atas. */
+.peta-bilah {
+  position: fixed;
+  top: calc(max(8px, env(safe-area-inset-top)) + 52px);
+  left: 8px;
+  z-index: 45;
+}
+
+/* ================================================================== */
+/* Panduan awal: sorotan tombol bertahap (ui/panduan.ts)               */
+/* ================================================================== */
+.panduan-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+/* Lubang terang di atas tombol; bayangan raksasa menggelapkan sisa layar. */
+.panduan-sorot {
+  position: fixed;
+  border-radius: 16px;
+  box-shadow: 0 0 0 200vmax rgba(10, 25, 18, 0.62);
+  outline: 3px solid var(--oranye-500);
+  pointer-events: none;
+  transition: left 0.2s ease, top 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+.panduan-overlay.tanpa-target {
+  background: rgba(10, 25, 18, 0.62);
+}
+.panduan-overlay.tanpa-target .panduan-sorot {
+  display: none;
+}
+.panduan-balon {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(360px, calc(100vw - 32px));
+  padding: 14px 16px 12px;
+  border-radius: var(--radius);
+  background: var(--krem-50);
+  border-left: 5px solid var(--oranye-500);
+  box-shadow: var(--bayangan-lg);
+  color: var(--teks);
+}
+.panduan-overlay.tanpa-target .panduan-balon {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.panduan-teks {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.panduan-aksi {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+/* ================================================================== */
+/* Sampul layar penuh (intro.ts): <picture> memilih gambar tegak atau   */
+/* mendatar; tanpa kartu menu, tombol melayang di bawah tengah.        */
+/* ================================================================== */
+.sampul-full {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  background: #f6d58e;
+}
+.sampul-full .sampul-gambar {
+  display: block;
+  width: 100vw;
+  height: 100dvh;
+  object-fit: cover;
+  /* Layar lebih lebar dari 16:9 memotong atas-bawah: jaga logo, korbankan pantai di balik tombol. */
+  object-position: center top;
+}
+.intro-screen[data-langkah='cover'] .cover-isi {
+  position: fixed;
+  left: 50%;
+  bottom: max(12px, env(safe-area-inset-bottom));
+  z-index: 1;
+  transform: translateX(-50%);
+  width: min(460px, calc(100vw - 32px));
+  max-height: calc(100dvh - 24px);
+  overflow-y: auto;
+  gap: 10px;
+  padding: 0;
+}
+/* Logo & judul sudah ada di gambar: teks judul hanya untuk pembaca layar. */
+.intro-screen[data-langkah='cover'] .cover-hero {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+}
+.intro-screen[data-langkah='cover'] :is(.cover-isi > .muted, .footer-note) {
+  color: var(--putih);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.75);
+}
+/* Tombol ghost/secondary bawaan transparan: diberi latar agar terbaca di atas gambar. */
+.intro-screen[data-langkah='cover'] .cover-tombol .btn:is(.ghost, .secondary) {
+  background: rgba(255, 253, 247, 0.92);
+}
+@media (orientation: landscape) {
+  .intro-screen[data-langkah='cover'] .cover-isi {
+    width: min(620px, calc(100vw - 32px));
+  }
+  .intro-screen[data-langkah='cover'] .cover-tombol {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+  .intro-screen[data-langkah='cover'] .cover-tombol > :first-child {
     grid-column: 1 / -1;
   }
 }

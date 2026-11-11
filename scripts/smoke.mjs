@@ -31,6 +31,18 @@ async function lanjutSemua(maks = 12) {
   }
 }
 
+/** Panduan awal (sorotan tombol) harus muncul; ketuk Oke sampai selesai. */
+async function ikutiPanduan(nama) {
+  await page.waitForSelector('.panduan-overlay', { timeout: 8000 });
+  let langkah = 0;
+  while (await page.locator('.panduan-overlay').count()) {
+    await page.locator('.panduan-aksi .btn:not(.ghost)').click();
+    langkah++;
+    await t(150);
+  }
+  log(`panduan ${nama}: ${langkah} langkah`);
+}
+
 try {
   await page.goto(BASE, { waitUntil: 'networkidle' });
   await page.getByRole('button', { name: /Mulai Petualangan/ }).click();
@@ -52,6 +64,8 @@ try {
   let d = await api(() => window.__survivalSains.debug());
   if (d.tahap !== 1) throw new Error(`tahap setelah misi = ${d.tahap}`);
   log('misi diterima (tahap 1)');
+  await ikutiPanduan('balai');
+  log(`bilah tujuan: "${await page.locator('.bilah-tujuan-teks').innerText()}"`);
 
   await api(() => { window.__survivalSains.pindahKe('uji'); window.__survivalSains.interaksi(); });
   await t(400);
@@ -79,6 +93,7 @@ try {
   await api(() => { window.__survivalSains.pindahKe('uji'); window.__survivalSains.interaksi(); });
   await t(400);
   await lanjutSemua(1);
+  await ikutiPanduan('uji');
   const bank = await api(() => window.__survivalSains.bank());
   for (let s = 0; s < 3; s++) {
     await page.locator('.vn-teks').click().catch(() => {});
@@ -115,6 +130,10 @@ try {
   }
   if (mode !== 'peta-3d') throw new Error(`mode akhir ${mode}`);
   log('kembali ke peta pulau; Lembah Gema terbuka');
+  await ikutiPanduan('peta');
+  log(`bilah peta: "${await page.locator('.peta-bilah').innerText()}"`);
+  const tersimpan = (await api(() => window.__survivalSains.progress())).panduan;
+  if (!['balai', 'uji', 'peta'].every((x) => tersimpan.includes(x))) throw new Error(`panduan tidak tersimpan: ${tersimpan}`);
 
   if (errors.length) {
     console.error('[smoke] ERROR:');

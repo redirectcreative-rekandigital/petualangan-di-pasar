@@ -40,7 +40,7 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,ico,json,woff2}', 'assets/gambar-hp/*.webp'],
+        globPatterns: ['**/*.{js,css,html,svg,png,ico,json,woff2}', 'assets/gambar-hp/*.webp', 'assets/sampul-*.webp'],
         // Decoder DRACO/KTX2 dan model 3D tidak diprecache (berat, jarang dipakai
         // saat kunjungan pertama) — cukup di-cache saat benar-benar diminta.
         globIgnores: ['assets/libs/**', 'assets/models/**'],

@@ -1,0 +1,325 @@
+{
+ "bab": "Bab 9c - E03 siklus air & mitigasi bencana - Pos Siaga",
+ "versi": "v001",
+ "skala": "meter (player ~1.6 m)",
+ "orientasi": "glTF +Y atas, depan +Z, origin bawah-tengah",
+ "sumber_tata_letak": "bundle live noktahWorld-7R3ahhes.js, layout ke[1] dicermin X (urutan 11)",
+ "npc": {
+  "Ibu Pertiwi (penjaga, P)": "NPC 17 ibu_batu",
+  "Cantrik Banyu (L)": "NPC 08 cantrik_peta"
+ },
+ "aset_bersama_dipakai": [
+  "aset_bersama/gerbang_peta",
+  "aset_bersama/jalan_lebar (lurus, skala Y = panjang/3)",
+  "aset_goa_sinar/tiang_obor",
+  "aset_goa_sinar/pagar_kayu",
+  "aset_goa_sinar/semak",
+  "aset_bersama/kolam (danau = Kolam_Besar x1.9 di (-12,-12))",
+  "aset_bersama/pohon (12)"
+ ],
+ "aset": [
+  {
+   "nama": "pos_siaga",
+   "versi": "v001",
+   "glb": "pos_siaga/export/pos_siaga_v001.glb",
+   "blend": "pos_siaga/source/pos_siaga_v001.blend",
+   "tris": 2496,
+   "ukuran_file_kb": 148.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.29,
+    5.75,
+    5.327
+   ],
+   "node": [
+    "Pos_Siaga",
+    "Papan_Nama"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Abu_Gelap",
+    "Aksen_E03",
+    "Aksen_E03_Gelap",
+    "Batu_Plinth_Gelap",
+    "Beton",
+    "Bunga_Oranye",
+    "Bunga_Putih",
+    "Emas",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Logam",
+    "Merah_Bendera",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "kios() rumah penjaga (roof = accent)",
+   "accent": "Aksen_E03",
+   "notes": "pos siaga bencana (E03): atap cyan, tiang sirine 4.6 m, kentongan, kotak P3K, pelampung, peti logistik, radio"
+  },
+  {
+   "nama": "bukit_titik_kumpul",
+   "versi": "v001",
+   "glb": "bukit_titik_kumpul/export/bukit_titik_kumpul_v001.glb",
+   "blend": "bukit_titik_kumpul/source/bukit_titik_kumpul_v001.blend",
+   "tris": 632,
+   "ukuran_file_kb": 39.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    11.699,
+    7.675,
+    12.1
+   ],
+   "node": [
+    "Bukit_Titik_Kumpul"
+   ],
+   "material": [
+    "Abu_Gelap",
+    "Batu_Plinth",
+    "Hijau_Bukit",
+    "Hijau_Evakuasi",
+    "Kayu_Gelap",
+    "Rumput_E03"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "hill cone r6 h5 #6dbb4f at (14,-14) with 3 m pole #334155 + green flag #16a34a (titik kumpul)",
+   "notes": "tangga batu di depan (-Y Blender = +Z glTF), puncak datar r1.6 di 4.65 m, papan TITIK KUMPUL (text_face)"
+  },
+  {
+   "nama": "papan_evakuasi",
+   "versi": "v001",
+   "glb": "papan_evakuasi/export/papan_evakuasi_v001.glb",
+   "blend": "papan_evakuasi/source/papan_evakuasi_v001.blend",
+   "tris": 108,
+   "ukuran_file_kb": 8.2,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    1.4,
+    2.05,
+    0.15
+   ],
+   "node": [
+    "Papan_Evakuasi"
+   ],
+   "material": [
+    "Hijau_Evakuasi",
+    "Logam",
+    "Putih"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "evacuation arrow sign (dressing; panah menunjuk +X)"
+  },
+  {
+   "nama": "karung_pasir",
+   "versi": "v001",
+   "glb": "karung_pasir/export/karung_pasir_v001.glb",
+   "blend": "karung_pasir/source/karung_pasir_v001.blend",
+   "tris": 200,
+   "ukuran_file_kb": 17.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    3.301,
+    0.435,
+    0.483
+   ],
+   "node": [
+    "Karung_Pasir_Dinding",
+    "Karung_Pasir_Tumpuk"
+   ],
+   "material": [
+    "Karung"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Karung_Pasir_Dinding",
+    "Karung_Pasir_Tumpuk"
+   ],
+   "tris_each": {
+    "Karung_Pasir_Dinding": 140,
+    "Karung_Pasir_Tumpuk": 60
+   },
+   "replaces": "sandbags (dressing tanggul/pos siaga)"
+  },
+  {
+   "nama": "stasiun_siklus_air",
+   "versi": "v001",
+   "glb": "stasiun_siklus_air/export/stasiun_siklus_air_v001.glb",
+   "blend": "stasiun_siklus_air/source/stasiun_siklus_air_v001.blend",
+   "tris": 804,
+   "ukuran_file_kb": 50.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.029,
+    1.355,
+    2.029
+   ],
+   "node": [
+    "Stasiun_Siklus_Air"
+   ],
+   "material": [
+    "Abu_Gelap",
+    "Air_Danau",
+    "Air_Kolam",
+    "Aksen_E03",
+    "Amber_Aksen",
+    "Awan",
+    "Batu_Abu",
+    "Emas",
+    "Jalan_Pasir",
+    "Laut",
+    "Matahari",
+    "Salju",
+    "Strata_3"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "Si() story station (siklus air + bencana: matahari, awan, hujan, laut, danau, gunung, 4 panah)",
+   "accent": "Aksen_E03"
+  },
+  {
+   "nama": "panggung_uji",
+   "versi": "v001",
+   "glb": "panggung_uji/export/panggung_uji_v001.glb",
+   "blend": "panggung_uji/source/panggung_uji_v001.blend",
+   "tris": 1400,
+   "ukuran_file_kb": 81.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.921,
+    2.247,
+    5.852
+   ],
+   "node": [
+    "Arena_Uji",
+    "Cincin_Aksen",
+    "Pagar_Uji",
+    "Api_1_Mati",
+    "Api_1_Nyala",
+    "Cahaya_Api_1",
+    "Api_2_Mati",
+    "Api_2_Nyala",
+    "Cahaya_Api_2",
+    "Api_3_Mati",
+    "Api_3_Nyala",
+    "Cahaya_Api_3"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Aksen_E03",
+    "Api",
+    "Api_Inti",
+    "Api_Mati",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Pagar_Uji"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Api_1_Kedip",
+    "Api_2_Kedip",
+    "Api_3_Kedip"
+   ],
+   "replaces": "Hi() test arena",
+   "states": "Api_k_Mati default visible / Api_k_Nyala hide on load, show per correct answer; Pagar_Uji hidden when opened; Cincin_Aksen glows when opened",
+   "accent": "Aksen_E03"
+  },
+  {
+   "nama": "lantai_siaga",
+   "versi": "v001",
+   "glb": "lantai_siaga/export/lantai_siaga_v001.glb",
+   "blend": "lantai_siaga/source/lantai_siaga_v001.blend",
+   "tris": 102,
+   "ukuran_file_kb": 7.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.0,
+    0.3,
+    4.0
+   ],
+   "node": [
+    "lantai_siaga"
+   ],
+   "material": [
+    "Rumput_E03",
+    "Rumput_E03_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "ground plane (grass #93b77d), tile 4x4 m, top 0.06"
+  },
+  {
+   "nama": "kit_siaga",
+   "versi": "v001",
+   "glb": "kit_siaga/export/kit_siaga_v001.glb",
+   "blend": "kit_siaga/source/kit_siaga_v001.blend",
+   "tris": 410,
+   "ukuran_file_kb": 31.9,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.086,
+    2.05,
+    18.1
+   ],
+   "node": [
+    "Papan_Evakuasi",
+    "Karung_Pasir_Dinding",
+    "Karung_Pasir_Tumpuk",
+    "lantai_siaga"
+   ],
+   "material": [
+    "Hijau_Evakuasi",
+    "Karung",
+    "Logam",
+    "Putih",
+    "Rumput_E03",
+    "Rumput_E03_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "tris_each": {
+    "Papan_Evakuasi": 108,
+    "Karung_Pasir_Dinding": 140,
+    "Karung_Pasir_Tumpuk": 60,
+    "lantai_siaga": 102
+   },
+   "groups": {
+    "papan_evakuasi": [
+     "Papan_Evakuasi"
+    ],
+    "karung_pasir": [
+     "Karung_Pasir_Dinding",
+     "Karung_Pasir_Tumpuk"
+    ],
+    "lantai_siaga": [
+     "lantai_siaga"
+    ]
+   }
+  }
+ ],
+ "overview": [
+  "overview_scene.png",
+  "overview_uji.png",
+  "overview_rumah.png"
+ ],
+ "kelemahan": [
+  "BUG DI KODE LIVE: pada layout E03 (ke[1] dicermin) danau h(-12,-12) menimpa rumah (-11,-12) dan bukit (14,-14) menimpa arena uji (12,-9) karena dekorasi tidak ikut dicermin. Di overview bukit dipindah ke samping arena (titik kumpul) dan danau ke tanah kosong; programmer sebaiknya memakai posisi overview (lihat _builder/overview_scene.blend) atau mencermin X dekorasi lalu menggeser",
+  "bukit titik kumpul bisa terlihat tinggi (7.7 m dengan bendera) - skala sesuai kode (r6 h5)",
+  "tulisan papan (TITIK KUMPUL / JALUR EVAKUASI) belum ada, hanya text_face untuk teks dari game"
+ ],
+ "koordinat_kode": {
+  "muncul": [
+   0,
+   17
+  ],
+  "penjaga": [
+   -6,
+   7
+  ],
+  "cerita": [
+   0,
+   -6
+  ],
+  "uji": [
+   12,
+   -9
+  ],
+  "gerbang": [
+   14,
+   12
+  ],
+  "rumah": [
+   -11,
+   -12
+  ]
+ }
+}

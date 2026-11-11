@@ -16,7 +16,8 @@ export interface PlayerBundle {
   group: THREE.Group;
   /** Titik acuan posisi (kaki) untuk kamera dan collision. */
   position: THREE.Vector3;
-  setPosition: (x: number, z: number) => void;
+  /** `y` = tinggi lantai yang diinjak (tangga mercusuar); 0 di dunia datar. */
+  setPosition: (x: number, z: number, y?: number) => void;
   /** Menghadap ke arah pergerakan. */
   faceDirection: (dx: number, dz: number, dt: number) => void;
   /** Animasi jalan sederhana (ayun kaki) berdasarkan kecepatan. */
@@ -25,6 +26,10 @@ export interface PlayerBundle {
   lompat: () => boolean;
   /** Gerak tubuh saat berinteraksi (klip `Interact` pada avatar GLB). */
   interaksi: () => void;
+  /** Adegan pembuka Tidur lalu Bangun (langsung selesai pada karakter prosedural). */
+  adeganBangun: () => Promise<void>;
+  /** Sudut mata: kepala disembunyikan, tangan diangkat; `null` kembali normal. */
+  poseOrangPertama: (kamera: THREE.PerspectiveCamera | null) => void;
   /** Klip animasi avatar GLB yang sedang main (null bila memakai karakter prosedural). */
   infoAnimasi: () => { klip: string; timeScale: number } | null;
   /** Memajukan fisika lompat (gravitasi) tiap frame. `true` pada frame mendarat. */
@@ -81,9 +86,9 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
   let kecepatanY = 0;
   let mendarat = 0; // sisa waktu efek "mendarat" (tubuh memendek sesaat)
 
-  const setPosition = (x: number, z: number): void => {
-    position.set(x, 0, z);
-    akar.position.set(x, tinggi, z);
+  const setPosition = (x: number, z: number, y = 0): void => {
+    position.set(x, y, z);
+    akar.position.set(x, y + tinggi, z);
   };
 
   const lompat = (): boolean => {
@@ -106,7 +111,7 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
         mendarat = 0.14;
         baruMendarat = true;
       }
-      akar.position.y = tinggi;
+      akar.position.y = position.y + tinggi;
     }
     // Efek pegas kecil: memendek saat mendarat, sedikit memanjang di udara.
     if (mendarat > 0) {
@@ -145,7 +150,7 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
   };
 
   const cobaPakaiGlb = async (renderer?: THREE.WebGLRenderer): Promise<boolean> => {
-    const model = await cobaAvatarGlb(opsi.gender, renderer, opsi.kostum);
+    const model = await cobaAvatarGlb(opsi.gender, renderer, opsi.kostum, TINGGI_PEMAIN);
     if (!model) return false;
     glb = model;
     // Sembunyikan karakter prosedural, tampilkan model GLB di grup yang sama.
@@ -171,6 +176,12 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
     animate: (speed, elapsed) => animate(tinggi > 0 ? 0 : speed, elapsed),
     lompat,
     interaksi: () => glb?.mainkanSekali('Interact'),
+    adeganBangun: () => glb?.adeganBangun() ?? Promise.resolve(),
+    poseOrangPertama: (kamera) => {
+      if (glb) glb.poseOrangPertama(kamera);
+      // Karakter prosedural tidak punya pose tangan: cukup sembunyikan agar tidak menutupi kamera.
+      else group.visible = kamera === null;
+    },
     infoAnimasi: () => glb?.infoAnimasi() ?? null,
     updateLompat,
     diUdara: () => tinggi > 0,
@@ -178,6 +189,9 @@ export function createPlayer(penampilan: PlayerGender | Penampilan = 'laki-laki'
     dispose,
   };
 }
+
+/** Tinggi pemain di dunia balai (m), setara cantrik pada aset bab. */
+export const TINGGI_PEMAIN = 1.6;
 
 /** Kecepatan awal lompat (satuan/detik) dan gravitasi: puncak ±1,1 satuan, ±0,6 detik di udara. */
 const KECEPATAN_LOMPAT = 6.6;

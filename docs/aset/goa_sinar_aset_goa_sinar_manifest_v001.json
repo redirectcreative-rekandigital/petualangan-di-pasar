@@ -1,0 +1,528 @@
+{
+ "versi": "v001",
+ "skala": "meter (player ~1.6 m)",
+ "orientasi": "glTF +Y atas, depan +Z, origin bawah-tengah (kecuali stalaktit: atas-tengah)",
+ "validator": "gltf-validator 0 error / 0 warning untuk semua GLB",
+ "aset": [
+  {
+   "nama": "pendopo",
+   "glb": "pendopo/export/pendopo_v001.glb",
+   "blend": "pendopo/source/pendopo_v001.blend",
+   "tris": 1672,
+   "ukuran_file_kb": 100.2,
+   "dimensi_m_xyz_blender": [
+    5.214,
+    5.327,
+    5.75
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.214,
+    5.75,
+    5.327
+   ],
+   "node": [
+    "Pendopo",
+    "Papan_Nama"
+   ],
+   "material": [
+    "Batu_Plinth",
+    "Batu_Plinth_Gelap",
+    "Genteng",
+    "Genteng_Gelap",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Merah_Bendera",
+    "Putih"
+   ],
+   "notes": "Papan_Nama = blank plank for in-game text (front face centre in glTF coords in node extras)",
+   "budget_tris": 3000
+  },
+  {
+   "nama": "tiang_obor",
+   "glb": "tiang_obor/export/tiang_obor_v001.glb",
+   "blend": "tiang_obor/source/tiang_obor_v001.blend",
+   "tris": 238,
+   "ukuran_file_kb": 17.6,
+   "dimensi_m_xyz_blender": [
+    0.48,
+    0.48,
+    2.176
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    0.48,
+    2.176,
+    0.48
+   ],
+   "node": [
+    "Tiang_Obor",
+    "Api",
+    "Cahaya_Obor"
+   ],
+   "material": [
+    "Api",
+    "Api_Inti",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Kayu_Jati"
+   ],
+   "animations": [
+    "Api_Kedip (loop 1.0 s, node Api)"
+   ],
+   "light_hint_node": "Cahaya_Obor",
+   "budget_tris": 3000
+  },
+  {
+   "nama": "papan_nama",
+   "glb": "papan_nama/export/papan_nama_v001.glb",
+   "blend": "papan_nama/source/papan_nama_v001.blend",
+   "tris": 304,
+   "ukuran_file_kb": 21.7,
+   "dimensi_m_xyz_blender": [
+    1.18,
+    0.48,
+    2.195
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    1.18,
+    2.195,
+    0.48
+   ],
+   "node": [
+    "Papan_Nama_Tiang",
+    "Papan_Nama"
+   ],
+   "material": [
+    "Batu_Plinth",
+    "Emas",
+    "Genteng",
+    "Genteng_Gelap",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan"
+   ],
+   "notes": "Papan_Nama = blank plank face for in-game text",
+   "budget_tris": 3000
+  },
+  {
+   "nama": "stasiun_cahaya",
+   "glb": "stasiun_cahaya/export/stasiun_cahaya_v001.glb",
+   "blend": "stasiun_cahaya/source/stasiun_cahaya_v001.blend",
+   "tris": 996,
+   "ukuran_file_kb": 62.9,
+   "dimensi_m_xyz_blender": [
+    2.029,
+    2.029,
+    0.995
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.029,
+    0.995,
+    2.029
+   ],
+   "node": [
+    "Stasiun_Cahaya",
+    "Senter_Lensa",
+    "Pelangi",
+    "Cahaya_Stasiun"
+   ],
+   "material": [
+    "Batu_Goa",
+    "Cahaya_Senter",
+    "Cermin",
+    "Emas",
+    "Hitam",
+    "Jalan_Pasir",
+    "Kaca",
+    "Kayu_Gelap",
+    "Mata_Biru",
+    "Pelangi_Biru",
+    "Pelangi_Hijau",
+    "Pelangi_Jingga",
+    "Pelangi_Kuning",
+    "Pelangi_Merah",
+    "Pelangi_Ungu",
+    "Putih"
+   ],
+   "nodes_toggle": [
+    "Pelangi",
+    "Senter_Lensa"
+   ],
+   "budget_tris": 3000
+  },
+  {
+   "nama": "panggung_bundar",
+   "glb": "panggung_bundar/export/panggung_bundar_v001.glb",
+   "blend": "panggung_bundar/source/panggung_bundar_v001.blend",
+   "tris": 1504,
+   "ukuran_file_kb": 76.9,
+   "dimensi_m_xyz_blender": [
+    5.0,
+    5.0,
+    1.95
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.0,
+    1.95,
+    5.0
+   ],
+   "node": [
+    "Panggung_Bundar"
+   ],
+   "material": [
+    "Bambu",
+    "Bambu_Ruas",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Biru_Tiang",
+    "Kayu_Gelap",
+    "Oranye"
+   ],
+   "notes": "entrance gap in the railing faces +Z (front)",
+   "budget_tris": 3000
+  },
+  {
+   "nama": "batu_kecil",
+   "glb": "batu_kecil/export/batu_kecil_v001.glb",
+   "blend": "batu_kecil/source/batu_kecil_v001.blend",
+   "tris": 240,
+   "ukuran_file_kb": 17.7,
+   "dimensi_m_xyz_blender": [
+    3.302,
+    0.574,
+    0.356
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    3.302,
+    0.356,
+    0.574
+   ],
+   "node": [
+    "batu_kecil_a",
+    "batu_kecil_b",
+    "batu_kecil_c"
+   ],
+   "material": [
+    "Batu_Abu"
+   ],
+   "variants": [
+    "batu_kecil_a",
+    "batu_kecil_b",
+    "batu_kecil_c"
+   ],
+   "tris_each": {
+    "batu_kecil_a": 80,
+    "batu_kecil_b": 80,
+    "batu_kecil_c": 80
+   },
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "bongkahan_dinding_goa",
+   "glb": "bongkahan_dinding_goa/export/bongkahan_dinding_goa_v001.glb",
+   "blend": "bongkahan_dinding_goa/source/bongkahan_dinding_goa_v001.blend",
+   "tris": 960,
+   "ukuran_file_kb": 62.4,
+   "dimensi_m_xyz_blender": [
+    13.16,
+    2.947,
+    2.756
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    13.16,
+    2.756,
+    2.947
+   ],
+   "node": [
+    "bongkahan_a",
+    "bongkahan_b",
+    "bongkahan_c"
+   ],
+   "material": [
+    "Batu_Goa"
+   ],
+   "variants": [
+    "bongkahan_a",
+    "bongkahan_b",
+    "bongkahan_c"
+   ],
+   "tris_each": {
+    "bongkahan_a": 320,
+    "bongkahan_b": 320,
+    "bongkahan_c": 320
+   },
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "stalaktit",
+   "glb": "stalaktit/export/stalaktit_v001.glb",
+   "blend": "stalaktit/source/stalaktit_v001.blend",
+   "tris": 330,
+   "ukuran_file_kb": 27.5,
+   "dimensi_m_xyz_blender": [
+    4.859,
+    1.031,
+    2.4
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.859,
+    2.4,
+    1.031
+   ],
+   "node": [
+    "stalaktit_a",
+    "stalaktit_b",
+    "stalaktit_c"
+   ],
+   "material": [
+    "Batu_Goa",
+    "Batu_Goa_Gelap"
+   ],
+   "variants": [
+    "stalaktit_a",
+    "stalaktit_b",
+    "stalaktit_c"
+   ],
+   "tris_each": {
+    "stalaktit_a": 110,
+    "stalaktit_b": 100,
+    "stalaktit_c": 120
+   },
+   "notes": "stalaktit origin = top centre (ceiling mount)",
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "semak",
+   "glb": "semak/export/semak_v001.glb",
+   "blend": "semak/source/semak_v001.blend",
+   "tris": 240,
+   "ukuran_file_kb": 17.6,
+   "dimensi_m_xyz_blender": [
+    2.857,
+    1.082,
+    0.594
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.857,
+    0.594,
+    1.082
+   ],
+   "node": [
+    "semak_a",
+    "semak_b"
+   ],
+   "material": [
+    "Daun",
+    "Daun_Gelap"
+   ],
+   "variants": [
+    "semak_a",
+    "semak_b"
+   ],
+   "tris_each": {
+    "semak_a": 80,
+    "semak_b": 160
+   },
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "pagar_kayu",
+   "glb": "pagar_kayu/export/pagar_kayu_v001.glb",
+   "blend": "pagar_kayu/source/pagar_kayu_v001.blend",
+   "tris": 176,
+   "ukuran_file_kb": 12.1,
+   "dimensi_m_xyz_blender": [
+    3.73,
+    0.13,
+    1.0
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    3.73,
+    1.0,
+    0.13
+   ],
+   "node": [
+    "pagar_kayu_segmen",
+    "pagar_kayu_ujung"
+   ],
+   "material": [
+    "Kayu_Jati",
+    "Kayu_Papan"
+   ],
+   "variants": [
+    "pagar_kayu_segmen",
+    "pagar_kayu_ujung"
+   ],
+   "tris_each": {
+    "pagar_kayu_segmen": 132,
+    "pagar_kayu_ujung": 44
+   },
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "jalan_setapak",
+   "glb": "jalan_setapak/export/jalan_setapak_v001.glb",
+   "blend": "jalan_setapak/source/jalan_setapak_v001.blend",
+   "tris": 204,
+   "ukuran_file_kb": 13.6,
+   "dimensi_m_xyz_blender": [
+    6.8,
+    2.0,
+    0.04
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    6.8,
+    0.04,
+    2.0
+   ],
+   "node": [
+    "jalan_lurus",
+    "jalan_belok",
+    "jalan_pertigaan"
+   ],
+   "material": [
+    "Jalan_Pasir"
+   ],
+   "variants": [
+    "jalan_lurus",
+    "jalan_belok",
+    "jalan_pertigaan"
+   ],
+   "tris_each": {
+    "jalan_lurus": 44,
+    "jalan_belok": 68,
+    "jalan_pertigaan": 92
+   },
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "lantai_goa",
+   "glb": "lantai_goa/export/lantai_goa_v001.glb",
+   "blend": "lantai_goa/source/lantai_goa_v001.blend",
+   "tris": 78,
+   "ukuran_file_kb": 4.9,
+   "dimensi_m_xyz_blender": [
+    4.0,
+    4.0,
+    0.093
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.0,
+    0.093,
+    4.0
+   ],
+   "node": [
+    "lantai_goa"
+   ],
+   "material": [
+    "Tanah_Goa"
+   ],
+   "variants": [
+    "lantai_goa"
+   ],
+   "tris_each": {
+    "lantai_goa": 78
+   },
+   "budget_tris_per_varian": 500
+  },
+  {
+   "nama": "kit_lingkungan",
+   "glb": "kit_lingkungan/export/kit_lingkungan_v001.glb",
+   "blend": "kit_lingkungan/source/kit_lingkungan_v001.blend",
+   "tris": 2228,
+   "ukuran_file_kb": 154.5,
+   "dimensi_m_xyz_blender": [
+    13.389,
+    35.283,
+    3.5
+   ],
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    13.389,
+    3.5,
+    35.283
+   ],
+   "node": [
+    "batu_kecil_a",
+    "batu_kecil_b",
+    "batu_kecil_c",
+    "bongkahan_a",
+    "bongkahan_b",
+    "bongkahan_c",
+    "stalaktit_a",
+    "stalaktit_b",
+    "stalaktit_c",
+    "semak_a",
+    "semak_b",
+    "pagar_kayu_segmen",
+    "pagar_kayu_ujung",
+    "jalan_lurus",
+    "jalan_belok",
+    "jalan_pertigaan",
+    "lantai_goa"
+   ],
+   "material": [
+    "Batu_Abu",
+    "Batu_Goa",
+    "Batu_Goa_Gelap",
+    "Daun",
+    "Daun_Gelap",
+    "Jalan_Pasir",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Tanah_Goa"
+   ],
+   "tris_each": {
+    "batu_kecil_a": 80,
+    "batu_kecil_b": 80,
+    "batu_kecil_c": 80,
+    "bongkahan_a": 320,
+    "bongkahan_b": 320,
+    "bongkahan_c": 320,
+    "stalaktit_a": 110,
+    "stalaktit_b": 100,
+    "stalaktit_c": 120,
+    "semak_a": 80,
+    "semak_b": 160,
+    "pagar_kayu_segmen": 132,
+    "pagar_kayu_ujung": 44,
+    "jalan_lurus": 44,
+    "jalan_belok": 68,
+    "jalan_pertigaan": 92,
+    "lantai_goa": 78
+   },
+   "groups": {
+    "batu_kecil": [
+     "batu_kecil_a",
+     "batu_kecil_b",
+     "batu_kecil_c"
+    ],
+    "bongkahan_dinding_goa": [
+     "bongkahan_a",
+     "bongkahan_b",
+     "bongkahan_c"
+    ],
+    "stalaktit": [
+     "stalaktit_a",
+     "stalaktit_b",
+     "stalaktit_c"
+    ],
+    "semak": [
+     "semak_a",
+     "semak_b"
+    ],
+    "pagar_kayu": [
+     "pagar_kayu_segmen",
+     "pagar_kayu_ujung"
+    ],
+    "jalan_setapak": [
+     "jalan_lurus",
+     "jalan_belok",
+     "jalan_pertigaan"
+    ],
+    "lantai_goa": [
+     "lantai_goa"
+    ]
+   }
+  }
+ ]
+}

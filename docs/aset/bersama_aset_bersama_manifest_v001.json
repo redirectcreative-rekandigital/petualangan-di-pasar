@@ -1,0 +1,70 @@
+{
+ "aset": [
+  {
+   "nama": "gerbang_peta",
+   "versi": "v001",
+   "glb": "/workspace/aset_bersama/gerbang_peta/export/gerbang_peta_v001.glb",
+   "blend": "/workspace/aset_bersama/gerbang_peta/source/gerbang_peta_v001.blend",
+   "tris": 428,
+   "ukuran_file_kb": 29.3,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.76,
+    4.5,
+    0.96
+   ],
+   "node": [
+    "Gerbang_Peta",
+    "Portal",
+    "Papan_Gerbang"
+   ],
+   "material": [
+    "Atap_Gerbang",
+    "Bata_Gerbang",
+    "Kayu_Gelap",
+    "Kayu_Papan",
+    "Portal_Cyan"
+   ],
+   "validator": "0 error / 0 warning",
+   "nodes_toggle": [
+    "Portal"
+   ],
+   "notes": "Portal: alpha blend 0.45 + emissive cyan; animate material.opacity like code (0.22..0.45)",
+   "replaces": "_i() gerbang (all chapters)",
+   "budget_tris": 3000
+  },
+  {
+   "nama": "jalan_lebar",
+   "versi": "v001",
+   "glb": "/workspace/aset_bersama/jalan_lebar/export/jalan_lebar_v001.glb",
+   "blend": "/workspace/aset_bersama/jalan_lebar/source/jalan_lebar_v001.blend",
+   "tris": 204,
+   "ukuran_file_kb": 13.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    9.8,
+    0.04,
+    3.0
+   ],
+   "node": [
+    "jalan_lebar_lurus",
+    "jalan_lebar_belok",
+    "jalan_lebar_pertigaan"
+   ],
+   "material": [
+    "Jalan_Pasir"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "jalan_lebar_lurus",
+    "jalan_lebar_belok",
+    "jalan_lebar_pertigaan"
+   ],
+   "tris_each": {
+    "jalan_lebar_lurus": 44,
+    "jalan_lebar_belok": 68,
+    "jalan_lebar_pertigaan": 92
+   },
+   "notes": "path 2.2 m wide (= code path planes), cell 3x3 m, 4 cm thick; lurus can be scaled along Z for long runs",
+   "budget_tris_per_varian": 500
+  }
+ ]
+}

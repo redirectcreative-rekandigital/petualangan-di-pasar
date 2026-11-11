@@ -13,21 +13,27 @@ if (typeof globalThis.FileReader === 'undefined') {
       this.onerror = null;
     }
     readAsArrayBuffer(blob) {
-      blob.arrayBuffer().then((buf) => {
-        this.result = buf;
-        this.onloadend?.();
-      }, (err) => {
-        this.onerror?.(err);
-      });
+      blob.arrayBuffer().then(
+        (buf) => {
+          this.result = buf;
+          this.onloadend?.();
+        },
+        (err) => {
+          this.onerror?.(err);
+        },
+      );
     }
     readAsDataURL(blob) {
-      blob.arrayBuffer().then((buf) => {
-        const b64 = Buffer.from(buf).toString('base64');
-        this.result = `data:${blob.type || 'application/octet-stream'};base64,${b64}`;
-        this.onloadend?.();
-      }, (err) => {
-        this.onerror?.(err);
-      });
+      blob.arrayBuffer().then(
+        (buf) => {
+          const b64 = Buffer.from(buf).toString('base64');
+          this.result = `data:${blob.type || 'application/octet-stream'};base64,${b64}`;
+          this.onloadend?.();
+        },
+        (err) => {
+          this.onerror?.(err);
+        },
+      );
     }
   };
 }
@@ -127,16 +133,17 @@ function bangunKarakter(gender) {
   }
 
   /* --- Pinggang: sabuk + kompas --- */
-  tambah(
-    new THREE.CylinderGeometry(0.315, 0.33, 0.09, 20),
-    mSabuk,
-    [0, 0.94, 0],
-  );
+  tambah(new THREE.CylinderGeometry(0.315, 0.33, 0.09, 20), mSabuk, [0, 0.94, 0]);
   // Gesper.
   tambah(new THREE.BoxGeometry(0.1, 0.07, 0.03), mLogam, [0, 0.94, 0.315]);
   // Kompas di pinggang kanan.
   tambah(new THREE.CylinderGeometry(0.055, 0.055, 0.022, 18), mLogam, [0.285, 0.9, 0.16], [Math.PI / 2, 0, -0.25]);
-  tambah(new THREE.CylinderGeometry(0.036, 0.036, 0.026, 16), mat(WARNA.lensa, 0.25), [0.285, 0.9, 0.163], [Math.PI / 2, 0, -0.25]);
+  tambah(
+    new THREE.CylinderGeometry(0.036, 0.036, 0.026, 16),
+    mat(WARNA.lensa, 0.25),
+    [0.285, 0.9, 0.163],
+    [Math.PI / 2, 0, -0.25],
+  );
 
   /* --- Badan --- */
   if (perempuan) {
@@ -253,9 +260,7 @@ async function ekspor(nama, gender) {
 
   const ukuran = new THREE.Vector3();
   new THREE.Box3().setFromObject(root).getSize(ukuran);
-  console.log(
-    `[avatar] ${nama} → ${(buffer.byteLength / 1024).toFixed(1)} KB, tinggi ${ukuran.y.toFixed(2)}`,
-  );
+  console.log(`[avatar] ${nama} → ${(buffer.byteLength / 1024).toFixed(1)} KB, tinggi ${ukuran.y.toFixed(2)}`);
 }
 
 async function main() {

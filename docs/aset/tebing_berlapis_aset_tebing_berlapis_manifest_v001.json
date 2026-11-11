@@ -1,0 +1,349 @@
+{
+ "bab": "Bab 9a - E01 litosfer - Tebing Berlapis",
+ "versi": "v001",
+ "skala": "meter (player ~1.6 m)",
+ "orientasi": "glTF +Y atas, depan +Z, origin bawah-tengah",
+ "sumber_tata_letak": "bundle live noktahWorld-7R3ahhes.js, layout ke[2] (urutan 9)",
+ "npc": {
+  "Ibu Pertiwi (penjaga, P)": "NPC 17 ibu_batu",
+  "Cantrik Watu (L)": "NPC 06 cantrik_batu"
+ },
+ "aset_bersama_dipakai": [
+  "aset_bersama/gerbang_peta",
+  "aset_bersama/jalan_lebar (lurus, skala Y = panjang/3)",
+  "aset_goa_sinar/tiang_obor",
+  "aset_goa_sinar/pagar_kayu",
+  "aset_goa_sinar/semak"
+ ],
+ "aset": [
+  {
+   "nama": "pos_pendaki",
+   "versi": "v001",
+   "glb": "pos_pendaki/export/pos_pendaki_v001.glb",
+   "blend": "pos_pendaki/source/pos_pendaki_v001.blend",
+   "tris": 2428,
+   "ukuran_file_kb": 142.1,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.214,
+    5.75,
+    5.327
+   ],
+   "node": [
+    "Pos_Pendaki",
+    "Papan_Nama"
+   ],
+   "material": [
+    "Aksen_E01",
+    "Aksen_E01_Gelap",
+    "Besi",
+    "Beton",
+    "Bunga_Oranye",
+    "Emas",
+    "Hijau_Evakuasi",
+    "Karung",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Krem",
+    "Merah_Bendera",
+    "Putih",
+    "Strata_3",
+    "Strata_5"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "kios() rumah penjaga (roof = accent)",
+   "accent": "Aksen_E01",
+   "notes": "pos pendaki Ibu Pertiwi (E01): atap abu batu, gulungan tali, ransel, peti, beliung, meja peta"
+  },
+  {
+   "nama": "tebing_berlapis",
+   "versi": "v001",
+   "glb": "tebing_berlapis/export/tebing_berlapis_v001.glb",
+   "blend": "tebing_berlapis/source/tebing_berlapis_v001.blend",
+   "tris": 964,
+   "ukuran_file_kb": 64.7,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    17.713,
+    9.632,
+    4.316
+   ],
+   "node": [
+    "Tebing_Berlapis_A",
+    "Tebing_Berlapis_B",
+    "Tebing_Berlapis_Tangga"
+   ],
+   "material": [
+    "Abu_Gelap",
+    "Besi",
+    "Karung",
+    "Kayu_Papan",
+    "Merah_Bendera",
+    "Strata_1",
+    "Strata_2",
+    "Strata_3",
+    "Strata_4",
+    "Strata_5"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Tebing_Berlapis_A",
+    "Tebing_Berlapis_B",
+    "Tebing_Berlapis_Tangga"
+   ],
+   "tris_each": {
+    "Tebing_Berlapis_A": 240,
+    "Tebing_Berlapis_B": 240,
+    "Tebing_Berlapis_Tangga": 484
+   },
+   "replaces": "strata wall 9 cols x 5 layers of 5.2x1.6x4 boxes (#a16207 #78716c #57534e #ea580c #92400e) at z=-20.5",
+   "notes": "1 segmen = 1 kolom (5.2 m lebar, 8 m tinggi, 4 m tebal). Tebing_Berlapis_Tangga = landmark \"atas tebing\" (tangga tali + bendera) taruh di belakang arena"
+  },
+  {
+   "nama": "gunung_api",
+   "versi": "v001",
+   "glb": "gunung_api/export/gunung_api_v001.glb",
+   "blend": "gunung_api/source/gunung_api_v001.blend",
+   "tris": 188,
+   "ukuran_file_kb": 14.5,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    3.567,
+    4.07,
+    3.2
+   ],
+   "node": [
+    "Gunung_Api"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Lava",
+    "Strata_2",
+    "Strata_3"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "volcano model (E01 dressing, mirip prop ki())",
+   "notes": "kawah + aliran lava emissive (Lava 3.0)"
+  },
+  {
+   "nama": "stasiun_litosfer",
+   "versi": "v001",
+   "glb": "stasiun_litosfer/export/stasiun_litosfer_v001.glb",
+   "blend": "stasiun_litosfer/source/stasiun_litosfer_v001.blend",
+   "tris": 668,
+   "ukuran_file_kb": 41.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.029,
+    0.875,
+    2.029
+   ],
+   "node": [
+    "Stasiun_Litosfer"
+   ],
+   "material": [
+    "Abu_Gelap",
+    "Aksen_E01",
+    "Bunga_Kuning",
+    "Daun_Pohon_Muda",
+    "Emas",
+    "Jalan_Pasir",
+    "Kristal",
+    "Lava",
+    "Salju",
+    "Strata_2",
+    "Strata_3",
+    "Strata_5",
+    "Terakota"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "ki() story station (litosfer: lapisan tanah, gunung api, kristal batuan, gunung bersalju)",
+   "accent": "Aksen_E01"
+  },
+  {
+   "nama": "panggung_uji",
+   "versi": "v001",
+   "glb": "panggung_uji/export/panggung_uji_v001.glb",
+   "blend": "panggung_uji/source/panggung_uji_v001.blend",
+   "tris": 1400,
+   "ukuran_file_kb": 81.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.921,
+    2.247,
+    5.852
+   ],
+   "node": [
+    "Arena_Uji",
+    "Cincin_Aksen",
+    "Pagar_Uji",
+    "Api_1_Mati",
+    "Api_1_Nyala",
+    "Cahaya_Api_1",
+    "Api_2_Mati",
+    "Api_2_Nyala",
+    "Cahaya_Api_2",
+    "Api_3_Mati",
+    "Api_3_Nyala",
+    "Cahaya_Api_3"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Aksen_E01",
+    "Api",
+    "Api_Inti",
+    "Api_Mati",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Pagar_Uji"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Api_1_Kedip",
+    "Api_2_Kedip",
+    "Api_3_Kedip"
+   ],
+   "replaces": "Hi() test arena",
+   "states": "Api_k_Mati default visible / Api_k_Nyala hide on load, show per correct answer; Pagar_Uji hidden when opened; Cincin_Aksen glows when opened",
+   "accent": "Aksen_E01"
+  },
+  {
+   "nama": "batu_kapur",
+   "versi": "v001",
+   "glb": "batu_kapur/export/batu_kapur_v001.glb",
+   "blend": "batu_kapur/source/batu_kapur_v001.blend",
+   "tris": 240,
+   "ukuran_file_kb": 17.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    7.324,
+    0.951,
+    1.518
+   ],
+   "node": [
+    "Batu_Kapur_A",
+    "Batu_Kapur_B",
+    "Batu_Kapur_C"
+   ],
+   "material": [
+    "Beton"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Batu_Kapur_A",
+    "Batu_Kapur_B",
+    "Batu_Kapur_C"
+   ],
+   "tris_each": {
+    "Batu_Kapur_A": 80,
+    "Batu_Kapur_B": 80,
+    "Batu_Kapur_C": 80
+   },
+   "replaces": "12 rocks #a8a29e (E01) - juga dipakai E03"
+  },
+  {
+   "nama": "lantai_tebing",
+   "versi": "v001",
+   "glb": "lantai_tebing/export/lantai_tebing_v001.glb",
+   "blend": "lantai_tebing/source/lantai_tebing_v001.blend",
+   "tris": 102,
+   "ukuran_file_kb": 7.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.0,
+    0.3,
+    4.0
+   ],
+   "node": [
+    "lantai_tebing"
+   ],
+   "material": [
+    "Rumput_E01",
+    "Rumput_E01_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "ground plane (grass #c7a878), tile 4x4 m, top 0.06"
+  },
+  {
+   "nama": "kit_tebing",
+   "versi": "v001",
+   "glb": "kit_tebing/export/kit_tebing_v001.glb",
+   "blend": "kit_tebing/source/kit_tebing_v001.blend",
+   "tris": 530,
+   "ukuran_file_kb": 38.8,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    8.039,
+    4.07,
+    18.793
+   ],
+   "node": [
+    "Batu_Kapur_A",
+    "Batu_Kapur_B",
+    "Batu_Kapur_C",
+    "Gunung_Api",
+    "lantai_tebing"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Beton",
+    "Lava",
+    "Rumput_E01",
+    "Rumput_E01_Gelap",
+    "Strata_2",
+    "Strata_3"
+   ],
+   "validator": "0 error / 0 warning",
+   "tris_each": {
+    "Batu_Kapur_A": 80,
+    "Batu_Kapur_B": 80,
+    "Batu_Kapur_C": 80,
+    "Gunung_Api": 188,
+    "lantai_tebing": 102
+   },
+   "groups": {
+    "batu_kapur": [
+     "Batu_Kapur_A",
+     "Batu_Kapur_B",
+     "Batu_Kapur_C"
+    ],
+    "gunung_api": [
+     "Gunung_Api"
+    ],
+    "lantai_tebing": [
+     "lantai_tebing"
+    ]
+   }
+  }
+ ],
+ "overview": [
+  "overview_scene.png",
+  "overview_uji.png",
+  "overview_rumah.png"
+ ],
+ "kelemahan": [
+  "dinding strata kode di x=-20+l*5 (jarak 5 m, kotak 5.2 m saling tumpang 0.2 m); segmen kita 5.2 m - pakai jarak 5 m seperti kode",
+  "penjaga menunggu \"atas tebing\": di game arena tetap di tanah; tebing + tangga tali sebagai latar di belakang (tidak bisa didaki)",
+  "tidak ada pohon (sesuai kode)"
+ ],
+ "koordinat_kode": {
+  "muncul": [
+   -12,
+   15
+  ],
+  "penjaga": [
+   -7,
+   6
+  ],
+  "cerita": [
+   9,
+   6
+  ],
+  "uji": [
+   0,
+   -9
+  ],
+  "gerbang": [
+   14,
+   -12
+  ],
+  "rumah": [
+   -11,
+   -12
+  ]
+ }
+}

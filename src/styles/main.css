@@ -697,6 +697,32 @@ body.world-mode #app {
   pointer-events: auto;
 }
 
+.btn-kunci-lari {
+  position: absolute;
+  left: 50%;
+  bottom: calc(100% + 8px);
+  transform: translateX(-50%);
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(31, 111, 74, 0.55);
+  background: rgba(255, 255, 255, 0.82);
+  font-size: 20px;
+  line-height: 1;
+  cursor: pointer;
+  touch-action: none;
+}
+
+.btn-kunci-lari.hidden {
+  display: none;
+}
+
+.btn-kunci-lari.terkunci {
+  background: #f59e0b;
+  border-color: #b45309;
+}
+
 .joystick-base {
   width: 128px;
   height: 128px;
@@ -748,6 +774,11 @@ body.world-mode #app {
 .btn-action.interact {
   background: var(--oranye-500);
   font-size: 0.95rem;
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  pointer-events: auto;
 }
 .btn-action.menu {
   min-width: 54px;
@@ -1397,6 +1428,8 @@ body.world-mode #app {
 }
 
 .sapa-bar {
+  /* .hud-3d meneruskan ketukan ke dunia 3D: daftar emoji harus menangkapnya sendiri. */
+  pointer-events: auto;
   position: fixed;
   right: 12px;
   bottom: calc(88px + env(safe-area-inset-bottom));
@@ -1430,7 +1463,11 @@ body.world-mode #app {
 }
 
 /* ==================== ATUR PAKAIAN (PILIH WARNA) ==================== */
+/* Menempel di atas: karakter tetap terlihat saat daftar warna digulir. */
 .warna-panggung {
+  position: sticky;
+  top: max(6px, env(safe-area-inset-top));
+  z-index: 5;
   display: flex;
   justify-content: center;
   background: radial-gradient(circle at 50% 30%, var(--hijau-100) 0%, var(--putih) 70%);
@@ -1440,8 +1477,9 @@ body.world-mode #app {
 }
 
 .karakter-preview.preview-besar {
-  width: 240px;
-  height: auto;
+  /* Dibatasi agar pilihan warna masih punya ruang di bawah pratinjau yang menempel. */
+  width: auto;
+  height: min(36dvh, 340px);
   aspect-ratio: 240 / 340;
   max-width: 100%;
   position: relative;

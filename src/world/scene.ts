@@ -10,6 +10,8 @@ import { teksturRumput, ulangi } from './tekstur';
  */
 
 export interface SceneBundle {
+  /** Bidang tanah dasar. */
+  ground: THREE.Mesh;
   scene: THREE.Scene;
   renderer: THREE.WebGLRenderer;
   camera: THREE.PerspectiveCamera;
@@ -274,5 +276,5 @@ export function createScene(canvas: HTMLCanvasElement, options: SceneOptions = {
     renderer.dispose();
   };
 
-  return { scene, renderer, camera, pakaiBayangan, updateAwan, dispose };
+  return { scene, renderer, camera, ground, pakaiBayangan, updateAwan, dispose };
 }

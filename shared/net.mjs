@@ -4,7 +4,7 @@
  * dijaga agar sinkron di sini.
  */
 
-export const SAPAAN_EMOJI = ['👋', '👍', '😀', '🎉', '❤️', '🙌'];
+export const SAPAAN_EMOJI = ['👋', '👍', '😀', '🎉', '😊', '🙌'];
 
 /** Batas jumlah pemain per ruang. */
 export const MAKS_PEMAIN_PER_RUANG = 40;

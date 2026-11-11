@@ -77,6 +77,12 @@ export interface BarisSiswa {
 }
 
 /** Cuplikan posisi seorang pemain untuk sinkronisasi antar pemain. */
+/** Pilihan kostum avatar GLB; divalidasi server dan dirapikan lagi oleh penerima. */
+export interface KostumPemain {
+  preset?: string;
+  warna?: Record<string, string>;
+}
+
 export interface PosisiPemain {
   id: string;
   nama: string;
@@ -87,6 +93,8 @@ export interface PosisiPemain {
   warnaBawahan?: number;
   /** Warna hijab (khusus perempuan), bila ada. */
   warnaHijab?: number;
+  /** Hanya ada pada siaran saat pemain masuk/keluar noktah (hemat data). */
+  kostum?: KostumPemain;
   noktah: NoktahId | null;
   /** Posisi di dalam dunia noktah (satuan dunia). */
   x: number;
@@ -113,6 +121,7 @@ export type PesanKlien =
       warnaBaju?: number;
       warnaBawahan?: number;
       warnaHijab?: number;
+      kostum?: KostumPemain;
     }
   | { t: 'pos'; noktah: NoktahId | null; x: number; z: number; rot: number }
   | { t: 'sapa'; emoji: string }
@@ -128,7 +137,7 @@ export type PesanServer =
   | { t: 'kabar'; teks: string; kode?: 'nama-ganda'; nama?: string };
 
 /** Rentang emoji sapaan yang diizinkan (aman untuk anak). */
-export const SAPAAN_EMOJI = ['👋', '👍', '😀', '🎉', '❤️', '🙌'] as const;
+export const SAPAAN_EMOJI = ['👋', '👍', '😀', '🎉', '😊', '🙌'] as const;
 export type SapaEmoji = (typeof SAPAAN_EMOJI)[number];
 
 /** Batas jumlah pemain per ruang. */

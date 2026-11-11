@@ -110,8 +110,23 @@ function daftarSiswa(token) {
 
 const wss = new WebSocketServer({ noServer: true });
 
-/** Kirim daftar pemain pada noktah yang sama ke semua orang di noktah itu. */
-function siarkanPemainNoktah(token, noktah) {
+/** Kostum dari klien: hanya bentuk yang dikenal, supaya data asing tidak disiarkan ke siswa lain. */
+function kostumAman(k) {
+  if (!k || typeof k !== 'object') return undefined;
+  const warna = {};
+  if (k.warna && typeof k.warna === 'object') {
+    for (const [bagian, hex] of Object.entries(k.warna).slice(0, 12)) {
+      if (/^[a-z]{1,20}$/i.test(bagian) && typeof hex === 'string' && /^#[0-9a-f]{6}$/i.test(hex)) warna[bagian] = hex;
+    }
+  }
+  return { preset: typeof k.preset === 'string' ? k.preset.slice(0, 40) : undefined, warna };
+}
+
+/**
+ * Kirim daftar pemain pada noktah yang sama ke semua orang di noktah itu.
+ * `denganKostum` hanya saat ada yang masuk/keluar: siaran ini berjalan tiap gerakan.
+ */
+function siarkanPemainNoktah(token, noktah, denganKostum = false) {
   const r = ruang.get(token);
   if (!r) return;
   const diNoktah = [...r.siswa.values()].filter((s) => s.online && s.noktah === noktah && noktah !== null);
@@ -122,6 +137,7 @@ function siarkanPemainNoktah(token, noktah) {
     warnaBaju: s.warnaBaju,
     warnaBawahan: s.warnaBawahan,
     warnaHijab: s.warnaHijab,
+    ...(denganKostum ? { kostum: s.kostum } : {}),
     noktah: s.noktah,
     x: s.x,
     z: s.z,
@@ -169,11 +185,13 @@ wss.on('connection', (ws) => {
         warnaBaju: typeof msg.warnaBaju === 'number' ? msg.warnaBaju : undefined,
         warnaBawahan: typeof msg.warnaBawahan === 'number' ? msg.warnaBawahan : undefined,
         warnaHijab: typeof msg.warnaHijab === 'number' ? msg.warnaHijab : undefined,
+        kostum: kostumAman(msg.kostum),
       };
       if (lama) {
         // Siswa yang sama tersambung lagi: pakai baris lama, tutup koneksi lamanya.
         if (lama.ws && lama.ws !== ws && lama.ws.readyState === 1) lama.ws.close();
-        Object.assign(lama, tampilan, { online: true, ws, lastSeen: new Date().toISOString() });
+        // noktah dikosongkan agar `pos` berikutnya terhitung masuk dan kostumnya disiarkan lagi.
+        Object.assign(lama, tampilan, { online: true, ws, noktah: null, lastSeen: new Date().toISOString() });
       } else {
         r.siswa.set(idSaya, {
           id: idSaya,
@@ -215,8 +233,8 @@ wss.on('connection', (ws) => {
       siswa.noktah = noktahBaru;
       siswa.lastSeen = new Date().toISOString();
       if (noktahBaru !== noktahLama) {
-        if (noktahLama) siarkanPemainNoktah(info.token, noktahLama);
-        if (noktahBaru) siarkanPemainNoktah(info.token, noktahBaru);
+        if (noktahLama) siarkanPemainNoktah(info.token, noktahLama, true);
+        if (noktahBaru) siarkanPemainNoktah(info.token, noktahBaru, true);
       } else if (noktahBaru) {
         siarkanPemainNoktah(info.token, noktahBaru);
       }

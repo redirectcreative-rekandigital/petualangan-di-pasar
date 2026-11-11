@@ -1,0 +1,226 @@
+{
+ "versi": "v002",
+ "catatan": "v002 = v001 (gerbang_peta, jalan_lebar) + isian alam bersama Bab 3-9c: pohon, tunggul, batang_kayu, kolam, awan",
+ "aset": [
+  {
+   "nama": "gerbang_peta",
+   "versi": "v001",
+   "glb": "gerbang_peta/export/gerbang_peta_v001.glb",
+   "blend": "gerbang_peta/source/gerbang_peta_v001.blend",
+   "tris": 428,
+   "ukuran_file_kb": 29.3,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.76,
+    4.5,
+    0.96
+   ],
+   "node": [
+    "Gerbang_Peta",
+    "Portal",
+    "Papan_Gerbang"
+   ],
+   "material": [
+    "Atap_Gerbang",
+    "Bata_Gerbang",
+    "Kayu_Gelap",
+    "Kayu_Papan",
+    "Portal_Cyan"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "_i() gerbang (all chapters)",
+   "notes": "Portal: alpha blend 0.45 + emissive cyan; animate material.opacity like code (0.22..0.45)"
+  },
+  {
+   "nama": "jalan_lebar",
+   "versi": "v001",
+   "glb": "jalan_lebar/export/jalan_lebar_v001.glb",
+   "blend": "jalan_lebar/source/jalan_lebar_v001.blend",
+   "tris": 204,
+   "ukuran_file_kb": 13.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    9.8,
+    0.04,
+    3.0
+   ],
+   "node": [
+    "jalan_lebar_lurus",
+    "jalan_lebar_belok",
+    "jalan_lebar_pertigaan"
+   ],
+   "material": [
+    "Jalan_Pasir"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "jalan_lebar_lurus",
+    "jalan_lebar_belok",
+    "jalan_lebar_pertigaan"
+   ],
+   "tris_each": {
+    "jalan_lebar_lurus": 44,
+    "jalan_lebar_belok": 68,
+    "jalan_lebar_pertigaan": 92
+   },
+   "notes": "path 2.2 m wide (= code path planes), cell 3x3 m, 4 cm thick; lurus can be scaled along Z for long runs"
+  },
+  {
+   "nama": "pohon",
+   "versi": "v001",
+   "glb": "pohon/export/pohon_v001.glb",
+   "blend": "pohon/source/pohon_v001.blend",
+   "tris": 508,
+   "ukuran_file_kb": 39.5,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    12.876,
+    4.4,
+    2.785
+   ],
+   "node": [
+    "Pohon_Bulat_A",
+    "Pohon_Bulat_B",
+    "Pohon_Cemara"
+   ],
+   "material": [
+    "Batang",
+    "Daun_Cemara",
+    "Daun_Pohon",
+    "Daun_Pohon_Muda"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Pohon_Bulat_A",
+    "Pohon_Bulat_B",
+    "Pohon_Cemara"
+   ],
+   "tris_each": {
+    "Pohon_Bulat_A": 312,
+    "Pohon_Bulat_B": 128,
+    "Pohon_Cemara": 68
+   },
+   "replaces": "B() trees (trunk #7a5230, icosa canopy r1.4) in Ui dressing",
+   "notes": "instance per tree; recolour canopy by swapping Daun_Pohon/_Muda material if chapter needs (e.g. H03 #5cb85c, E02 #3fa34d)"
+  },
+  {
+   "nama": "tunggul",
+   "versi": "v001",
+   "glb": "tunggul/export/tunggul_v001.glb",
+   "blend": "tunggul/source/tunggul_v001.blend",
+   "tris": 288,
+   "ukuran_file_kb": 17.2,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.043,
+    0.775,
+    1.729
+   ],
+   "node": [
+    "Tunggul_A",
+    "Tunggul_B"
+   ],
+   "material": [
+    "Batang",
+    "Kayu_Jati",
+    "Kayu_Papan"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Tunggul_A",
+    "Tunggul_B"
+   ],
+   "tris_each": {
+    "Tunggul_A": 144,
+    "Tunggul_B": 144
+   },
+   "replaces": "H04 stumps cyl 0.5-0.65 h0.7 #8a5a32; H01 tunggul"
+  },
+  {
+   "nama": "batang_kayu",
+   "versi": "v001",
+   "glb": "batang_kayu/export/batang_kayu_v001.glb",
+   "blend": "batang_kayu/source/batang_kayu_v001.blend",
+   "tris": 76,
+   "ukuran_file_kb": 5.4,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.424,
+    0.972,
+    0.543
+   ],
+   "node": [
+    "Batang_Kayu"
+   ],
+   "material": [
+    "Batang",
+    "Kayu_Papan"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "fallen log (H01 batang kayu, H04 log pile base)"
+  },
+  {
+   "nama": "kolam",
+   "versi": "v001",
+   "glb": "kolam/export/kolam_v001.glb",
+   "blend": "kolam/source/kolam_v001.blend",
+   "tris": 1716,
+   "ukuran_file_kb": 104.9,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    12.49,
+    1.1,
+    4.355
+   ],
+   "node": [
+    "Kolam_Kecil",
+    "Kolam_Besar"
+   ],
+   "material": [
+    "Air_Kolam",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Coklat_Ekor",
+    "Daun_Gelap",
+    "Tanah_Goa",
+    "Teratai"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Kolam_Kecil",
+    "Kolam_Besar"
+   ],
+   "tris_each": {
+    "Kolam_Kecil": 724,
+    "Kolam_Besar": 992
+   },
+   "replaces": "pond ellipse planes (H01 2.6x1.8; E02 3x2.2 -> Kolam_Besar scale 1.15; E03 lake 5x3.5 -> Kolam_Besar scale 1.9)",
+   "notes": "water top at 0.1 m (above ground tile 0.06)"
+  },
+  {
+   "nama": "awan",
+   "versi": "v001",
+   "glb": "awan/export/awan_v001.glb",
+   "blend": "awan/source/awan_v001.blend",
+   "tris": 560,
+   "ukuran_file_kb": 44.3,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    11.903,
+    2.15,
+    2.125
+   ],
+   "node": [
+    "Awan_A",
+    "Awan_B"
+   ],
+   "material": [
+    "Awan"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Awan_A",
+    "Awan_B"
+   ],
+   "tris_each": {
+    "Awan_A": 320,
+    "Awan_B": 240
+   },
+   "replaces": "cloud spheres (E02 5 clouds at y 11-13, E03 station cloud)",
+   "notes": "place at height 11-13 m; floating"
+  }
+ ]
+}

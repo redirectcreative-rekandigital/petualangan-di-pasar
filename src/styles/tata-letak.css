@@ -136,16 +136,78 @@
 }
 
 /* ---------- Tombol kanan bawah ---------- */
+/* --naik-tas menyejajarkan pusat Tas (92px) dengan pusat joystick di tiap ukuran layar. */
+.hud-3d {
+  --naik-tas: 54px;
+}
+@media (max-width: 480px) {
+  .hud-3d {
+    --naik-tas: 46px;
+  }
+}
 .hud-actions {
   right: max(16px, env(safe-area-inset-right));
-  bottom: max(20px, env(safe-area-inset-bottom));
-  gap: 10px;
+  bottom: calc(max(20px, env(safe-area-inset-bottom)) + var(--naik-tas));
+  display: block;
+  width: 92px;
+  height: 92px;
 }
-.hud-aksi-atas,
-.hud-aksi-utama {
-  display: flex;
-  align-items: flex-end;
-  gap: 12px;
+/* Tas di pusat; tombol lain melingkari sisi kiri dan atasnya. */
+.hud-actions .btn-action {
+  position: absolute;
+  padding: 0;
+  border-radius: 50%;
+  touch-action: none;
+  user-select: none;
+}
+.hud-actions .btn-action.tas-besar {
+  right: 0;
+  bottom: 0;
+  width: 92px;
+  min-width: 92px;
+  height: 92px;
+  flex-direction: column;
+  gap: 0;
+  background: var(--oranye-500);
+}
+.tas-ikon {
+  font-size: 2.1rem;
+  line-height: 1;
+}
+.tas-jumlah {
+  font-size: 0.85rem;
+  font-weight: 800;
+}
+.hud-actions .btn-action.lompat {
+  right: calc(100% + 10px);
+  bottom: calc(50% - 37px);
+}
+.hud-actions .btn-action.sapa {
+  right: 85px;
+  bottom: 85px;
+  width: 52px;
+  min-width: 52px;
+  height: 52px;
+  font-size: 1.5rem;
+}
+.hud-actions .btn-action.kamera {
+  right: 18px;
+  bottom: calc(100% + 10px);
+  width: 56px;
+  min-width: 56px;
+  height: 56px;
+  flex-direction: column;
+  gap: 0;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--hijau-900);
+}
+.kamera-ikon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+.kamera-label {
+  font-size: 0.62rem;
+  font-weight: 800;
 }
 .btn-action.lompat {
   flex-direction: column;
@@ -179,14 +241,18 @@
   bottom: calc(max(20px, env(safe-area-inset-bottom)) + 36px);
 }
 @media (orientation: landscape) and (max-height: 600px) {
+  .hud-3d {
+    --naik-tas: 28px;
+  }
   .joystick-host {
     left: calc(max(18px, env(safe-area-inset-left)) + 40px);
     bottom: calc(max(20px, env(safe-area-inset-bottom)) + 16px);
   }
 }
+/* Di sisi kiri lingkaran tombol, sejajar tombol 😊 dan di atas tombol Lompat. */
 .sapa-bar {
-  right: max(16px, env(safe-area-inset-right));
-  bottom: calc(max(20px, env(safe-area-inset-bottom)) + 150px);
+  right: calc(max(16px, env(safe-area-inset-right)) + 145px);
+  bottom: calc(max(20px, env(safe-area-inset-bottom)) + 111px + var(--naik-tas));
 }
 
 /* Layar dunia: panel & modal tak boleh lebih tinggi dari layar. */
@@ -667,15 +733,14 @@
     min-width: 68px;
     height: 68px;
   }
-  .hud-actions {
-    gap: 8px;
+  .hud-actions .btn-action.lompat {
+    bottom: calc(50% - 34px);
   }
   .misi-tombol {
     min-height: 42px;
     padding: 4px 12px 4px 8px;
   }
   .sapa-bar {
-    bottom: calc(max(20px, env(safe-area-inset-bottom)) + 130px);
     flex-direction: row;
   }
   /* Pesan singkat turun ke bawah-tengah, di antara joystick dan tombol. */
@@ -730,6 +795,9 @@
   .hadiah-potret {
     width: 60px;
     height: 60px;
+  }
+  .hud-3d {
+    --naik-tas: 22px;
   }
   .joystick-base {
     width: 104px;

@@ -3,6 +3,8 @@ import { NOKTAH } from '../data/balai';
 import { URUTAN_BALAI } from '../data/cerita';
 import { buatPulau3D, posisiDiPulau, DIAMETER_PULAU } from './pulau';
 import { buatKios } from './kios';
+import { berkasRumah } from './asetBab';
+import { loadModel, klonModel } from './loaders';
 import { buatKarakter, type KarakterRig } from './karakter';
 import type { Elemen, NoktahId, NoktahMeta } from '../../shared/types';
 
@@ -816,6 +818,23 @@ function buatPulau(
     const kios = buatKios({ warna: baseWarna, meriah: false, skala: 0.42 }, track);
     kios.group.position.y = 0.75;
     group.add(kios.group);
+    // Rumah GLB bab menggantikan kios begitu termuat; bila gagal, kios tetap tampil.
+    const berkas = berkasRumah(n.kode);
+    if (berkas) {
+      void loadModel(berkas)
+        .then((gltf) => {
+          const rumah = klonModel(gltf);
+          rumah.traverse((o) => {
+            const mesh = o as THREE.Mesh;
+            if (mesh.isMesh) track(mesh.material as THREE.Material);
+          });
+          rumah.scale.setScalar(0.42);
+          rumah.position.y = 0.75;
+          group.remove(kios.group);
+          group.add(rumah);
+        })
+        .catch(() => undefined);
+    }
   }
 
   // Bendera warna elemen di sisi kios.

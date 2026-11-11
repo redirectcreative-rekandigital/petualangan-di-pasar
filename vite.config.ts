@@ -50,8 +50,8 @@ export default defineConfig({
             urlPattern: /assets\/(libs|models)\/.*/i,
             handler: 'CacheFirst',
             options: {
-              cacheName: 'aset-3d',
-              expiration: { maxEntries: 40, maxAgeSeconds: 60 * 60 * 24 * 60 },
+              cacheName: 'aset-3d-v2', // v2: player_*.glb diganti dengan nama berkas yang sama
+              expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 60 },
             },
           },
         ],

@@ -5,6 +5,7 @@ import { getQuestionsByBalai } from '../../data/bank';
 import { getBalai } from '../../data/balai';
 import { BATAS_LULUS_FINAL, CERITA, EPILOG, FINAL_BAGIAN, getCerita, type TokohCerita } from '../../data/cerita';
 import { bukaPercakapan } from '../percakapan';
+import { kostumDari } from '../../core/kostumPemain';
 import { jalankanTantangan } from '../tantangan';
 import { bukaHalamanCerita } from '../halamanCerita';
 import { putarCutscene } from '../cutscene';
@@ -130,7 +131,7 @@ export function renderFinal(ctx: ScreenContext): HTMLElement {
       warnaBawahan: prog0.warnaBawahan,
       warnaHijab: prog0.gender === 'perempuan' ? prog0.warnaHijab : undefined,
     });
-    const p = bukaPercakapan(document.body, { nama: prog0.playerName, gender: prog0.gender });
+    const p = bukaPercakapan(document.body, { nama: prog0.playerName, gender: prog0.gender, kostum: kostumDari(prog0) });
     /** Sembunyikan kotak percakapan selama karakter bergerak, agar gerakannya terlihat jelas. */
     const sambilBergerak = async (gerak: Promise<void>): Promise<void> => {
       p.root.classList.add('tersembunyi');

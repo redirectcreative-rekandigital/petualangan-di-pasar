@@ -1,14 +1,11 @@
 import * as THREE from 'three';
 import { createScene, type SceneQuality, QUALITY_HIGH, THEME_ZONA } from './scene';
 import { createPlayer, type PlayerBundle } from './player';
-import { createCameraController, type CameraController } from './camera';
+import { createCameraController, titikKeLayar, type CameraController, type FokusKamera, type ModeKamera } from './camera';
 import { resolveAll, clampToMap } from './collision';
-import { buildSign, buildBadge, buildTag, buildPlakat } from './papan';
-import { buatKios } from './kios';
-import { buildDiorama } from './diorama';
-import { buatKarakter, type KarakterRig } from './karakter';
-import { createPengelolaPemainLain, type PengelolaPemainLain } from './pemainLain';
-import { buildPenghias, type PenghiasHandle, type PenghiasTitik } from './instancing';
+import { buildTag, buildPlakat } from './papan';
+import { buatDuniaGlb, buatNpc, type AsetBab, type DuniaGlb, type NpcGlb } from './asetBab';
+import { buatBalonSapa, createPengelolaPemainLain, Y_BALON, type PengelolaPemainLain } from './pemainLain';
 import { warnaBalai } from '../data/balai';
 import { bangunLatar, TEMA_BALAI } from './latarBalai';
 import type { CeritaBalai } from '../data/cerita';
@@ -33,6 +30,7 @@ import { kostumDari } from '../core/kostumPemain';
  */
 
 export type PeranTitik = 'penjaga' | 'cantrik' | 'uji' | 'gerbang';
+export type PeranNpc = 'penjaga' | 'cantrik';
 
 export interface NoktahWorldOptions {
   canvas: HTMLCanvasElement;
@@ -42,6 +40,8 @@ export interface NoktahWorldOptions {
   tahap: TahapMisi;
   /** Prolog: pemain muncul di samping Penjaga, bukan di gerbang. */
   prolog?: boolean;
+  /** Berkas GLB bab ini, sudah dimuat (`muatAsetBab`). */
+  aset: AsetBab;
   getProgress: () => Progress;
   quality?: SceneQuality;
 }
@@ -62,11 +62,24 @@ export interface NoktahWorldHandle {
   setPaused: (paused: boolean) => void;
   resetCamera: () => void;
   setPemainLain: (daftar: PosisiPemain[]) => void;
+  /** Balon emoji di atas karakter sendiri. */
+  sapaSendiri: (emoji: string) => void;
   posisiPemain: () => { x: number; z: number; rot: number };
   /** Sudut kamera orbit saat ini (radian). */
   yawKamera: () => number;
   /** Pemain memutar animasi interaksi (bicara/baca/tantangan/gerbang). */
   animasiInteraksi: () => void;
+  /** NPC yang sedang berbicara (klip Talk), `null` bila dialog selesai. */
+  npcBicara: (peran: PeranNpc | null) => void;
+  /** Kamera mendekat ke pemain dan lawan bicara; `null` kembali ke kamera normal. */
+  fokusPercakapan: (peran: PeranTitik | null) => void;
+  setModeKamera: (mode: ModeKamera) => void;
+  /** Posisi layar (px) untuk tombol aksi di atas tokoh/titik terdekat. */
+  layarTitikDekat: () => { x: number; y: number } | null;
+  /** NPC memberi alat atau tugas (klip Interact sekali main). */
+  npcInteraksi: (peran: PeranNpc) => void;
+  /** Adegan pembuka: pemain tidur lalu bangun. Selesai saat kembali Idle. */
+  adeganBangun: () => Promise<void>;
   /** Meletakkan pemain di koordinat tertentu (mis. setelah ganti bahasa). */
   letakkanPemain: (pos: { x: number; z: number; rot: number; yaw?: number }) => void;
   /** Pintasan uji: letakkan pemain di dekat sebuah titik. */
@@ -83,7 +96,12 @@ export interface NoktahWorldHandle {
   dispose: () => void;
 }
 
-const MOVE_SPEED = 7.5;
+/** Batas kecepatan agar klip Walk (0,71 m/s x timeScale maks 3) tidak meluncur. */
+const MOVE_SPEED = 2.1;
+/** Kecepatan saat lari dikunci (klip Run). */
+const RUN_SPEED = 4;
+/** Klip Walk NPC 0,5 m/s terlalu lambat untuk menyeberang arena: dipercepat 3x. */
+const JALAN_NPC = 1.5;
 const PLAYER_RADIUS = 0.9;
 const AREA = 44;
 const SETENGAH = AREA / 2;
@@ -128,7 +146,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   const quality = options.quality ?? QUALITY_HIGH;
   const meta = options.balai;
   const cerita = options.cerita;
-  const { scene, renderer, camera, dispose: disposeScene } = createScene(options.canvas, {
+  const { scene, renderer, camera, ground, dispose: disposeScene } = createScene(options.canvas, {
     quality,
     theme: TEMA_BALAI[meta.kode] ?? THEME_ZONA[meta.elemen] ?? THEME_ZONA['Makhluk Hidup'],
     groundSize: AREA + 60,
@@ -143,42 +161,28 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   const warna = warnaBalai(meta.kode);
   const colliders: ColliderBox[] = [];
 
-  /* ---------------- Jalan setapak antar titik ---------------- */
-  const jalanMat = track(new THREE.MeshLambertMaterial({ color: 0xd6b48a }));
+  const dunia: DuniaGlb = buatDuniaGlb(scene, options.aset, warna, track);
+
+  /* ---------------- Lantai & jalan setapak antar titik ---------------- */
+  // Ubin 4 m dengan tepi di y 0,06: diturunkan supaya permukaannya di y = 0.
+  ground.position.y = -0.12;
+  const lantai = [...options.aset.kit.keys()].find((k) => k.startsWith('lantai_')) as string;
+  for (let x = -20; x <= 20; x += 4) {
+    for (let z = -20; z <= 20; z += 4) dunia.tanam(lantai, x, -0.06, z);
+  }
   const jalur: Titik[] = [tata.muncul, tata.penjaga, tata.cerita, tata.uji, tata.gerbang];
   for (let i = 0; i < jalur.length - 1; i++) {
     const a = jalur[i] as Titik;
     const b = jalur[i + 1] as Titik;
     const panjang = Math.hypot(b.x - a.x, b.z - a.z);
-    const geo = track(new THREE.PlaneGeometry(2.2, panjang));
-    const m = new THREE.Mesh(geo, jalanMat);
-    m.rotation.x = -Math.PI / 2;
-    m.rotation.z = -Math.atan2(b.x - a.x, b.z - a.z);
-    m.position.set((a.x + b.x) / 2, 0.012, (a.z + b.z) / 2);
-    m.receiveShadow = true;
-    scene.add(m);
+    // Ruas lurus 3 m (sumbu Z) direntang sepanjang jalan; tebal 4 cm menutup gelombang lantai.
+    dunia.tanam('jalan_lebar_lurus', (a.x + b.x) / 2, 0, (a.z + b.z) / 2, [1, 1, panjang / 3], Math.atan2(b.x - a.x, b.z - a.z));
   }
 
   /* ---------------- Rumah balai ---------------- */
-  const rumah = new THREE.Group();
-  rumah.position.set(tata.rumah.x, 0, tata.rumah.z);
-  rumah.rotation.y = hadapKe(tata.rumah, tata.penjaga);
-  const kios = buatKios({ warna, tanpaPalang: true }, track);
-  kios.group.traverse((o) => {
-    o.castShadow = true;
-    o.receiveShadow = true;
-  });
-  rumah.add(kios.group);
-  const papanNama = buildSign(cerita.tempat, warna, track);
-  papanNama.scale.setScalar(0.85);
-  papanNama.position.set(0.55, 2.56, kios.dalam / 2 + 0.06);
-  rumah.add(papanNama);
-  const lencana = buildBadge(String(meta.kode), warna, track);
-  lencana.position.set(-2.0, 2.56, kios.dalam / 2 + 0.06);
-  lencana.scale.set(0.28, 0.28, 1);
-  rumah.add(lencana);
-  scene.add(rumah);
+  const rumah = dunia.pasang(options.aset.rumah, tata.rumah.x, tata.rumah.z, hadapKe(tata.rumah, tata.penjaga), { teks: cerita.tempat }).root;
   colliders.push(kotak(tata.rumah.x, tata.rumah.z, 4.6, 4.6));
+  const tinggiAtap = new THREE.Box3().setFromObject(rumah).max.y;
 
   // Bintang di atas rumah.
   const bintang: THREE.Mesh[] = [];
@@ -186,30 +190,17 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   const starGeo = track(new THREE.OctahedronGeometry(0.3));
   for (let i = 0; i < 3; i++) {
     const s = new THREE.Mesh(starGeo, starMat);
-    s.position.set((i - 1) * 0.8, kios.tinggiAtap + 1.4, 0);
+    s.position.set((i - 1) * 0.8, tinggiAtap + 0.6, 0);
     s.visible = false;
     rumah.add(s);
     bintang.push(s);
   }
 
   /* ---------------- Penjaga ---------------- */
-  const penjagaRig = buatKarakter({
-    gender: cerita.penjaga.gender,
-    warnaPakaian: cerita.penjaga.warnaBaju,
-    warnaBawahan: cerita.penjaga.warnaBawahan,
-    warnaHijab: cerita.penjaga.warnaKepala,
-    warnaRambut: cerita.penjaga.busana?.jenggot ? 0xd4d4d4 : undefined,
-    warnaKulit: 0xe0ac7e,
-    busana: cerita.penjaga.busana,
-    pakaiMarker: false,
-    skala: 1,
-  });
-  penjagaRig.geometri.forEach((x) => track(x));
-  penjagaRig.material.forEach((x) => track(x));
-  penjagaRig.group.traverse((o) => (o.castShadow = true));
+  const penjagaRig: NpcGlb = buatNpc(options.aset.penjaga, track);
   const tagPenjaga = buildTag(t('Penjaga'), cerita.penjaga.nama, warna, track);
   tagPenjaga.scale.setScalar(0.9);
-  tagPenjaga.position.set(0, 2.35, 0.2);
+  tagPenjaga.position.set(0, 2.2, 0.2);
   penjagaRig.group.add(tagPenjaga);
   scene.add(penjagaRig.group);
   const posPenjaga = new THREE.Vector3();
@@ -219,14 +210,6 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   const ruang = new THREE.Group();
   ruang.position.set(tata.cerita.x, 0, tata.cerita.z);
   ruang.rotation.y = hadapKe(tata.cerita, tata.penjaga);
-  const panggung = buildDiorama(meta.kode, warna, track);
-  panggung.scale.setScalar(0.8);
-  panggung.position.set(0, 0, -2.2);
-  panggung.traverse((o) => {
-    o.castShadow = true;
-    o.receiveShadow = true;
-  });
-  ruang.add(panggung);
   const plakat = buildPlakat(meta.materi, warna, track);
   plakat.scale.setScalar(0.55);
   plakat.position.set(-2.6, 1.9, -1.2);
@@ -234,26 +217,16 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   ruang.add(plakat);
   scene.add(ruang);
   const pusatPanggung = posisiLokal(ruang, new THREE.Vector3(0, 0, -2.2));
+  dunia.pasang(options.aset.stasiun, pusatPanggung.x, pusatPanggung.z, ruang.rotation.y);
   colliders.push(kotak(pusatPanggung.x, pusatPanggung.z, 3.8, 3.8));
 
-  const cantrikRig = buatKarakter({
-    gender: cerita.cantrik.gender,
-    warnaPakaian: cerita.cantrik.warnaBaju,
-    warnaBawahan: cerita.cantrik.warnaBawahan,
-    warnaHijab: cerita.cantrik.warnaKepala,
-    busana: cerita.cantrik.busana,
-    pakaiMarker: false,
-    skala: 0.86,
-  });
-  cantrikRig.geometri.forEach((x) => track(x));
-  cantrikRig.material.forEach((x) => track(x));
-  cantrikRig.group.traverse((o) => (o.castShadow = true));
+  const cantrikRig: NpcGlb = buatNpc(options.aset.cantrik, track);
   const posCantrik = posisiLokal(ruang, new THREE.Vector3(1.9, 0, 0.2));
   cantrikRig.group.position.set(posCantrik.x, 0, posCantrik.z);
   cantrikRig.group.rotation.y = ruang.rotation.y;
   const tagCantrik = buildTag(t('Halaman Cerita'), cerita.cantrik.nama, warna, track);
   tagCantrik.scale.setScalar(0.85);
-  tagCantrik.position.set(0, 2.1, 0.2);
+  tagCantrik.position.set(0, 2, 0.2);
   cantrikRig.group.add(tagCantrik);
   const buku = buatBuku(warna, track);
   buku.position.set(0.9, 1.7, 0.3);
@@ -262,18 +235,12 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   colliders.push(kotak(posCantrik.x, posCantrik.z, 1.1, 1.1));
 
   /* ---------------- Tempat Uji ---------------- */
-  const uji = buatTempatUji(warna, track);
-  uji.group.position.set(tata.uji.x, 0, tata.uji.z);
-  uji.group.rotation.y = hadapKe(tata.uji, tata.cerita);
-  scene.add(uji.group);
+  const uji = pasangTempatUji(dunia, options.aset, tata.uji.x, tata.uji.z, hadapKe(tata.uji, tata.cerita), warna);
 
   /* ---------------- Gerbang keluar ---------------- */
-  const gerbang = buatGerbang(track);
-  gerbang.group.position.set(tata.gerbang.x, 0, tata.gerbang.z);
-  gerbang.group.rotation.y = hadapKe(tata.gerbang, tata.uji);
-  scene.add(gerbang.group);
+  const gerbang = pasangGerbang(dunia, options.aset, tata.gerbang.x, tata.gerbang.z, hadapKe(tata.gerbang, tata.uji));
   for (const sisi of [-1, 1]) {
-    const p = posisiLokal(gerbang.group, new THREE.Vector3(sisi * 1.9, 0, 0));
+    const p = posisiLokal(gerbang.root, new THREE.Vector3(sisi * 1.9, 0, 0));
     colliders.push(kotak(p.x, p.z, 0.9, 0.9));
   }
 
@@ -295,7 +262,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   scene.add(cincin);
 
   /* ---------------- Pagar & penghias ---------------- */
-  buildPagar(scene, track);
+  tanamPagar(dunia);
   colliders.push(
     kotak(0, SETENGAH, AREA, 1),
     kotak(0, -SETENGAH, AREA, 1),
@@ -304,15 +271,21 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   );
   const dihindari: Titik[] = [tata.muncul, tata.penjaga, tata.cerita, tata.uji, tata.gerbang, tata.rumah];
   // Latar khas balai (goa, lembah, ladang, sungai, tebing, dst.).
-  const latar = bangunLatar(String(meta.kode), scene, track, dihindari);
+  const bebasJalur = (x: number, z: number, r: number): boolean =>
+    dihindari.every((p) => Math.hypot(x - p.x, z - p.z) > r + 2) &&
+    jalur.every((a, i) => i === jalur.length - 1 || jarakKeSegmen(x, z, a, jalur[i + 1] as Titik) > r + 1.1);
+  const latar = bangunLatar(String(meta.kode), scene, dunia, track, dihindari, {
+    ruang: { x: tata.cerita.x, z: tata.cerita.z, rot: ruang.rotation.y },
+    uji: { x: tata.uji.x, z: tata.uji.z, rot: uji.root.rotation.y },
+    bebasJalur,
+  });
   colliders.push(...latar.colliders);
   const gersang = ['F01', 'F02', 'F03', 'E01'].includes(String(meta.kode));
-  const penghias: PenghiasHandle[] = [
-    buildPenghias(scene, 'pohon', sebar(gersang ? 0 : 10, 6, dihindari, jalur), track),
-    buildPenghias(scene, 'semak', sebar(gersang ? 6 : 20, 3, dihindari, jalur), track),
-    buildPenghias(scene, 'batu', sebar(gersang ? 14 : 6, 4, dihindari, jalur), track),
-    buildPenghias(scene, 'lampu', sebar(6, 9, dihindari, jalur), track),
-  ];
+  sebar(gersang ? 0 : 10, 6, dihindari, jalur).forEach((p, i) => dunia.tanam(i % 2 ? 'Pohon_Bulat_A' : 'Pohon_Bulat_B', p.x, 0, p.z, p.skala, p.rotasi));
+  sebar(gersang ? 6 : 20, 3, dihindari, jalur).forEach((p, i) => dunia.tanam(i % 2 ? 'semak_a' : 'semak_b', p.x, 0, p.z, p.skala, p.rotasi));
+  sebar(gersang ? 14 : 6, 4, dihindari, jalur).forEach((p, i) => dunia.tanam(`batu_kecil_${'abc'[i % 3]}`, p.x, 0, p.z, p.skala * 1.6, p.rotasi));
+  for (const p of sebar(6, 9, dihindari, jalur)) dunia.pasang(options.aset.obor, p.x, p.z, p.rotasi);
+  dunia.selesai();
 
   /* ---------------- Pemain ---------------- */
   const prog = options.getProgress();
@@ -331,20 +304,26 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     : tata.muncul;
   player.setPosition(awal.x, awal.z);
   scene.add(player.group);
-  void player.cobaPakaiGlb(renderer);
+  const glbPemain = player.cobaPakaiGlb(renderer);
   const camCtrl: CameraController = createCameraController(camera);
   camCtrl.setYaw(Math.atan2(-(tata.penjaga.x - awal.x), -(tata.penjaga.z - awal.z)));
 
-  const pemainLain: PengelolaPemainLain = createPengelolaPemainLain(scene);
+  const pemainLain: PengelolaPemainLain = createPengelolaPemainLain(scene, renderer, player.position);
+  const balonSaya = track(buatBalonSapa());
+  balonSaya.sprite.position.y = Y_BALON;
+  player.group.add(balonSaya.sprite);
 
   /* ---------------- Status ---------------- */
   let tahap: TahapMisi = options.tahap;
   let paused = false;
   let nearby: TitikDekat | null = null;
+  let fokusPeran: PeranTitik | null = null;
+  let sisiFokus = 1;
+  let modeKamera: ModeKamera = 'normal';
 
   const posisiPenjagaUntuk = (t: TahapMisi): Titik => {
     if (t >= 2) {
-      const p = posisiLokal(uji.group, new THREE.Vector3(0, 0, -2.9));
+      const p = posisiLokal(uji.root, new THREE.Vector3(0, 0, -2.9));
       return p;
     }
     return tata.penjaga;
@@ -393,9 +372,40 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     return terbaik;
   }
 
+  /** Bidikan dari samping, condong ke sisi pemain agar wajah lawan bicara terlihat. */
+  function bidikanPercakapan(peran: PeranTitik, sisi: number): FokusKamera {
+    const titik = posisiTitik(peran);
+    const dx = titik.x - player.position.x;
+    const dz = titik.z - player.position.z;
+    const jarak = Math.hypot(dx, dz) || 1;
+    const ux = dx / jarak;
+    const uz = dz / jarak;
+    const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    // Keduanya muat melebar, dan muat di setengah atas layar (bawah tertutup kotak dialog).
+    const mundur = Math.max((jarak / 2 + 1) / (tanV * camera.aspect), 1.9 / tanV);
+    const tengahX = player.position.x + dx / 2;
+    const tengahZ = player.position.z + dz / 2;
+    return {
+      posisi: new THREE.Vector3(tengahX - uz * sisi * mundur - ux * mundur * 0.35, 1.7, tengahZ + ux * sisi * mundur - uz * mundur * 0.35),
+      lihat: new THREE.Vector3(tengahX, 0.3, tengahZ),
+    };
+  }
+
+  /** Sisi kamera bebas bila titik kamera dan tengah pandangannya tidak di dalam penghalang. */
+  function sisiBebas(peran: PeranTitik, sisi: number): boolean {
+    const { posisi, lihat } = bidikanPercakapan(peran, sisi);
+    return [1, 0.55].every((f) => {
+      const x = lihat.x + (posisi.x - lihat.x) * f;
+      const z = lihat.z + (posisi.z - lihat.z) * f;
+      const r = resolveAll({ x, z, r: 0.4 }, colliders);
+      const c = clampToMap(x, z, SETENGAH, 0.4);
+      return Math.hypot(r.x - x, r.z - z) < 0.01 && c.x === x && c.z === z;
+    });
+  }
+
   const update = (dt: number, elapsed: number): void => {
     const orbit = options.input.consumeOrbit();
-    if (orbit.yaw !== 0 || orbit.pitch !== 0) camCtrl.orbit(orbit.yaw, orbit.pitch);
+    if (!fokusPeran && (orbit.yaw !== 0 || orbit.pitch !== 0)) camCtrl.orbit(orbit.yaw, orbit.pitch);
 
     if (!paused) {
       // Gerak relatif ke kamera: joystick "atas" = menjauh dari kamera (maju di
@@ -407,8 +417,9 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
       const cosY = Math.cos(yaw);
       const mx = options.input.state.moveX;
       const my = options.input.state.moveY;
-      const wishX = (mx * cosY - my * sinY) * MOVE_SPEED * dt;
-      const wishZ = (-mx * sinY - my * cosY) * MOVE_SPEED * dt;
+      const laju = options.input.state.lari ? RUN_SPEED : MOVE_SPEED;
+      const wishX = (mx * cosY - my * sinY) * laju * dt;
+      const wishZ = (-mx * sinY - my * cosY) * laju * dt;
       if (options.input.state.jumpPressed && player.lompat()) sfx.lompat();
       if (player.updateLompat(dt)) sfx.mendarat();
       // Kecepatan NYATA (setelah tabrakan) dikirim ke animasi: berjalan menabrak
@@ -423,25 +434,31 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
       }
       const kecepatanNyata = dt > 0 ? Math.hypot(player.position.x - xLama, player.position.z - zLama) / dt : 0;
       player.animate(kecepatanNyata, elapsed);
+      // Sudut mata: badan selalu searah kamera agar tangan tetap di depan pandangan.
+      if (modeKamera === 'tangan') player.faceDirection(-sinY, -cosY, 1);
     } else {
       // Dijeda (percakapan/modal): animasi tetap hidup (Idle / Interact selesai main).
       player.animate(0, elapsed);
+      if (fokusPeran) {
+        const lawan = posisiTitik(fokusPeran);
+        player.faceDirection(lawan.x - player.position.x, lawan.z - player.position.z, dt);
+      }
     }
 
     // Penjaga berjalan pelan menuju posisinya (mis. pindah ke Tempat Uji).
     const jarakPenjaga = posPenjaga.distanceTo(targetPenjaga);
     if (jarakPenjaga > 0.05) {
-      const langkah = Math.min(jarakPenjaga, dt * 4);
+      const langkah = Math.min(jarakPenjaga, dt * JALAN_NPC);
       const arah = targetPenjaga.clone().sub(posPenjaga).normalize();
       posPenjaga.addScaledVector(arah, langkah);
       penjagaRig.group.position.copy(posPenjaga);
       penjagaRig.group.rotation.y = Math.atan2(arah.x, arah.z);
-      penjagaRig.langkah(4, elapsed);
+      penjagaRig.update(dt, JALAN_NPC);
     } else {
-      penjagaRig.idle(elapsed, 0.4);
+      penjagaRig.update(dt, 0);
       hadapkan(penjagaRig, posPenjaga, dt);
     }
-    cantrikRig.idle(elapsed, 1.7);
+    cantrikRig.update(dt, 0);
     hadapkan(cantrikRig, new THREE.Vector3(posCantrik.x, 0, posCantrik.z), dt);
     buku.position.y = 1.7 + Math.sin(elapsed * 1.7) * 0.08;
     buku.rotation.y += dt * 0.8;
@@ -458,16 +475,18 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     cincin.scale.setScalar(denyut);
     panah.visible = nearby === null;
 
-    uji.update(elapsed);
     latar.update(elapsed);
     gerbang.update(elapsed, tahap === 3);
-    for (const p of penghias) p.update(player.position);
-    pemainLain.update(dt, elapsed);
-    camCtrl.update(player.position, dt);
+    dunia.update(dt, elapsed, player.position);
+    pemainLain.update(dt);
+    balonSaya.update(dt);
+    if (fokusPeran) camCtrl.setFokus(bidikanPercakapan(fokusPeran, sisiFokus));
+    camCtrl.update(player.position, dt, player.group.position.y);
+    player.poseOrangPertama(camCtrl.diMataPemain() ? camera : null);
     renderer.render(scene, camera);
   };
 
-  function hadapkan(rig: KarakterRig, pos: THREE.Vector3, dt: number): void {
+  function hadapkan(rig: NpcGlb, pos: THREE.Vector3, dt: number): void {
     const d = Math.hypot(player.position.x - pos.x, player.position.z - pos.z);
     if (d > 7) return;
     const target = Math.atan2(player.position.x - pos.x, player.position.z - pos.z);
@@ -489,8 +508,44 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     },
     resetCamera: () => camCtrl.reset(),
     setPemainLain: (daftar) => pemainLain.set(daftar),
+    sapaSendiri: (emoji) => balonSaya.tampilkan(emoji),
     posisiPemain: () => ({ x: player.position.x, z: player.position.z, rot: player.group.rotation.y }),
     animasiInteraksi: () => player.interaksi(),
+    npcBicara: (peran) => {
+      penjagaRig.setBicara(peran === 'penjaga');
+      cantrikRig.setBicara(peran === 'cantrik');
+    },
+    fokusPercakapan: (peran) => {
+      fokusPeran = peran;
+      if (!peran) {
+        camCtrl.setFokus(null);
+        return;
+      }
+      // Tetap di sisi kamera sekarang agar tidak berputar jauh, kecuali sisi itu terhalang.
+      const { posisi, lihat } = bidikanPercakapan(peran, 1);
+      const dekat = camera.position.clone().sub(lihat).dot(posisi.sub(lihat)) >= 0 ? 1 : -1;
+      sisiFokus = sisiBebas(peran, dekat) || !sisiBebas(peran, -dekat) ? dekat : -dekat;
+    },
+    setModeKamera: (mode) => {
+      modeKamera = mode;
+      camCtrl.setMode(mode);
+    },
+    layarTitikDekat: () => {
+      if (!nearby) return null;
+      // Di Tempat Uji yang sudah terbuka, tombol menempel pada penjaga yang menunggu di sana.
+      const titik = nearby.peran === 'uji' && tahap >= 2 ? { x: posPenjaga.x, z: posPenjaga.z } : posisiTitik(nearby.peran);
+      const atas = nearby.peran === 'gerbang' ? 3.4 : nearby.peran === 'uji' && tahap < 2 ? 2.6 : 2.1;
+      const kanvas = renderer.domElement;
+      return titikKeLayar(new THREE.Vector3(titik.x, atas, titik.z).project(camera), kanvas.clientWidth, kanvas.clientHeight);
+    },
+    npcInteraksi: (peran) => (peran === 'penjaga' ? penjagaRig : cantrikRig).interaksi(),
+    // Adegan Tidur/Bangun harus terlihat utuh, apa pun mode kamera pilihan pemain.
+    adeganBangun: async () => {
+      camCtrl.setMode('normal');
+      await glbPemain;
+      await player.adeganBangun();
+      camCtrl.setMode(modeKamera);
+    },
     yawKamera: () => camCtrl.getYaw(),
     letakkanPemain: (pos) => {
       player.setPosition(pos.x, pos.z);
@@ -520,7 +575,6 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
       player.dispose();
       pemainLain.dispose();
       camCtrl.dispose();
-      for (const p of penghias) p.dispose();
       disposables.forEach((d) => d.dispose());
       disposeScene();
     },
@@ -545,113 +599,63 @@ function posisiLokal(g: THREE.Object3D, lokal: THREE.Vector3): Titik {
   };
 }
 
-/** Tempat Uji: lingkaran batu dengan 3 obor + pagar bambu saat terkunci. */
-function buatTempatUji(aksen: number, track: Track): {
-  group: THREE.Group;
-  setTerbuka: (v: boolean) => void;
-  setObor: (n: number) => void;
-  update: (t: number) => void;
-} {
-  const g = new THREE.Group();
-  const batuMat = track(new THREE.MeshStandardMaterial({ color: 0x9ca3af, roughness: 0.9 }));
-  const alas = new THREE.Mesh(track(new THREE.CylinderGeometry(2.6, 2.8, 0.3, 28)), batuMat);
-  alas.position.y = 0.15;
-  alas.receiveShadow = true;
-  g.add(alas);
-  const cincinMat = track(new THREE.MeshStandardMaterial({ color: aksen, roughness: 0.6 }));
-  const cincin = new THREE.Mesh(track(new THREE.TorusGeometry(2.3, 0.08, 8, 40)), cincinMat);
-  cincin.rotation.x = Math.PI / 2;
-  cincin.position.y = 0.32;
-  g.add(cincin);
-
-  // Tiga obor di belakang lingkaran.
-  const kayuMat = track(new THREE.MeshLambertMaterial({ color: 0x6b4423 }));
-  const apiMat = track(new THREE.MeshBasicMaterial({ color: 0xf97316 }));
-  const apiPadamMat = track(new THREE.MeshBasicMaterial({ color: 0x475569 }));
-  const tiangGeo = track(new THREE.CylinderGeometry(0.09, 0.12, 1.6, 8));
-  const apiGeo = track(new THREE.ConeGeometry(0.22, 0.5, 10));
-  const api: THREE.Mesh[] = [];
-  [-1.6, 0, 1.6].forEach((x) => {
-    const tiang = new THREE.Mesh(tiangGeo, kayuMat);
-    tiang.position.set(x, 0.95, -2.1);
-    tiang.castShadow = true;
-    g.add(tiang);
-    const a = new THREE.Mesh(apiGeo, apiPadamMat);
-    a.position.set(x, 1.95, -2.1);
-    g.add(a);
-    api.push(a);
-  });
-
-  // Pagar bambu (tampak saat terkunci).
-  const pagar = new THREE.Group();
-  const bambuMat = track(new THREE.MeshLambertMaterial({ color: 0xa3a04a }));
-  const bambuGeo = track(new THREE.CylinderGeometry(0.07, 0.07, 1.3, 6));
-  for (let i = 0; i < 18; i++) {
-    const s = (i / 18) * Math.PI * 2;
-    const b = new THREE.Mesh(bambuGeo, bambuMat);
-    b.position.set(Math.cos(s) * 2.9, 0.65, Math.sin(s) * 2.9);
-    pagar.add(b);
-  }
-  const talimGeo = track(new THREE.TorusGeometry(2.9, 0.04, 6, 40));
-  const tali = new THREE.Mesh(talimGeo, bambuMat);
-  tali.rotation.x = Math.PI / 2;
-  tali.position.y = 1.0;
-  pagar.add(tali);
-  g.add(pagar);
-
-  let terbuka = false;
-  let nyala = 0;
+/** Tempat Uji (`panggung_uji`): tiga api yang dinyalakan satu per jawaban benar. */
+function pasangTempatUji(
+  dunia: DuniaGlb,
+  aset: AsetBab,
+  x: number,
+  z: number,
+  rotY: number,
+  aksen: number,
+): { root: THREE.Object3D; setTerbuka: (v: boolean) => void; setObor: (n: number) => void } {
+  const { root, mixer, klip } = dunia.pasang(aset.arena, x, z, rotY, { putar: false });
+  const node = (nama: string): THREE.Object3D => {
+    const o = root.getObjectByName(nama);
+    if (!o) throw new Error(`Node arena tidak ada: ${nama}`);
+    return o;
+  };
+  const api = [1, 2, 3].map((k) => ({
+    mati: node(`Api_${k}_Mati`),
+    nyala: node(`Api_${k}_Nyala`),
+    aksi: (mixer as THREE.AnimationMixer).clipAction(klip(`Api_${k}_Kedip`)),
+  }));
+  for (const a of api) a.nyala.visible = false;
+  const pagar = node('Pagar_Uji');
+  const cincin = (node('Cincin_Aksen') as THREE.Mesh).material as THREE.MeshStandardMaterial;
   return {
-    group: g,
+    root,
     setTerbuka: (v) => {
-      terbuka = v;
       pagar.visible = !v;
-      cincinMat.emissive = new THREE.Color(v ? aksen : 0x000000);
-      cincinMat.emissiveIntensity = v ? 0.6 : 0;
+      cincin.emissive.setHex(v ? aksen : 0x000000);
+      cincin.emissiveIntensity = v ? 0.6 : 0;
     },
     setObor: (n) => {
-      nyala = Math.max(0, Math.min(3, n));
-      api.forEach((a, i) => (a.material = i < nyala ? apiMat : apiPadamMat));
-    },
-    update: (t) => {
       api.forEach((a, i) => {
-        if (i < nyala || terbuka) {
-          a.scale.y = 1 + Math.sin(t * 9 + i) * 0.15;
-        }
+        const menyala = i < n;
+        a.mati.visible = !menyala;
+        a.nyala.visible = menyala;
+        if (!menyala) a.aksi.stop();
+        else if (!a.aksi.isRunning()) a.aksi.reset().play();
       });
     },
   };
 }
 
-/** Gapura keluar bergaya candi bentar + cahaya portal. */
-function buatGerbang(track: Track): { group: THREE.Group; update: (t: number, menyala: boolean) => void } {
-  const g = new THREE.Group();
-  const bataMat = track(new THREE.MeshStandardMaterial({ color: 0xb45309, roughness: 0.85 }));
-  const atasMat = track(new THREE.MeshStandardMaterial({ color: 0x7c2d12, roughness: 0.8 }));
-  for (const sisi of [-1, 1]) {
-    const tiang = new THREE.Mesh(track(new THREE.BoxGeometry(0.9, 3.4, 0.9)), bataMat);
-    tiang.position.set(sisi * 1.9, 1.7, 0);
-    tiang.castShadow = true;
-    g.add(tiang);
-    const puncak = new THREE.Mesh(track(new THREE.ConeGeometry(0.62, 1.1, 4)), atasMat);
-    puncak.position.set(sisi * 1.9, 3.95, 0);
-    puncak.rotation.y = Math.PI / 4;
-    g.add(puncak);
-  }
-  const portalMat = track(
-    new THREE.MeshBasicMaterial({ color: 0x67e8f9, transparent: true, opacity: 0.35, side: THREE.DoubleSide, depthWrite: false }),
-  );
-  const portal = new THREE.Mesh(track(new THREE.PlaneGeometry(2.9, 3.1)), portalMat);
-  portal.position.set(0, 1.6, 0);
-  g.add(portal);
-  const papan = buildSign(t('🗺️ Jalan ke Peta'), 0x0e7490, track);
-  papan.scale.setScalar(0.7);
-  papan.position.set(0, 3.7, 0.1);
-  g.add(papan);
+/** Gerbang keluar (`gerbang_peta`): Portal berdenyut, opacity tetap di 0,22..0,45. */
+function pasangGerbang(
+  dunia: DuniaGlb,
+  aset: AsetBab,
+  x: number,
+  z: number,
+  rotY: number,
+): { root: THREE.Object3D; update: (t: number, menyala: boolean) => void } {
+  const { root } = dunia.pasang(aset.gerbang, x, z, rotY, { teks: t('🗺️ Jalan ke Peta') });
+  const portal = root.getObjectByName('Portal') as THREE.Mesh;
+  const portalMat = portal.material as THREE.MeshStandardMaterial;
   return {
-    group: g,
-    update: (t, menyala) => {
-      portalMat.opacity = (menyala ? 0.45 : 0.22) + Math.sin(t * 2.5) * 0.08;
+    root,
+    update: (waktu, menyala) => {
+      portalMat.opacity = (menyala ? 0.41 : 0.26) + Math.sin(waktu * 2.5) * 0.04;
     },
   };
 }
@@ -691,9 +695,9 @@ function jarakKeSegmen(px: number, pz: number, a: Titik, b: Titik): number {
   return Math.hypot(px - (a.x + t * dx), pz - (a.z + t * dz));
 }
 
-function sebar(jumlah: number, seed: number, hindari: Titik[], jalur: Titik[]): PenghiasTitik[] {
+function sebar(jumlah: number, seed: number, hindari: Titik[], jalur: Titik[]): Array<Titik & { skala: number; rotasi: number }> {
   const rng = acak(seed * 7919 + 13);
-  const out: PenghiasTitik[] = [];
+  const out: Array<Titik & { skala: number; rotasi: number }> = [];
   let coba = 0;
   while (out.length < jumlah && coba < jumlah * 40) {
     coba++;
@@ -710,31 +714,13 @@ function sebar(jumlah: number, seed: number, hindari: Titik[], jalur: Titik[]): 
   return out;
 }
 
-function buildPagar(scene: THREE.Scene, track: Track): void {
-  const postGeo = track(new THREE.BoxGeometry(0.24, 1.2, 0.24));
-  const postMat = track(new THREE.MeshLambertMaterial({ color: 0x9a6b3f }));
-  const railGeo = track(new THREE.BoxGeometry(AREA, 0.16, 0.16));
-  const railMat = track(new THREE.MeshLambertMaterial({ color: 0xb88454 }));
-  const edge = SETENGAH - 0.5;
-  for (const z of [-edge, edge]) {
-    for (let x = -edge; x <= edge; x += 2.5) {
-      const post = new THREE.Mesh(postGeo, postMat);
-      post.position.set(x, 0.6, z);
-      scene.add(post);
-    }
-    const rail = new THREE.Mesh(railGeo, railMat);
-    rail.position.set(0, 0.8, z);
-    scene.add(rail);
-  }
-  for (const x of [-edge, edge]) {
-    for (let z = -edge; z <= edge; z += 2.5) {
-      const post = new THREE.Mesh(postGeo, postMat);
-      post.position.set(x, 0.6, z);
-      scene.add(post);
-    }
-    const rail = new THREE.Mesh(railGeo, railMat);
-    rail.rotation.y = Math.PI / 2;
-    rail.position.set(x, 0.8, 0);
-    scene.add(rail);
+/** Pagar keliling dari segmen 2 m (tiang di x = -1): 4 sisi saling menutup sudut. */
+function tanamPagar(dunia: DuniaGlb): void {
+  const tepi = 21;
+  for (let i = -20; i <= 20; i += 2) {
+    dunia.tanam('pagar_kayu_segmen', i, 0, -tepi);
+    dunia.tanam('pagar_kayu_segmen', tepi, 0, i, 1, -Math.PI / 2);
+    dunia.tanam('pagar_kayu_segmen', -i, 0, tepi, 1, Math.PI);
+    dunia.tanam('pagar_kayu_segmen', -tepi, 0, -i, 1, Math.PI / 2);
   }
 }

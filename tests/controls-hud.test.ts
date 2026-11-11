@@ -117,3 +117,54 @@ describe('HUD balai', () => {
     expect(lompat()).toBe(1);
   });
 });
+
+describe('kunci lari', () => {
+  it('tombol tersembunyi sampai diminta tampil, lalu menyalakan status terkunci', () => {
+    let tekan = 0;
+    const hud = createHud({ onInteract: () => {}, onMenu: () => {}, onTas: () => {}, onLompat: () => {}, onKunciLari: () => tekan++ });
+    const btn = hud.root.querySelector('.btn-kunci-lari') as HTMLElement;
+    expect(btn.classList.contains('hidden')).toBe(true);
+    hud.setKunciLari(true, true);
+    expect(btn.classList.contains('hidden')).toBe(false);
+    expect(btn.getAttribute('aria-pressed')).toBe('true');
+    btn.dispatchEvent(new Event('pointerdown', { cancelable: true }));
+    expect(tekan).toBe(1);
+    hud.destroy();
+  });
+
+  it('toggleLari membalik status input', () => {
+    const input = createInputManager();
+    expect(input.state.lari).toBe(false);
+    input.toggleLari();
+    expect(input.state.lari).toBe(true);
+    input.toggleLari();
+    expect(input.state.lari).toBe(false);
+    input.destroy();
+  });
+});
+
+describe('tombol kanan bawah', () => {
+  it('Tas pindah ke lingkaran kanan bawah, tombol aksi melayang di luarnya', () => {
+    const hud = createHud({ onInteract: () => {}, onMenu: () => {}, onTas: () => {}, onLompat: () => {} });
+    const lingkaran = hud.root.querySelector('.hud-actions') as HTMLElement;
+    expect(lingkaran.querySelector('.tas-besar')).not.toBeNull();
+    expect(lingkaran.querySelector('.lompat')).not.toBeNull();
+    expect(lingkaran.querySelector('.kamera')).not.toBeNull();
+    expect(hud.root.querySelector('.hud-kiri-atas .tas-besar')).toBeNull();
+    expect(lingkaran.querySelector('.interact')).toBeNull();
+    hud.setInteractPos(120.4, 80.6);
+    expect((hud.root.querySelector('.interact') as HTMLElement).style.transform).toContain('translate(120px, 81px)');
+    hud.destroy();
+  });
+
+  it('tombol Kamera memanggil onKamera dan menampilkan mode', () => {
+    let tekan = 0;
+    const hud = createHud({ onInteract: () => {}, onMenu: () => {}, onTas: () => {}, onLompat: () => {}, onKamera: () => tekan++ });
+    const btn = hud.root.querySelector('.kamera') as HTMLElement;
+    btn.dispatchEvent(new Event('pointerdown', { cancelable: true }));
+    expect(tekan).toBe(1);
+    hud.setModeKamera('Dekat');
+    expect(btn.textContent).toContain('Dekat');
+    hud.destroy();
+  });
+});

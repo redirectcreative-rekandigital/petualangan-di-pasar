@@ -42,7 +42,7 @@ try {
   await page.fill('input.isian', 'Uji');
   await page.getByRole('button', { name: /Mulai Bertahan/ }).click();
   await page.waitForSelector('canvas.world-canvas', { timeout: 20000 });
-  await page.waitForSelector('.vn-overlay', { timeout: 8000 });
+  await page.waitForSelector('.vn-overlay', { timeout: 45000 }); // adegan Tidur-Bangun lambat di swiftshader
   log('prolog: terbangun di Goa Sinar, Mbok Sinar menyapa');
 
   await lanjutSemua();

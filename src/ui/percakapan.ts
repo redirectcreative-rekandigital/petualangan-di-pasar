@@ -5,6 +5,8 @@ import type { TokohCerita } from '../data/cerita';
 import { pasangGambar } from '../core/gambar';
 import type { PlayerGender } from '../../shared/types';
 import { t } from '../core/bahasa';
+import type { PilihanKostum } from '../world/kostum';
+import { potretPemain } from './components/potretPemain';
 
 /**
  * Kotak percakapan bergaya visual novel di bagian bawah layar.
@@ -19,6 +21,7 @@ import { t } from '../core/bahasa';
 export interface InfoPemain {
   nama: string;
   gender: PlayerGender;
+  kostum?: PilihanKostum;
 }
 
 export type Penutur = TokohCerita | 'pemain';
@@ -96,6 +99,18 @@ export function bukaPercakapan(host: HTMLElement, pemain: InfoPemain): Percakapa
   /** Menyelesaikan Promise `bicara`/`pilih` yang sedang menunggu saat percakapan ditutup. */
   let batalkan: (() => void) | null = null;
   let ucapanTerakhir: { teks: string; pitch: number; rate: number } | null = null;
+  let gambarPemain: string | null = null;
+  const tampilkanGambarPemain = (): void => {
+    if (!gambarPemain) return;
+    potret.textContent = '';
+    potret.style.backgroundImage = `url("${gambarPemain}")`;
+    potret.classList.add('ada-gambar');
+  };
+  // Emoji tampil sampai render selesai; penutur bisa sudah berganti saat itu.
+  void potretPemain(pemain.gender, pemain.kostum).then((url) => {
+    gambarPemain = url;
+    if (kotak.classList.contains('pemain')) tampilkanGambarPemain();
+  });
   let timerKetik = 0;
   let selesaiKetik: (() => void) | null = null;
 
@@ -119,6 +134,7 @@ export function bukaPercakapan(host: HTMLElement, pemain: InfoPemain): Percakapa
       nama.textContent = pemain.nama || t('Kamu');
       peran.textContent = t('Penjelajah');
       kotak.classList.add('pemain');
+      tampilkanGambarPemain();
       return { pitch: pemain.gender === 'perempuan' ? 1.35 : 1.2, rate: 1.05 };
     }
     potret.textContent = siapa.ikon;

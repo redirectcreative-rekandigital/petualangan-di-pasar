@@ -8,11 +8,12 @@ import { jadikanModalAktif } from './modal';
 /**
  * HUD dunia balai.
  *
- * Kiri atas : kartu 🎒 tas & ⭐ bintang, lalu tepat di bawahnya tombol kartu
+ * Kiri atas : kartu ⭐ bintang, lalu tepat di bawahnya tombol kartu
  *             "📜 Misi" (ketuk → modal berisi tahapan & tugas misi saat ini).
- * Kiri bawah: joystick.
- * Kanan bawah: tombol aksi (🅰️ bicara/baca/tantangan) dan ⤴️ Lompat; di atasnya
- *             👋 sapa (mode kelas) dan ☰ menu.
+ * Kiri bawah: joystick; tombol kecil 🏃 di atasnya muncul saat bergerak untuk mengunci lari.
+ * Kanan bawah: 🎒 Tas besar di pojok, dilingkari ⤴️ Lompat, 😊 sapa (mode kelas), dan 📷 kamera.
+ * Melayang  : tombol aksi (bicara/baca/tantangan) di atas tokoh atau titik terdekat.
+ * Kanan atas: ☰ menu.
  */
 export interface HudHandlers {
   onInteract: () => void;
@@ -21,12 +22,20 @@ export interface HudHandlers {
   /** Membuka ringkasan bintang per bab. */
   onBintang?: () => void;
   onLompat: () => void;
+  /** Tombol kecil di atas joystick: mengunci atau melepas lari. */
+  onKunciLari?: () => void;
+  /** Tombol 📷: berganti ke mode kamera berikutnya. */
+  onKamera?: () => void;
   onSapa?: (emoji: string) => void;
 }
 
 export interface Hud {
   root: HTMLElement;
   setInteractVisible: (visible: boolean, label?: string) => void;
+  /** Menempatkan tombol aksi pada posisi layar (px). */
+  setInteractPos: (x: number, y: number) => void;
+  setKunciLari: (tampil: boolean, terkunci: boolean) => void;
+  setModeKamera: (label: string) => void;
   updateStats: (progress: Progress) => void;
   /** Teks misi saat ini (mis. "Temui Mbok Sinar"). */
   setMisi: (teks: string, tahap: number) => void;
@@ -37,13 +46,28 @@ export interface Hud {
   destroy: () => void;
 }
 
-const DAFTAR_SAPA = ['👋', '👍', '😀', '🎉', '❤️', '🙌'];
+const DAFTAR_SAPA = ['👋', '👍', '😀', '🎉', '😊', '🙌'];
 const LANGKAH: Array<{ nama: string; ikon: string }> = [
   { nama: t('Misi'), ikon: '🗣️' },
   { nama: t('Cerita'), ikon: '📖' },
   { nama: t('Tantangan'), ikon: '🔥' },
   { nama: t('Pulang'), ikon: '🗺️' },
 ];
+
+/**
+ * pointerdown (bukan click) agar tombol terasa langsung di layar sentuh,
+ * dan tetap bisa ditekan sambil jari lain memegang joystick.
+ */
+function saatDitekan(tombol: HTMLElement, fn: () => void): void {
+  tombol.addEventListener('pointerdown', (ev) => {
+    ev.preventDefault();
+    fn();
+  });
+  tombol.addEventListener('click', (ev) => {
+    // Klik dari keyboard (Enter) tidak memicu pointerdown.
+    if ((ev as MouseEvent).detail === 0) fn();
+  });
+}
 
 export function createHud(handlers: HudHandlers): Hud {
   const interactBtn = el('button', {
@@ -58,16 +82,15 @@ export function createHud(handlers: HudHandlers): Hud {
     attrs: { type: 'button', 'aria-label': t('Lompat') },
     children: [el('span', { class: 'lompat-ikon', text: '⤴️' }), el('span', { class: 'lompat-label', text: t('Lompat') })],
   });
-  // pointerdown (bukan click) agar lompat terasa langsung di layar sentuh,
-  // dan tetap bisa ditekan sambil jari lain memegang joystick.
-  lompatBtn.addEventListener('pointerdown', (ev) => {
-    ev.preventDefault();
-    handlers.onLompat();
+  saatDitekan(lompatBtn, () => handlers.onLompat());
+
+  const kameraLabel = el('span', { class: 'kamera-label', text: t('Normal') });
+  const kameraBtn = el('button', {
+    class: 'btn-action kamera',
+    attrs: { type: 'button', 'aria-label': t('Ganti mode kamera') },
+    children: [el('span', { class: 'kamera-ikon', text: '📷' }), kameraLabel],
   });
-  lompatBtn.addEventListener('click', (ev) => {
-    // Klik dari keyboard (Enter) tidak memicu pointerdown.
-    if ((ev as MouseEvent).detail === 0) handlers.onLompat();
-  });
+  saatDitekan(kameraBtn, () => handlers.onKamera?.());
 
   const menuBtn = el('button', {
     class: 'btn-action menu hud-menu-kanan',
@@ -76,10 +99,11 @@ export function createHud(handlers: HudHandlers): Hud {
     on: { click: () => handlers.onMenu() },
   });
 
-  const tasChip = el('button', {
-    class: 'chip tas',
-    text: t('🎒 Tas {jumlah}/11', { jumlah: 0 }),
+  const tasJumlah = el('span', { class: 'tas-jumlah', text: '0/11' });
+  const tasBtn = el('button', {
+    class: 'btn-action tas-besar',
     attrs: { type: 'button', 'aria-label': t('Buka tas survival') },
+    children: [el('span', { class: 'tas-ikon', text: '🎒' }), tasJumlah],
     on: { click: () => handlers.onTas() },
   });
   const starChip = el('button', {
@@ -89,7 +113,7 @@ export function createHud(handlers: HudHandlers): Hud {
     on: { click: () => handlers.onBintang?.() },
   });
   const onlineChip = el('span', { class: 'chip online hidden', text: '👥 0' });
-  const stats = el('div', { class: 'hud-stats', children: [tasChip, starChip, onlineChip] });
+  const stats = el('div', { class: 'hud-stats', children: [starChip, onlineChip] });
 
   /* ---------- Kartu tombol Misi + modal ---------- */
   let misiTeksKini = '';
@@ -165,7 +189,13 @@ export function createHud(handlers: HudHandlers): Hud {
     tutup.focus({ preventScroll: true });
   }
 
-  const joystickHost = el('div', { class: 'joystick-host' });
+  const kunciLariBtn = el('button', {
+    class: 'btn-kunci-lari hidden',
+    text: '🏃',
+    attrs: { type: 'button', 'aria-label': t('Kunci lari'), 'aria-pressed': 'false' },
+  });
+  saatDitekan(kunciLariBtn, () => handlers.onKunciLari?.());
+  const joystickHost = el('div', { class: 'joystick-host', children: [kunciLariBtn] });
 
   const barSapa = el('div', { class: 'sapa-bar' });
   for (const emo of DAFTAR_SAPA) {
@@ -185,22 +215,15 @@ export function createHud(handlers: HudHandlers): Hud {
   }
   const sapaBtn = el('button', {
     class: 'btn-action sapa hidden',
-    text: '👋',
+    text: '😊',
     attrs: { type: 'button', 'aria-label': t('Sapa teman') },
     on: { click: () => barSapa.classList.toggle('tampil') },
   });
 
-  // Tombol utama (aksi & lompat) selalu di posisi tetap; tombol aksi muncul di
-  // kiri tombol lompat sehingga lompat tidak bergeser saat aksi tampil.
-  const actions = el('div', {
-    class: 'hud-actions',
-    children: [
-      el('div', { class: 'hud-aksi-atas', children: [sapaBtn] }),
-      el('div', { class: 'hud-aksi-utama', children: [interactBtn, lompatBtn] }),
-    ],
-  });
+  // Tombol kecil melingkari Tas (posisinya di tata-letak.css).
+  const actions = el('div', { class: 'hud-actions', children: [tasBtn, lompatBtn, sapaBtn, kameraBtn] });
   // Tombol ☰ berdiri sendiri di pojok kanan atas.
-  const root = el('div', { class: 'hud-3d', children: [kiriAtas, menuBtn, joystickHost, barSapa, actions] });
+  const root = el('div', { class: 'hud-3d', children: [kiriAtas, menuBtn, joystickHost, barSapa, actions, interactBtn] });
 
   return {
     root,
@@ -208,8 +231,21 @@ export function createHud(handlers: HudHandlers): Hud {
       interactBtn.classList.toggle('hidden', !visible);
       if (interactBtn.textContent !== label) interactBtn.textContent = label;
     },
+    setInteractPos: (x, y) => {
+      interactBtn.style.transform = `translate(${Math.round(x)}px, ${Math.round(y)}px) translate(-50%, -100%)`;
+    },
+    setModeKamera: (label) => {
+      kameraLabel.textContent = label;
+    },
+    setKunciLari: (tampil, terkunci) => {
+      kunciLariBtn.classList.toggle('hidden', !tampil);
+      kunciLariBtn.classList.toggle('terkunci', terkunci);
+      kunciLariBtn.setAttribute('aria-pressed', String(terkunci));
+      const ikon = terkunci ? '🔒' : '🏃';
+      if (kunciLariBtn.textContent !== ikon) kunciLariBtn.textContent = ikon;
+    },
     updateStats: (progress) => {
-      tasChip.textContent = t('🎒 Tas {jumlah}/11', { jumlah: progress.alat.length });
+      tasJumlah.textContent = `${progress.alat.length}/11`;
       starChip.textContent = `⭐ ${totalStars(progress)}/${maxStars()}`;
     },
     setMisi: (teks, tahap) => {

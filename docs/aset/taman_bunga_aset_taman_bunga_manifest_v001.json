@@ -1,0 +1,353 @@
+{
+ "bab": "Bab 5 - H03 simbiosis - Taman Bunga",
+ "versi": "v001",
+ "skala": "meter (player ~1.6 m)",
+ "orientasi": "glTF +Y atas, depan +Z, origin bawah-tengah",
+ "sumber_tata_letak": "bundle live noktahWorld-7R3ahhes.js, layout ke[1] dicermin X (urutan 5)",
+ "npc": {
+  "Nyai Kembang (penjaga, P)": "NPC 04 ibu_bunga",
+  "Cantrik Tawon (L)": "NPC 15 cantrik_kenikir"
+ },
+ "aset_bersama_dipakai": [
+  "aset_bersama/gerbang_peta",
+  "aset_bersama/jalan_lebar (lurus, skala Y = panjang/3)",
+  "aset_goa_sinar/tiang_obor",
+  "aset_goa_sinar/pagar_kayu",
+  "aset_goa_sinar/semak",
+  "aset_bersama/pohon (6)",
+  "aset_goa_sinar/batu_kecil"
+ ],
+ "aset": [
+  {
+   "nama": "rumah_kembang",
+   "versi": "v001",
+   "glb": "rumah_kembang/export/rumah_kembang_v001.glb",
+   "blend": "rumah_kembang/source/rumah_kembang_v001.blend",
+   "tris": 2564,
+   "ukuran_file_kb": 162.3,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    6.657,
+    5.75,
+    5.457
+   ],
+   "node": [
+    "Rumah_Kembang",
+    "Papan_Nama"
+   ],
+   "material": [
+    "Air_Danau",
+    "Aksen_H03",
+    "Aksen_H03_Gelap",
+    "Batu_Plinth",
+    "Batu_Plinth_Gelap",
+    "Bunga_Kuning",
+    "Bunga_Pink",
+    "Bunga_Putih",
+    "Bunga_Ungu",
+    "Daun_Pohon_Muda",
+    "Emas",
+    "Hijau_Evakuasi",
+    "Kayu_Gelap",
+    "Kayu_Jati",
+    "Kayu_Papan",
+    "Laut",
+    "Merah_Bendera",
+    "Putih",
+    "Tanah_Ladang"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "kios() rumah penjaga (roof = accent)",
+   "accent": "Aksen_H03",
+   "notes": "rumah Nyai Kembang: atap teal, pot bunga di depan, pergola bunga merambat + bangku di sisi kanan"
+  },
+  {
+   "nama": "pohon_besar",
+   "versi": "v001",
+   "glb": "pohon_besar/export/pohon_besar_v001.glb",
+   "blend": "pohon_besar/source/pohon_besar_v001.blend",
+   "tris": 472,
+   "ukuran_file_kb": 34.6,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    6.075,
+    7.574,
+    5.556
+   ],
+   "node": [
+    "Pohon_Besar"
+   ],
+   "material": [
+    "Aksen_H01",
+    "Batang",
+    "Bunga_Ungu",
+    "Daun_Pohon_Muda"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "landmark akar pohon besar (tempat Nyai Kembang menunggu), dekat arena",
+   "notes": "batang besar + 6 akar papan, 5 tajuk, anggrek ungu menempel (simbiosis)"
+  },
+  {
+   "nama": "stasiun_simbiosis",
+   "versi": "v001",
+   "glb": "stasiun_simbiosis/export/stasiun_simbiosis_v001.glb",
+   "blend": "stasiun_simbiosis/source/stasiun_simbiosis_v001.blend",
+   "tris": 880,
+   "ukuran_file_kb": 58.7,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    2.029,
+    1.415,
+    2.029
+   ],
+   "node": [
+    "Stasiun_Simbiosis"
+   ],
+   "material": [
+    "Aksen_H01",
+    "Aksen_H03",
+    "Batang",
+    "Batu_Abu",
+    "Bunga_Kuning",
+    "Bunga_Pink",
+    "Bunga_Ungu",
+    "Emas",
+    "Hijau_Evakuasi",
+    "Jalan_Pasir",
+    "Kaca",
+    "Kuning_Lebah",
+    "Polybag",
+    "Ulat"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "ui() story station (simbiosis: bunga + lebah, pohon + anggrek, ulat)",
+   "accent": "Aksen_H03"
+  },
+  {
+   "nama": "panggung_uji",
+   "versi": "v001",
+   "glb": "panggung_uji/export/panggung_uji_v001.glb",
+   "blend": "panggung_uji/source/panggung_uji_v001.blend",
+   "tris": 1400,
+   "ukuran_file_kb": 81.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    5.921,
+    2.247,
+    5.852
+   ],
+   "node": [
+    "Arena_Uji",
+    "Cincin_Aksen",
+    "Pagar_Uji",
+    "Api_1_Mati",
+    "Api_1_Nyala",
+    "Cahaya_Api_1",
+    "Api_2_Mati",
+    "Api_2_Nyala",
+    "Cahaya_Api_2",
+    "Api_3_Mati",
+    "Api_3_Nyala",
+    "Cahaya_Api_3"
+   ],
+   "material": [
+    "Abu_Arena",
+    "Aksen_H03",
+    "Api",
+    "Api_Inti",
+    "Api_Mati",
+    "Batu_Abu",
+    "Batu_Plinth",
+    "Kayu_Gelap",
+    "Pagar_Uji"
+   ],
+   "validator": "0 error / 0 warning",
+   "animations": [
+    "Api_1_Kedip",
+    "Api_2_Kedip",
+    "Api_3_Kedip"
+   ],
+   "replaces": "Hi() test arena",
+   "states": "Api_k_Mati default visible / Api_k_Nyala hide on load, show per correct answer; Pagar_Uji hidden when opened; Cincin_Aksen glows when opened",
+   "accent": "Aksen_H03"
+  },
+  {
+   "nama": "bunga",
+   "versi": "v001",
+   "glb": "bunga/export/bunga_v001.glb",
+   "blend": "bunga/source/bunga_v001.blend",
+   "tris": 540,
+   "ukuran_file_kb": 44.2,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.29,
+    1.2,
+    0.945
+   ],
+   "node": [
+    "Bunga_A",
+    "Bunga_B",
+    "Bunga_C"
+   ],
+   "material": [
+    "Bunga_Kuning",
+    "Bunga_Merah",
+    "Bunga_Oranye",
+    "Bunga_Pink",
+    "Bunga_Putih",
+    "Bunga_Ungu",
+    "Daun_Pohon_Muda",
+    "Hijau_Evakuasi"
+   ],
+   "validator": "0 error / 0 warning",
+   "variants": [
+    "Bunga_A",
+    "Bunga_B",
+    "Bunga_C"
+   ],
+   "tris_each": {
+    "Bunga_A": 244,
+    "Bunga_B": 244,
+    "Bunga_C": 52
+   },
+   "replaces": "46 flowers (stem + icosa head) r9-20.5; colours #f472b6 #facc15 #f97316 #a78bfa white #ef4444"
+  },
+  {
+   "nama": "sarang_lebah",
+   "versi": "v001",
+   "glb": "sarang_lebah/export/sarang_lebah_v001.glb",
+   "blend": "sarang_lebah/source/sarang_lebah_v001.blend",
+   "tris": 300,
+   "ukuran_file_kb": 22.7,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    0.966,
+    1.805,
+    0.673
+   ],
+   "node": [
+    "Sarang_Lebah"
+   ],
+   "material": [
+    "Bunga_Putih",
+    "Kaca",
+    "Kayu_Gelap",
+    "Kayu_Papan",
+    "Kuning_Lebah",
+    "Polybag"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "beehive box + bees (taman dressing)"
+  },
+  {
+   "nama": "lantai_taman",
+   "versi": "v001",
+   "glb": "lantai_taman/export/lantai_taman_v001.glb",
+   "blend": "lantai_taman/source/lantai_taman_v001.blend",
+   "tris": 102,
+   "ukuran_file_kb": 7.0,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    4.0,
+    0.3,
+    4.0
+   ],
+   "node": [
+    "lantai_taman"
+   ],
+   "material": [
+    "Rumput_H03",
+    "Rumput_H03_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "replaces": "ground plane (grass #8fd27a), tile 4x4 m, top 0.06"
+  },
+  {
+   "nama": "kit_taman",
+   "versi": "v001",
+   "glb": "kit_taman/export/kit_taman_v001.glb",
+   "blend": "kit_taman/source/kit_taman_v001.blend",
+   "tris": 942,
+   "ukuran_file_kb": 73.5,
+   "dimensi_m_glTF_lebar_tinggi_dalam": [
+    7.215,
+    1.905,
+    18.462
+   ],
+   "node": [
+    "Bunga_A",
+    "Bunga_B",
+    "Bunga_C",
+    "Sarang_Lebah",
+    "lantai_taman"
+   ],
+   "material": [
+    "Bunga_Kuning",
+    "Bunga_Merah",
+    "Bunga_Oranye",
+    "Bunga_Pink",
+    "Bunga_Putih",
+    "Bunga_Putih.001",
+    "Bunga_Ungu",
+    "Daun_Pohon_Muda",
+    "Hijau_Evakuasi",
+    "Kaca",
+    "Kayu_Gelap",
+    "Kayu_Papan",
+    "Kuning_Lebah",
+    "Polybag",
+    "Rumput_H03",
+    "Rumput_H03_Gelap"
+   ],
+   "validator": "0 error / 0 warning",
+   "tris_each": {
+    "Bunga_A": 244,
+    "Bunga_B": 244,
+    "Bunga_C": 52,
+    "Sarang_Lebah": 300,
+    "lantai_taman": 102
+   },
+   "groups": {
+    "bunga": [
+     "Bunga_A",
+     "Bunga_B",
+     "Bunga_C"
+    ],
+    "sarang_lebah": [
+     "Sarang_Lebah"
+    ],
+    "lantai_taman": [
+     "lantai_taman"
+    ]
+   }
+  }
+ ],
+ "overview": [
+  "overview_scene.png",
+  "overview_uji.png",
+  "overview_rumah.png"
+ ],
+ "kelemahan": [
+  "lebah di stasiun/sarang statis (kode punya lebah terbang - animasi dari kode)",
+  "bunga = kepala icosphere sederhana"
+ ],
+ "koordinat_kode": {
+  "muncul": [
+   0,
+   17
+  ],
+  "penjaga": [
+   -6,
+   7
+  ],
+  "cerita": [
+   0,
+   -6
+  ],
+  "uji": [
+   12,
+   -9
+  ],
+  "gerbang": [
+   14,
+   12
+  ],
+  "rumah": [
+   -11,
+   -12
+  ]
+ }
+}

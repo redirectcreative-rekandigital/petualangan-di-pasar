@@ -68,7 +68,9 @@ export function createInputManager(): InputManager {
     const k = ev.key.toLowerCase();
     keys.add(k);
     if (k === 'e') interactQueued = true;
-    if (k === 'escape' || k === 'h') menuQueued = true;
+    // Esc hanya menutup modal (ditangani modal itu sendiri); membuka menu dengan Esc
+    // membuatnya langsung terbuka lagi setelah ditutup.
+    if (k === 'h') menuQueued = true;
     // Spasi = lompat. Abaikan saat fokus di tombol, karena Spasi juga "mengklik" tombol itu.
     if (k === ' ' && !ev.repeat && !(ev.target instanceof HTMLButtonElement)) jumpQueued = true;
     if (['w', 'a', 's', 'd', ' ', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(k)) {

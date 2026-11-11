@@ -20,6 +20,9 @@ import {
   catatBaca,
   applyBalaiResult,
   KARAKTER,
+  sudahPanduan,
+  tandaiPanduan,
+  ulangPanduan,
 } from './core/state';
 import { getNoktah, getBalai } from './data/balai';
 import { getCerita, balaiSesudah, isiNama, CERITA, URUTAN_BALAI, type CeritaBalai } from './data/cerita';
@@ -28,6 +31,8 @@ import { createInputManager, type InputManager } from './input/controls';
 import { isWebGLAvailable } from './world/webgl';
 import { catatFrame } from './core/kualitas';
 import { pantauOverlay } from './ui/pantauOverlay';
+import { putarPanduan, langkahPanduan } from './ui/panduan';
+import { buatBilahTujuan } from './ui/hud';
 import type { SceneQuality } from './world/scene';
 import type { NoktahWorldHandle, PeranNpc, PeranTitik } from './world/noktahWorld';
 import { createHud, type Hud } from './ui/hud';
@@ -52,7 +57,7 @@ import { sfx } from './core/sound';
 import { pasangLayarPenuhOtomatis } from './core/layarPenuh';
 import { skorJawaban, starsForSkor } from './core/scoring';
 import type { ScreenContext, ScreenName } from './ui/screens/context';
-import type { NoktahId, Progress, TahapMisi } from '../shared/types';
+import type { IdPanduan, NoktahId, Progress, TahapMisi } from '../shared/types';
 import { t, BAHASA, aturPenyimpanPosisi, ambilPosisiTersimpan } from './core/bahasa';
 import { bukaKunciSuara } from './core/suara';
 import { bukaPengaturan } from './ui/pengaturan';
@@ -312,6 +317,8 @@ async function buildPeta(options: Record<string, unknown>): Promise<void> {
   await handle.siap.catch((err: unknown) => console.error(err));
   loading.tutup();
   if (petaSession?.handle !== handle) return;
+  await panduan('peta');
+  if (petaSession?.handle !== handle) return;
 
   const tujuan = balaiTujuan(progress);
   const namaTujuan = tujuan === 'FINAL' ? t('Mercusuar Tua') : (getCerita(tujuan)?.tempat ?? tujuan);
@@ -338,7 +345,7 @@ function tambahkanBarPeta(): void {
         on: { click: () => bukaBintang() },
       }),
       el('button', {
-        class: 'btn kecil',
+        class: 'btn kecil peta-tujuan',
         text: `▶ ${namaTujuan}`,
         attrs: { type: 'button' },
         on: {
@@ -361,7 +368,11 @@ function tambahkanBarPeta(): void {
       }),
     ],
   });
-  app.append(bar);
+  // Bilah 👉 "habis ini ngapain" di peta (sama dengan bilah tujuan di balai).
+  const bilah = buatBilahTujuan();
+  const tempatTujuan = tujuan === 'FINAL' ? t('Mercusuar Tua') : (getCerita(tujuan)?.tempat ?? tujuan);
+  bilah.setTeks(t('Ketuk {tempat} di peta, atau tombol ▶ di atas.', { tempat: tempatTujuan }));
+  app.append(bar, el('div', { class: 'peta-bilah', children: [bilah.root] }));
 }
 
 /** Tombol zoom besar di kanan bawah peta: anak tidak perlu mencubit layar. */
@@ -423,6 +434,7 @@ function menuPeta(): void {
             tombol(t('📖 Petunjuk Bermain'), () => navigate('howto', { dari: 'map' })),
             tombol(t('⚙️ Pengaturan'), () => bukaPengaturan(app), 'btn secondary block'),
             tombol(t('🎓 Hasil Belajar'), () => navigate('result'), 'btn secondary block'),
+            tombol(t('🧭 Ulangi Panduan'), ulangiPanduan, 'btn secondary block'),
             tombol(t('🏠 Kembali ke Menu Utama'), () => navigate('intro'), 'btn secondary block'),
             tombol(t('✖️ Tutup'), () => {}, 'btn ghost block'),
           ],
@@ -482,7 +494,7 @@ function bukaFinal(): void {
   }
   app.innerHTML = '';
   document.body.classList.add('world-mode', 'balai-mode');
-  mercusuar = bukaMercusuar({ app, ctx, onMenu: openMenu, onTas: bukaTas, onBintang: bukaBintang });
+  mercusuar = bukaMercusuar({ app, ctx, onMenu: openMenu, onTas: bukaTas, onBintang: bukaBintang, onSiap: () => void panduan('mercusuar') });
 }
 
 function bukaNoktah(options: Record<string, unknown>): void {
@@ -613,6 +625,7 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean, posisi?: Posisi
     input.endFrame();
     const sibuk = session.sibuk || overlay.adaOverlay();
     if (!sibuk && input.state.interactPressed) void handleInteract();
+    if (!sibuk && input.state.menuPressed) openMenu();
     // Layar tertutup penuh (cutscene, Halaman Cerita di mode ringan): dunia 3D tak perlu digambar.
     if (overlay.tertutupPenuh()) {
       session.raf = requestAnimationFrame(loop);
@@ -665,6 +678,7 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean, posisi?: Posisi
   // Kembali dari ganti bahasa: letakkan pemain di tempat semula, tanpa sapaan awal.
   if (posisi) {
     world.letakkanPemain(posisi);
+    void panduanBalai();
     return;
   }
 
@@ -676,12 +690,52 @@ async function buildNoktahWorld(kode: NoktahId, prolog: boolean, posisi?: Posisi
       session.sibuk = false;
       window.setTimeout(() => void percakapanMisi(), 300);
     });
-  } else if (tahapMisi(progress, kode) === 0) {
-    showToast(
-      t('Selamat datang di {tempat}! Temui {nama}.', { tempat: cerita.tempat, nama: cerita.penjaga.nama }),
-      3000,
-    );
+  } else {
+    // Prolog menunggu dialog misi pertama (lihat percakapanMisi); balai lain langsung.
+    // Sapaan menyusul setelah panduan agar tidak menutupi balonnya.
+    void panduanBalai().then(() => {
+      if (session?.world !== world || tahapMisi(progress, kode) !== 0) return;
+      showToast(t('Selamat datang di {tempat}! Temui {nama}.', { tempat: cerita.tempat, nama: cerita.penjaga.nama }), 3000);
+    });
   }
+}
+
+/* ---------- Panduan awal (ui/panduan.ts) ---------- */
+
+function sedangOnline(): boolean {
+  return Boolean(progress.token) && onlineTersedia();
+}
+
+/** Memutar panduan satu layar, sekali per siswa. Dunia dijeda selama panduan tampil. */
+async function panduan(id: IdPanduan): Promise<void> {
+  if (sudahPanduan(progress, id)) return;
+  const dunia = session ?? mercusuar;
+  const sibukLama = dunia?.sibuk ?? false;
+  if (dunia) dunia.sibuk = true;
+  const online = id === 'balai' && sedangOnline();
+  try {
+    await putarPanduan(langkahPanduan(id, { online }), app);
+  } finally {
+    if (dunia) dunia.sibuk = sibukLama;
+  }
+  let next = tandaiPanduan(progress, id);
+  if (online) next = tandaiPanduan(next, 'sapa');
+  simpan(next);
+}
+
+/** Menu "🧭 Ulangi Panduan": putar panduan layar ini sekarang; layar lain menyusul saat dikunjungi. */
+function ulangiPanduan(): void {
+  simpan(ulangPanduan(progress));
+  if (session) void panduanBalai();
+  else if (mercusuar) void panduan('mercusuar');
+  else if (petaSession) void panduan('peta');
+}
+
+/** Panduan balai; bila sudah dilihat saat main sendiri, langkah 😊 Sapa muncul sekali saat online. */
+async function panduanBalai(): Promise<void> {
+  if (!session) return;
+  await panduan('balai');
+  if (session && sedangOnline()) await panduan('sapa');
 }
 
 function labelInteraksi(peran: PeranTitik | undefined): string {
@@ -777,6 +831,8 @@ async function percakapanMisi(): Promise<void> {
   });
   if (batal) return;
   if (session) showToast(t('📖 Cari {nama}. Ikuti panah kuning!', { nama: session.cerita.cantrik.nama }), 3000);
+  // Panduan kontrol tepat setelah misi pertama diterima: kini anak tahu harus ke mana.
+  await panduanBalai();
 }
 
 async function percakapanPengingat(): Promise<void> {
@@ -856,6 +912,8 @@ async function tantanganBalai(): Promise<void> {
       if (i !== 0) return;
     }
     await p.bicara(c.penjaga, c.ujiBuka, { labelLanjut: t('Bismillah ▶') });
+    if (p.tertutup()) return;
+    await panduan('uji');
     session?.world.setOborUji(0);
     let benarSejauh = 0;
     const hasil = await jalankanTantangan(p, {
@@ -1223,6 +1281,7 @@ function openMenu(): void {
             ),
             tombol(t('🗺️ Kembali ke Peta'), () => navigate('map'), 'btn secondary block'),
             tombol(t('🎓 Hasil Belajar'), () => navigate('result'), 'btn secondary block'),
+            tombol(t('🧭 Ulangi Panduan'), ulangiPanduan, 'btn secondary block'),
             tombol(t('🏠 Kembali ke Menu Utama'), () => navigate('intro'), 'btn secondary block'),
             tombol(t('✖️ Tutup'), () => {}, 'btn ghost block'),
           ],

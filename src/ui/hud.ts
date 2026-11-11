@@ -69,6 +69,46 @@ function saatDitekan(tombol: HTMLElement, fn: () => void): void {
   });
 }
 
+const KUNCI_BILAH_CIUT = 'survival-sains:bilah-tujuan-ciut';
+
+/**
+ * Bilah "habis ini ngapain": satu baris 👉 berisi tugas saat ini. Ketuk untuk
+ * menciutkan menjadi ikon 👉 saja; pilihan itu diingat di perangkat ini.
+ */
+export function buatBilahTujuan(): { root: HTMLElement; setTeks: (teks: string) => void } {
+  const teks = el('span', { class: 'bilah-tujuan-teks' });
+  const root = el('button', {
+    class: 'bilah-tujuan',
+    attrs: { type: 'button', 'aria-label': t('Tugasmu sekarang (ketuk untuk menciutkan)') },
+    children: [el('span', { class: 'bilah-tujuan-ikon', text: '👉', attrs: { 'aria-hidden': 'true' } }), teks],
+  });
+  const terapkan = (ciut: boolean): void => {
+    root.classList.toggle('ciut', ciut);
+    root.setAttribute('aria-expanded', String(!ciut));
+  };
+  try {
+    terapkan(localStorage.getItem(KUNCI_BILAH_CIUT) === '1');
+  } catch {
+    terapkan(false);
+  }
+  root.addEventListener('click', () => {
+    sfx.click();
+    const ciut = !root.classList.contains('ciut');
+    terapkan(ciut);
+    try {
+      localStorage.setItem(KUNCI_BILAH_CIUT, ciut ? '1' : '0');
+    } catch {
+      /* penyimpanan diblokir: cukup untuk sesi ini */
+    }
+  });
+  return {
+    root,
+    setTeks: (isi) => {
+      if (teks.textContent !== isi) teks.textContent = isi;
+    },
+  };
+}
+
 export function createHud(handlers: HudHandlers): Hud {
   const interactBtn = el('button', {
     class: 'btn-action interact hidden',
@@ -129,7 +169,8 @@ export function createHud(handlers: HudHandlers): Hud {
     sfx.click();
     bukaMisi();
   });
-  const kiriAtas = el('div', { class: 'hud-kiri-atas', children: [stats, misiBtn] });
+  const bilah = buatBilahTujuan();
+  const kiriAtas = el('div', { class: 'hud-kiri-atas', children: [stats, misiBtn, bilah.root] });
 
   let modal: HTMLElement | null = null;
   function bukaMisi(): void {
@@ -256,6 +297,7 @@ export function createHud(handlers: HudHandlers): Hud {
       if (misiTeksKini && tahap !== tahapKini) misiBtn.classList.add('baru');
       misiTeksKini = teks;
       tahapKini = tahap;
+      bilah.setTeks(teks);
       misiTahap.textContent = `${Math.min(tahap + 1, LANGKAH.length)}/${LANGKAH.length} · ${LANGKAH[tahap]?.nama ?? ''}`;
     },
     bukaMisi,

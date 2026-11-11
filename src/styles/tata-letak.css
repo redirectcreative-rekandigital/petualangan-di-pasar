@@ -961,3 +961,92 @@ body:has(.dialog-overlay) .hud-menu-kanan {
     grid-column: 1 / -1;
   }
 }
+
+/* ================================================================== */
+/* Bilah tujuan 👉 "habis ini ngapain" (ui/hud.ts buatBilahTujuan)     */
+/* ================================================================== */
+.bilah-tujuan {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 6px;
+  max-width: min(320px, calc(100vw - 100px));
+  padding: 6px 12px 6px 9px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(20, 83, 45, 0.88);
+  color: var(--putih);
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: left;
+  box-shadow: var(--bayangan);
+  cursor: pointer;
+  pointer-events: auto;
+}
+.bilah-tujuan-ikon {
+  flex: none;
+}
+.bilah-tujuan.ciut {
+  padding: 6px 9px;
+}
+.bilah-tujuan.ciut .bilah-tujuan-teks {
+  display: none;
+}
+/* Di peta: tepat di bawah bilah atas. */
+.peta-bilah {
+  position: fixed;
+  top: calc(max(8px, env(safe-area-inset-top)) + 52px);
+  left: 8px;
+  z-index: 45;
+}
+
+/* ================================================================== */
+/* Panduan awal: sorotan tombol bertahap (ui/panduan.ts)               */
+/* ================================================================== */
+.panduan-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+}
+/* Lubang terang di atas tombol; bayangan raksasa menggelapkan sisa layar. */
+.panduan-sorot {
+  position: fixed;
+  border-radius: 16px;
+  box-shadow: 0 0 0 200vmax rgba(10, 25, 18, 0.62);
+  outline: 3px solid var(--oranye-500);
+  pointer-events: none;
+  transition: left 0.2s ease, top 0.2s ease, width 0.2s ease, height 0.2s ease;
+}
+.panduan-overlay.tanpa-target {
+  background: rgba(10, 25, 18, 0.62);
+}
+.panduan-overlay.tanpa-target .panduan-sorot {
+  display: none;
+}
+.panduan-balon {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(360px, calc(100vw - 32px));
+  padding: 14px 16px 12px;
+  border-radius: var(--radius);
+  background: var(--krem-50);
+  border-left: 5px solid var(--oranye-500);
+  box-shadow: var(--bayangan-lg);
+  color: var(--teks);
+}
+.panduan-overlay.tanpa-target .panduan-balon {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+.panduan-teks {
+  margin: 0 0 12px;
+  font-size: 1rem;
+  line-height: 1.4;
+}
+.panduan-aksi {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}

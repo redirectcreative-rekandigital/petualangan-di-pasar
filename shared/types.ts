@@ -246,4 +246,9 @@ export interface Progress {
   bacaan: Record<string, CatatanBaca>;
   /** Jumlah benar terbaik per bagian Final (4 bagian). */
   finalBagian: number[];
+  /** Panduan awal (sorotan tombol) yang sudah dilihat siswa ini. */
+  panduan?: IdPanduan[];
 }
+
+/** Panduan awal per layar; `sapa` = langkah tambahan Multiplayer Kelas. */
+export type IdPanduan = 'balai' | 'peta' | 'uji' | 'mercusuar' | 'sapa';

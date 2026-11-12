@@ -269,6 +269,13 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
             ],
           }),
           el('p', { class: 'muted', text: t('Untuk Kepentingan Lomba Guru Pembuatan Game Edukasi Berbasis AI bagi Guru Muhammadiyah se-Cabang Blimbing Dalam Rangka Hari Guru Nasional dan Milad Muhammadiyah') }),
+          el('p', {
+            class: 'kecil-teks',
+            children: [
+              `${t('👩‍🏫 Untuk guru/juri:')} `,
+              el('a', { text: t('buka Mode Guru'), attrs: { href: `${import.meta.env.BASE_URL}modeguru/` } }),
+            ],
+          }),
         ],
       }),
     );

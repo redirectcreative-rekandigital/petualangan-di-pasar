@@ -1179,3 +1179,66 @@ g[class^='anim-'] {
 .cerita-buku > * {
   flex-shrink: 0;
 }
+
+/* Mode Guru: tombol pojok, tabel perhatian, diagram perjalanan, keterangan sel. */
+.guru-pojok {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 20;
+  display: flex;
+  gap: 6px;
+}
+.guru-pojok .btn {
+  min-width: 40px;
+  background: var(--kartu, #fff);
+  box-shadow: 0 2px 6px rgb(0 0 0 / 12%);
+}
+.tabel-perhatian {
+  width: 100%;
+}
+.tabel-perhatian th,
+.tabel-perhatian td {
+  text-align: left;
+}
+.tabel-perhatian tbody tr {
+  cursor: pointer;
+}
+.tabel-perhatian tbody tr:hover,
+.tabel-perhatian tbody tr:focus-visible {
+  background: rgb(0 0 0 / 5%);
+}
+.bar-perjalanan {
+  width: 100%;
+  border: 0;
+  background: none;
+  padding: 4px 6px;
+  border-radius: 8px;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.bar-perjalanan:hover,
+.bar-perjalanan.aktif {
+  background: rgb(0 0 0 / 5%);
+}
+.bar-perjalanan .bar-isi span {
+  background: var(--oranye-500, #f59e0b);
+}
+.nama-perjalanan {
+  margin: 0 6px 8px;
+}
+.matriks-kemajuan td[data-tip] {
+  cursor: pointer;
+}
+.tip-sel {
+  position: fixed;
+  z-index: 60;
+  max-width: 240px;
+  padding: 5px 9px;
+  border-radius: 8px;
+  background: #1f2937;
+  color: #fff;
+  font-size: 0.78rem;
+  pointer-events: none;
+}

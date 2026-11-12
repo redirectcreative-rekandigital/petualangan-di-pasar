@@ -1,7 +1,7 @@
 import { el } from '../components/dom';
 import { sfx } from '../../core/sound';
 import { APP_INFO } from '../../core/state';
-import { showToast } from '../dialog';
+import { showDialog, showToast } from '../dialog';
 import { ambilSesiGuru, buatSesiGuru, kendaliGuru, onlineTersedia, type RosterSiswa } from '../../net/klien';
 import { getQuestionBankAsli as getQuestionBank } from '../../data/bank';
 import { CERITA_ASLI as CERITA, URUTAN_BALAI } from '../../data/cerita';
@@ -16,9 +16,12 @@ import {
   KKM_BAWAAN,
   persenBalai,
   balaiBelumTuntas,
+  sebaranPerjalanan,
 } from '../../core/analisis';
+import { putarPanduan, type LangkahPanduan } from '../panduan';
 import { kabarBaik, layarProyektor, type KabarKelas } from './proyektor';
 import type { ScreenContext } from './context';
+import { buatKelasContoh, type KelasContoh } from './kelasContoh';
 
 /**
  * Halaman "Mode Guru": membuat ruang kelas (token 4 digit) dan memantau
@@ -32,6 +35,28 @@ const KUNCI_TOKEN = 'survival-sains:token-guru';
 const KUNCI_KKM = 'survival-sains:kkm-guru';
 const KUNCI_RAHASIA = 'survival-sains:kunci-guru';
 const KUNCI_SALINAN = 'survival-sains:salinan-kelas-guru';
+const KUNCI_TUR = 'survival-sains:tur-guru';
+
+/** Pengenalan layar awal Mode Guru. */
+const LANGKAH_AWAL: LangkahPanduan[] = [
+  { teks: '👋 Selamat datang di Mode Guru! Di sini guru memantau hasil belajar siswa yang bermain Survival Sains dalam satu kelas.' },
+  { target: '.tombol-buat-sesi', teks: 'Buat sesi kelas untuk mendapatkan token 4 digit. Siswa memasukkan token ini di HP saat memilih mode kelas.' },
+  { target: '.tombol-contoh', teks: 'Belum ada siswa? Buka Kelas Contoh: 31 siswa uji coba untuk mencoba semua fitur dasbor. Juri bisa mulai dari sini.' },
+  { target: '.guru-pojok', teks: '❓ membuka panduan ini lagi. 🏝️ membuka halaman game siswa.' },
+];
+
+/** Pengenalan dasbor: data, tombol, dan alur tab. */
+const LANGKAH_DASBOR: LangkahPanduan[] = [
+  { target: '.token-card', teks: 'Token kelas. Bagikan ke siswa, atau tampilkan di layar kelas lewat 📽️ Proyektor (ada kode QR dan papan peringkat).' },
+  { target: '.kartu-kendali', teks: 'Kendali kelas: kunci kelas agar siswa baru tidak bisa masuk, jeda semua layar siswa, dan kirim pengumuman singkat.' },
+  { target: '.ringkas-kelas', teks: 'Ringkasan kelas: jumlah siswa, yang online, total bintang, dan persen jawaban benar. Diperbarui otomatis tiap 3 detik.' },
+  { target: '.kartu-kkm', teks: 'KKM adalah batas tuntas. Nilai resmi diambil dari percobaan pertama; balai di bawah KKM ditandai belum tuntas.' },
+  { target: '.tombol-csv', teks: 'Unduh CSV Kelas (nilai per balai tiap siswa) atau CSV Jawaban (setiap jawaban) untuk diolah di Excel.' },
+  { target: '.guru-tabs', teks: 'Tiga tab: 📊 Kelas (perjalanan dan kemajuan per bab), ❓ Soal (soal tersulit dan miskonsepsi), 🧒 Siswa (detail dan rekomendasi tiap anak).' },
+  { target: '.kartu-perhatian', teks: 'Perlu perhatian: siswa yang butuh bantuan atau belum tuntas, beserta bab-nya. Ketuk barisnya untuk membuka detail siswa.' },
+  { target: '.kartu-perjalanan', teks: 'Perjalanan siswa: berapa siswa yang sedang berada di tiap bab. Ketuk batangnya untuk melihat nama siswanya.' },
+  { target: '.matriks-kemajuan', teks: 'Tabel kemajuan: satu baris per siswa, satu kolom per bab. Ketuk ikon di tabel untuk melihat keterangannya.' },
+];
 
 /** Pengumuman cepat satu ketukan. */
 const PENGUMUMAN_CEPAT = ['⏰ 5 menit lagi', '👀 Lihat ke depan', '💾 Simpan dan selesai', '🙋 Angkat tangan kalau butuh bantuan'];
@@ -62,6 +87,16 @@ interface StateGuru {
   jeda: boolean;
   proyektor: boolean;
   kabar: KabarKelas[];
+  /** Kelas contoh (data uj, tanpa server); null = sesi asli. */
+  contoh: KelasContoh | null;
+  /** Waktu siswa contoh terakhir maju. */
+  majuPada: number;
+  /** Daftar "Perlu perhatian" dibuka semua (bukan 5 teratas). */
+  perhatianSemua: boolean;
+  /** Bab yang batangnya diketuk di diagram perjalanan. */
+  babTerbuka: string | null;
+  /** Panduan sedang diputar: dasbor tidak digambar ulang. */
+  tur: boolean;
 }
 
 export function renderGuru(_ctx: ScreenContext): HTMLElement {
@@ -79,6 +114,11 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
     jeda: false,
     proyektor: false,
     kabar: [],
+    contoh: null,
+    majuPada: 0,
+    perhatianSemua: false,
+    babTerbuka: null,
+    tur: false,
   };
 
   const root = el('section', { class: 'screen' });
@@ -86,23 +126,83 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
   root.append(panel);
 
   const kembali = el('button', {
-    class: 'btn ghost block',
-    text: '🏝️ Buka Halaman Siswa',
-    attrs: { type: 'button' },
+    class: 'btn kecil ghost',
+    text: '🏝️',
+    attrs: { type: 'button', 'aria-label': 'Buka Halaman Siswa', title: 'Buka Halaman Siswa' },
     on: {
       click: () => {
         sfx.click();
-        st.jalan = false;
-        window.clearInterval(st.timer);
-        // Mode Guru punya alamat sendiri: kembali ke alamat game siswa (tanpa /modeguru, ?mode=guru).
-        const akar = window.location.pathname.replace(/modeguru\/?$/i, '');
-        window.location.href = akar || './';
+        const { root: dialog } = showDialog({
+          tokoh: 'Buka Halaman Siswa?',
+          ikon: '🏝️',
+          teks: st.token && !st.contoh
+            ? 'Dasbor guru akan ditutup. Sesi kelas tetap berjalan dan bisa dibuka lagi lewat Mode Guru di browser ini.'
+            : 'Dasbor guru akan ditutup dan kamu pindah ke halaman game siswa.',
+          aksi: '🏝️ Ya, buka halaman siswa',
+          onBatal: () => sfx.click(),
+          onAksi: () => {
+            st.jalan = false;
+            window.clearInterval(st.timer);
+            // Mode Guru punya alamat sendiri: kembali ke alamat game siswa (tanpa /modeguru, ?mode=guru).
+            const akar = window.location.pathname.replace(/modeguru\/?$/i, '');
+            window.location.href = akar || './';
+          },
+        });
+        document.body.append(dialog);
       },
     },
   });
 
+  const pojok = el('div', {
+    class: 'guru-pojok',
+    children: [
+      el('button', {
+        class: 'btn kecil ghost',
+        text: '❓',
+        attrs: { type: 'button', 'aria-label': 'Panduan Mode Guru', title: 'Panduan Mode Guru' },
+        on: { click: () => { sfx.click(); turGuru(st.token && st.siswa.length ? 'dasbor' : 'awal'); } },
+      }),
+      kembali,
+    ],
+  });
+  root.append(pojok);
+
+  function turGuru(jenis: 'awal' | 'dasbor'): void {
+    if (st.tur) return;
+    st.tur = true;
+    if (jenis === 'dasbor') {
+      st.tab = 'kelas';
+      st.dipilih = null;
+      gambar();
+    }
+    void putarPanduan(jenis === 'awal' ? LANGKAH_AWAL : LANGKAH_DASBOR).then(() => {
+      st.tur = false;
+      segarkan();
+    });
+  }
+
+  /** Panduan otomatis sekali: layar awal, lalu dasbor saat pertama terisi. */
+  function turOtomatis(): void {
+    const jenis = !st.token ? 'awal' : st.siswa.length && !st.proyektor ? 'dasbor' : null;
+    if (!jenis || st.tur || bacaSimpanan(`${KUNCI_TUR}-${jenis}`)) return;
+    simpanSimpanan(`${KUNCI_TUR}-${jenis}`, '1');
+    window.setTimeout(() => turGuru(jenis), 400);
+  }
+
   function segarkan(): void {
-    if (!st.jalan) return;
+    if (!st.jalan || st.tur) return;
+    if (st.contoh) {
+      // Kelas contoh terasa hidup: tiap ~8 detik satu siswa maju.
+      if (Date.now() - st.majuPada >= 8000) {
+        st.contoh.majukan();
+        st.majuPada = Date.now();
+      }
+      const baru = st.contoh.siswa();
+      st.kabar = [...st.kabar.filter((k) => k.sampai > Date.now()), ...kabarBaik(st.siswa, baru)].slice(-6);
+      st.siswa = baru;
+      gambar();
+      return;
+    }
     if (!st.token) return;
     void ambilSesiGuru(st.token).then((res) => {
       if (!st.jalan) return;
@@ -136,14 +236,41 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
     segarkan();
   }
 
+  function mulaiContoh(): void {
+    st.contoh = buatKelasContoh();
+    st.token = '1234';
+    st.kunci = null;
+    st.siswa = st.contoh.siswa();
+    st.majuPada = Date.now();
+    st.tab = 'kelas';
+    st.dipilih = null;
+    gambar();
+    mulaiPolling();
+  }
+
+  function keluarContoh(): void {
+    window.clearInterval(st.timer);
+    Object.assign(st, { contoh: null, token: null, siswa: [], terkunci: false, jeda: false, kabar: [], dipilih: null, proyektor: false });
+    gambar();
+  }
+
+  const tombolContoh = el('button', {
+    class: 'btn secondary block tombol-contoh',
+    text: '👀 Lihat Contoh Kelas',
+    attrs: { type: 'button' },
+    on: { click: () => { sfx.click(); mulaiContoh(); } },
+  });
+
   function gambar(): void {
     const potong = panel.scrollTop;
     panel.replaceChildren(...isiPanel());
     panel.scrollTop = potong;
+    pojok.hidden = st.proyektor;
+    turOtomatis();
   }
 
   function isiPanel(): HTMLElement[] {
-    if (!onlineTersedia()) {
+    if (!onlineTersedia() && !st.contoh) {
       return [
         headerGuru(),
         el('div', {
@@ -156,7 +283,7 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
             }),
           ],
         }),
-        el('div', { class: 'stack', children: [kembali] }),
+        el('div', { class: 'stack', children: [tombolContoh] }),
       ];
     }
 
@@ -166,7 +293,7 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
         attrs: { type: 'text', placeholder: 'Nama guru (mis. Bu Rosy)', value: st.guru, maxlength: '30' },
       });
       const buat = el('button', {
-        class: 'btn block',
+        class: 'btn block tombol-buat-sesi',
         text: '🔑 Buat Sesi Kelas',
         attrs: { type: 'button' },
         on: {
@@ -201,7 +328,8 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
           ],
         }),
         el('div', { class: 'card', children: [inputGuru] }),
-        el('div', { class: 'stack', children: [buat, kembali] }),
+        el('p', { class: 'muted kecil-teks center-text', text: 'Ingin melihat dasbor terisi dulu? Buka kelas contoh berisi 31 siswa uji coba.' }),
+        el('div', { class: 'stack', children: [buat, tombolContoh] }),
       ];
     }
 
@@ -223,6 +351,17 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
     // Sudah punya token: tampilkan token besar + daftar siswa.
     const anak: HTMLElement[] = [
       headerGuru(),
+      ...(st.contoh
+        ? [
+            el('div', {
+              class: 'card warn',
+              children: [
+                el('span', { class: 'label-kecil', text: '🧪 MODE CONTOH' }),
+                el('p', { text: 'Data uji coba 31 siswa untuk melihat cara kerja dasbor. Tidak tersimpan dan tidak dikirim ke server. Tombol kendali bisa dicoba.' }),
+              ],
+            }),
+          ]
+        : []),
       el('div', {
         class: 'card token-card',
         children: [
@@ -253,11 +392,12 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
               }),
               el('button', {
                 class: 'btn kecil ghost',
-                text: '🔄 Ganti Sesi',
+                text: st.contoh ? '🚪 Keluar dari Contoh' : '🔄 Ganti Sesi',
                 attrs: { type: 'button' },
                 on: {
                   click: () => {
                     sfx.click();
+                    if (st.contoh) return keluarContoh();
                     window.clearInterval(st.timer);
                     st.token = null;
                     st.kunci = null;
@@ -280,6 +420,16 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
     }
 
     const kendali = async (aksi: Parameters<typeof kendaliGuru>[2], data: Parameters<typeof kendaliGuru>[3] = {}): Promise<boolean> => {
+      if (st.contoh) {
+        // Kelas contoh: kendali hanya mengubah layar ini.
+        if (aksi === 'kunci') st.terkunci = !!data.nilai;
+        else if (aksi === 'jeda') st.jeda = !!data.nilai;
+        else if (aksi === 'umum') showToast(`📢 Terkirim (contoh): ${data.teks ?? ''}`);
+        else if (aksi === 'nama' && data.id && data.nama) st.contoh.ubahNama(data.id, data.nama);
+        else if (aksi === 'keluarkan' && data.id) st.contoh.keluarkan(data.id);
+        if (aksi !== 'akhiri') segarkan();
+        return true;
+      }
       if (!st.token || !st.kunci) return false;
       const galat = await kendaliGuru(st.token, st.kunci, aksi, data);
       if (galat) showToast(galat);
@@ -291,7 +441,7 @@ export function renderGuru(_ctx: ScreenContext): HTMLElement {
     const isiUmum = el('input', { class: 'isian', attrs: { type: 'text', maxlength: '120', placeholder: 'Tulis pengumuman', style: 'flex:1 1 12rem' } });
     anak.push(
       el('div', {
-        class: 'card',
+        class: 'card kartu-kendali',
         children: [
           el('span', { class: 'label-kecil', text: 'Kendali kelas' }),
           el('div', {
@@ -322,6 +472,7 @@ CSV kelas diunduh otomatis. Semua siswa dilepas dan data di server dihapus.`)) r
               if (!ok) return;
               if (snapshot.length) eksporCsv(snapshot, tokenAkhir);
               window.clearInterval(st.timer);
+              st.contoh = null;
               st.token = null;
               st.kunci = null;
               st.siswa = [];
@@ -365,7 +516,7 @@ CSV kelas diunduh otomatis. Semua siswa dilepas dan data di server dihapus.`)) r
     });
     anak.push(
       el('div', {
-        class: 'card',
+        class: 'card kartu-kkm',
         children: [
           el('span', { class: 'label-kecil', text: 'KKM (batas tuntas, 1–100)' }),
           inputKkm,
@@ -376,7 +527,7 @@ CSV kelas diunduh otomatis. Semua siswa dilepas dan data di server dihapus.`)) r
 
     anak.push(
       el('div', {
-        class: 'row-tombol',
+        class: 'row-tombol tombol-csv',
         children: [
           el('button', {
             class: 'btn kecil secondary',
@@ -412,38 +563,94 @@ CSV kelas diunduh otomatis. Semua siswa dilepas dan data di server dihapus.`)) r
       anak.push(el('div', { class: 'guru-tabs', children: [tabTombol('kelas', '📊 Kelas'), tabTombol('soal', '❓ Soal'), tabTombol('siswa', '🧒 Siswa')] }));
       const perhatian = st.siswa.filter((s) => URUTAN_BALAI.some((k) => statusBalai(s.progress, k) === 'bantuan') || balaiBelumTuntas(s.progress, kkm).length > 0);
       if (st.tab === 'kelas' && perhatian.length) {
+        const babDari = (k: string): string => CERITA.find((c) => c.kode === k)?.bab ?? k;
+        const baris = (st.perhatianSemua ? perhatian : perhatian.slice(0, 5)).map((s, i) => {
+          const buka = (): void => { sfx.click(); st.tab = 'siswa'; st.dipilih = s.id; gambar(); };
+          return el('tr', {
+            attrs: { role: 'button', tabindex: '0' },
+            on: { click: buka, keydown: (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); buka(); } } },
+            children: [
+              el('td', { text: String(i + 1) }),
+              el('td', { class: 'nama-sel', text: s.nama }),
+              el('td', { text: s.online ? '🟢 online' : '⚪ offline' }),
+              el('td', { text: URUTAN_BALAI.filter((k) => statusBalai(s.progress, k) === 'bantuan').map(babDari).join(', ') || '-' }),
+              el('td', { text: balaiBelumTuntas(s.progress, kkm).map(babDari).join(', ') || '-' }),
+            ],
+          });
+        });
         anak.push(
           el('div', {
-            class: 'card warn',
+            class: 'card warn kartu-perhatian',
             children: [
               el('span', { class: 'label-kecil', text: `🆘 Perlu perhatian (${perhatian.length})` }),
-              ...perhatian.map((s) =>
-                el('button', {
-                  class: 'btn kecil ghost block',
-                  text: `${s.nama} · ${s.online ? 'online' : 'offline'} · ${URUTAN_BALAI.filter((k) => statusBalai(s.progress, k) === 'bantuan').length} balai butuh bantuan, ${balaiBelumTuntas(s.progress, kkm).length} belum tuntas`,
-                  attrs: { type: 'button' },
-                  on: { click: () => { sfx.click(); st.tab = 'siswa'; st.dipilih = s.id; gambar(); } },
-                }),
-              ),
+              el('div', {
+                class: 'tabel-gulir',
+                children: [
+                  el('table', {
+                    class: 'matriks tabel-perhatian',
+                    children: [
+                      el('thead', { children: [el('tr', { children: ['No', 'Nama', 'Status', '🆘 Butuh bantuan', `⚠️ Belum tuntas (KKM ${kkm})`].map((h) => el('th', { text: h })) })] }),
+                      el('tbody', { children: baris }),
+                    ],
+                  }),
+                ],
+              }),
+              ...(perhatian.length > 5
+                ? [el('button', {
+                    class: 'btn kecil ghost',
+                    text: st.perhatianSemua ? 'Tampilkan 5 saja' : `Lihat semua (${perhatian.length})`,
+                    attrs: { type: 'button' },
+                    on: { click: () => { sfx.click(); st.perhatianSemua = !st.perhatianSemua; gambar(); } },
+                  })]
+                : []),
             ],
           }),
         );
       }
-      if (st.tab === 'kelas') anak.push(...tabKelas(st.siswa));
+      if (st.tab === 'kelas') {
+        anak.push(...tabKelas(st.siswa, { babTerbuka: st.babTerbuka, pilihBab: (k) => { sfx.click(); st.babTerbuka = st.babTerbuka === k ? null : k; gambar(); } }));
+      }
       else if (st.tab === 'soal') anak.push(...tabSoal(st.siswa));
       else {
         const pilih = st.siswa.find((x) => x.id === st.dipilih);
         if (pilih) {
           anak.push(
-            el('button', { class: 'btn kecil ghost', text: '← Semua siswa', attrs: { type: 'button' }, on: { click: () => { st.dipilih = null; gambar(); } } }),
+            el('button', { class: 'btn kecil secondary', text: '← Semua siswa', attrs: { type: 'button' }, on: { click: () => { st.dipilih = null; gambar(); } } }),
             detailSiswa(pilih, {
               ubahNama: () => {
-                const nama = window.prompt('Nama baru untuk siswa ini:', pilih.nama)?.trim();
-                if (nama && nama.length >= 2) void kendali('nama', { id: pilih.id, nama });
+                const isian = el('input', { class: 'isian', attrs: { type: 'text', value: pilih.nama, maxlength: '24', 'aria-label': 'Nama baru', style: 'width:100%;margin:0 0 12px' } });
+                const { root: dialog } = showDialog({
+                  tokoh: 'Ubah nama siswa',
+                  ikon: '✏️',
+                  teks: `Nama baru untuk ${pilih.nama}:`,
+                  aksi: '💾 Simpan',
+                  onBatal: () => sfx.click(),
+                  onAksi: () => {
+                    sfx.click();
+                    const nama = isian.value.trim();
+                    if (nama.length < 2) showToast('Nama minimal 2 huruf.');
+                    else if (nama !== pilih.nama) void kendali('nama', { id: pilih.id, nama });
+                  },
+                });
+                dialog.querySelector('.dialog-text')?.after(isian);
+                isian.addEventListener('keydown', (e) => { if (e.key === 'Enter') dialog.querySelector<HTMLButtonElement>('.stack .btn')?.click(); });
+                document.body.append(dialog);
+                isian.focus();
+                isian.select();
               },
               keluarkan: () => {
-                if (!window.confirm(`Keluarkan ${pilih.nama} dari kelas? Siswa ini tidak bisa bergabung lagi.`)) return;
-                void kendali('keluarkan', { id: pilih.id }).then((ok) => { if (ok) { st.dipilih = null; gambar(); } });
+                const { root: dialog } = showDialog({
+                  tokoh: `Keluarkan ${pilih.nama}?`,
+                  ikon: '🚫',
+                  teks: 'Siswa ini dikeluarkan dari kelas dan tidak bisa bergabung lagi dengan token ini.',
+                  aksi: '🚫 Ya, keluarkan',
+                  onBatal: () => sfx.click(),
+                  onAksi: () => {
+                    sfx.click();
+                    void kendali('keluarkan', { id: pilih.id }).then((ok) => { if (ok) { st.dipilih = null; gambar(); } });
+                  },
+                });
+                document.body.append(dialog);
               },
             }),
           );
@@ -461,7 +668,6 @@ CSV kelas diunduh otomatis. Semua siswa dilepas dan data di server dihapus.`)) r
       }
     }
 
-    anak.push(el('div', { class: 'stack', children: [kembali] }));
     return anak;
   }
 
@@ -541,7 +747,43 @@ function ringkasKelas(siswa: RosterSiswa[]): { totalBintang: number; persenBenar
 /* Tab analisis                                                        */
 /* ------------------------------------------------------------------ */
 
-function tabKelas(siswa: RosterSiswa[]): HTMLElement[] {
+/** Keterangan kecil di dekat sel yang diketuk (title tidak muncul di layar sentuh). */
+function tampilkanTip(sel: HTMLElement): void {
+  document.querySelector('.tip-sel')?.remove();
+  const r = sel.getBoundingClientRect();
+  const tip = el('div', { class: 'tip-sel', text: sel.dataset.tip ?? '', attrs: { role: 'status' } });
+  document.body.append(tip);
+  tip.style.left = `${Math.max(8, Math.min(window.innerWidth - tip.offsetWidth - 8, r.left + r.width / 2 - tip.offsetWidth / 2))}px`;
+  tip.style.top = `${Math.max(8, r.top - tip.offsetHeight - 6)}px`;
+  window.setTimeout(() => tip.remove(), 2500);
+}
+
+function diagramPerjalanan(siswa: RosterSiswa[], opsi: { babTerbuka: string | null; pilihBab: (kode: string) => void }): HTMLElement {
+  const sebaran = sebaranPerjalanan(siswa);
+  const maks = Math.max(1, ...sebaran.map((b) => b.siswa.length));
+  return el('div', {
+    class: 'card kartu-perjalanan',
+    children: [
+      el('span', { class: 'label-kecil', text: '🧭 Perjalanan siswa (posisi sekarang per bab)' }),
+      ...sebaran.flatMap((b) => {
+        const buka = opsi.babTerbuka === b.kode;
+        const baris = el('button', {
+          class: `bar-materi bar-perjalanan ${buka ? 'aktif' : ''}`,
+          attrs: { type: 'button', 'aria-expanded': String(buka) },
+          on: { click: () => opsi.pilihBab(b.kode) },
+          children: [
+            el('span', { class: 'bar-label', text: b.label }),
+            el('span', { class: 'bar-isi', children: [el('span', { attrs: { style: `width:${(b.siswa.length / maks) * 100}%` } })] }),
+            el('span', { class: 'bar-nilai', text: `${b.siswa.length} siswa` }),
+          ],
+        });
+        return buka ? [baris, el('p', { class: 'muted kecil-teks nama-perjalanan', text: b.siswa.join(', ') || 'Tidak ada siswa di sini.' })] : [baris];
+      }),
+    ],
+  });
+}
+
+function tabKelas(siswa: RosterSiswa[], opsi: { babTerbuka: string | null; pilihBab: (kode: string) => void }): HTMLElement[] {
   const kepala = el('tr', {
     children: [el('th', { text: 'Siswa' }), ...URUTAN_BALAI.map((k) => el('th', { text: String(CERITA.find((c) => c.kode === k)?.urutan ?? k), attrs: { title: k } }))],
   });
@@ -551,12 +793,17 @@ function tabKelas(siswa: RosterSiswa[]): HTMLElement[] {
         el('td', { class: 'nama-sel', text: s.nama }),
         ...URUTAN_BALAI.map((k) => {
           const st = statusBalai(s.progress, k);
-          return el('td', { class: `sel-${st}`, text: LABEL_STATUS[st].ikon, attrs: { title: `${k}: ${LABEL_STATUS[st].teks}` } });
+          const c = CERITA.find((x) => x.kode === k);
+          const tip = `${s.nama} · ${c ? `${c.bab} ${c.judulBab}` : k}: ${LABEL_STATUS[st].teks}`;
+          return el('td', { class: `sel-${st}`, text: LABEL_STATUS[st].ikon, attrs: { title: tip, 'data-tip': tip } });
         }),
       ],
     }),
   );
-  const tabel = el('div', { class: 'tabel-gulir', children: [el('table', { class: 'matriks', children: [el('thead', { children: [kepala] }), el('tbody', { children: baris })] })] });
+  const tabel = el('div', {
+    class: 'tabel-gulir',
+    on: { click: (e) => { const td = (e.target as HTMLElement).closest<HTMLElement>('td[data-tip]'); if (td) tampilkanTip(td); } },
+    children: [el('table', { class: 'matriks matriks-kemajuan', children: [el('thead', { children: [kepala] }), el('tbody', { children: baris })] })] });
   const legenda = el('p', {
     class: 'muted kecil-teks',
     text: Object.values(LABEL_STATUS).map((l) => `${l.ikon} ${l.teks}`).join(' · '),
@@ -572,7 +819,8 @@ function tabKelas(siswa: RosterSiswa[]): HTMLElement[] {
     }),
   );
   return [
-    el('div', { class: 'card', children: [el('span', { class: 'label-kecil', text: 'Kemajuan siswa per balai (urut bab)' }), tabel, legenda] }),
+    diagramPerjalanan(siswa, opsi),
+    el('div', { class: 'card', children: [el('span', { class: 'label-kecil', text: 'Kemajuan siswa per balai (urut bab)' }), el('p', { class: 'muted kecil-teks', text: '👆 Ketuk ikon untuk melihat keterangan.' }), tabel, legenda] }),
     el('div', { class: 'card', children: [el('span', { class: 'label-kecil', text: 'Persen benar kelas per bab' }), ...materi] }),
   ];
 }

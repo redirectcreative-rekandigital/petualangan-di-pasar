@@ -156,6 +156,31 @@ export function rekomendasi(p: ProgresSiswa): string[] {
   return saran;
 }
 
+export interface PosisiBab {
+  kode: string;
+  label: string;
+  siswa: string[];
+}
+
+/** Sebaran posisi siswa sekarang: balai pertama yang belum lulus, lalu Final, lalu Selesai. */
+export function sebaranPerjalanan(siswa: SiswaRingkas[]): PosisiBab[] {
+  const hasil: PosisiBab[] = [
+    ...URUTAN_BALAI.map((kode) => {
+      const c = CERITA.find((x) => x.kode === kode);
+      return { kode, label: c ? `${c.bab} ${c.judulBab}` : kode, siswa: [] as string[] };
+    }),
+    { kode: 'FINAL', label: '🗼 Final Mercusuar', siswa: [] },
+    { kode: 'SELESAI', label: '🏁 Selesai', siswa: [] },
+  ];
+  for (const s of siswa) {
+    const p = s.progress;
+    const i = URUTAN_BALAI.findIndex((k) => (p.bintang?.[k] ?? 0) < 1 && (p.tahap?.[k] ?? 0) < 3);
+    const kode = i >= 0 ? URUTAN_BALAI[i] : p.puncakLulus ? 'SELESAI' : 'FINAL';
+    hasil.find((h) => h.kode === kode)?.siswa.push(s.nama);
+  }
+  return hasil;
+}
+
 /** Ringkasan per siswa per balai untuk ekspor CSV. */
 export function barisCsvSiswa(s: SiswaRingkas): string[] {
   const p = s.progress;

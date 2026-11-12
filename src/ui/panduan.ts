@@ -108,6 +108,7 @@ export function langkahPanduan(id: IdPanduan, opsi: { online?: boolean } = {}): 
 function kotakTarget(selektor: string | undefined): DOMRect | null {
   if (!selektor) return null;
   const elemen = [...document.querySelectorAll<HTMLElement>(selektor)].find((e) => e.offsetParent !== null || getComputedStyle(e).position === 'fixed');
+  elemen?.scrollIntoView?.({ block: 'center' });
   const r = elemen?.getBoundingClientRect();
   return r && r.width > 0 && r.height > 0 ? r : null;
 }
@@ -148,6 +149,12 @@ export function putarPanduan(langkah: LangkahPanduan[], host: HTMLElement = docu
       const diBawah = r.top + r.height / 2 < window.innerHeight / 2;
       balon.style.top = diBawah ? `${Math.min(r.bottom + jarak * 2, window.innerHeight - 160)}px` : '';
       balon.style.bottom = diBawah ? '' : `${Math.max(window.innerHeight - r.top + jarak * 2, 12)}px`;
+      // Target lebih tinggi dari layar (mis. HP landscape): balon jangan sampai keluar layar.
+      const b = balon.getBoundingClientRect();
+      if (b.top < 8 || b.bottom > window.innerHeight - 8) {
+        balon.style.top = '';
+        balon.style.bottom = '12px';
+      }
     };
 
     const tutup = (): void => {

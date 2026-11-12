@@ -8,7 +8,17 @@
 - **Jenjang/kelas sasaran:** Kelas 5 SD/MI
 - **Mata pelajaran:** IPAS (Bab 1 sampai Bab 9)
 - **Platform AI:** Claude (Anthropic)
+- **Link Siswa (game):** <https://sains-edu.sdmuhwonorejo.com/>
+- **Link Guru (dasbor):** <https://sains-edu.sdmuhwonorejo.com/modeguru>
 - **Teknologi:** game web (HTML, CSS, TypeScript), Three.js untuk 3D, SVG untuk ilustrasi, Web Speech API untuk narasi suara, Node.js + WebSocket untuk mode kelas, PWA
+
+## Cara Juri Melihat Mode Guru
+
+1. Buka **Link Guru** di laptop, lalu buat sesi kelas. Token 4 digit akan muncul.
+2. Buka **Link Siswa** di HP, pilih mode kelas, lalu masukkan token tersebut.
+3. Mainkan satu balai. Dasbor guru langsung terisi: hasil siswa, soal tersulit, miskonsepsi, dan ekspor CSV.
+
+Mode Guru juga bisa dibuka dari game: popup info awal (tautan "buka Mode Guru") atau menu ☰ Lainnya → Tentang Game → **Buka Mode Guru**.
 
 ## Ringkasan
 

@@ -4,7 +4,7 @@ import { z } from 'zod';
  * Skema zod untuk memvalidasi file bank soal JSON sebelum dimainkan.
  * Jika bank soal tidak valid, game menampilkan pesan ramah, bukan crash.
  *
- * Versi IPA Kelas 5 SD/MI "Survival Sains": seluruh soal berjenis
+ * Versi IPAS Kelas 5 SD/MI "Survival Sains": seluruh soal berjenis
  * pilihan ganda (A–D).
  */
 

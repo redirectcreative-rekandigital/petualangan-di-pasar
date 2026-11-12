@@ -230,7 +230,7 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
           kartuKelas,
           sapaan,
           el('div', { class: 'stack cover-tombol', children: [mulai, mulaiBaru, tombolKelas, lainnya] }),
-          el('p', { class: 'footer-note', text: t('Game Edukasi IPA · {jenjang} · © 2026', { jenjang: APP_INFO.jenjang }) }),
+          el('p', { class: 'footer-note', text: t('Game Edukasi IPAS · {jenjang} · © 2026', { jenjang: APP_INFO.jenjang }) }),
         ],
       }),
     ]);

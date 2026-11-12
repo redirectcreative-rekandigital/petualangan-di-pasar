@@ -1,5 +1,5 @@
 /**
- * Menghasilkan bank soal IPA Kelas 5 dari Bank_Soal_IPA_Kelas5_SD.md.
+ * Menghasilkan bank soal IPAS Kelas 5 dari Bank_Soal_IPA_Kelas5_SD.md.
  *
  * Sumber: 9 bab × 10 soal pilihan ganda (A–D) = 90 soal.
  * Pemetaan bab -> noktah/balai:

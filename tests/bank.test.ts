@@ -6,10 +6,10 @@ import { NOKTAH, SEMUA_BALAI, noktahMateri } from '../src/data/balai';
 import { genderPenjaga } from '../src/world/karakter';
 
 /**
- * Uji integritas & verifikasi kunci jawaban bank soal IPA "Survival Sains".
+ * Uji integritas & verifikasi kunci jawaban bank soal IPAS "Survival Sains".
  */
 
-describe('bank soal IPA', () => {
+describe('bank soal IPAS', () => {
   const bank = getQuestionBank();
 
   // Validasi skema hanya di test/build (tidak lagi di HP siswa, lihat data/bank.ts).

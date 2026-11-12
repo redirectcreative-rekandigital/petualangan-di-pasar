@@ -8,18 +8,18 @@ const STORAGE_KEY = 'survival-sains:progress:v1';
 
 export const APP_INFO = {
   judul: 'Survival Sains',
-  subjudul: t('Petualangan bertahan hidup dengan ilmu IPA untuk Kelas 5 SD/MI'),
+  subjudul: t('Petualangan bertahan hidup dengan ilmu IPAS untuk Kelas 5 SD/MI'),
   pembuat: 'Rosyitania Yudha Astari, S.Pd',
   sekolah: t('Guru SD Muhammadiyah Wonorejo Polokarto'),
   jenjang: t('Kelas 5 SD/MI'),
-  mapel: t('IPA (Ilmu Pengetahuan Alam)'),
+  mapel: t('IPAS (Ilmu Pengetahuan Alam dan Sosial)'),
   platformAi: 'Claude (Anthropic) untuk ide, naskah, kode, dan pengujian',
-  konteks: t('Penguatan materi IPA kelas 5: cahaya, bunyi, ekosistem, rantai makanan, simbiosis, kelestarian, magnet, listrik, dan bumi'),
+  konteks: t('Penguatan materi IPAS kelas 5: cahaya, bunyi, ekosistem, rantai makanan, simbiosis, kelestarian, magnet, listrik, dan bumi'),
   nilaiKarakter:
     t('Rasa ingin tahu yang santun dan sayang pada alam. Alam adalah tanda kebesaran Allah, dan manusia adalah khalifah penjaga bumi.'),
   tujuan: [
-    t('Memahami 9 bab IPA kelas 5 lewat 11 Halaman Cerita bergambar dan interaktif.'),
-    t('Menerapkan konsep IPA untuk memecahkan masalah bertahan hidup di setiap balai.'),
+    t('Memahami 9 bab IPAS kelas 5 lewat 11 Halaman Cerita bergambar dan interaktif.'),
+    t('Menerapkan konsep IPAS untuk memecahkan masalah bertahan hidup di setiap balai.'),
     t('Menjawab soal pilihan ganda dengan umpan balik dan petunjuk yang merujuk ke cerita.'),
     t('Menyelesaikan Final di Mercusuar Tua (30 soal) dengan batas lulus 70%.'),
   ],

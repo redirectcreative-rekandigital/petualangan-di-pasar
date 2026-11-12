@@ -72,7 +72,7 @@ export function renderResult(ctx: ScreenContext): HTMLElement {
           el('h2', { text: APP_INFO.judul }),
           el('p', { class: 'muted', text: t('Sertifikat "Penyintas Sains" diberikan kepada') }),
           namaPreview,
-          el('p', { class: 'muted', text: t('atas keberhasilan menyalakan Mercusuar Tua dengan 11 bekal ilmu IPA.') }),
+          el('p', { class: 'muted', text: t('atas keberhasilan menyalakan Mercusuar Tua dengan 11 bekal ilmu IPAS.') }),
           el('p', { class: 'muted', text: t('Total bintang: {v0} dari {v1} · Final: {totalFinal}/30', { v0: totalStars(progress), v1: maxStars(), totalFinal }) }),
           el('p', { class: 'muted', text: t('Akurasi jawaban: {akurasi}% ({totalBenar}/{totalSoal})', { akurasi, totalBenar, totalSoal }) }),
           el('p', {

@@ -223,7 +223,7 @@ function isiPetunjuk(): HTMLElement[] {
           el('ul', {
             class: 'tujuan',
             children: [
-              el('li', { text: t('Balai dibuka berurutan mengikuti bab buku IPA kelas 5 (Bab 1 Cahaya sampai Bab 9 Bumi).') }),
+              el('li', { text: t('Balai dibuka berurutan mengikuti bab buku IPAS kelas 5 (Bab 1 Cahaya sampai Bab 9 Bumi).') }),
               el('li', { text: t('Setiap balai: misi dari Penjaga → Halaman Cerita → tantangan di Tempat Uji → pulang lewat gerbang.') }),
               el('li', { text: t('Tempat Uji terbuka setelah Halaman Cerita selesai dibaca.') }),
               el('li', { text: t('3 soal per balai, 3 hati ❤️ per soal. 3 benar = ⭐⭐⭐, 2 = ⭐⭐, 1 = ⭐. Minimal 1 bintang untuk lulus.') }),

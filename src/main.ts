@@ -303,7 +303,9 @@ async function buildPeta(options: Record<string, unknown>): Promise<void> {
       warnaPakaian: progress.warnaBaju,
       warnaBawahan: progress.warnaBawahan,
       warnaHijab: progress.gender === 'perempuan' ? progress.warnaHijab : undefined,
+      kostum: kostumDari(progress),
     },
+    kabutTersibak: options.kabutTersibak as NoktahId | undefined,
   });
   petaSession = {
     handle,
@@ -316,6 +318,8 @@ async function buildPeta(options: Record<string, unknown>): Promise<void> {
   tambahkanZoomPeta(handle);
   await handle.siap.catch((err: unknown) => console.error(err));
   loading.tutup();
+  if (petaSession?.handle !== handle) return;
+  await handle.sibakKabut();
   if (petaSession?.handle !== handle) return;
   await panduan('peta');
   if (petaSession?.handle !== handle) return;
@@ -1052,7 +1056,8 @@ async function keluarLewatGerbang(): Promise<void> {
     tahap === 3 && berikut
       ? t('Kabut tersibak! Jalan ke {tempat} terbuka.', { tempat: getCerita(berikut)?.tempat ?? berikut })
       : undefined;
-  navigate('map', { pesan, pesanLoading: t('Kembali ke peta pulau...') });
+  const kabutTersibak = tahap === 3 && berikut && !progress.misi[balaiKey(berikut)] ? berikut : undefined;
+  navigate('map', { pesan, kabutTersibak, pesanLoading: t('Kembali ke peta pulau...') });
 }
 
 /* ---------- Tas survival ---------- */
@@ -1455,7 +1460,7 @@ boot();
   masukBalai: (kode: NoktahId, prolog = false) => navigate('noktah', { noktah: kode, prolog }),
   pindahKe: (peran: PeranTitik) => session?.world.pindahKe(peran) ?? false,
   interaksi: () => (mercusuar ? mercusuar.interaksi() : handleInteract()),
-  kePeta: () => navigate('map'),
+  kePeta: (opsi: Record<string, unknown> = {}) => navigate('map', opsi),
   petaLayar: () => petaSession?.handle.posisiLayar() ?? null,
   keFinal: () => navigate('final'),
   pintuMercusuar: (i: number) => mercusuar?.world.pindahKePintu(i),

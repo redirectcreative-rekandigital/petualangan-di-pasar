@@ -12,7 +12,7 @@ import type {
 import { CERITA, URUTAN_BALAI, getCerita } from './cerita';
 
 /**
- * Peta belajar "Survival Sains" (IPA Kelas 5 SD/MI).
+ * Peta belajar "Survival Sains" (IPAS Kelas 5 SD/MI).
  *
  * Peta besar berbentuk kitab terbuka berisi 11 NOKTAH materi, dikelompokkan
  * ke 3 zona: Makhluk Hidup (H), Fisika (F), dan Bumi (E). Setiap noktah
@@ -675,7 +675,7 @@ const NOKTAH_ASLI: NoktahMeta[] = [
   {
     kode: 'FINAL',
     nama: 'Menara Kitab',
-    materi: 'Tantangan puncak: campuran semua materi IPA',
+    materi: 'Tantangan puncak: campuran semua materi IPAS',
     elemen: 'Bumi',
     peta: FINAL_POSISI,
     balai: [
@@ -691,7 +691,7 @@ const NOKTAH_ASLI: NoktahMeta[] = [
           pengantar:
             'Bacalah setiap soal dengan teliti. Gunakan semua rahasia alam yang telah kamu catat.',
         },
-        materi: 'Tantangan puncak: campuran semua materi IPA',
+        materi: 'Tantangan puncak: campuran semua materi IPAS',
         elemen: 'Bumi',
         urutan: 0,
         materiPoin: [

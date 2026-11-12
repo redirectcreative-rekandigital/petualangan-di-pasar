@@ -6,7 +6,7 @@
 - **Pembuat:** Rosyitania Yudha Astari, S.Pd
 - **Sekolah:** SD Muhammadiyah Wonorejo Polokarto
 - **Jenjang/kelas sasaran:** Kelas 5 SD/MI
-- **Mata pelajaran:** IPA (Bab 1 sampai Bab 9)
+- **Mata pelajaran:** IPAS (Bab 1 sampai Bab 9)
 - **Platform AI:** Claude (Anthropic)
 - **Teknologi:** game web (HTML, CSS, TypeScript), Three.js untuk 3D, SVG untuk ilustrasi, Web Speech API untuk narasi suara, Node.js + WebSocket untuk mode kelas, PWA
 
@@ -14,7 +14,7 @@
 
 Survival Sains adalah game petualangan 3D bergaya RPG. Siswa berperan sebagai penjelajah cilik yang terdampar di Pulau Wonorejo setelah badai. Untuk pulang, siswa harus menyalakan Mercusuar Tua di puncak pulau.
 
-Sembilan Penjaga pulau menyimpan bekal ilmu dan alat survival. Setiap alat hanya diberikan setelah siswa memahami materinya: membaca Halaman Cerita lalu lulus tantangan soal. Materi IPA dipakai langsung untuk bertahan hidup, sehingga siswa melihat gunanya belajar.
+Sembilan Penjaga pulau menyimpan bekal ilmu dan alat survival. Setiap alat hanya diberikan setelah siswa memahami materinya: membaca Halaman Cerita lalu lulus tantangan soal. Materi IPAS dipakai langsung untuk bertahan hidup, sehingga siswa melihat gunanya belajar.
 
 ## Tujuan Pembelajaran
 
@@ -87,7 +87,7 @@ Dasbor guru memperbarui data setiap 3 detik:
 
 ## Manfaat
 
-- **Bagi siswa:** belajar IPA lewat cerita yang runtut. Materi dibacakan dengan suara, dilengkapi gambar bergerak dan latihan langsung. Kesalahan menjadi bagian dari belajar.
+- **Bagi siswa:** belajar IPAS lewat cerita yang runtut. Materi dibacakan dengan suara, dilengkapi gambar bergerak dan latihan langsung. Kesalahan menjadi bagian dari belajar.
 - **Bagi guru:** dapat memantau ketuntasan per bab dan per siswa, menemukan miskonsepsi kelas, dan menyiapkan bimbingan ulang yang tepat sasaran.
 - **Bagi sekolah:** media yang berjalan di HP siswa, bisa dipasang offline, dan tidak membutuhkan biaya lisensi.
 

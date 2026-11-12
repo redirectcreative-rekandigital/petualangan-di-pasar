@@ -2,10 +2,10 @@
  * Tipe bersama (dipakai engine, layar, dan bank soal).
  * Salinan TS dari skema zod di src/data/schema.ts.
  *
- * Versi 5: struktur "kitab noktah + balai" untuk game IPA Kelas 5 SD/MI
+ * Versi 5: struktur "kitab noktah + balai" untuk game IPAS Kelas 5 SD/MI
  * "Survival Sains".
  *
- * - Peta besar berbentuk kitab berisi 11 NOKTAH materi IPA, dikelompokkan ke
+ * - Peta besar berbentuk kitab berisi 11 NOKTAH materi IPAS, dikelompokkan ke
  *   3 zona (Makhluk Hidup `H`, Fisika `F`, Bumi `E`).
  * - Tiap noktah punya 1 BALAI (rumah penjaga) di dalamnya. Setiap balai
  *   memiliki 2 tokoh: Penjaga (misi/dialog) dan Tokoh Materi (membawakan
@@ -13,7 +13,7 @@
  * - Satu noktah khusus (`FINAL`) untuk babak puncak "Menara Kitab".
  */
 
-/** Kode materi pada peta: 11 noktah IPA (H=Makhluk Hidup, F=Fisika, E=Bumi). */
+/** Kode materi pada peta: 11 noktah IPAS (H=Makhluk Hidup, F=Fisika, E=Bumi). */
 export type MateriKode =
   | 'H01'
   | 'H02'

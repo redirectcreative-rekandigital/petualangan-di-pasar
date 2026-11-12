@@ -8,6 +8,9 @@ import { loadModel, klonModel, lepasModel } from './loaders';
 import { buangRenderer, siapkanRender } from './scene';
 import { modeRingan, saatRingan, catatFrame } from '../core/kualitas';
 import { buatKarakter, type KarakterRig } from './karakter';
+import { cobaAvatarGlb, type AvatarModel } from './avatarModel';
+import type { PilihanKostum } from './kostum';
+import { sfx } from '../core/sound';
 import type { Elemen, NoktahId, NoktahMeta } from '../../shared/types';
 
 /**
@@ -46,7 +49,14 @@ export interface PetaBesarOptions {
     warnaPakaian?: number;
     warnaBawahan?: number;
     warnaHijab?: number;
+    /** Kostum avatar GLB (sama dengan di balai). */
+    kostum?: PilihanKostum;
   };
+  /**
+   * Balai yang baru terbuka: kabutnya tetap tampil sampai `sibakKabut()`
+   * dipanggil, lalu tersibak dengan animasi.
+   */
+  kabutTersibak?: NoktahId;
   /** Batas devicePixelRatio. */
   pixelRatioCap?: number;
 }
@@ -59,6 +69,8 @@ export interface PetaBesarHandle {
   zoom: (faktor: number) => void;
   /** Kembali menyorot tujuan berikutnya dari dekat. */
   fokusTujuan: () => void;
+  /** Memutar animasi kabut tersibak (`kabutTersibak`); selesai saat kabut hilang. */
+  sibakKabut: () => Promise<void>;
   /** Posisi layar (px) tiap balai, untuk uji otomatis. */
   posisiLayar: () => Array<{ kode: NoktahId; x: number; y: number }>;
   /** Selesai saat rumah GLB termuat dan shader/tekstur sudah disiapkan (tutup loading). */
@@ -235,8 +247,11 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
     warnaPakaian?: number;
     warnaBawahan?: number;
     warnaHijab?: number;
+    kostum?: PilihanKostum;
   };
   let pemainRig: KarakterRig | null = null;
+  /** Avatar GLB berkostum (sama dengan di balai); null = masih karakter prosedural. */
+  let pemainGlb: AvatarModel | null = null;
   let pemainRing: THREE.Mesh | null = null;
   const pemainGroup = new THREE.Group();
   pemainGroup.visible = false;
@@ -271,6 +286,19 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
 
       pemainRig = rig;
       pemainRing = ring;
+
+      // Ganti dengan avatar GLB sesuai karakter & kostum pilihan (prosedural = cadangan).
+      void cobaAvatarGlb(tampilan.gender, tampilan.kostum, 1.85).then((model) => {
+        if (!model) return;
+        if (!berjalan) {
+          model.dispose();
+          return;
+        }
+        pemainGlb = model;
+        disposables.push(model);
+        pemainGroup.remove(rig.group);
+        pemainGroup.add(model.group);
+      });
     }
     return { rig: pemainRig, ring: pemainRing };
   }
@@ -290,10 +318,14 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
 
   perbaruiPemain();
 
+  let tahanKabut: NoktahId | null = options.kabutTersibak ?? null;
+  let sibak: { p: PulauNoktah; mulai: number; selesai: () => void } | null = null;
+  const LAMA_SIBAK = 2.2;
+
   function perbaruiWarna(): void {
     for (const p of pulauList) {
       const st = options.getStatus(p.kode);
-      p.kabut.visible = st.terkunci;
+      p.kabut.visible = st.terkunci || p.kode === tahanKabut;
       p.labelMat.opacity = st.terkunci ? 0.45 : 0.95;
       if (st.terkunci) {
         p.pinMat.color.setHex(0x9ca3af);
@@ -735,9 +767,36 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
       if (g.position.x > 120) g.position.x = -120;
     }
 
+    // Kabut tersibak: gumpalan melebar ke luar, naik, lalu memudar.
+    if (sibak) {
+      const k = Math.min(1, (t - sibak.mulai) / LAMA_SIBAK);
+      const halus = 1 - (1 - k) ** 3;
+      for (const m of sibak.p.kabut.children) {
+        const asal = m.userData.asal as THREE.Vector3;
+        m.position.set(asal.x * (1 + halus * 2.2), asal.y + halus * 4, asal.z * (1 + halus * 2.2));
+      }
+      sibak.p.kabut.scale.setScalar(1 + halus * 0.6);
+      const mat = (sibak.p.kabut.children[0] as THREE.Mesh).material as THREE.MeshLambertMaterial;
+      mat.opacity = 0.82 * (1 - halus);
+      // Pin balai melompat kecil saat kabut hampir hilang.
+      if (k > 0.6) sibak.p.pin.scale.setScalar(1 + Math.sin(((k - 0.6) / 0.4) * Math.PI) * 0.5);
+      if (k >= 1) {
+        for (const m of sibak.p.kabut.children) m.position.copy(m.userData.asal as THREE.Vector3);
+        sibak.p.kabut.scale.setScalar(1);
+        mat.opacity = 0.82;
+        sibak.p.pin.scale.setScalar(1);
+        tahanKabut = null;
+        sibak.p.kabut.visible = false;
+        const selesai = sibak.selesai;
+        sibak = null;
+        selesai();
+      }
+    }
+
     // Ikon pemain: napas, sedikit goyang, dan cincin berdenyut.
+    if (pemainGroup.visible && pemainGlb) pemainGlb.update(0, dt);
     if (pemainGroup.visible && pemainRig && pemainRing) {
-      pemainRig.idle(t, 0.3);
+      if (!pemainGlb) pemainRig.idle(t, 0.3);
       pemainGroup.rotation.y = Math.sin(t * 0.6) * 0.35;
       const denyut = 1 + Math.sin(t * 2.4) * 0.12;
       pemainRing.scale.setScalar(denyut);
@@ -783,6 +842,17 @@ export function createPetaBesar(canvas: HTMLCanvasElement, options: PetaBesarOpt
       render();
     },
     zoom: zoomKe,
+    sibakKabut: () => {
+      const p = tahanKabut ? pulauList.find((x) => x.kode === tahanKabut) : undefined;
+      if (!p || !berjalan) {
+        tahanKabut = null;
+        return Promise.resolve();
+      }
+      sfx.buka();
+      return new Promise<void>((selesai) => {
+        sibak = { p, mulai: performance.now() / 1000, selesai };
+      });
+    },
     fokusTujuan: () => {
       // Lepas fokus geseran pemain: kamera kembali mengikuti tujuan berikutnya.
       fokusGeser = null;
@@ -899,11 +969,13 @@ function buatPulau(
     const s = (i / 6) * Math.PI * 2;
     m.position.set(Math.cos(s) * 2.6, 2.2 + (i % 2) * 0.7, Math.sin(s) * 2.6);
     m.scale.set(2.6, 1.6, 2.6);
+    m.userData.asal = m.position.clone();
     kabut.add(m);
   }
   const tengah = new THREE.Mesh(kabutGeo, kabutMat);
   tengah.position.y = 3.2;
   tengah.scale.set(3.4, 2.2, 3.4);
+  tengah.userData.asal = tengah.position.clone();
   kabut.add(tengah);
   kabut.visible = false;
   group.add(kabut);

@@ -1,4 +1,4 @@
-# Bank Soal dan Materi IPA Kelas 5 SD
+# Bank Soal dan Materi IPAS Kelas 5 SD
 
 > Format: setiap soal memiliki ID unik `bXX-sYY` (bab-soal), pilihan A–D, dan baris `Jawaban`. Mudah di-parse dengan regex.
 

@@ -8,7 +8,7 @@ import type { BusanaNusantara } from '../world/karakter';
  * Pemain, anggota termuda Kapal Ekspedisi Sains, terdampar di Pulau Wonorejo
  * setelah badai. Untuk pulang, ia harus menyalakan Mercusuar Tua di
  * puncak pulau. Sembilan Penjaga pulau masing-masing menyimpan bekal ilmu dan
- * satu alat survival. Balai dibuka berurutan mengikuti bab buku IPA kelas 5.
+ * satu alat survival. Balai dibuka berurutan mengikuti bab buku IPAS kelas 5.
  *
  * Nilai keislaman & kemuhammadiyahan: salam di setiap pertemuan, basmalah
  * sebelum tantangan, hamdalah setelah lulus, alam sebagai tanda kebesaran

@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Survival Sains - game petualangan IPA kelas 5 SD/MI: terdampar di Pulau Wonorejo, pelajari 9 bab IPA bersama 9 penjaga, lalu nyalakan Mercusuar Tua.",
+  "description": "Survival Sains - game petualangan IPAS kelas 5 SD/MI: terdampar di Pulau Wonorejo, pelajari 9 bab IPAS bersama 9 penjaga, lalu nyalakan Mercusuar Tua.",
   "scripts": {
     "dev": "node scripts/dev.mjs",
     "dev:vite": "vite",

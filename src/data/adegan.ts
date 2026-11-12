@@ -2,7 +2,7 @@ import { lokalkan } from '../core/bahasa';
 import type { MateriKode } from '../../shared/types';
 
 /**
- * Halaman Cerita: materi IPA dikemas sebagai cerita bergambar 4 adegan.
+ * Halaman Cerita: materi IPAS dikemas sebagai cerita bergambar 4 adegan.
  *
  * Setiap adegan digambar sebagai SVG 320×200 (latar + sprite emoji/garis
  * beranimasi CSS) dengan narasi pendek yang dibacakan TTS. Adegan terakhir

@@ -268,12 +268,15 @@ code {
 
 .tombol-bahasa {
   min-height: 44px;
-  padding: 0 14px;
+  padding: 0 36px 0 14px;
   border-radius: var(--r-tombol);
   border: 2px solid var(--hijau);
-  background: transparent;
+  /* panah dropdown sendiri karena appearance: none */
+  background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%231f6f4a' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 14px center;
   color: var(--hijau-tua);
   font: 700 0.95rem var(--font-judul);
+  appearance: none;
+  cursor: pointer;
 }
 
 .tombol-bahasa:hover {
@@ -284,9 +287,68 @@ code {
   transform: translateY(1px);
 }
 
+.tombol-menu {
+  display: grid;
+  align-content: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0 11px;
+  border: 2px solid var(--hijau);
+  border-radius: var(--r-tombol);
+  background: transparent;
+}
+
+.tombol-menu span {
+  height: 2px;
+  background: var(--hijau-tua);
+  border-radius: 2px;
+  transition: transform 0.2s, opacity 0.2s;
+}
+
+.kepala.buka .tombol-menu span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.kepala.buka .tombol-menu span:nth-child(2) {
+  opacity: 0;
+}
+
+.kepala.buka .tombol-menu span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+@media (max-width: 999px) {
+  .kepala-kanan .tombol-bahasa {
+    display: none;
+  }
+
+  .kepala.buka .navigasi {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    padding: 8px var(--tepi) 16px;
+    background: var(--krem-terang);
+    border-bottom: 1px solid var(--garis);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.08);
+  }
+
+  .navigasi .tombol-bahasa {
+    margin-top: 8px;
+  }
+}
+
 @media (min-width: 1000px) {
   .navigasi {
     display: flex;
+  }
+
+  .navigasi .tombol-bahasa,
+  .tombol-menu {
+    display: none;
   }
 
   .kepala-kanan {
@@ -520,12 +582,30 @@ main > section > * {
 
 .daftar-dok {
   margin: 0;
-  padding-left: 1.1em;
+  padding: 0;
+  list-style: none;
 }
 
 .daftar-dok a {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: 6px 0;
+}
+
+.coba-langkah .tautan-aksi {
+  gap: 8px;
+}
+
+.ikon {
+  flex: none;
+  width: 1.2em;
+  height: 1.2em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 
 @media (min-width: 860px) {

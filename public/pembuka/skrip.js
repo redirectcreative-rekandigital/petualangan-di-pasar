@@ -4,14 +4,18 @@
   var KUNCI = 'survival-sains:bahasa';
 
   // ---------- Bahasa ----------
-  var tombol = document.getElementById('tombol-bahasa');
+  var tombol = document.querySelectorAll('.tombol-bahasa');
 
   function terapkan(b) {
     var en = b === 'en';
     html.lang = b;
     html.classList.toggle('en', en);
     document.title = en ? 'Survival Sains · About the Game' : 'Survival Sains · Pembuka Karya';
-    tombol.setAttribute('aria-label', en ? 'Ganti bahasa ke Bahasa Indonesia' : 'Switch language to English');
+    tombol.forEach(function (t) {
+      t.value = b;
+      t.setAttribute('aria-label', en ? 'Choose language' : 'Pilih bahasa');
+    });
+    aturMenu(buka()); // segarkan label tombol menu
     document.querySelectorAll('img').forEach(function (img) {
       if (!img.dataset.id) img.dataset.id = img.getAttribute('src');
       if (!img.dataset.altId) img.dataset.altId = img.getAttribute('alt') || '';
@@ -21,12 +25,44 @@
     gantiLayar(aktif, true);
   }
 
-  tombol.addEventListener('click', function () {
-    var b = html.lang === 'en' ? 'id' : 'en';
-    try {
-      localStorage.setItem(KUNCI, b);
-    } catch (e) {}
-    terapkan(b);
+  tombol.forEach(function (t) {
+    t.addEventListener('change', function () {
+      var b = t.value;
+      try {
+        localStorage.setItem(KUNCI, b);
+      } catch (e) {}
+      terapkan(b);
+    });
+  });
+
+  // ---------- Menu garis tiga (layar < 1000px) ----------
+  var kepala = document.querySelector('.kepala');
+  var tombolMenu = document.getElementById('tombol-menu');
+
+  function buka() {
+    return kepala.classList.contains('buka');
+  }
+
+  function aturMenu(b) {
+    kepala.classList.toggle('buka', b);
+    tombolMenu.setAttribute('aria-expanded', String(b));
+    var en = html.lang === 'en';
+    tombolMenu.setAttribute('aria-label', b ? (en ? 'Close menu' : 'Tutup menu') : en ? 'Open menu' : 'Buka menu');
+  }
+
+  tombolMenu.addEventListener('click', function () {
+    aturMenu(!buka());
+  });
+  document.querySelectorAll('.navigasi a').forEach(function (a) {
+    a.addEventListener('click', function () {
+      aturMenu(false);
+    });
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape' && buka()) {
+      aturMenu(false);
+      tombolMenu.focus();
+    }
   });
 
   // ---------- Enam tahap: layar HP mengikuti langkah yang sedang dibaca ----------

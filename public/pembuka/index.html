@@ -38,19 +38,27 @@
         <img src="../icon-192.png" width="40" height="40" alt="" />
         <span>Survival Sains</span>
       </a>
-      <nav class="navigasi" aria-label="Bagian halaman">
+      <nav class="navigasi" id="navigasi" aria-label="Bagian halaman">
         <a href="#cerita"><span data-l="id">Cerita</span><span data-l="en">Story</span></a>
         <a href="#pulau"><span data-l="id">Pulau</span><span data-l="en">Island</span></a>
         <a href="#balai"><span data-l="id">Satu Balai</span><span data-l="en">One Hall</span></a>
         <a href="#fitur"><span data-l="id">Fitur</span><span data-l="en">Features</span></a>
         <a href="#guru"><span data-l="id">Mode Guru</span><span data-l="en">Teacher Mode</span></a>
         <a href="#pembuat"><span data-l="id">Pembuat</span><span data-l="en">Maker</span></a>
+        <select class="tombol-bahasa" aria-label="Pilih bahasa">
+          <option value="id">Indonesia</option>
+          <option value="en">English</option>
+        </select>
       </nav>
       <div class="kepala-kanan">
         <img class="logo" src="gambar/logo-muh.webp" width="160" height="160" alt="Logo Muhammadiyah" />
         <img class="logo" src="gambar/logo-sdm.webp" width="160" height="205" alt="Logo SD Muhammadiyah Wonorejo" />
-        <button type="button" class="tombol-bahasa" id="tombol-bahasa" aria-label="Ganti bahasa ke English">
-          <span data-l="id">English</span><span data-l="en">Indonesia</span>
+        <select class="tombol-bahasa" aria-label="Pilih bahasa">
+          <option value="id">Indonesia</option>
+          <option value="en">English</option>
+        </select>
+        <button type="button" class="tombol-menu" id="tombol-menu" aria-label="Buka menu" aria-expanded="false" aria-controls="navigasi">
+          <span></span><span></span><span></span>
         </button>
       </div>
     </header>
@@ -108,12 +116,24 @@
         </div>
         <ol class="coba-langkah">
           <li>
+            <h3><span data-l="id">Administrasi lomba</span><span data-l="en">Competition documents</span></h3>
+            <p data-l="id">Semua dokumen lomba ada di repositori publik dan bisa dibaca tanpa masuk.</p>
+            <p data-l="en">All competition documents are in a public repository (in Indonesian).</p>
+            <ul class="daftar-dok">
+              <li><a href="orisionalitas.pdf" target="_blank" rel="noopener"><svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l8 3v6c0 5-3.4 9.3-8 11-4.6-1.7-8-6-8-11V5z"/><path d="M9 12l2 2 4-4"/></svg><span data-l="id">Pernyataan orisinalitas</span><span data-l="en">Statement of originality</span></a></li>
+              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/naskah-survival-sains.md" target="_blank" rel="noopener"><svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/></svg><span data-l="id">Naskah lengkap</span><span data-l="en">Full script</span></a></li>
+              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/Bank_Soal_IPA_Kelas5_SD.md" target="_blank" rel="noopener"><svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="2" width="8" height="4" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4M12 16h4M8 11h.01M8 16h.01"/></svg><span data-l="id">Bank soal dan materi</span><span data-l="en">Question bank and material</span></a></li>
+              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/deskripsi-karya.md" target="_blank" rel="noopener"><svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg><span data-l="id">Deskripsi karya</span><span data-l="en">Work description</span></a></li>
+              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/jurnal-ai.md" target="_blank" rel="noopener"><svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9z"/><path d="M19 15v4M17 17h4M5 3v4M3 5h4"/></svg><span data-l="id">Jurnal penggunaan AI</span><span data-l="en">AI usage journal</span></a></li>
+            </ul>
+          </li>
+          <li>
             <h3><span data-l="id">Main mode sendiri</span><span data-l="en">Play solo</span></h3>
             <p data-l="id">
               Ketuk Mulai Petualangan, pilih karakter, lalu jelajahi Goa Sinar. Balai pertama ini sekaligus tutorial.
             </p>
             <p data-l="en">Tap Start Adventure, choose a character, then explore Goa Sinar. The first hall doubles as the tutorial.</p>
-            <a class="tautan-aksi" href="../"><span data-l="id">Buka game</span><span data-l="en">Open the game</span></a>
+            <a class="tautan-aksi" href="../" target="_blank" rel="noopener"><svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="4"/><path d="M6 12h4M8 10v4M15 13h.01M18 11h.01"/></svg><span data-l="id">Buka game</span><span data-l="en">Open the game</span></a>
           </li>
           <li>
             <h3><span data-l="id">Lihat dasbor guru tanpa menyiapkan kelas</span><span data-l="en">See the teacher dashboard without a class</span></h3>
@@ -125,18 +145,7 @@
               In Teacher Mode, tap <strong>Lihat Contoh Kelas</strong> (sample class). 31 test students (token 1234)
               progress on their own, and the class controls can be tried. The dashboard is in Indonesian.
             </p>
-            <a class="tautan-aksi" href="../modeguru/"><span data-l="id">Buka Mode Guru</span><span data-l="en">Open Teacher Mode</span></a>
-          </li>
-          <li>
-            <h3><span data-l="id">Baca naskah dan bank soal</span><span data-l="en">Read the script and question bank</span></h3>
-            <p data-l="id">Semua dokumen lomba ada di repositori publik dan bisa dibaca tanpa masuk.</p>
-            <p data-l="en">All competition documents are in a public repository (in Indonesian).</p>
-            <ul class="daftar-dok">
-              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/naskah-survival-sains.md"><span data-l="id">Naskah lengkap</span><span data-l="en">Full script</span></a></li>
-              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/Bank_Soal_IPA_Kelas5_SD.md"><span data-l="id">Bank soal dan materi</span><span data-l="en">Question bank and material</span></a></li>
-              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/deskripsi-karya.md"><span data-l="id">Deskripsi karya</span><span data-l="en">Work description</span></a></li>
-              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/jurnal-ai.md"><span data-l="id">Jurnal penggunaan AI</span><span data-l="en">AI usage journal</span></a></li>
-            </ul>
+            <a class="tautan-aksi" href="../modeguru/" target="_blank" rel="noopener"><svg class="ikon" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 3h20M3 3v11a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V3M12 16v5M8 21h8"/><path d="M7 12l3-3 2 2 5-5"/></svg><span data-l="id">Buka Mode Guru</span><span data-l="en">Open Teacher Mode</span></a>
           </li>
         </ol>
       </section>

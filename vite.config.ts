@@ -1,5 +1,18 @@
-import { defineConfig } from 'vite';
+import { defineConfig, type Connect } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+
+// /pembuka -> /pembuka/ (path relatif di halaman butuh garis miring), lalu /pembuka/ -> index.html.
+const halamanFolder: Connect.NextHandleFunction = (r, res, next) => {
+  const req = r as { url?: string }; // tsconfig tanpa @types/node
+  const m = req.url?.match(/^\/(pembuka|modeguru)(\/?)(\?.*)?$/);
+  if (m && !m[2]) {
+    res.statusCode = 302;
+    res.setHeader('Location', `/${m[1]}/${m[3] ?? ''}`);
+    return res.end();
+  }
+  if (m) req.url = `/${m[1]}/index.html${m[3] ?? ''}`;
+  next();
+};
 
 // Base relatif agar bisa dibuka dari subfolder GitHub Pages maupun domain sendiri.
 export default defineConfig({
@@ -15,6 +28,16 @@ export default defineConfig({
     },
   },
   plugins: [
+    {
+      // Vite tidak menyajikan index.html folder di public/; tanpa ini /pembuka/ jatuh ke game.
+      name: 'halaman-folder-public',
+      configureServer(server) {
+        server.middlewares.use(halamanFolder);
+      },
+      configurePreviewServer(server) {
+        server.middlewares.use(halamanFolder);
+      },
+    },
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.png', 'icon-192.png', 'icon-512.png'],

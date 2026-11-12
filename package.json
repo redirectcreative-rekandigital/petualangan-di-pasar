@@ -18,6 +18,7 @@
     "format": "prettier --write .",
     "smoke": "node scripts/smoke.mjs",
     "smoke:guru": "node scripts/smoke-guru.mjs",
+    "smoke:mercusuar": "node scripts/smoke-mercusuar.mjs",
     "build:avatar": "node scripts/build-avatar.mjs",
     "kompres:model": "node scripts/kompres-model.mjs",
     "serve": "node server/index.mjs",

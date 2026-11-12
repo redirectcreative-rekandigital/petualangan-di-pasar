@@ -134,9 +134,24 @@ membagikan token 4 digit. Token juga bisa ditampilkan di layar **Proyektor** bes
   ringkasan dan CSV terunduh otomatis.
 - **Server restart.** Dasbor membangun ulang ruang kelas memakai token, kunci, dan salinan data siswa
   dari browser guru. Siswa tersambung ulang otomatis dan mengirim ulang progresnya.
+- **Analisis kelas** dalam tiga tab:
+  - 📊 **Kelas:** tabel *Perlu perhatian* (siswa yang butuh bantuan atau belum tuntas, beserta
+    bab-nya), diagram *Perjalanan siswa* (jumlah siswa yang sedang berada di tiap bab), tabel
+    kemajuan per bab (ketuk ikon untuk keterangan), dan persen benar per bab.
+  - ❓ **Soal:** soal tersulit dan miskonsepsi (pilihan salah yang paling sering dipilih).
+  - 🧒 **Siswa:** detail, nilai per bab, dan rekomendasi tiap anak.
+  - Ekspor **CSV Kelas** dan **CSV Jawaban** untuk diolah di Excel.
+- **Kelas Contoh.** Tombol *👀 Lihat Contoh Kelas* membuka dasbor berisi 31 siswa uji coba (token
+  1234). Jawabannya diambil dari bank soal asli, siswa maju sendiri pelan-pelan, dan tombol kendali
+  bisa dicoba. Data ini tidak tersimpan dan tidak dikirim ke server. Cocok untuk juri atau guru yang
+  ingin melihat dasbor tanpa menyiapkan kelas.
+- **Panduan awal guru/juri** muncul sekali saat Mode Guru dan dasbor pertama dibuka. Isinya
+  menjelaskan data, tombol, dan alur tab. Bisa dibuka lagi lewat tombol ❓ di pojok kanan atas, di
+  sebelah tombol 🏝️ halaman siswa.
 - Melihat dasbor hanya butuh token, karena belum ada PIN. Jangan bagikan token ke luar kelas.
 
-Mode Guru tidak ditampilkan di beranda siswa.
+Mode Guru juga bisa dibuka dari game: tautan di popup info awal, atau menu ☰ Lainnya → Tentang Game →
+**Buka Mode Guru**.
 
 ## Privasi
 

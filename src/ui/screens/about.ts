@@ -94,6 +94,7 @@ export function renderAbout(ctx: ScreenContext): HTMLElement {
           el('span', { class: 'label-kecil', text: t('👩‍🏫 Untuk Guru & Juri') }),
           el('p', { text: t('Mode Guru menampilkan dasbor kelas: hasil tiap siswa, soal tersulit, miskonsepsi, dan ekspor CSV.') }),
           el('a', { class: 'btn secondary block', text: t('👩‍🏫 Buka Mode Guru'), attrs: { href: `${import.meta.env.BASE_URL}modeguru/` } }),
+          el('a', { class: 'btn secondary block', text: t('📄 Tentang Karya Ini'), attrs: { href: `${import.meta.env.BASE_URL}pembuka/` } }),
         ],
       }),
       el('div', { class: 'stack', children: [kembali] }),

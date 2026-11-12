@@ -3,14 +3,23 @@
 //   → lampu menyala → epilog → hasil.
 //
 // Prasyarat: server berjalan (npm run dev / preview / serve) pada BASE.
+// Opsi: BAHASA=en untuk menguji versi English; SHOTS=folder untuk menyimpan
+// tangkapan layar (lantai Final, epilog, sertifikat), dipakai halaman /pembuka.
 import { chromium } from 'playwright';
 
 const BASE = process.env.SMOKE_URL ?? 'http://localhost:5173/';
+const EN = process.env.BAHASA === 'en';
+const SHOTS = process.env.SHOTS;
+const L = (id, en) => (EN ? en : id);
 const errors = [];
 const log = (m) => console.log(`[mercusuar] ${m}`);
 
 const browser = await chromium.launch({ args: ['--use-gl=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
-const page = await browser.newPage({ viewport: { width: 915, height: 412 }, hasTouch: true });
+const page = await browser.newPage({ viewport: { width: 915, height: 412 }, hasTouch: true, deviceScaleFactor: SHOTS ? 2 : 1 });
+// Layar penuh mengunci ukuran jendela; matikan saat mengambil gambar potret.
+if (SHOTS) await page.addInitScript(() => { Element.prototype.requestFullscreen = () => Promise.resolve(); });
+if (EN) await page.addInitScript(() => localStorage.setItem('survival-sains:bahasa', 'en'));
+const foto = (nama, el = page) => (SHOTS ? el.screenshot({ path: `${SHOTS}/${nama}-${EN ? 'en' : 'id'}.png` }) : null);
 page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
 page.on('console', (m) => {
   if (m.type() === 'error') errors.push(`console: ${m.text()}`);
@@ -34,7 +43,7 @@ async function jalaniPercakapan(bank, salahSekali = false) {
         salahSekali = false;
         await page.locator('.vn-pilihan.jawab', { hasText: q.options.find((o) => o !== q.answer) }).first().click();
         await page.locator('.vn-teks').click().catch(() => {});
-        await page.locator('.vn-pilihan', { hasText: 'Coba lagi' }).click();
+        await page.locator('.vn-pilihan', { hasText: L('Coba lagi', 'Try again') }).click();
         await page.locator('.vn-teks').click().catch(() => {});
         await page.waitForSelector('.vn-pilihan.jawab');
       }
@@ -59,7 +68,7 @@ try {
   if ((await api(() => window.__survivalSains.mode())) !== 'mercusuar-3d') throw new Error('tidak masuk mercusuar-3d');
   log(`masuk Mercusuar, posisi awal ${JSON.stringify(await debug())}`);
   // Panduan awal Mercusuar menahan gerak sampai ditutup.
-  const lewati = page.getByRole('button', { name: 'Lewati panduan' });
+  const lewati = page.getByRole('button', { name: L('Lewati panduan', 'Skip guide') });
   if (await lewati.waitFor({ timeout: 4000 }).then(() => true, () => false)) {
     await lewati.click();
     log('panduan dilewati');
@@ -88,6 +97,12 @@ try {
     if (d.nearby !== `pintu${lantai}`) throw new Error(`tidak dekat pintu${lantai}: ${JSON.stringify(d)}`);
     void api(() => window.__survivalSains.interaksi());
     await page.waitForSelector('.vn-overlay');
+    if (lantai === 0) {
+      await page.locator('.vn-teks').click().catch(() => {});
+      await page.waitForSelector('.vn-pilihan.jawab').catch(() => {});
+      await t(400);
+      await foto('final');
+    }
     const n = await jalaniPercakapan(bank, lantai === 0);
     const skor = (await api(() => window.__survivalSains.progress())).finalBagian;
     log(`lantai ${lantai}: ${n} soal, skor bagian ${JSON.stringify(skor)}`);
@@ -107,8 +122,19 @@ try {
 
   await page.waitForSelector('.cut-overlay', { timeout: 10000 });
   log('lampu menyala, epilog tampil');
-  await page.getByRole('button', { name: /Lewati/ }).click();
+  await t(2500);
+  await foto('epilog');
+  await page.getByRole('button', { name: L(/Lewati/, /Skip/) }).click();
   await t(1500);
+  if (SHOTS) {
+    await page.setViewportSize({ width: 412, height: 915 }).catch(() => {});
+    const s = page.locator('.sertifikat');
+    if (await s.count()) {
+      await s.scrollIntoViewIfNeeded();
+      await t(500);
+      await foto('sertifikat', s);
+    }
+  }
   const prog = await api(() => window.__survivalSains.progress());
   const total = prog.finalBagian.reduce((a, b) => a + b, 0);
   if (!prog.puncakLulus) throw new Error('puncakLulus tidak tersimpan');

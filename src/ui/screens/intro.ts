@@ -274,6 +274,8 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
             children: [
               `${t('👩‍🏫 Untuk guru/juri:')} `,
               el('a', { text: t('buka Mode Guru'), attrs: { href: `${import.meta.env.BASE_URL}modeguru/` } }),
+              ` ${t('atau')} `,
+              el('a', { text: t('baca tentang karya ini'), attrs: { href: `${import.meta.env.BASE_URL}pembuka/` } }),
             ],
           }),
         ],

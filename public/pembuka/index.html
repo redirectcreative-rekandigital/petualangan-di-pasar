@@ -1,0 +1,658 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Survival Sains · Pembuka Karya</title>
+    <meta
+      name="description"
+      content="Survival Sains: game petualangan 3D untuk IPAS kelas 5 SD/MI. Halaman pengantar karya untuk juri dan guru."
+    />
+    <meta property="og:title" content="Survival Sains" />
+    <meta property="og:description" content="Game petualangan 3D untuk belajar IPAS kelas 5 SD/MI, Semester 1." />
+    <meta property="og:image" content="../assets/sampul-landscape.jpg" />
+    <link rel="icon" href="../favicon.png" />
+    <link rel="preload" href="Baloo2-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="gaya.css" />
+    <script>
+      // Bahasa dipilih sebelum halaman tampil agar tidak berkedip. Kunci yang sama
+      // dengan game, jadi pilihan di sini ikut terbawa saat juri menekan "Main".
+      (function () {
+        var b = 'id';
+        try {
+          var q = new URLSearchParams(location.search).get('lang');
+          b = q === 'en' || q === 'id' ? q : localStorage.getItem('survival-sains:bahasa') === 'en' ? 'en' : 'id';
+        } catch (e) {}
+        var h = document.documentElement;
+        h.lang = b;
+        h.className = 'js' + (b === 'en' ? ' en' : '');
+      })();
+    </script>
+    <script src="skrip.js" defer></script>
+  </head>
+  <body>
+    <a class="lompat" href="#isi"><span data-l="id">Langsung ke isi</span><span data-l="en">Skip to content</span></a>
+
+    <header class="kepala">
+      <a class="merek" href="#mulai">
+        <img src="../icon-192.png" width="40" height="40" alt="" />
+        <span>Survival Sains</span>
+      </a>
+      <nav class="navigasi" aria-label="Bagian halaman">
+        <a href="#cerita"><span data-l="id">Cerita</span><span data-l="en">Story</span></a>
+        <a href="#pulau"><span data-l="id">Pulau</span><span data-l="en">Island</span></a>
+        <a href="#balai"><span data-l="id">Satu Balai</span><span data-l="en">One Hall</span></a>
+        <a href="#fitur"><span data-l="id">Fitur</span><span data-l="en">Features</span></a>
+        <a href="#guru"><span data-l="id">Mode Guru</span><span data-l="en">Teacher Mode</span></a>
+        <a href="#pembuat"><span data-l="id">Pembuat</span><span data-l="en">Maker</span></a>
+      </nav>
+      <div class="kepala-kanan">
+        <img class="logo" src="gambar/logo-muh.webp" width="160" height="160" alt="Logo Muhammadiyah" />
+        <img class="logo" src="gambar/logo-sdm.webp" width="160" height="205" alt="Logo SD Muhammadiyah Wonorejo" />
+        <button type="button" class="tombol-bahasa" id="tombol-bahasa" aria-label="Ganti bahasa ke English">
+          <span data-l="id">English</span><span data-l="en">Indonesia</span>
+        </button>
+      </div>
+    </header>
+
+    <main id="isi">
+      <!-- ============ Sampul ============ -->
+      <section class="sampul" id="mulai" aria-labelledby="judul-utama">
+        <picture class="sampul-gambar">
+          <source media="(max-width: 720px)" srcset="../assets/sampul-portrait.webp" width="1080" height="1920" />
+          <img
+            src="../assets/sampul-landscape.webp"
+            width="1920"
+            height="1080"
+            fetchpriority="high"
+            alt="Sampul Survival Sains: para Penjaga berdiri di jalur pulau menuju Mercusuar Tua, dengan kapal ekspedisi di laut."
+          />
+        </picture>
+        <div class="sampul-teks">
+          <p class="sampul-mapel">
+            <span data-l="id">IPAS · Kelas 5 SD/MI · Semester 1</span>
+            <span data-l="en">Science &amp; Social Studies (IPAS) · Grade 5 · Semester 1</span>
+          </p>
+          <h1 id="judul-utama">
+            <span data-l="id">Belajar IPAS sambil bertahan hidup di Pulau Wonorejo</span>
+            <span data-l="en">Learn science by surviving on Wonorejo Island</span>
+          </h1>
+          <p class="sampul-lead" data-l="id">
+            Survival Sains adalah game petualangan 3D. Siswa terdampar setelah badai, belajar dari sembilan Penjaga
+            pulau, lalu menyalakan Mercusuar Tua supaya bisa pulang. Setiap bab IPAS langsung dipakai untuk bertahan.
+          </p>
+          <p class="sampul-lead" data-l="en">
+            Survival Sains is a 3D adventure game. Students are stranded after a storm, learn from the island's nine
+            Guardians, then light the Old Lighthouse to get home. Every science chapter is put to use for survival.
+          </p>
+          <div class="sampul-aksi">
+            <a class="btn utama" href="../">
+              <span data-l="id">Main Sekarang</span><span data-l="en">Play Now</span>
+            </a>
+            <a class="btn kedua" href="../modeguru/">
+              <span data-l="id">Buka Mode Guru</span><span data-l="en">Open Teacher Mode</span>
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Jalur juri ============ -->
+      <section class="coba" aria-labelledby="judul-coba">
+        <div class="coba-kepala">
+          <h2 id="judul-coba">
+            <span data-l="id">Untuk juri: coba dalam 5 menit</span>
+            <span data-l="en">For judges: try it in 5 minutes</span>
+          </h2>
+          <p data-l="id">Tidak perlu akun, tidak perlu memasang apa pun. Bisa di HP atau laptop.</p>
+          <p data-l="en">No account, nothing to install. Works on a phone or a laptop.</p>
+        </div>
+        <ol class="coba-langkah">
+          <li>
+            <h3><span data-l="id">Main mode sendiri</span><span data-l="en">Play solo</span></h3>
+            <p data-l="id">
+              Ketuk Mulai Petualangan, pilih karakter, lalu jelajahi Goa Sinar. Balai pertama ini sekaligus tutorial.
+            </p>
+            <p data-l="en">Tap Start Adventure, choose a character, then explore Goa Sinar. The first hall doubles as the tutorial.</p>
+            <a class="tautan-aksi" href="../"><span data-l="id">Buka game</span><span data-l="en">Open the game</span></a>
+          </li>
+          <li>
+            <h3><span data-l="id">Lihat dasbor guru tanpa menyiapkan kelas</span><span data-l="en">See the teacher dashboard without a class</span></h3>
+            <p data-l="id">
+              Di Mode Guru, ketuk <strong>Lihat Contoh Kelas</strong>. Ada 31 siswa uji coba (token 1234) yang maju
+              sendiri, dan tombol kendali bisa dicoba.
+            </p>
+            <p data-l="en">
+              In Teacher Mode, tap <strong>Lihat Contoh Kelas</strong> (sample class). 31 test students (token 1234)
+              progress on their own, and the class controls can be tried. The dashboard is in Indonesian.
+            </p>
+            <a class="tautan-aksi" href="../modeguru/"><span data-l="id">Buka Mode Guru</span><span data-l="en">Open Teacher Mode</span></a>
+          </li>
+          <li>
+            <h3><span data-l="id">Baca naskah dan bank soal</span><span data-l="en">Read the script and question bank</span></h3>
+            <p data-l="id">Semua dokumen lomba ada di repositori publik dan bisa dibaca tanpa masuk.</p>
+            <p data-l="en">All competition documents are in a public repository (in Indonesian).</p>
+            <ul class="daftar-dok">
+              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/naskah-survival-sains.md"><span data-l="id">Naskah lengkap</span><span data-l="en">Full script</span></a></li>
+              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/Bank_Soal_IPA_Kelas5_SD.md"><span data-l="id">Bank soal dan materi</span><span data-l="en">Question bank and material</span></a></li>
+              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/deskripsi-karya.md"><span data-l="id">Deskripsi karya</span><span data-l="en">Work description</span></a></li>
+              <li><a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/jurnal-ai.md"><span data-l="id">Jurnal penggunaan AI</span><span data-l="en">AI usage journal</span></a></li>
+            </ul>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ============ Cerita ============ -->
+      <section class="cerita" id="cerita" aria-labelledby="judul-cerita">
+        <div class="cerita-teks">
+          <h2 id="judul-cerita">
+            <span data-l="id">Badai, pulau asing, dan satu mercusuar</span>
+            <span data-l="en">A storm, a strange island, and one lighthouse</span>
+          </h2>
+          <p data-l="id">
+            Pemain adalah anggota termuda Kapal Ekspedisi Sains yang terdampar di Pulau Wonorejo. Untuk pulang, ia harus
+            menyalakan Mercusuar Tua di puncak pulau. Sembilan Penjaga masing-masing menyimpan bekal ilmu dan satu alat
+            survival.
+          </p>
+          <p data-l="en">
+            The player is the youngest member of the Science Expedition Ship, stranded on Wonorejo Island. To get home,
+            they must light the Old Lighthouse at the top of the island. Each of the nine Guardians holds a piece of
+            knowledge and one survival tool.
+          </p>
+          <ul class="cerita-guna">
+            <li><span data-l="id"><b>Cahaya</b> untuk keluar dari goa dan membuat sinyal</span><span data-l="en"><b>Light</b> to get out of the cave and signal for help</span></li>
+            <li><span data-l="id"><b>Bunyi</b> untuk memanggil bantuan</span><span data-l="en"><b>Sound</b> to call for help</span></li>
+            <li><span data-l="id"><b>Magnet</b> untuk membuat kompas</span><span data-l="en"><b>Magnets</b> to make a compass</span></li>
+            <li><span data-l="id"><b>Listrik</b> untuk menyalakan lampu mercusuar</span><span data-l="en"><b>Electricity</b> to power the lighthouse lamp</span></li>
+          </ul>
+        </div>
+        <figure class="hp kabut cerita-hp">
+          <img src="gambar/badai-id.webp" data-en="gambar/badai-en.webp" width="824" height="1830" loading="lazy"
+            alt="Cutscene pembuka: kapal ekspedisi diterjang badai." data-alt-en="Opening cutscene: the expedition ship caught in a storm." />
+          <figcaption><span data-l="id">Cutscene pembuka</span><span data-l="en">Opening cutscene</span></figcaption>
+        </figure>
+      </section>
+
+      <!-- ============ Pulau: 11 balai ============ -->
+      <section class="pulau" id="pulau" aria-labelledby="judul-pulau">
+        <div class="pulau-kepala">
+          <h2 id="judul-pulau">
+            <span data-l="id">Sebelas balai, mengikuti urutan bab buku</span>
+            <span data-l="en">Eleven halls, in textbook chapter order</span>
+          </h2>
+          <p data-l="id">
+            Balai terbuka satu per satu. Kabut di balai berikutnya baru tersibak setelah balai sebelumnya lulus. Bab 9
+            dibagi menjadi tiga balai. Ketuk balai untuk melihat isinya.
+          </p>
+          <p data-l="en">
+            Halls open one at a time. The fog over the next hall only clears once the previous one is passed. Chapter 9
+            is split into three halls. Tap a hall to see what is inside.
+          </p>
+        </div>
+        <figure class="layar-lebar kabut pulau-peta">
+          <img src="gambar/peta-penuh-id.webp" data-en="gambar/peta-penuh-en.webp" width="1600" height="720" loading="lazy"
+            alt="Peta pulau 3D dengan semua balai terbuka dan jalur melingkar menuju Mercusuar Tua."
+            data-alt-en="3D island map with every hall open and the spiral path to the Old Lighthouse." />
+        </figure>
+        <ol class="jalur" id="jalur">
+          <!-- Emoji alat sama persis dengan ikon alat di dalam game (Tas Survival). -->
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">1</span><span class="jalur-nama">Goa Sinar</span><span class="jalur-bab"><span data-l="id">Bab 1 · Cahaya dan Mata</span><span data-l="en">Chapter 1 · Light and the Eye</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Mbok Sinar</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">🪞</span> <span data-l="id">Cermin Sinyal</span><span data-l="en">Signal Mirror</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">2</span><span class="jalur-nama">Lembah Gema</span><span class="jalur-bab"><span data-l="id">Bab 2 · Bunyi dan Pendengaran</span><span data-l="en">Chapter 2 · Sound and Hearing</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Ki Gaung</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">🪘</span> <span data-l="id">Kentongan</span><span data-l="en">Kentongan Drum</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">3</span><span class="jalur-nama">Pondok Tepi Hutan</span><span class="jalur-bab"><span data-l="id">Bab 3 · Ekosistem</span><span data-l="en">Chapter 3 · Ecosystems</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Nini Rimba</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">📒</span> <span data-l="id">Buku Catatan Penyintas</span><span data-l="en">Survivor's Notebook</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">4</span><span class="jalur-nama">Ladang dan Lumbung</span><span class="jalur-bab"><span data-l="id">Bab 4 · Rantai Makanan</span><span data-l="en">Chapter 4 · Food Chains</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Ki Lumbung</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">🧺</span> <span data-l="id">Keranjang Bekal</span><span data-l="en">Supply Basket</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">5</span><span class="jalur-nama">Taman Bunga</span><span class="jalur-bab"><span data-l="id">Bab 5 · Simbiosis</span><span data-l="en">Chapter 5 · Symbiosis</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Nyai Kembang</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">🥅</span> <span data-l="id">Kelambu Hutan</span><span data-l="en">Forest Mosquito Net</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">6</span><span class="jalur-nama">Persemaian</span><span class="jalur-bab"><span data-l="id">Bab 6 · Kelestarian Lingkungan</span><span data-l="en">Chapter 6 · Environmental Conservation</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Eyang Wana</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">🌱</span> <span data-l="id">Bibit Pohon</span><span data-l="en">Tree Seedling</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">7</span><span class="jalur-nama">Bukit Batu Besi</span><span class="jalur-bab"><span data-l="id">Bab 7 · Magnet</span><span data-l="en">Chapter 7 · Magnets</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Empu Wesi</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">🧭</span> <span data-l="id">Kompas Buatan</span><span data-l="en">Homemade Compass</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">8</span><span class="jalur-nama">Sungai Kincir</span><span class="jalur-bab"><span data-l="id">Bab 8 · Listrik</span><span data-l="en">Chapter 8 · Electricity</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Mbah Kilat</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">🔋</span> <span data-l="id">Dinamo Mercusuar</span><span data-l="en">Lighthouse Dynamo</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">9</span><span class="jalur-nama">Tebing Berlapis</span><span class="jalur-bab"><span data-l="id">Bab 9a · Litosfer</span><span data-l="en">Chapter 9a · The Lithosphere</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Ibu Pertiwi</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">🪢</span> <span data-l="id">Tali Pendaki</span><span data-l="en">Climbing Rope</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">10</span><span class="jalur-nama">Mata Air</span><span class="jalur-bab"><span data-l="id">Bab 9b · Hidrosfer dan Atmosfer</span><span data-l="en">Chapter 9b · The Hydrosphere and Atmosphere</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Ibu Pertiwi</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">🫙</span> <span data-l="id">Botol Air Bersih</span><span data-l="en">Clean Water Bottle</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik kabut">
+            <details>
+              <summary><span class="jalur-no">11</span><span class="jalur-nama">Pos Siaga</span><span class="jalur-bab"><span data-l="id">Bab 9c · Siklus Air dan Bencana</span><span data-l="en">Chapter 9c · The Water Cycle and Disasters</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd>Ibu Pertiwi</dd>
+                <dt><span data-l="id">Alat survival</span><span data-l="en">Survival tool</span></dt><dd><span aria-hidden="true">🗺️</span> <span data-l="id">Peta Jalur Aman</span><span data-l="en">Safe Route Map</span></dd>
+              </dl>
+            </details>
+          </li>
+          <li class="jalur-titik jalur-final kabut">
+            <details>
+              <summary><span class="jalur-no">F</span><span class="jalur-nama"><span data-l="id">Mercusuar Tua</span><span data-l="en">Old Lighthouse</span></span><span class="jalur-bab"><span data-l="id">Semua bab · 30 soal campuran</span><span data-l="en">All chapters · 30 mixed questions</span></span></summary>
+              <dl>
+                <dt><span data-l="id">Penjaga</span><span data-l="en">Guardian</span></dt><dd><span data-l="id">Penjaga tiap lantai</span><span data-l="en">One Guardian per floor</span></dd>
+                <dt><span data-l="id">Hadiah</span><span data-l="en">Reward</span></dt><dd><span data-l="id">Sertifikat Penyintas Sains</span><span data-l="en">Science Survivor certificate</span></dd>
+              </dl>
+            </details>
+          </li>
+        </ol>
+      </section>
+
+      <!-- ============ Pola 6 tahap ============ -->
+      <section class="tahap" id="balai" aria-labelledby="judul-tahap">
+        <div class="tahap-kepala">
+          <h2 id="judul-tahap">
+            <span data-l="id">Di setiap balai, enam langkah yang sama</span>
+            <span data-l="en">Inside every hall, the same six steps</span>
+          </h2>
+          <p data-l="id">Polanya tetap, jadi anak tahu harus ke mana. Panah kuning dan cincin di tanah selalu menunjuk tujuan berikutnya.</p>
+          <p data-l="en">The pattern never changes, so children always know where to go. A yellow arrow and a ring on the ground point to the next goal.</p>
+        </div>
+        <div class="tahap-isi">
+          <div class="tahap-layar" aria-hidden="true">
+            <div class="hp"><img id="layar-tahap" src="gambar/balai-id.webp" width="824" height="1830" alt="" /></div>
+          </div>
+          <ol class="tahap-daftar">
+            <li data-gambar="balai">
+              <h3><span data-l="id">Tiba di balai</span><span data-l="en">Arrive at the hall</span></h3>
+              <p data-l="id">Dunia 3D dengan joystick di HP atau papan ketik di laptop. Bilah misi di atas menyebut tujuan saat ini.</p>
+              <p data-l="en">A 3D world with a joystick on phones or the keyboard on laptops. The mission bar at the top names the current goal.</p>
+              <div class="hp tahap-gambar"><img src="gambar/balai-id.webp" data-en="gambar/balai-en.webp" width="824" height="1830" loading="lazy" alt="Pemain berjalan di Goa Sinar menuju Penjaga." data-alt-en="The player walking through Goa Sinar towards the Guardian." /></div>
+            </li>
+            <li data-gambar="percakapan">
+              <h3><span data-l="id">Penjaga memberi misi</span><span data-l="en">The Guardian gives a mission</span></h3>
+              <p data-l="id">Percakapan bergaya visual novel, dibuka dengan salam. Suara narasi menyesuaikan tokoh.</p>
+              <p data-l="en">A visual-novel style conversation that opens with a greeting. The narration voice changes per character.</p>
+              <div class="hp tahap-gambar"><img src="gambar/percakapan-id.webp" data-en="gambar/percakapan-en.webp" width="824" height="1830" loading="lazy" alt="Mbok Sinar menyapa pemain di kotak percakapan." data-alt-en="Mbok Sinar greeting the player in the dialogue box." /></div>
+            </li>
+            <li data-gambar="cerita">
+              <h3><span data-l="id">Membaca Halaman Cerita</span><span data-l="en">Read the Story Pages</span></h3>
+              <p data-l="id">Empat adegan bergambar bersama Cantrik. Kata kunci ditebalkan, kalimat yang dibacakan disorot.</p>
+              <p data-l="en">Four illustrated scenes with the Cantrik. Key words are bold and the sentence being read aloud is highlighted.</p>
+              <div class="hp tahap-gambar"><img src="gambar/cerita-id.webp" data-en="gambar/cerita-en.webp" width="824" height="1830" loading="lazy" alt="Adegan Cermin dan Air: sinar dipantulkan cermin dan dibiaskan air." data-alt-en="Mirror and Water scene: light reflected by a mirror and refracted by water." /></div>
+            </li>
+            <li data-gambar="kuis">
+              <h3><span data-l="id">Menjawab di Tempat Uji</span><span data-l="en">Answer at the Test Site</span></h3>
+              <p data-l="id">Tempat Uji baru terbuka setelah cerita dibaca. Tiga soal, masing-masing dengan tiga hati.</p>
+              <p data-l="en">The Test Site only opens after the story is read. Three questions, each with three hearts.</p>
+              <div class="hp tahap-gambar"><img src="gambar/kuis-id.webp" data-en="gambar/kuis-en.webp" width="824" height="1830" loading="lazy" alt="Soal pilihan ganda dari Mbok Sinar dengan tiga hati." data-alt-en="A multiple-choice question from Mbok Sinar with three hearts." /></div>
+            </li>
+            <li data-gambar="hadiah">
+              <h3><span data-l="id">Menerima alat survival</span><span data-l="en">Receive a survival tool</span></h3>
+              <p data-l="id">Penjaga memberi alat, bintang, dan hikmah. Jalan ke balai berikutnya terbuka.</p>
+              <p data-l="en">The Guardian hands over a tool, stars, and a lesson of wisdom. The path to the next hall opens.</p>
+              <div class="hp tahap-gambar"><img src="gambar/hadiah-id.webp" data-en="gambar/hadiah-en.webp" width="824" height="1830" loading="lazy" alt="Kartu hadiah Cermin Sinyal dengan dua bintang dan hikmah." data-alt-en="Reward card for the Signal Mirror with two stars and a lesson." /></div>
+            </li>
+            <li data-gambar="peta" data-lebar>
+              <h3><span data-l="id">Kembali ke peta</span><span data-l="en">Back to the map</span></h3>
+              <p data-l="id">Keluar lewat gerbang. Di peta, kabut di balai yang baru terbuka tersibak.</p>
+              <p data-l="en">Leave through the gate. On the map, the fog over the newly opened hall clears away.</p>
+              <div class="layar-lebar tahap-gambar"><img src="gambar/peta-id.webp" data-en="gambar/peta-en.webp" width="1600" height="720" loading="lazy" alt="Peta pulau: Lembah Gema baru terbuka, balai lain masih berkabut." data-alt-en="Island map: Lembah Gema just opened, other halls still under fog." /></div>
+            </li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- ============ Fitur belajar ============ -->
+      <section class="fitur" id="fitur" aria-labelledby="judul-fitur">
+        <h2 id="judul-fitur">
+          <span data-l="id">Yang membantu anak benar-benar paham</span>
+          <span data-l="en">What helps children actually understand</span>
+        </h2>
+
+        <article class="fitur-utama">
+          <div class="fitur-teks">
+            <h3><span data-l="id">Halaman Cerita: 44 adegan beranimasi</span><span data-l="en">Story Pages: 44 animated scenes</span></h3>
+            <ul>
+              <li><span data-l="id">Benda di gambar bisa diketuk untuk melihat namanya, dan muncul bergiliran.</span><span data-l="en">Objects in a scene can be tapped to show their names, and they appear one by one.</span></li>
+              <li><span data-l="id">Gelombang bunyi digambar memancar, dengan warna berbeda untuk infrasonik, audiosonik, dan ultrasonik.</span><span data-l="en">Sound waves are drawn radiating out, coloured differently for infrasonic, audible, and ultrasonic sound.</span></li>
+              <li><span data-l="id">Tiap materi ditutup dengan Kunci Ingat: diagram berikon, ringkasan, dan hikmah.</span><span data-l="en">Each topic ends with Key Points: an icon diagram, a summary, and a lesson of wisdom.</span></li>
+            </ul>
+          </div>
+          <div class="fitur-pasangan">
+            <figure class="hp kabut"><img src="gambar/cerita-id.webp" data-en="gambar/cerita-en.webp" width="824" height="1830" loading="lazy" alt="Adegan Halaman Cerita tentang pemantulan dan pembiasan." data-alt-en="Story Page scene about reflection and refraction." /></figure>
+            <figure class="hp kabut"><img src="gambar/kunci-ingat-id.webp" data-en="gambar/kunci-ingat-en.webp" width="824" height="1830" loading="lazy" alt="Kunci Ingat Bab 1: diagram berikon dan ringkasan materi." data-alt-en="Chapter 1 Key Points: icon diagram and summary." /></figure>
+          </div>
+        </article>
+
+        <article class="fitur-salah">
+          <figure class="hp kabut"><img src="gambar/kuis-salah-id.webp" data-en="gambar/kuis-salah-en.webp" width="824" height="1830" loading="lazy" alt="Setelah jawaban salah: hati tinggal dua, pilihan Coba lagi atau Ingat cerita." data-alt-en="After a wrong answer: two hearts left, with Try again or Remember the story." /></figure>
+          <div class="fitur-teks">
+            <h3><span data-l="id">Salah itu bagian dari belajar</span><span data-l="en">Mistakes are part of learning</span></h3>
+            <p data-l="id">
+              Jawaban salah tidak langsung diberi kunci. Penjaga memberi petunjuk yang merujuk adegan cerita, lalu anak
+              bisa memilih <b>Coba lagi</b> atau <b>Ingat cerita</b> untuk membuka adegan itu. Jawaban benar diberi
+              penjelasan dari cerita.
+            </p>
+            <p data-l="en">
+              A wrong answer never reveals the key. The Guardian gives a hint that points to a story scene, and the child
+              can choose <b>Try again</b> or <b>Remember the story</b> to reopen that scene. Right answers are explained
+              using the story.
+            </p>
+          </div>
+        </article>
+
+        <article class="fitur-bahasa">
+          <div class="fitur-teks">
+            <h3><span data-l="id">Dua bahasa, dibacakan dengan suara</span><span data-l="en">Two languages, read aloud</span></h3>
+            <p data-l="id">
+              Seluruh game tersedia dalam Bahasa Indonesia dan English. Narasi suara mengikuti bahasa yang aktif, dengan
+              nada dan kecepatan berbeda per tokoh. Teks tetap tampil walau suara dimatikan.
+            </p>
+            <p data-l="en">
+              The whole game is available in Indonesian and English. Voice narration follows the active language, with a
+              different pitch and pace for each character. Text stays on screen when sound is off.
+            </p>
+          </div>
+          <div class="fitur-pasangan bahasa-pasangan">
+            <figure class="hp"><img src="gambar/kartu-id.webp" width="824" height="1830" loading="lazy" alt="Kartu Anggota Ekspedisi dalam Bahasa Indonesia." data-alt-en="Expedition Member Card in Indonesian." /><figcaption>Bahasa Indonesia</figcaption></figure>
+            <figure class="hp"><img src="gambar/kartu-en.webp" width="824" height="1830" loading="lazy" alt="Kartu Anggota Ekspedisi dalam English." data-alt-en="Expedition Member Card in English." /><figcaption>English</figcaption></figure>
+          </div>
+        </article>
+
+        <article class="fitur-tas">
+          <figure class="layar-lebar kabut"><img src="gambar/tas-id.webp" data-en="gambar/tas-en.webp" width="1600" height="720" loading="lazy" alt="Tas Survival berisi 11 tempat alat; Cermin Sinyal sudah didapat." data-alt-en="Survival Bag with 11 tool slots; the Signal Mirror has been collected." /></figure>
+          <div class="fitur-teks">
+            <h3><span data-l="id">Tas Survival dan bintang</span><span data-l="en">Survival Bag and stars</span></h3>
+            <p data-l="id">Sebelas alat, satu per balai. Mercusuar Tua baru terbuka setelah tas penuh. Bintang tiap balai menunjukkan seberapa lancar anak menjawab.</p>
+            <p data-l="en">Eleven tools, one per hall. The Old Lighthouse only opens once the bag is full. Stars per hall show how smoothly the child answered.</p>
+          </div>
+        </article>
+
+        <article class="fitur-final">
+          <div class="fitur-teks">
+            <h3><span data-l="id">Final: Malam Badai di Mercusuar Tua</span><span data-l="en">Finale: Storm Night at the Old Lighthouse</span></h3>
+            <p data-l="id">
+              30 soal dari semua bab dalam 4 lantai. Lulus bila benar minimal 21 soal (70%). Bila belum lulus, cukup
+              mengulang lantai yang belum tuntas. Game ditutup dengan epilog dan sertifikat <b>Penyintas Sains</b>.
+            </p>
+            <p data-l="en">
+              30 questions from every chapter across 4 floors. Passing needs at least 21 correct (70%). Players only
+              repeat the floors they have not finished. The game ends with an epilogue and a <b>Science Survivor</b>
+              certificate.
+            </p>
+          </div>
+          <div class="final-gambar">
+            <figure class="layar-lebar kabut"><img src="gambar/final-id.webp" data-en="gambar/final-en.webp" width="1600" height="720" loading="lazy" alt="Lantai Bawah Mercusuar Tua: Mbok Sinar mengajak membuka pintu dengan Bismillah." data-alt-en="Lower Floor of the Old Lighthouse: Mbok Sinar opens the challenge with Bismillah." /></figure>
+            <figure class="sertifikat kabut"><img src="gambar/sertifikat-id.webp" width="776" height="814" loading="lazy" alt="Sertifikat digital Penyintas Sains setelah Final 30 dari 30." data-alt-en="Science Survivor digital certificate after scoring 30 out of 30 in the finale." /><figcaption><span data-l="id">Sertifikat dari permainan uji sampai tamat</span><span data-l="en">Certificate from a full test playthrough (Indonesian)</span></figcaption></figure>
+          </div>
+        </article>
+
+        <ul class="fitur-kecil">
+          <li>
+            <h3><span data-l="id">Nyaman di HP sekolah</span><span data-l="en">Comfortable on school phones</span></h3>
+            <p data-l="id">Kontrol sentuh dan joystick, mode ringan otomatis untuk HP dengan RAM kecil.</p>
+            <p data-l="en">Touch controls and a joystick, plus an automatic light mode for low-memory phones.</p>
+          </li>
+          <li>
+            <h3><span data-l="id">Bisa dipasang dan main offline</span><span data-l="en">Installable, plays offline</span></h3>
+            <p data-l="id">Game bisa dipasang sebagai aplikasi (PWA). Mode sendiri tetap jalan tanpa internet.</p>
+            <p data-l="en">The game installs as an app (PWA). Solo mode keeps working without internet.</p>
+          </li>
+          <li>
+            <h3><span data-l="id">Main bersama satu kelas</span><span data-l="en">Play together as a class</span></h3>
+            <p data-l="id">Siswa masuk dengan token 4 digit, menjelajah sesuai kecepatan masing-masing, dan saling menyapa dengan emoji. Tidak ada obrolan bebas.</p>
+            <p data-l="en">Students join with a 4-digit token, explore at their own pace, and greet each other with emoji. There is no free chat.</p>
+          </li>
+        </ul>
+
+        <div class="video" id="video-murid">
+          <h3><span data-l="id">Video: cara bermain (mode murid)</span><span data-l="en">Video: how to play (student mode)</span></h3>
+          <div class="video-kotak">
+            <!-- TODO: ganti dengan sematan YouTube saat tautan video mode murid tersedia. -->
+            <p><span data-l="id">Video menyusul</span><span data-l="en">Video coming soon</span></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Mode Guru ============ -->
+      <section class="guru" id="guru" aria-labelledby="judul-guru">
+        <div class="guru-kepala">
+          <h2 id="judul-guru">
+            <span data-l="id">Mode Guru: tahu siapa yang perlu dibantu, di bab mana</span>
+            <span data-l="en">Teacher Mode: see who needs help, and in which chapter</span>
+          </h2>
+          <p data-l="id">
+            Guru membuat sesi, membagikan token 4 digit, dan memantau kelas langsung. Token bisa ditampilkan di layar
+            proyektor beserta kode QR.
+          </p>
+          <p data-l="en">
+            Teachers start a session, share a 4-digit token, and follow the class live. The token can be shown on a
+            projector screen with a QR code. The dashboard is in Indonesian.
+          </p>
+          <a class="btn utama" href="../modeguru/"><span data-l="id">Coba Kelas Contoh</span><span data-l="en">Try the Sample Class</span></a>
+        </div>
+
+        <div class="guru-galeri">
+          <figure class="guru-besar kabut">
+            <img src="gambar/guru-atas.webp" width="1920" height="1200" loading="lazy" alt="Dasbor Kelas Contoh: token 1234, kendali kelas, dan ringkasan 31 siswa." data-alt-en="Sample Class dashboard: token 1234, class controls, and a summary of 31 students." />
+            <figcaption><span data-l="id">Kendali kelas: kunci, jeda semua, pengumuman ke layar siswa.</span><span data-l="en">Class controls: lock, pause everyone, announcements to student screens.</span></figcaption>
+          </figure>
+          <figure class="kabut">
+            <img src="gambar/guru-perhatian.webp" width="1008" height="428" loading="lazy" alt="Tabel Perlu perhatian: siswa yang butuh bantuan beserta bab-nya." data-alt-en="Needs attention table: students who need help and their chapter." />
+            <figcaption><span data-l="id">Perlu perhatian: siapa yang tersendat dan di bab mana.</span><span data-l="en">Needs attention: who is stuck, and in which chapter.</span></figcaption>
+          </figure>
+          <figure class="kabut">
+            <img src="gambar/guru-perjalanan.webp" width="1008" height="977" loading="lazy" alt="Diagram Perjalanan siswa: jumlah siswa di tiap bab." data-alt-en="Student journey chart: number of students in each chapter." />
+            <figcaption><span data-l="id">Perjalanan siswa: berapa anak di tiap bab saat ini.</span><span data-l="en">Student journey: how many children are in each chapter right now.</span></figcaption>
+          </figure>
+          <figure class="kabut">
+            <img src="gambar/guru-soal.webp" width="1008" height="246" loading="lazy" alt="Kartu soal: persen benar langsung dan pilihan salah yang paling sering dipilih." data-alt-en="Question card: first-try accuracy and the most common wrong choice." />
+            <figcaption><span data-l="id">Miskonsepsi: pilihan salah yang paling sering dipilih.</span><span data-l="en">Misconceptions: the wrong choice picked most often.</span></figcaption>
+          </figure>
+        </div>
+        <p class="catatan-data" data-l="id">Nama di gambar berasal dari Kelas Contoh bawaan game (data uji coba), bukan siswa nyata.</p>
+        <p class="catatan-data" data-l="en">Names in these images come from the game's built-in Sample Class (test data), not real students.</p>
+
+        <div class="guru-rinci">
+          <div>
+            <h3><span data-l="id">Cara penilaian</span><span data-l="en">How scoring works</span></h3>
+            <ul>
+              <li><span data-l="id">Nilai resmi diambil dari percobaan pertama.</span><span data-l="en">The official score comes from the first attempt.</span></li>
+              <li><span data-l="id">Benar di kesempatan ke-1, ke-2, ke-3 bernilai 1; 0,5; 0,25.</span><span data-l="en">Correct on the 1st, 2nd, or 3rd try scores 1, 0.5, or 0.25.</span></li>
+              <li><span data-l="id">Nilai akhir 0 sampai 100: 60% rata-rata balai + 40% Final.</span><span data-l="en">Final grade 0 to 100: 60% hall average + 40% finale.</span></li>
+              <li><span data-l="id">KKM bawaan 70, bisa diubah guru di dasbor.</span><span data-l="en">Default pass mark is 70, adjustable on the dashboard.</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3><span data-l="id">Data yang bisa diolah</span><span data-l="en">Data you can work with</span></h3>
+            <ul>
+              <li><span data-l="id">Tiga tab: Kelas, Soal, Siswa (detail, nilai per bab, rekomendasi).</span><span data-l="en">Three tabs: Class, Questions, Students (details, chapter scores, recommendations).</span></li>
+              <li><span data-l="id">Ekspor CSV Kelas dan CSV Jawaban (satu baris per jawaban) untuk analisis butir soal di Excel.</span><span data-l="en">Export Class CSV and Answers CSV (one row per answer) for item analysis in Excel.</span></li>
+              <li><span data-l="id">Bila server dimulai ulang, ruang kelas dibangun lagi dari browser guru dan siswa tersambung otomatis.</span><span data-l="en">If the server restarts, the class is rebuilt from the teacher's browser and students reconnect automatically.</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="video" id="video-guru">
+          <h3><span data-l="id">Video: memakai Mode Guru</span><span data-l="en">Video: using Teacher Mode</span></h3>
+          <div class="video-kotak">
+            <!-- TODO: ganti dengan sematan YouTube saat tautan video mode guru tersedia. -->
+            <p><span data-l="id">Video menyusul</span><span data-l="en">Video coming soon</span></p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ Nilai ============ -->
+      <section class="nilai" id="nilai" aria-labelledby="judul-nilai">
+        <h2 id="judul-nilai">
+          <span data-l="id">Nilai keislaman dan kemuhammadiyahan</span>
+          <span data-l="en">Islamic and Muhammadiyah values</span>
+        </h2>
+        <p class="nilai-lead" data-l="id">Bukan bagian tersendiri, tetapi hadir di setiap pertemuan dengan Penjaga.</p>
+        <p class="nilai-lead" data-l="en">Not a separate chapter: they appear in every meeting with a Guardian.</p>
+        <ul class="nilai-daftar">
+          <li><span data-l="id">Salam di setiap pertemuan</span><span data-l="en">A greeting of salam at every meeting</span></li>
+          <li><span data-l="id">Basmalah sebelum tantangan</span><span data-l="en">Basmalah before each challenge</span></li>
+          <li><span data-l="id">Hamdalah setelah lulus</span><span data-l="en">Hamdalah after passing</span></li>
+          <li><span data-l="id">Tadabbur alam</span><span data-l="en">Reflecting on nature (tadabbur)</span></li>
+          <li><span data-l="id">Manusia sebagai khalifah penjaga bumi</span><span data-l="en">People as caretakers (khalifah) of the earth</span></li>
+          <li><span data-l="id">Ilmu untuk menolong sesama</span><span data-l="en">Knowledge used to help others</span></li>
+        </ul>
+      </section>
+
+      <!-- ============ AI ============ -->
+      <section class="ai" id="ai" aria-labelledby="judul-ai">
+        <h2 id="judul-ai">
+          <span data-l="id">Bagaimana AI dipakai</span>
+          <span data-l="en">How AI was used</span>
+        </h2>
+        <p class="ai-lead" data-l="id">
+          Platform AI: Claude (Anthropic). AI dipakai sebagai alat bantu ide, naskah, kode, dan pengujian. Keputusan
+          desain dan pemeriksaan materi ada pada guru.
+        </p>
+        <p class="ai-lead" data-l="en">
+          AI platform: Claude (Anthropic). AI was used as a helper for ideas, writing, code, and testing. Design decisions
+          and checking the material stayed with the teacher.
+        </p>
+        <div class="ai-kolom">
+          <div>
+            <h3><span data-l="id">Dibantu AI</span><span data-l="en">Helped by AI</span></h3>
+            <ul>
+              <li><span data-l="id">Rancangan alur: pola misi 6 tahap, Halaman Cerita, kuis dalam percakapan, Final, dasbor guru</span><span data-l="en">Game flow design: the 6-step mission pattern, Story Pages, quizzes in dialogue, the finale, the teacher dashboard</span></li>
+              <li><span data-l="id">Mengemas materi menjadi 44 adegan cerita dan petunjuk soal yang merujuk adegan</span><span data-l="en">Turning the material into 44 story scenes and hints that point back to scenes</span></li>
+              <li><span data-l="id">Kode game, ilustrasi SVG, dan cutscene</span><span data-l="en">Game code, SVG illustrations, and cutscenes</span></li>
+              <li><span data-l="id">Uji otomatis: uji unit, uji satu balai penuh, uji multiplayer, uji Final</span><span data-l="en">Automated tests: unit tests, a full-hall run, multiplayer, and the finale</span></li>
+            </ul>
+          </div>
+          <div>
+            <h3><span data-l="id">Diputuskan guru</span><span data-l="en">Decided by the teacher</span></h3>
+            <ul>
+              <li><span data-l="id">Judul, urutan balai mengikuti bab buku, sembilan Penjaga, nama tokoh bernuansa Nusantara</span><span data-l="en">The title, halls in textbook order, nine Guardians, character names with a Nusantara feel</span></li>
+              <li><span data-l="id">Narasi suara, cara kerja mode kelas, dan batas lulus Final 70%</span><span data-l="en">Voice narration, how class mode works, and the 70% finale pass mark</span></li>
+              <li><span data-l="id">Bank soal dan materi asal dari versi sebelumnya</span><span data-l="en">The question bank and source material from the earlier version</span></li>
+              <li><span data-l="id">Persetujuan nilai keislaman yang dimasukkan</span><span data-l="en">Approving the Islamic values included</span></li>
+            </ul>
+          </div>
+        </div>
+        <p class="ai-cek" data-l="id">
+          Kunci jawaban diperiksa otomatis dengan <code>npm run verify:bank</code>: setiap kunci ada tepat satu kali di
+          pilihan, tidak ada soal ganda, dan Final tepat 30 soal. Tidak ada nama atau data murid yang dimasukkan ke AI.
+        </p>
+        <p class="ai-cek" data-l="en">
+          Answer keys are checked automatically with <code>npm run verify:bank</code>: every key appears exactly once
+          among the options, no duplicate questions, and the finale has exactly 30. No student names or data were given
+          to the AI.
+        </p>
+        <a class="tautan-aksi" href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/jurnal-ai.md">
+          <span data-l="id">Baca jurnal AI lengkap</span><span data-l="en">Read the full AI journal (Indonesian)</span>
+        </a>
+      </section>
+
+      <!-- ============ Privasi ============ -->
+      <section class="privasi" id="privasi" aria-labelledby="judul-privasi">
+        <h2 id="judul-privasi"><span data-l="id">Privasi</span><span data-l="en">Privacy</span></h2>
+        <p data-l="id">
+          Mode sendiri tidak mengirim data ke mana pun; progres disimpan di perangkat. Mode kelas mengirim nama
+          panggilan, posisi, dan ringkasan belajar ke server kelas selama sesi, disimpan di memori server, dan tidak
+          dibagikan ke pihak ketiga. Guru dianjurkan meminta siswa memakai nama panggilan.
+        </p>
+        <p data-l="en">
+          Solo mode sends no data anywhere; progress stays on the device. Class mode sends a nickname, position, and a
+          learning summary to the class server during the session. It is kept in server memory and never shared with
+          third parties. Teachers are encouraged to have students use nicknames.
+        </p>
+      </section>
+
+      <!-- ============ Pembuat ============ -->
+      <section class="pembuat" id="pembuat" aria-labelledby="judul-pembuat">
+        <div class="pembuat-kartu">
+          <img class="pembuat-foto" src="gambar/pembuat.webp" width="280" height="512" loading="lazy" alt="Foto Rosyitania Yudha Astari, S.Pd" data-alt-en="Photo of Rosyitania Yudha Astari, S.Pd" />
+          <div class="pembuat-teks">
+            <p class="pembuat-label"><span data-l="id">Dibuat oleh</span><span data-l="en">Made by</span></p>
+            <h2 id="judul-pembuat">Rosyitania Yudha Astari, S.Pd</h2>
+            <p class="pembuat-sekolah">SD Muhammadiyah Wonorejo Polokarto</p>
+            <p class="pembuat-lomba" data-l="id">
+              Karya untuk Lomba Guru Pembuatan Game Edukasi Berbasis AI bagi Guru Muhammadiyah se-Cabang Blimbing, dalam
+              rangka Hari Guru Nasional dan Milad Muhammadiyah (2026).
+            </p>
+            <p class="pembuat-lomba" data-l="en">
+              Entry for the AI-Based Educational Game Competition for Muhammadiyah Teachers of the Blimbing Branch, held
+              for National Teachers' Day and the Muhammadiyah Anniversary (2026).
+            </p>
+            <div class="pembuat-logo">
+              <img src="gambar/logo-muh.webp" width="160" height="160" alt="Logo Muhammadiyah" />
+              <img src="gambar/logo-sdm.webp" width="160" height="205" alt="Logo SD Muhammadiyah Wonorejo" />
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="kaki">
+      <p>
+        Survival Sains · <a href="../">sains-edu.sdmuhwonorejo.com</a> ·
+        <a href="https://github.com/redirectcreative-rekandigital/petualangan-di-pasar/blob/main/docs/atribusi.md"><span data-l="id">Lisensi dan atribusi</span><span data-l="en">License and attribution</span></a>
+      </p>
+    </footer>
+
+      </body>
+</html>

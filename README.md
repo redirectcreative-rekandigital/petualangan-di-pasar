@@ -8,6 +8,8 @@ Blimbing Dalam Rangka Hari Guru Nasional dan Milad Muhammadiyah (2026)**.
 
 **Main sekarang:** <https://sains-edu.sdmuhwonorejo.com/>
 
+**Pengantar karya untuk juri:** <https://sains-edu.sdmuhwonorejo.com/pembuka/> (ringkasan, screenshot, dan jalur coba 5 menit; ID/EN)
+
 ## Identitas karya
 
 | | |
@@ -184,6 +186,7 @@ npm run lint
 npm run smoke      # uji asap 1 balai penuh di layar HP (butuh server berjalan)
 npm run smoke:guru # uji asap Mode Guru (setelah npm run build)
 node scripts/smoke-multiplayer.mjs   # uji guru + 2 siswa (butuh `npm run serve`)
+node scripts/tangkap-pembuka.mjs     # ambil ulang screenshot halaman /pembuka (butuh `npm run serve`)
 ```
 
 Port bisa diganti: `PORT=9000 npm run serve` atau `npx vite --port 5180`.

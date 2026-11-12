@@ -43,7 +43,10 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico,json,woff2}', 'assets/gambar-hp/*.webp', 'assets/sampul-*.webp'],
         // Decoder DRACO/KTX2 dan model 3D tidak diprecache (berat, jarang dipakai
         // saat kunjungan pertama) — cukup di-cache saat benar-benar diminta.
-        globIgnores: ['assets/libs/**', 'assets/models/**'],
+        // Halaman /pembuka untuk juri, bukan untuk main offline siswa.
+        globIgnores: ['assets/libs/**', 'assets/models/**', 'pembuka/**'],
+        // Tanpa ini, HP yang sudah memasang game membuka game saat menuju /pembuka/.
+        navigateFallbackDenylist: [/\/pembuka(\/|$)/],
         maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
         runtimeCaching: [
           {

@@ -1020,27 +1020,6 @@ main > section > * {
   }
 }
 
-/* ---------- Video ---------- */
-.video h3 {
-  font-size: 1.2rem;
-}
-
-.video-kotak {
-  aspect-ratio: 16 / 9;
-  max-width: 640px;
-  display: grid;
-  place-items: center;
-  border-radius: var(--r-kartu);
-  border: 2px dashed #b9a275;
-  background: rgba(255, 251, 241, 0.6);
-}
-
-.video-kotak p {
-  margin: 0;
-  font: 700 1.2rem var(--font-judul);
-  color: var(--tinta-lemah);
-}
-
 /* ---------- Mode Guru ---------- */
 .guru {
   background: var(--hijau-tua);
@@ -1116,15 +1095,6 @@ main > section > * {
   margin: 0;
   display: grid;
   gap: 8px;
-  color: var(--teks-terang-lemah);
-}
-
-.guru .video-kotak {
-  border-color: rgba(255, 248, 232, 0.4);
-  background: rgba(255, 248, 232, 0.05);
-}
-
-.guru .video-kotak p {
   color: var(--teks-terang-lemah);
 }
 

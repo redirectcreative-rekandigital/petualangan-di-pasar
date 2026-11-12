@@ -38,8 +38,8 @@ export function langkahPanduan(id: IdPanduan, opsi: { online?: boolean } = {}): 
         {
           target: '.joystick-base',
           teks: hp
-            ? t('Geser joystick ini untuk berjalan. Ikuti panah kuning menuju tujuanmu.')
-            : t('Tekan W A S D (atau tombol panah) untuk berjalan. Ikuti panah kuning menuju tujuanmu.'),
+            ? t('Geser joystick ini untuk berjalan. Ikuti panah kuning menuju tujuanmu. Panah samar di bawah kakimu juga menunjuk arahnya.')
+            : t('Tekan W A S D (atau tombol panah) untuk berjalan. Ikuti panah kuning menuju tujuanmu. Panah samar di bawah kakimu juga menunjuk arahnya.'),
         },
         {
           teks: hp

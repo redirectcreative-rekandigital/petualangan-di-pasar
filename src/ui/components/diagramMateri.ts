@@ -46,7 +46,9 @@ export function renderDiagramMateri(diagram: DiagramMateri): HTMLElement {
       children: [
         el('summary', {
           class: 'diagram-tombol',
-          children: [el('span', { class: 'diagram-nama', text: b.nama }), el('span', { class: 'diagram-panah', attrs: { 'aria-hidden': 'true' }, text: '▾' })],
+          children: [
+            b.ikon ? el('span', { class: 'diagram-bagian-ikon', attrs: { 'aria-hidden': 'true' }, text: b.ikon }) : null,
+            el('span', { class: 'diagram-nama', text: b.nama }), el('span', { class: 'diagram-panah', attrs: { 'aria-hidden': 'true' }, text: '▾' })],
         }),
         el('p', { class: 'diagram-isi', text: b.fungsi }),
       ],

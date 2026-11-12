@@ -2,11 +2,11 @@ import { el } from './components/dom';
 import { sfx } from '../core/sound';
 import { ucapkan, berhenti } from '../core/suara';
 import { renderDiagramMateri } from './components/diagramMateri';
-import { getAdegan, type Adegan, type Interaksi, type Latar, type Sprite } from '../data/adegan';
+import { getAdegan, type Adegan, type Interaksi, type JenisBunyi, type Latar, type Sprite } from '../data/adegan';
 import type { CeritaBalai } from '../data/cerita';
 import { pasangGambar } from '../core/gambar';
 import type { BalaiMeta } from '../../shared/types';
-import { t } from '../core/bahasa';
+import { BAHASA, t } from '../core/bahasa';
 
 /**
  * Halaman Cerita: buku cerita bergerak berisi 4 adegan per materi, ditutup
@@ -105,7 +105,7 @@ const FONT_LABEL = '"Baloo 2", "Segoe UI", system-ui, sans-serif';
  * - Label yang menempel di atas balok berwarna (kutub magnet, lapisan tanah)
  *   cukup teks tegas bergaris tepi gelap tipis, tanpa pil.
  */
-function gambarLabel(svg: SVGSVGElement, s: Extract<Sprite, { t: 'label' }>, diAtasKotak: boolean, kelas: string, gaya: string): void {
+function gambarLabel(svg: SVGSVGElement, s: Extract<Sprite, { t: 'label' }>, diAtasKotak: boolean, kelas: string, gaya: string): SVGGElement {
   const ukuran = Math.max(11, s.s ?? 11);
   const warnaTeks = s.w ?? '#0f172a';
   const terang = kecerahan(warnaTeks) > 0.6;
@@ -128,7 +128,7 @@ function gambarLabel(svg: SVGSVGElement, s: Extract<Sprite, { t: 'label' }>, diA
     t.setAttribute('stroke-linejoin', 'round');
     g.append(t);
     svg.append(g);
-    return;
+    return g;
   }
   // Lebar pil: perkiraan awal, lalu disesuaikan dengan ukuran teks sebenarnya
   // begitu SVG tampil di layar (dan sekali lagi setelah font selesai dimuat).
@@ -160,9 +160,14 @@ function gambarLabel(svg: SVGSVGElement, s: Extract<Sprite, { t: 'label' }>, diA
   };
   requestAnimationFrame(() => requestAnimationFrame(pas));
   void document.fonts?.ready.then(pas);
+  return g;
 }
 
 function gambarSprite(svg: SVGSVGElement, s: Sprite, kotakAdegan: Array<Extract<Sprite, { t: 'kotak' }>> = []): void {
+  if (s.t === 'gelombang') {
+    gambarGelombang(svg, s);
+    return;
+  }
   const kelas = s.a ? `anim-${s.a}` : '';
   const gaya = s.d ? `animation-delay:${s.d}s` : '';
   if (s.t === 'garis') {
@@ -203,23 +208,117 @@ function gambarSprite(svg: SVGSVGElement, s: Sprite, kotakAdegan: Array<Extract<
     gambarLabel(svg, s, diAtasKotak, kelas, gaya);
     return;
   }
+  const ukuran = s.s ?? 30;
   const g = svgEl('g', { class: kelas, style: `${gaya};transform-origin:${s.x}px ${s.y}px;transform-box:view-box` });
+  // Benda tanpa animasi muncul sendiri ikut "masuk" memantul, bergiliran.
+  const masuk = svgEl('g', {
+    class: s.a === 'muncul' ? '' : 'masuk',
+    style: `animation-delay:${Math.min(urutanMasuk++ * 0.12, 1.2).toFixed(2)}s;transform-origin:${s.x}px ${s.y}px;transform-box:view-box`,
+  });
   const t = svgEl('text', {
     x: s.x,
     y: s.y,
-    'font-size': s.s ?? 30,
+    'font-size': ukuran,
     'text-anchor': 'middle',
     'dominant-baseline': 'central',
+    style: `transform-origin:${s.x}px ${s.y}px;transform-box:view-box`,
   });
   t.textContent = s.e;
-  g.append(t);
+  masuk.append(t);
+  g.append(masuk);
   svg.append(g);
+  if (s.n) pasangKetuk(svg, g, t, s.n, s.x, s.y, ukuran);
+}
+
+/** Urutan benda dalam adegan (untuk jeda animasi masuk); direset tiap adegan. */
+let urutanMasuk = 0;
+
+const WARNA_BUNYI: Record<JenisBunyi, { w: string; durasi: number }> = {
+  infra: { w: '#7c3aed', durasi: 2.4 },
+  audio: { w: '#16a34a', durasi: 1.8 },
+  ultra: { w: '#ea580c', durasi: 1.0 },
+};
+
+/** Tiga busur yang memancar dari sumber bunyi, membesar lalu memudar. */
+function gambarGelombang(svg: SVGSVGElement, s: Extract<Sprite, { t: 'gelombang' }>): void {
+  const { w, durasi } = WARNA_BUNYI[s.jenis];
+  const r = s.s ?? 18;
+  // Busur ±55° di sisi `arah`, berpusat di sumber bunyi.
+  const dx = Math.cos(0.96) * r * s.arah;
+  const dy = Math.sin(0.96) * r;
+  const d = `M ${s.x + dx} ${s.y - dy} A ${r} ${r} 0 0 ${s.arah === 1 ? 1 : 0} ${s.x + dx} ${s.y + dy}`;
+  for (let i = 0; i < 3; i++) {
+    svg.append(
+      svgEl('path', {
+        d,
+        fill: 'none',
+        stroke: w,
+        'stroke-width': 3.5,
+        'stroke-linecap': 'round',
+        'vector-effect': 'non-scaling-stroke',
+        class: 'anim-gelombang',
+        style: `animation-duration:${durasi}s;animation-delay:${((s.d ?? 0) + (durasi / 3) * i).toFixed(2)}s;transform-origin:${s.x}px ${s.y}px;transform-box:view-box`,
+      }),
+    );
+  }
+}
+
+/** Benda bisa diketuk: melompat kecil dan namanya muncul sebentar. */
+function pasangKetuk(svg: SVGSVGElement, g: SVGGElement, t: SVGTextElement, nama: string, x: number, y: number, ukuran: number): void {
+  g.classList.add('bisa-ketuk');
+  g.setAttribute('role', 'button');
+  g.setAttribute('tabindex', '0');
+  g.setAttribute('aria-label', nama);
+  let label: SVGGElement | null = null;
+  let jeda = 0;
+  const tampil = (): void => {
+    sfx.click();
+    t.classList.remove('lompat');
+    void t.getBoundingClientRect(); // paksa reflow agar animasi lompat diulang
+    t.classList.add('lompat');
+    label?.remove();
+    window.clearTimeout(jeda);
+    // Label di bawah benda; bila terlalu dekat tepi bawah, di atasnya.
+    const bawah = y + ukuran * 0.62 + 12;
+    const ly = bawah < 194 ? bawah : y - ukuran * 0.62 - 4;
+    label = gambarLabel(svg, { t: 'label', teks: nama, x: Math.min(Math.max(x, 50), 270), y: ly, s: 12 }, false, 'anim-muncul label-ketuk', '');
+    jeda = window.setTimeout(() => label?.remove(), 2500);
+  };
+  g.addEventListener('click', tampil);
+  g.addEventListener('keydown', (ev) => {
+    if (ev.key === 'Enter' || ev.key === ' ') {
+      ev.preventDefault();
+      tampil();
+    }
+  });
+}
+
+/**
+ * Narasi dengan kata kunci materi ditebalkan. Kata yang memuat salah satu
+ * `kata` (mis. "pantul" → "memantul") ikut disorot.
+ */
+export function sorotKata(teks: string, kata: string[]): Array<Node> {
+  // shortcut: `kata` hanya berbahasa Indonesia, jadi mode Inggris tanpa sorot; terjemahkan `kata` bila perlu.
+  if (BAHASA !== 'id' || kata.length === 0) return [document.createTextNode(teks)];
+  const pola = [...kata].sort((x, y) => y.length - x.length).map((k) => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+  const re = new RegExp(`[\\p{L}-]*(?:${pola.join('|')})[\\p{L}-]*`, 'giu');
+  const hasil: Node[] = [];
+  let akhir = 0;
+  for (const m of teks.matchAll(re)) {
+    const i = m.index ?? 0;
+    if (i > akhir) hasil.push(document.createTextNode(teks.slice(akhir, i)));
+    hasil.push(el('strong', { class: 'kata-kunci', text: m[0] }));
+    akhir = i + m[0].length;
+  }
+  if (akhir < teks.length) hasil.push(document.createTextNode(teks.slice(akhir)));
+  return hasil;
 }
 
 /** Menggambar satu adegan menjadi elemen SVG. */
 export function gambarAdegan(adegan: Adegan, id: string): SVGSVGElement {
   const svg = svgEl('svg', { viewBox: '0 0 320 200', class: 'cerita-svg', role: 'img', 'aria-label': adegan.judul });
   gambarLatar(svg, adegan.latar, id);
+  urutanMasuk = 0;
   const kotak = adegan.sprite.filter((s): s is Extract<Sprite, { t: 'kotak' }> => s.t === 'kotak');
   for (const s of adegan.sprite) gambarSprite(svg, s, kotak);
   return svg;
@@ -420,7 +519,7 @@ export function bukaHalamanCerita(host: HTMLElement, opsi: OpsiHalaman): Promise
       const a = daftar[indeks] as Adegan;
       const svg = gambarAdegan(a, `${opsi.cerita.kode}-${indeks}`);
       const narasi = el('div', { class: 'cerita-narasi' });
-      a.narasi.forEach((n, i) => narasi.append(el('p', { text: n, attrs: { 'data-i': String(i) } })));
+      a.narasi.forEach((n, i) => narasi.append(el('p', { children: sorotKata(n, a.kata), attrs: { 'data-i': String(i) } })));
 
       // Bacakan narasi berurutan, sorot paragraf yang sedang dibaca.
       const bacakan = (i: number): void => {
@@ -479,7 +578,10 @@ export function bukaHalamanCerita(host: HTMLElement, opsi: OpsiHalaman): Promise
 
       // `ada-panggung`: di layar mendatar, gambar adegan di kiri & narasi di kanan.
       buku.classList.add('ada-panggung');
-      buku.append(kepala(a.judul), el('div', { class: 'cerita-panggung', children: [svg] }), narasi, el('div', { class: 'cerita-alat', children: [ulang] }));
+      const petunjukKetuk = a.sprite.some((s) => s.t !== 'gelombang' && 'n' in s && s.n)
+        ? el('span', { class: 'cerita-petunjuk-ketuk', text: t('👆 Ketuk gambar untuk melihat namanya') })
+        : null;
+      buku.append(kepala(a.judul), el('div', { class: 'cerita-panggung', children: [svg] }), narasi, el('div', { class: 'cerita-alat', children: [petunjukKetuk, ulang] }));
       if (interaksiEl) buku.append(interaksiEl);
       buku.append(el('div', { class: 'cerita-navigasi', children: opsi.modeIngat ? [kembali] : [kembali, lanjut] }));
       window.setTimeout(() => bacakan(0), 250);

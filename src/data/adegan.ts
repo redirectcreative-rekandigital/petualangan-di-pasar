@@ -48,8 +48,14 @@ export type Animasi =
   /** Tanda ❌ "putus": tersembunyi, lalu muncul di paruh kedua siklus 6 detik. */
   | 'tanda-putus';
 
+/** Jenis bunyi untuk gelombang: warna & kerapatan berbeda (infra = ungu renggang, ultra = jingga rapat). */
+export type JenisBunyi = 'infra' | 'audio' | 'ultra';
+
 export type Sprite =
-  | { t?: 'emoji'; e: string; x: number; y: number; s?: number; a?: Animasi; d?: number }
+  /** `n`: nama benda, muncul saat benda diketuk. */
+  | { t?: 'emoji'; e: string; x: number; y: number; s?: number; a?: Animasi; d?: number; n?: string }
+  /** Tiga busur yang memancar dari (x, y); `arah` 1 = ke kanan, -1 = ke kiri. */
+  | { t: 'gelombang'; x: number; y: number; arah: 1 | -1; jenis: JenisBunyi; s?: number; d?: number }
   | { t: 'garis'; x1: number; y1: number; x2: number; y2: number; w?: string; tebal?: number; a?: Animasi; d?: number; putus?: boolean }
   | { t: 'label'; teks: string; x: number; y: number; s?: number; a?: Animasi; d?: number; w?: string }
   | { t: 'kotak'; x: number; y: number; lebar: number; tinggi: number; w: string; a?: Animasi; d?: number; r?: number };
@@ -76,7 +82,8 @@ export interface Adegan {
 }
 
 /* Singkatan agar data ringkas. */
-const e = (emo: string, x: number, y: number, s = 30, a?: Animasi, d?: number): Sprite => ({ e: emo, x, y, s, a, d });
+const e = (emo: string, x: number, y: number, s = 30, a?: Animasi, d?: number, n?: string): Sprite => ({ e: emo, x, y, s, a, d, n });
+const gel = (x: number, y: number, arah: 1 | -1, jenis: JenisBunyi, s = 18, d = 0): Sprite => ({ t: 'gelombang', x, y, arah, jenis, s, d });
 const g = (x1: number, y1: number, x2: number, y2: number, w = '#fde047', a: Animasi = 'gambar', d = 0, tebal = 4): Sprite => ({
   t: 'garis', x1, y1, x2, y2, w, a, d, tebal,
 });
@@ -110,7 +117,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Di dalam goa yang gelap, sebuah berkas sinar masuk dari celah atap.',
         'Lihat! Sinarnya lurus. Cahaya selalu merambat lurus.',
       ],
-      sprite: [e('☀️', 40, 22, 30, 'denyut'), g(52, 30, 200, 170, '#fde047', 'gambar', 0.3, 10), e('🧒', 210, 160, 34), l('merambat lurus', 150, 95, 12, 'muncul', 1.2, '#fef9c3')],
+      sprite: [e('☀️', 40, 26, 42, 'denyut', 0, 'Matahari'), g(52, 30, 200, 170, '#fde047', 'gambar', 0.3, 10), e('🧒', 218, 152, 50, undefined, undefined, 'Anak'), l('merambat lurus', 150, 95, 12, 'muncul', 1.2, '#fef9c3')],
       kata: ['lurus', 'merambat', 'cahaya'],
     },
     {
@@ -122,7 +129,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
       ],
       sprite: [
         g(20, 40, 120, 110, '#fde047', 'gambar', 0, 6),
-        e('🪞', 125, 112, 30),
+        e('🪞', 125, 112, 40, undefined, undefined, 'Cermin'),
         g(128, 108, 230, 40, '#fde047', 'gambar', 0.8, 6),
         l('dipantulkan', 205, 30, 11, 'muncul', 1.2, '#fef9c3'),
         { t: 'kotak', x: 190, y: 140, lebar: 120, tinggi: 55, w: '#38bdf8', r: 6 },
@@ -140,11 +147,11 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Cahaya melewati kornea, pupil, lensa, lalu jatuh di retina. Saraf membawa pesannya ke otak.',
       ],
       sprite: [
-        e('🌼', 30, 110, 34),
+        e('🌼', 30, 108, 44, undefined, undefined, 'Benda (bunga)'),
         g(50, 105, 150, 105, '#facc15', 'gambar', 0.2, 4),
-        e('👁️', 170, 105, 54, 'denyut'),
+        e('👁️', 170, 105, 66, 'denyut', 0, 'Mata'),
         g(195, 105, 270, 80, '#f472b6', 'gambar', 1.2, 3),
-        e('🧠', 285, 72, 34, 'muncul', 1.6),
+        e('🧠', 285, 72, 44, 'muncul', 1.6, 'Otak'),
         l('kornea → pupil → lensa → retina', 160, 170, 11, 'muncul', 0.8),
       ],
       kata: ['mata', 'kornea', 'pupil', 'iris', 'lensa', 'retina', 'saraf', 'melihat', 'otak'],
@@ -156,7 +163,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Mata adalah nikmat dari Allah yang harus dijaga.',
         'Ayo pilih kebiasaan yang baik untuk mata!',
       ],
-      sprite: [e('📖', 90, 110, 40), e('💡', 140, 50, 34, 'kedip'), e('🥕', 220, 120, 34, 'goyang')],
+      sprite: [e('📖', 85, 115, 56, undefined, undefined, 'Membaca buku'), e('💡', 150, 50, 46, 'kedip', 0, 'Cahaya terang'), e('🥕', 230, 120, 50, 'goyang', 0, 'Wortel (vitamin A)')],
       kata: ['menjaga', 'rabun', 'kacamata', 'gangguan', 'jarak', 'terang', 'vitamin'],
       interaksi: {
         jenis: 'pilih',
@@ -179,7 +186,16 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Bunyi terjadi karena benda bergetar. Getarannya merambat lewat udara sampai ke telinga.',
         'Bunyi bisa merambat lewat benda padat, cair, dan gas, tapi tidak di ruang hampa.',
       ],
-      sprite: [e('🥁', 60, 120, 40, 'getar'), e('〰️', 120, 115, 28, 'geser'), e('〰️', 165, 115, 28, 'geser', 0.4), e('👂', 240, 115, 40, 'denyut', 0.8), l('padat · cair · gas', 160, 175, 12)],
+      sprite: [
+        e('🥁', 55, 100, 62, 'getar', 0, 'Gendang bergetar'),
+        gel(92, 98, 1, 'audio', 20),
+        gel(160, 98, 1, 'audio', 20, 0.6),
+        e('👂', 262, 98, 64, 'denyut', 0.8, 'Telinga'),
+        e('🧱', 110, 150, 24, undefined, undefined, 'Padat'),
+        e('💧', 160, 150, 24, undefined, undefined, 'Cair'),
+        e('💨', 210, 150, 24, undefined, undefined, 'Gas (udara)'),
+        l('padat · cair · gas', 160, 182, 12),
+      ],
       kata: ['merambat', 'getar', 'medium', 'perantara', 'padat', 'cair', 'gas', 'hampa', 'udara', 'kecepatan'],
     },
     {
@@ -189,7 +205,14 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Pemain berteriak "Halo!" ke arah tebing. Bunyinya memantul kembali.',
         'Bunyi pantul yang terdengar setelah bunyi asli disebut gema. Bunyi bisa juga diserap benda lunak.',
       ],
-      sprite: [e('🧒', 50, 140, 36), l('Halo!', 85, 110, 13, 'muncul', 0), e('〰️', 140, 110, 26, 'geser'), e('⛰️', 270, 120, 70), e('〰️', 200, 135, 26, 'geser-balik', 1), l('...halo!', 120, 160, 12, 'muncul', 1.6, '#7c3aed')],
+      sprite: [
+        e('⛰️', 262, 112, 104, undefined, undefined, 'Tebing'),
+        e('🧒', 48, 135, 52, undefined, undefined, 'Pemain berteriak'),
+        l('Halo!', 78, 92, 14, 'muncul', 0),
+        gel(78, 120, 1, 'audio', 22),
+        gel(205, 135, -1, 'audio', 20, 1),
+        l('...halo!', 130, 172, 13, 'muncul', 1.6, '#7c3aed'),
+      ],
       kata: ['gema', 'gaung', 'pantul', 'serap', 'tebing', 'peredam'],
     },
     {
@@ -199,7 +222,15 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Daun telinga menangkap bunyi. Gendang telinga ikut bergetar.',
         'Getaran diteruskan tulang pendengaran ke rumah siput, lalu saraf membawanya ke otak.',
       ],
-      sprite: [e('〰️', 40, 100, 30, 'geser'), e('👂', 110, 100, 60), e('🥁', 175, 100, 24, 'getar', 0.5), e('🐌', 225, 100, 30, 'muncul', 1), e('🧠', 285, 95, 32, 'muncul', 1.5), l('daun telinga → gendang → tulang → rumah siput', 160, 170, 10)],
+      sprite: [
+        gel(6, 95, 1, 'audio', 16),
+        e('👂', 62, 95, 66, undefined, undefined, 'Daun telinga'),
+        e('🥁', 132, 95, 36, 'getar', 0.5, 'Gendang telinga'),
+        e('🦴', 185, 95, 34, 'muncul', 0.8, 'Tulang pendengaran'),
+        e('🐌', 236, 95, 38, 'muncul', 1.1, 'Rumah siput (koklea)'),
+        e('🧠', 290, 92, 42, 'muncul', 1.5, 'Otak (lewat saraf)'),
+        l('daun telinga → gendang → tulang → rumah siput', 160, 170, 10),
+      ],
       kata: ['telinga', 'gendang', 'koklea', 'rumah siput', 'tulang', 'martil', 'landasan', 'sanggurdi', 'saraf', 'mendengar'],
     },
     {
@@ -209,7 +240,13 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Manusia bisa mendengar bunyi audiosonik, yaitu 20 sampai 20.000 getaran per detik.',
         'Ayo kelompokkan bunyi berikut!',
       ],
-      sprite: [e('🐘', 60, 120, 40), e('🧒', 160, 125, 36), e('🦇', 260, 70, 36, 'melayang')],
+      sprite: [
+        e('🐘', 52, 125, 70, undefined, undefined, 'Gajah: infrasonik'),
+        gel(92, 122, 1, 'infra', 14),
+        e('🧒', 165, 130, 56, undefined, undefined, 'Manusia: audiosonik'),
+        e('🦇', 268, 60, 56, 'melayang', 0, 'Kelelawar: ultrasonik'),
+        gel(240, 60, -1, 'ultra', 14),
+      ],
       kata: ['infrasonik', 'audiosonik', 'ultrasonik', 'frekuensi', 'kelelawar', 'lumba', 'jangkrik', 'amplitudo'],
       interaksi: {
         jenis: 'kelompok',
@@ -234,7 +271,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Di hutan ada pohon, kupu-kupu, rusa, jamur, batu, air, tanah, dan sinar matahari.',
         'Hubungan timbal balik antara makhluk hidup dan lingkungannya disebut ekosistem.',
       ],
-      sprite: [e('☀️', 280, 25, 30, 'denyut'), e('🌳', 60, 110, 56), e('🦋', 150, 60, 26, 'melayang'), e('🦌', 200, 140, 40), e('🍄', 110, 160, 24), e('🪨', 260, 165, 26), e('💧', 30, 170, 20, 'jatuh')],
+      sprite: [e('☀️', 280, 28, 40, 'denyut', 0, 'Matahari'), e('🌳', 62, 104, 78, undefined, undefined, 'Pohon'), e('🦋', 155, 58, 36, 'melayang', 0, 'Kupu-kupu'), e('🦌', 205, 135, 58, undefined, undefined, 'Rusa'), e('🍄', 118, 160, 34, undefined, undefined, 'Jamur'), e('🪨', 268, 162, 36, undefined, undefined, 'Batu'), e('💧', 26, 168, 26, 'jatuh', 0, 'Air')],
       kata: ['ekosistem', 'timbal balik', 'lingkungan', 'hutan'],
     },
     {
@@ -248,8 +285,8 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         { t: 'kotak', x: 15, y: 30, lebar: 140, tinggi: 150, w: '#bbf7d0', r: 10 },
         { t: 'kotak', x: 165, y: 30, lebar: 140, tinggi: 150, w: '#e2e8f0', r: 10 },
         l('BIOTIK', 85, 50, 13), l('ABIOTIK', 235, 50, 13),
-        e('🌿', 50, 100, 30, 'muncul', 0.3), e('🐿️', 110, 100, 30, 'muncul', 0.6), e('🍄', 80, 150, 28, 'muncul', 0.9),
-        e('💧', 200, 100, 28, 'muncul', 1.2), e('🪨', 260, 100, 28, 'muncul', 1.5), e('☀️', 230, 150, 28, 'muncul', 1.8),
+        e('🌿', 50, 100, 38, 'muncul', 0.3, 'Tumbuhan'), e('🐿️', 115, 100, 38, 'muncul', 0.6, 'Hewan (tupai)'), e('🍄', 82, 148, 36, 'muncul', 0.9, 'Jamur'),
+        e('💧', 200, 100, 36, 'muncul', 1.2, 'Air'), e('🪨', 265, 100, 36, 'muncul', 1.5, 'Batu'), e('☀️', 232, 148, 36, 'muncul', 1.8, 'Cahaya matahari'),
       ],
       kata: ['biotik', 'abiotik', 'tak hidup', 'komponen', 'tanah', 'batu', 'suhu'],
     },
@@ -260,7 +297,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Tumbuhan hijau adalah produsen. Ia membuat makanan sendiri dengan fotosintesis.',
         'Hewan adalah konsumen. Jamur dan bakteri adalah pengurai yang mengembalikan sisa makhluk hidup ke tanah.',
       ],
-      sprite: [e('🌱', 60, 120, 40, 'naik'), l('produsen', 60, 165), e('🐇', 160, 125, 40), l('konsumen', 160, 165, 11, 'muncul', 0.6), e('🍄', 260, 130, 36, 'muncul', 1), l('pengurai', 260, 165, 11, 'muncul', 1.2)],
+      sprite: [e('🌱', 60, 118, 52, 'naik', 0, 'Tumbuhan hijau'), l('produsen', 60, 165), e('🐇', 160, 120, 52, undefined, undefined, 'Kelinci (hewan)'), l('konsumen', 160, 165, 11, 'muncul', 0.6), e('🍄', 260, 124, 48, 'muncul', 1, 'Jamur'), l('pengurai', 260, 165, 11, 'muncul', 1.2)],
       kata: ['produsen', 'konsumen', 'pengurai', 'fotosintesis', 'herbivora', 'karnivora', 'omnivora', 'jamur', 'bakteri', 'insektivora'],
     },
     {
@@ -269,9 +306,9 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
       narasi: ['Ekosistem ada di darat, di perairan, dan ada juga buatan manusia seperti sawah.', 'Ayo catat penghuni hutan di Buku Catatan!'],
       // Buku catatan + penghuni hutan yang akan dikelompokkan (biotik/abiotik).
       sprite: [
-        e('📒', 160, 62, 44, 'denyut'),
-        e('🌳', 50, 140, 40, 'muncul', 0.2), e('🐿️', 105, 150, 32, 'muncul', 0.4), e('🍄', 150, 155, 28, 'muncul', 0.6),
-        e('💧', 200, 152, 26, 'muncul', 0.8), e('☀️', 245, 140, 32, 'muncul', 1), e('🌬️', 290, 150, 28, 'muncul', 1.2),
+        e('📒', 160, 60, 50, 'denyut', 0, 'Buku Catatan'),
+        e('🌳', 45, 140, 46, 'muncul', 0.2, 'Pohon'), e('🐿️', 102, 150, 38, 'muncul', 0.4, 'Tupai'), e('🍄', 152, 155, 34, 'muncul', 0.6, 'Jamur'),
+        e('💧', 202, 152, 32, 'muncul', 0.8, 'Air'), e('☀️', 248, 140, 38, 'muncul', 1, 'Cahaya matahari'), e('🌬️', 292, 150, 34, 'muncul', 1.2, 'Angin (udara)'),
         l('biotik atau abiotik?', 160, 112, 12, 'muncul', 1.4),
       ],
       kata: ['darat', 'perairan', 'buatan', 'sawah', 'kolam', 'akuarium', 'laut'],
@@ -299,7 +336,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Semua energi di ladang berawal dari matahari.',
         'Padi dan rumput menangkap cahaya matahari untuk membuat makanan. Mereka produsen.',
       ],
-      sprite: [e('☀️', 40, 30, 40, 'denyut'), g(60, 45, 150, 130, '#facc15', 'gambar', 0.3, 3), e('🌾', 160, 140, 46, 'goyang'), l('produsen', 160, 185, 11, 'muncul', 1)],
+      sprite: [e('☀️', 40, 32, 50, 'denyut', 0, 'Matahari (sumber energi)'), g(62, 50, 145, 120, '#facc15', 'gambar', 0.3, 3), e('🌾', 165, 135, 62, 'goyang', 0, 'Padi (produsen)'), e('🌿', 240, 148, 44, 'goyang', 0.3, 'Rumput (produsen)'), l('produsen', 200, 185, 11, 'muncul', 1)],
       kata: ['matahari', 'energi', 'produsen', 'padi', 'rumput'],
     },
     {
@@ -310,7 +347,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Peristiwa makan dan dimakan secara berurutan disebut rantai makanan.',
       ],
       sprite: [
-        e('🌾', 30, 140, 32), e('🦗', 90, 140, 30, 'muncul', 0.5), e('🐸', 150, 140, 32, 'muncul', 1), e('🐍', 210, 140, 32, 'muncul', 1.5), e('🦅', 275, 110, 36, 'muncul', 2),
+        e('🌾', 30, 140, 38, undefined, undefined, 'Padi'), e('🦗', 90, 140, 36, 'muncul', 0.5, 'Belalang'), e('🐸', 150, 140, 38, 'muncul', 1, 'Katak'), e('🐍', 210, 140, 38, 'muncul', 1.5, 'Ular'), e('🦅', 275, 106, 46, 'muncul', 2, 'Elang'),
         g(45, 140, 75, 140, '#f97316', 'gambar', 0.5, 3), g(105, 140, 133, 140, '#f97316', 'gambar', 1, 3), g(167, 140, 193, 140, '#f97316', 'gambar', 1.5, 3), g(227, 135, 258, 115, '#f97316', 'gambar', 2, 3),
         l('konsumen I → II → III → puncak', 160, 185, 11, 'muncul', 2.3),
       ],
@@ -323,7 +360,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Di alam, satu makhluk bisa makan lebih dari satu jenis makanan.',
         'Beberapa rantai makanan yang saling berhubungan membentuk jaring-jaring makanan. Jamur menguraikan yang mati.',
       ],
-      sprite: [e('🌾', 60, 150, 32), e('🐭', 40, 90, 28), e('🦗', 110, 90, 28), e('🐸', 170, 60, 28), e('🐍', 110, 30, 28), e('🦅', 250, 40, 34, 'melayang'), e('🍄', 250, 150, 30, 'muncul', 1.2),
+      sprite: [e('🌾', 60, 152, 36, undefined, undefined, 'Padi'), e('🐭', 40, 90, 34, undefined, undefined, 'Tikus'), e('🦗', 110, 90, 34, undefined, undefined, 'Belalang'), e('🐸', 172, 60, 34, undefined, undefined, 'Katak'), e('🐍', 110, 30, 34, undefined, undefined, 'Ular'), e('🦅', 252, 42, 44, 'melayang', 0, 'Elang'), e('🍄', 252, 148, 42, 'muncul', 1.2, 'Jamur (pengurai)'),
         g(60, 140, 45, 105, '#f97316', 'gambar', 0.2, 2), g(65, 140, 105, 105, '#f97316', 'gambar', 0.4, 2), g(115, 80, 160, 65, '#f97316', 'gambar', 0.6, 2), g(45, 80, 100, 40, '#f97316', 'gambar', 0.8, 2), g(165, 50, 125, 35, '#f97316', 'gambar', 1, 2), g(125, 28, 230, 40, '#f97316', 'gambar', 1.2, 2)],
       kata: ['jaring', 'jaring-jaring', 'pengurai', 'keseimbangan', 'punah', 'populasi'],
     },
@@ -333,10 +370,10 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
       narasi: ['Sekarang giliranmu. Susun rantai makanan dari produsen sampai konsumen puncak!'],
       // Rantai yang belum lengkap: produsen → ? → ? → konsumen puncak.
       sprite: [
-        e('🌾', 40, 100, 36), g(62, 100, 92, 100, '#ea580c', 'gambar', 0.2, 4),
+        e('🌾', 40, 100, 42, undefined, undefined, 'Padi (produsen)'), g(64, 100, 92, 100, '#ea580c', 'gambar', 0.2, 4),
         e('❓', 118, 100, 32, 'denyut', 0.4), g(140, 100, 170, 100, '#ea580c', 'gambar', 0.6, 4),
         e('❓', 196, 100, 32, 'denyut', 0.8), g(218, 100, 248, 100, '#ea580c', 'gambar', 1, 4),
-        e('🦅', 278, 96, 38),
+        e('🦅', 278, 96, 46, undefined, undefined, 'Elang (konsumen puncak)'),
         l('produsen', 40, 140, 11, 'muncul', 0.3), l('konsumen puncak', 256, 140, 11, 'muncul', 1.2),
         l('susun dari bawah ke atas!', 160, 52, 12, 'muncul', 1.4),
       ],
@@ -364,7 +401,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Lebah mengisap nektar dari bunga. Sambil terbang, lebah membantu penyerbukan bunga.',
         'Keduanya untung. Hubungan saling menguntungkan disebut simbiosis mutualisme.',
       ],
-      sprite: [e('🌸', 100, 140, 46), e('🌼', 220, 145, 42), e('🐝', 160, 80, 30, 'melayang'), l('untung + untung', 160, 185, 12, 'muncul', 0.8, '#15803d')],
+      sprite: [e('🌸', 90, 135, 60, undefined, undefined, 'Bunga'), e('🌼', 230, 140, 56, undefined, undefined, 'Bunga'), e('🐝', 160, 74, 46, 'melayang', 0, 'Lebah'), l('untung + untung', 160, 185, 12, 'muncul', 0.8, '#15803d')],
       kata: ['mutualisme', 'lebah', 'bunga', 'penyerbukan', 'menguntungkan', 'kupu'],
     },
     {
@@ -374,7 +411,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Anggrek menempel di batang pohon untuk mendapat cahaya. Pohonnya tidak dirugikan.',
         'Satu untung, yang lain tidak untung dan tidak rugi. Itu simbiosis komensalisme.',
       ],
-      sprite: [e('🌳', 160, 110, 100), e('🌺', 185, 95, 26, 'denyut'), l('untung + biasa saja', 160, 185, 12, 'muncul', 0.8, '#0369a1')],
+      sprite: [e('🌳', 160, 104, 112, undefined, undefined, 'Pohon'), e('🌺', 188, 92, 34, 'denyut', 0, 'Anggrek'), l('untung + biasa saja', 160, 185, 12, 'muncul', 0.8, '#0369a1')],
       kata: ['komensalisme', 'anggrek', 'menempel', 'tidak dirugikan', 'ikan remora', 'hiu'],
     },
     {
@@ -384,7 +421,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Benalu mengambil makanan dari pohon inangnya, sehingga pohon merugi. Nyamuk mengisap darah manusia.',
         'Satu untung, yang lain rugi. Itu simbiosis parasitisme. Ada juga predasi dan kompetisi.',
       ],
-      sprite: [e('🌳', 90, 110, 80), e('🌿', 110, 75, 26, 'goyang'), e('🦟', 230, 70, 26, 'melayang'), e('🧒', 240, 140, 36), l('untung + rugi', 160, 185, 12, 'muncul', 0.8, '#b91c1c')],
+      sprite: [e('🌳', 85, 105, 92, undefined, undefined, 'Pohon inang'), e('🌿', 108, 72, 34, 'goyang', 0, 'Benalu'), e('🦟', 228, 66, 36, 'melayang', 0, 'Nyamuk'), e('🧒', 245, 135, 54, undefined, undefined, 'Manusia'), l('untung + rugi', 160, 185, 12, 'muncul', 0.8, '#b91c1c')],
       kata: ['parasitisme', 'benalu', 'nyamuk', 'kutu', 'tali putri', 'merugikan', 'inang', 'predasi', 'kompetisi', 'persaingan'],
     },
     {
@@ -393,9 +430,9 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
       narasi: ['Ayo tentukan jenis hubungan setiap pasangan makhluk hidup!'],
       // Tiga pasangan makhluk hidup; tanda tanya = jenis simbiosisnya.
       sprite: [
-        e('🐝', 45, 80, 30, 'melayang'), e('🌸', 80, 88, 30), e('❓', 62, 135, 24, 'denyut', 0.3),
-        e('🌳', 145, 82, 40), e('🌺', 170, 70, 20), e('❓', 160, 135, 24, 'denyut', 0.6),
-        e('🦟', 240, 72, 24, 'melayang'), e('🧒', 272, 90, 32), e('❓', 258, 135, 24, 'denyut', 0.9),
+        e('🐝', 42, 78, 36, 'melayang', 0, 'Lebah'), e('🌸', 82, 90, 36, undefined, undefined, 'Bunga'), e('❓', 62, 140, 26, 'denyut', 0.3),
+        e('🌳', 148, 82, 50, undefined, undefined, 'Pohon'), e('🌺', 174, 72, 24, undefined, undefined, 'Anggrek'), e('❓', 160, 140, 26, 'denyut', 0.6),
+        e('🦟', 238, 70, 30, 'melayang', 0, 'Nyamuk'), e('🧒', 275, 92, 40, undefined, undefined, 'Manusia'), e('❓', 258, 140, 26, 'denyut', 0.9),
         l('mutualisme · komensalisme · parasitisme', 160, 30, 11, 'muncul', 1.2),
       ],
       kata: ['simbiosis', 'hubungan'],
@@ -422,7 +459,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Pohon ditebang tanpa ditanam lagi. Sampah dibuang sembarangan. Hewan diburu.',
         'Akibatnya hewan kehilangan rumah, tanah longsor, dan banjir datang.',
       ],
-      sprite: [e('🪓', 70, 120, 34, 'goyang'), e('🪵', 130, 160, 32), e('🗑️', 200, 160, 28), e('🌧️', 240, 40, 36, 'muncul', 0.8), e('🌊', 260, 150, 36, 'muncul', 1.4)],
+      sprite: [e('🪓', 65, 115, 48, 'goyang', 0, 'Kapak (penebangan)'), e('🪵', 130, 158, 44, undefined, undefined, 'Kayu ditebang'), e('🗑️', 190, 158, 38, undefined, undefined, 'Sampah'), e('🌧️', 240, 44, 50, 'muncul', 0.8, 'Hujan deras'), e('🌊', 268, 148, 50, 'muncul', 1.4, 'Banjir')],
       kata: ['penebangan', 'liar', 'banjir', 'longsor', 'kerusakan', 'perburuan', 'sampah', 'pencemaran', 'gundul'],
     },
     {
@@ -432,7 +469,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Kita bisa menanam kembali hutan yang gundul. Itu namanya reboisasi. Menebang pun harus tebang pilih.',
         'Kurangi sampah, pakai ulang, dan daur ulang barang. Itulah 3R: reduce, reuse, recycle.',
       ],
-      sprite: [e('🌱', 60, 150, 30, 'naik'), e('🌱', 110, 150, 30, 'naik', 0.4), e('🌳', 160, 135, 46, 'muncul', 0.9), e('♻️', 250, 80, 46, 'putar'), l('reduce · reuse · recycle', 250, 135, 11, 'muncul', 1.2)],
+      sprite: [e('🌱', 45, 150, 38, 'naik', 0, 'Bibit pohon'), e('🌱', 95, 150, 38, 'naik', 0.4, 'Bibit pohon'), e('🌳', 150, 130, 62, 'muncul', 0.9, 'Pohon tumbuh (reboisasi)'), e('♻️', 252, 78, 56, 'putar', 0, 'Daur ulang (3R)'), l('reduce · reuse · recycle', 250, 138, 11, 'muncul', 1.2)],
       kata: ['reboisasi', 'tebang pilih', '3r', 'daur ulang', 'reduce', 'reuse', 'recycle', 'menanam', 'terasering'],
     },
     {
@@ -442,14 +479,14 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Indonesia punya cagar alam, suaka margasatwa, dan taman nasional untuk melindungi tumbuhan dan hewan.',
         'Satwa langka seperti komodo, orangutan, harimau sumatra, dan badak jawa harus kita jaga.',
       ],
-      sprite: [e('🦎', 60, 140, 38), e('🦧', 130, 120, 40), e('🐅', 200, 140, 40), e('🦏', 270, 140, 38), l('satwa langka Indonesia', 160, 50, 12)],
+      sprite: [e('🦎', 50, 138, 52, undefined, undefined, 'Komodo'), e('🦧', 122, 118, 56, undefined, undefined, 'Orangutan'), e('🐅', 198, 138, 54, undefined, undefined, 'Harimau sumatra'), e('🦏', 272, 138, 52, undefined, undefined, 'Badak jawa'), l('satwa langka Indonesia', 160, 50, 12)],
       kata: ['cagar alam', 'suaka', 'taman nasional', 'langka', 'komodo', 'orangutan', 'harimau', 'badak', 'konservasi', 'dilindungi'],
     },
     {
       judul: 'Pilih Tindakan Khalifah',
       latar: 'gundul',
       narasi: ['Sebagai khalifah di bumi, pilih tindakan yang menjaga alam!'],
-      sprite: [e('🌱', 160, 100, 50, 'naik')],
+      sprite: [e('🌱', 160, 100, 72, 'naik', 0, 'Menanam pohon')],
       kata: ['menjaga', 'lestari', 'khalifah'],
       interaksi: {
         jenis: 'kelompok',
@@ -474,7 +511,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Paku besi melompat dan menempel ke batu magnet. Magnet menarik benda dari besi, baja, nikel, dan kobalt.',
         'Kayu, plastik, dan kertas tidak ditarik magnet. Gaya tarik paling kuat ada di kedua kutubnya.',
       ],
-      sprite: [e('🧲', 160, 90, 56, 'getar'), e('📌', 100, 150, 24, 'naik'), e('📌', 220, 150, 24, 'naik', 0.4), e('🪵', 60, 165, 28), l('kutub = paling kuat', 160, 30, 12)],
+      sprite: [e('🧲', 160, 92, 72, 'getar', 0, 'Magnet'), e('📌', 100, 148, 34, 'naik', 0, 'Paku besi'), e('📌', 222, 148, 34, 'naik', 0.4, 'Paku besi'), e('🪵', 50, 162, 38, undefined, undefined, 'Kayu (tidak ditarik)'), e('📄', 275, 162, 32, undefined, undefined, 'Kertas (tidak ditarik)'), l('kutub = paling kuat', 160, 30, 12)],
       kata: ['magnet', 'menarik', 'besi', 'baja', 'nikel', 'kobalt', 'magnetis', 'kutub', 'terkuat', 'benda'],
     },
     {
@@ -509,14 +546,14 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Besi bisa dijadikan magnet dengan menggosoknya memakai magnet ke satu arah. Bisa juga dengan induksi, atau dengan arus listrik (elektromagnet).',
         'Kemagnetan bisa hilang bila magnet dipanaskan, dipukul-pukul, atau dijatuhkan berulang kali.',
       ],
-      sprite: [e('📍', 80, 120, 34), e('🧲', 120, 70, 34, 'geser'), l('gosok satu arah', 120, 160, 11), e('🔋', 230, 100, 34), e('🌀', 270, 100, 30, 'putar'), l('elektromagnet', 250, 160, 11, 'muncul', 0.8)],
+      sprite: [e('📍', 80, 120, 44, undefined, undefined, 'Besi'), e('🧲', 122, 68, 44, 'geser', 0, 'Magnet'), l('gosok satu arah', 110, 160, 11), e('🔋', 225, 100, 44, undefined, undefined, 'Baterai'), e('🌀', 275, 100, 40, 'putar', 0, 'Kumparan kawat'), l('elektromagnet', 250, 160, 11, 'muncul', 0.8)],
       kata: ['membuat', 'menggosok', 'induksi', 'elektromagnet', 'arus', 'hilang', 'dipanaskan', 'dipukul', 'dijatuhkan', 'permanen', 'sementara'],
     },
     {
       judul: 'Jarum Kompas',
       latar: 'bukit',
       narasi: ['Jarum yang sudah bermagnet akan menunjuk arah utara-selatan. Itulah prinsip kompas.'],
-      sprite: [e('🧭', 160, 100, 60, 'goyang')],
+      sprite: [e('🧭', 160, 100, 84, 'goyang', 0, 'Kompas')],
       kata: ['kompas', 'arah', 'pemanfaatan', 'dinamo', 'speaker', 'bel'],
       interaksi: {
         jenis: 'pilih',
@@ -541,9 +578,9 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
       ],
       sprite: [
         // Sumber listrik lain di baris atas.
-        e('☀️', 34, 30, 24), l('surya', 34, 56, 11), e('🌬️', 92, 30, 24), l('angin', 92, 56, 11), e('🔋', 150, 30, 24), l('baterai', 150, 56, 11),
+        e('☀️', 34, 30, 28, undefined, undefined, 'Tenaga surya'), l('surya', 34, 58, 11), e('🌬️', 92, 30, 28, undefined, undefined, 'Tenaga angin'), l('angin', 92, 58, 11), e('🔋', 150, 30, 28, undefined, undefined, 'Baterai'), l('baterai', 150, 58, 11),
         // PLTA: air → kincir/generator → kabel berarus → lampu menyala.
-        e('🌊', 50, 158, 40, 'geser'), e('🎡', 130, 125, 56, 'putar'), l('generator', 130, 172, 11),
+        e('🌊', 48, 156, 48, 'geser', 0, 'Air sungai'), e('🎡', 130, 125, 60, 'putar', 0, 'Kincir dan generator'), l('generator', 130, 174, 11),
         ...kabel(158, 125, 230, 125), ...kabel(230, 125, 230, 96),
         ...lampu(240, 78, false, 32),
         l('listrik mengalir!', 262, 150, 11, 'muncul', 0.8),
@@ -560,7 +597,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
       // Satu lingkaran tertutup: baterai (+) → kabel → lampu → kabel → baterai (−).
       sprite: [
         ...kabel(60, 120, 60, 50), ...kabel(60, 50, 250, 50), ...kabel(250, 50, 250, 150), ...kabel(250, 150, 60, 150), ...kabel(60, 150, 60, 120),
-        e('🔋', 60, 118, 36), l('+', 90, 100, 14), l('−', 90, 142, 14),
+        e('🔋', 60, 118, 40, undefined, undefined, 'Baterai'), l('+', 90, 100, 14), l('−', 90, 142, 14),
         ...lampu(250, 76, false, 32),
         e('➡️', 155, 50, 16, 'geser'), e('⬅️', 155, 150, 16, 'geser-balik'),
         l('rangkaian tertutup', 155, 104, 12, 'muncul', 0.4),
@@ -603,7 +640,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
       judul: 'Hemat Listrik',
       latar: 'kamar',
       narasi: ['Hemat listrik adalah wujud syukur. Pilih kebiasaan yang benar!'],
-      sprite: [e('💡', 160, 100, 56, 'kedip')],
+      sprite: [e('💡', 160, 100, 80, 'kedip', 0, 'Lampu')],
       kata: ['hemat', 'menghemat', 'mematikan', 'bahaya'],
       interaksi: {
         jenis: 'kelompok',
@@ -642,7 +679,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Litosfer membentuk kenampakan alam: gunung, bukit, lembah, dataran rendah, dan dataran tinggi.',
         'Gunung lebih tinggi dari bukit. Lembah berada di antara gunung atau bukit.',
       ],
-      sprite: [e('🏔️', 70, 100, 70), e('⛰️', 160, 120, 50), e('🏞️', 250, 130, 50), l('gunung', 70, 160), l('bukit', 160, 160, 11, 'muncul', 0.5), l('lembah', 250, 175, 11, 'muncul', 1)],
+      sprite: [e('🏔️', 70, 98, 86, undefined, undefined, 'Gunung'), e('⛰️', 162, 116, 60, undefined, undefined, 'Bukit'), e('🏞️', 252, 126, 62, undefined, undefined, 'Lembah'), l('gunung', 70, 160), l('bukit', 160, 160, 11, 'muncul', 0.5), l('lembah', 250, 175, 11, 'muncul', 1)],
       kata: ['gunung', 'bukit', 'lembah', 'dataran', 'kenampakan', 'pegunungan'],
     },
     {
@@ -652,7 +689,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Batuan dan tanah dimanfaatkan manusia untuk membangun rumah dan bercocok tanam.',
         'Tanah yang subur menumbuhkan tanaman. Kita harus menjaganya dari longsor dan pencemaran.',
       ],
-      sprite: [e('🪨', 70, 130, 40), e('🧱', 140, 130, 36), e('🏠', 210, 120, 44, 'muncul', 0.6), e('🌾', 275, 135, 36, 'goyang')],
+      sprite: [e('🪨', 55, 130, 52, undefined, undefined, 'Batuan'), e('🧱', 128, 130, 46, undefined, undefined, 'Batu bata'), e('🏠', 205, 118, 60, 'muncul', 0.6, 'Rumah'), e('🌾', 278, 132, 50, 'goyang', 0, 'Tanaman di tanah subur')],
       kata: ['manfaat', 'subur', 'bangunan', 'tanah'],
     },
     {
@@ -667,7 +704,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         { t: 'kotak', x: 50, y: 138, lebar: 220, tinggi: 34, w: '#ea580c', r: 4 },
         l('tanah', 160, 61, 12, 'muncul', 0, '#fff'), l('batuan', 160, 91, 12, 'muncul', 0, '#fff'),
         l('? ? ?', 160, 124, 14, 'kedip', 0, '#fff'), l('lapisan dalam bumi', 160, 160, 12, 'muncul', 0, '#fff'),
-        e('🧗', 296, 100, 26, 'naik'),
+        e('🧗', 296, 100, 30, 'naik', 0, 'Pendaki tebing'),
         l('mana yang litosfer?', 160, 22, 12, 'muncul', 0.6),
       ],
       kata: ['contoh', 'termasuk'],
@@ -694,7 +731,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Seluruh air di bumi disebut hidrosfer: laut, sungai, danau, air tanah, dan es di kutub.',
         'Sebagian besar air bumi ada di laut, dan rasanya asin.',
       ],
-      sprite: [e('🌊', 60, 140, 46, 'geser'), e('🏞️', 150, 130, 44), e('💧', 220, 160, 30, 'jatuh'), e('🧊', 280, 120, 36), l('hidrosfer', 160, 40, 14)],
+      sprite: [e('🌊', 55, 138, 58, 'geser', 0, 'Laut (air asin)'), e('🏞️', 145, 126, 56, undefined, undefined, 'Sungai dan danau'), e('💧', 218, 158, 38, 'jatuh', 0, 'Air tanah'), e('🧊', 280, 118, 48, undefined, undefined, 'Es di kutub'), l('hidrosfer', 160, 40, 14)],
       kata: ['hidrosfer', 'air', 'laut', 'sungai', 'danau', 'air tanah', 'es'],
     },
     {
@@ -704,7 +741,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Bumi diselimuti udara yang disebut atmosfer. Atmosfer melindungi kita dari panas matahari dan benda langit.',
         'Udara yang kita hirup mengandung oksigen. Tanpa atmosfer, tidak ada kehidupan.',
       ],
-      sprite: [e('🌍', 160, 110, 70, 'putar'), { t: 'kotak', x: 80, y: 30, lebar: 160, tinggi: 160, w: 'rgba(125,211,252,0.35)', r: 80 }, l('atmosfer', 160, 25, 13)],
+      sprite: [e('🌍', 160, 110, 88, 'putar', 0, 'Bumi'), { t: 'kotak', x: 80, y: 30, lebar: 160, tinggi: 160, w: 'rgba(125,211,252,0.35)', r: 80, a: 'denyut' }, e('☀️', 40, 40, 40, 'denyut', 0, 'Panas matahari'), e('☄️', 282, 44, 32, 'jatuh', 0, 'Benda langit'), l('atmosfer', 160, 25, 13)],
       kata: ['atmosfer', 'udara', 'oksigen', 'melindungi', 'selimut'],
     },
     {
@@ -716,7 +753,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
       ],
       sprite: [
         l('eksosfer', 160, 25, 11), l('termosfer', 160, 55, 11, 'muncul', 0.3), l('mesosfer', 160, 85, 11, 'muncul', 0.6), l('stratosfer (ozon)', 160, 115, 11, 'muncul', 0.9), l('troposfer (cuaca)', 160, 150, 12, 'muncul', 1.2, '#1d4ed8'),
-        e('🛰️', 270, 30, 22, 'melayang'), e('☄️', 50, 85, 22, 'jatuh'), e('✈️', 270, 115, 22, 'geser'), e('☁️', 60, 150, 28, 'melayang'), e('🌧️', 260, 155, 26),
+        e('🛰️', 270, 30, 28, 'melayang', 0, 'Satelit (eksosfer)'), e('☄️', 50, 85, 28, 'jatuh', 0, 'Meteor terbakar (mesosfer)'), e('✈️', 270, 115, 28, 'geser', 0, 'Pesawat'), e('☁️', 55, 150, 38, 'melayang', 0, 'Awan (troposfer)'), e('🌧️', 262, 155, 34, undefined, undefined, 'Hujan (troposfer)'),
       ],
       kata: ['troposfer', 'stratosfer', 'mesosfer', 'termosfer', 'eksosfer', 'ozon', 'cuaca', 'awan', 'ultraviolet', 'lapisan'],
     },
@@ -726,9 +763,9 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
       narasi: ['Susun lapisan atmosfer dari yang paling dekat dengan bumi!'],
       // Lapisan langit kosong dari bawah (awan) ke atas (satelit), siap disusun.
       sprite: [
-        e('🌍', 160, 178, 36),
-        e('☁️', 60, 150, 28, 'geser'), e('✈️', 250, 120, 24, 'geser-balik'),
-        e('☄️', 70, 70, 22, 'jatuh'), e('🛰️', 260, 36, 24, 'melayang'),
+        e('🌍', 160, 178, 40, undefined, undefined, 'Bumi'),
+        e('☁️', 60, 150, 34, 'geser', 0, 'Awan'), e('✈️', 250, 120, 30, 'geser-balik', 0, 'Pesawat'),
+        e('☄️', 70, 70, 28, 'jatuh', 0, 'Meteor'), e('🛰️', 260, 36, 30, 'melayang', 0, 'Satelit'),
         l('1 ?', 160, 148, 12, 'muncul', 0.2, '#fff'), l('2 ?', 160, 118, 12, 'muncul', 0.4, '#fff'),
         l('3 ?', 160, 88, 12, 'muncul', 0.6, '#fff'), l('4 ?', 160, 58, 12, 'muncul', 0.8, '#fff'),
         l('5 ?', 160, 28, 12, 'muncul', 1, '#fff'),
@@ -758,7 +795,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Panas matahari membuat air laut menguap (evaporasi). Uap air naik dan mengembun menjadi awan (kondensasi).',
         'Awan menjadi hujan (presipitasi). Air hujan meresap ke tanah dan mengalir kembali ke laut. Begitu terus berputar.',
       ],
-      sprite: [e('☀️', 40, 30, 34, 'denyut'), e('🌊', 70, 165, 40), e('♨️', 90, 120, 26, 'naik'), e('☁️', 170, 40, 44, 'muncul', 0.8), e('🌧️', 230, 70, 40, 'muncul', 1.4), e('💧', 240, 120, 20, 'jatuh', 1.8), e('⛰️', 270, 160, 44),
+      sprite: [e('☀️', 40, 30, 42, 'denyut', 0, 'Matahari'), e('🌊', 70, 162, 50, 'geser', 0, 'Laut'), e('♨️', 90, 120, 32, 'naik', 0, 'Uap air'), e('☁️', 170, 40, 54, 'muncul', 0.8, 'Awan'), e('🌧️', 232, 70, 48, 'muncul', 1.4, 'Hujan'), e('💧', 242, 122, 26, 'jatuh', 1.8, 'Air hujan'), e('⛰️', 272, 158, 54, undefined, undefined, 'Gunung'),
         l('menguap', 90, 95, 10, 'muncul', 0.3), l('mengembun', 170, 75, 10, 'muncul', 1), l('hujan', 245, 105, 10, 'muncul', 1.6)],
       kata: ['siklus', 'evaporasi', 'penguapan', 'menguap', 'kondensasi', 'mengembun', 'presipitasi', 'hujan', 'infiltrasi', 'meresap', 'awan', 'uap'],
     },
@@ -769,7 +806,7 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Lapisan bumi bisa bergerak dan bergeser. Getaran yang terasa di permukaan bumi disebut gempa bumi.',
         'Saat gempa, lindungi kepala, berlindung di bawah meja yang kuat, jauhi kaca, lalu keluar ke tanah lapang.',
       ],
-      sprite: [e('🏠', 90, 110, 50, 'getar'), e('🌳', 200, 110, 46, 'getar'), l('gempa bumi', 160, 40, 14, 'getar'), e('🧒', 250, 150, 30)],
+      sprite: [e('🏠', 85, 112, 66, 'getar', 0, 'Rumah bergetar'), e('🌳', 190, 110, 60, 'getar', 0, 'Pohon bergetar'), l('gempa bumi', 160, 40, 14, 'getar'), e('🧒', 262, 148, 44, undefined, undefined, 'Anak'), e('🙇', 262, 148, 0)],
       kata: ['gempa', 'getaran', 'bergeser', 'lempeng', 'tektonik', 'vulkanik', 'meja', 'kepala', 'kaca', 'lapang', 'evakuasi'],
     },
     {
@@ -779,14 +816,14 @@ export const ADEGAN_ASLI: Record<MateriKode, Adegan[]> = {
         'Gempa di dasar laut bisa menimbulkan gelombang besar yang disebut tsunami.',
         'Bila air laut surut tiba-tiba setelah gempa, segera lari ke tempat yang tinggi. Jangan mendekati pantai!',
       ],
-      sprite: [e('🌊', 60, 120, 70, 'geser'), e('🏃', 220, 150, 34, 'geser'), e('⛰️', 272, 100, 56), g(230, 140, 268, 92, '#16a34a', 'gambar', 0.6, 3), l('ke tempat tinggi!', 245, 185, 11, 'muncul', 1)],
+      sprite: [e('🌊', 62, 118, 84, 'geser', 0, 'Tsunami'), e('🏃', 212, 150, 44, 'geser', 0, 'Lari ke tempat tinggi'), e('⛰️', 276, 98, 64, undefined, undefined, 'Bukit'), g(230, 140, 268, 92, '#16a34a', 'gambar', 0.6, 3), l('ke tempat tinggi!', 245, 185, 11, 'muncul', 1)],
       kata: ['tsunami', 'surut', 'gelombang', 'pantai', 'tempat tinggi', 'bukit'],
     },
     {
       judul: 'Siaga Bencana',
       latar: 'bukit',
       narasi: ['Ikhtiar dengan ilmu, lalu bertawakal. Pilih langkah yang aman!'],
-      sprite: [e('🗺️', 160, 100, 50)],
+      sprite: [e('🗺️', 160, 100, 72, undefined, undefined, 'Peta jalur evakuasi')],
       kata: ['aman', 'siaga', 'mitigasi'],
       interaksi: {
         jenis: 'pilih',

@@ -3,7 +3,7 @@ import type { Progress } from '../../shared/types';
 import { totalStars, maxStars } from '../core/state';
 import { sfx } from '../core/sound';
 import { t } from '../core/bahasa';
-import { jadikanModalAktif } from './modal';
+import { jadikanModalAktif, tombolTutupX } from './modal';
 
 /**
  * HUD dunia balai.
@@ -189,7 +189,7 @@ export function createHud(handlers: HudHandlers): Hud {
         }),
       );
     });
-    const tutup = el('button', { class: 'btn block', text: t('Siap! 👍'), attrs: { type: 'button' } });
+    const tutup = tombolTutupX(() => tutupModal());
     // Kelas `dialog-overlay` membuat dunia 3D otomatis dijeda selama modal terbuka.
     const overlay = el('div', {
       class: 'overlay dialog-overlay misi-overlay',
@@ -198,10 +198,10 @@ export function createHud(handlers: HudHandlers): Hud {
         el('div', {
           class: 'dialog-panel misi-panel',
           children: [
+            tutup,
             el('h3', { text: t('📜 Misi Saat Ini') }),
             daftar,
             el('div', { class: 'misi-tugas', children: [el('span', { class: 'label-kecil', text: t('Tugasmu sekarang') }), el('p', { text: misiTeksKini })] }),
-            tutup,
           ],
         }),
       ],
@@ -217,10 +217,6 @@ export function createHud(handlers: HudHandlers): Hud {
       if (ev.key === 'Escape') tutupModal();
     };
     document.addEventListener('keydown', esc);
-    tutup.addEventListener('click', () => {
-      sfx.click();
-      tutupModal();
-    });
     // Ketuk area gelap di luar panel juga menutup.
     overlay.addEventListener('click', (ev) => {
       if (ev.target === overlay) tutupModal();

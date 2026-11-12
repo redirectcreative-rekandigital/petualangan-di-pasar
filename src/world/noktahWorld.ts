@@ -201,7 +201,7 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   /* ---------------- Penjaga ---------------- */
   const penjagaRig: NpcGlb = buatNpc(options.aset.penjaga, track);
   const tagPenjaga = buildTag(t('Penjaga'), cerita.penjaga.nama, warna, track);
-  tagPenjaga.scale.setScalar(0.9);
+  tagPenjaga.scale.setScalar(0.6);
   tagPenjaga.position.set(0, 2.2, 0.2);
   penjagaRig.group.add(tagPenjaga);
   scene.add(penjagaRig.group);
@@ -265,6 +265,22 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
   const cincin = new THREE.Mesh(cincinGeo, cincinMat);
   cincin.position.y = 0.03;
   scene.add(cincin);
+  // Panah datar samar di tanah dekat kaki pemain, menunjuk tujuan berikutnya.
+  const bentukKaki = new THREE.Shape();
+  bentukKaki.moveTo(0, 0.55);
+  bentukKaki.lineTo(0.4, 0.05);
+  bentukKaki.lineTo(0.14, 0.05);
+  bentukKaki.lineTo(0.14, -0.4);
+  bentukKaki.lineTo(-0.14, -0.4);
+  bentukKaki.lineTo(-0.14, 0.05);
+  bentukKaki.lineTo(-0.4, 0.05);
+  bentukKaki.closePath();
+  const kakiGeo = track(new THREE.ShapeGeometry(bentukKaki));
+  kakiGeo.rotateX(Math.PI / 2); // ujung panah menghadap +z lokal
+  const kakiMat = track(new THREE.MeshBasicMaterial({ color: 0xfacc15, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }));
+  const panahKaki = new THREE.Mesh(kakiGeo, kakiMat);
+  panahKaki.visible = false;
+  scene.add(panahKaki);
 
   /* ---------------- Pagar & penghias ---------------- */
   tanamPagar(dunia);
@@ -479,6 +495,19 @@ export function createNoktahWorld(options: NoktahWorldOptions): NoktahWorldHandl
     const denyut = 1 + Math.sin(elapsed * 3) * 0.1;
     cincin.scale.setScalar(denyut);
     panah.visible = nearby === null;
+
+    // Panah kaki: muncul/hilang perlahan; disembunyikan saat dekat tujuan atau dunia dijeda.
+    const dx = tujuan.x - player.position.x;
+    const dz = tujuan.z - player.position.z;
+    const jarakTujuan = Math.hypot(dx, dz);
+    const tampilKaki = !paused && nearby === null && jarakTujuan > 3;
+    const opasitasKaki = tampilKaki ? 0.4 + Math.sin(elapsed * 3) * 0.1 : 0;
+    kakiMat.opacity += (opasitasKaki - kakiMat.opacity) * Math.min(1, dt * 6);
+    panahKaki.visible = kakiMat.opacity > 0.01;
+    if (jarakTujuan > 0.01) {
+      panahKaki.position.set(player.position.x + (dx / jarakTujuan) * 1.1, 0.04, player.position.z + (dz / jarakTujuan) * 1.1);
+      panahKaki.rotation.y = Math.atan2(dx, dz);
+    }
 
     latar.update(elapsed);
     gerbang.update(elapsed, tahap === 3);

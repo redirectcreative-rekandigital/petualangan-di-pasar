@@ -94,7 +94,7 @@ describe('HUD balai', () => {
     expect(item?.[0]?.classList.contains('lewat')).toBe(true);
     expect(item?.[1]?.classList.contains('aktif')).toBe(true);
     // Tutup.
-    Array.from(modal?.querySelectorAll('button') ?? []).find((b) => b.textContent?.includes('Siap'))?.click();
+    modal?.querySelector<HTMLButtonElement>('.dialog-panel > .tutup-x')?.click();
     expect(document.querySelector('.misi-overlay')).toBeNull();
   });
 

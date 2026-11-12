@@ -1034,6 +1034,20 @@ body.world-mode #app {
   font-weight: 800;
   line-height: 1;
 }
+/* Di dalam kartu modal: menempel di pojok kanan atas, tetap terlihat saat isi digulir. */
+.dialog-panel > .tutup-x {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  width: 36px;
+  height: 36px;
+  font-size: 1rem;
+  margin: -8px -8px -28px auto;
+  flex-shrink: 0;
+}
+.dialog-panel > .tutup-x ~ h3 {
+  padding-right: 36px;
+}
 .tutup-x:hover {
   background: #b91c1c;
 }

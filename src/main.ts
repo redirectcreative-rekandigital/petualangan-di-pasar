@@ -61,7 +61,7 @@ import type { IdPanduan, NoktahId, Progress, TahapMisi } from '../shared/types';
 import { t, BAHASA, aturPenyimpanPosisi, ambilPosisiTersimpan } from './core/bahasa';
 import { bukaKunciSuara } from './core/suara';
 import { bukaPengaturan } from './ui/pengaturan';
-import { jadikanModalAktif, pasangTutupUmum, tutupModalAktif } from './ui/modal';
+import { jadikanModalAktif, pasangTutupUmum, tombolTutupX, tutupModalAktif } from './ui/modal';
 import { aturAksiKelas, parkirProfil, ambilProfilSendiri, profilSendiriBaru, buatIdSiswa } from './core/profil';
 
 const appRoot = document.getElementById('app');
@@ -427,6 +427,7 @@ function menuPeta(): void {
     el('div', {
       class: 'dialog-panel menu-panel',
       children: [
+        tombolTutupX(tutup),
         el('h3', { text: t('🏝️ Pulau Wonorejo') }),
         el('div', {
           class: 'menu-tombol',
@@ -436,7 +437,6 @@ function menuPeta(): void {
             tombol(t('🎓 Hasil Belajar'), () => navigate('result'), 'btn secondary block'),
             tombol(t('🧭 Ulangi Panduan'), ulangiPanduan, 'btn secondary block'),
             tombol(t('🏠 Kembali ke Menu Utama'), () => navigate('intro'), 'btn secondary block'),
-            tombol(t('✖️ Tutup'), () => {}, 'btn ghost block'),
           ],
         }),
       ],
@@ -1074,17 +1074,17 @@ function bukaTas(): void {
       }),
     );
   }
-  const tutup = el('button', { class: 'btn block', text: t('Tutup'), attrs: { type: 'button' } });
+  const tombolX = tombolTutupX(() => tutupTas());
   const overlay = el('div', {
     class: 'overlay dialog-overlay',
     children: [
       el('div', {
         class: 'dialog-panel tas-panel',
         children: [
+          tombolX,
           el('h3', { text: t('🎒 Tas Survival ({length}/11)', { length: progress.alat.length }) }),
           el('p', { class: 'muted', text: t('Kumpulkan 11 alat untuk membuka Mercusuar Tua.') }),
           daftar,
-          tutup,
         ],
       }),
     ],
@@ -1097,14 +1097,10 @@ function bukaTas(): void {
     if (session) session.sibuk = false;
   };
   lepasEsc = pasangTutupUmum(overlay, tutupTas);
-  tutup.addEventListener('click', () => {
-    sfx.click();
-    tutupTas();
-  });
   overlay.setAttribute('role', 'dialog');
   overlay.setAttribute('aria-modal', 'true');
   app.append(overlay);
-  tutup.focus({ preventScroll: true });
+  tombolX.focus({ preventScroll: true });
 }
 
 /* ---------- Bintang belajar per bab ---------- */
@@ -1153,7 +1149,7 @@ function bukaBintang(): void {
       }),
     ],
   });
-  const tutup = el('button', { class: 'btn block', text: t('Tutup'), attrs: { type: 'button' } });
+  const tombolX = tombolTutupX(() => tutupBintang());
   const hasil = el('button', { class: 'btn secondary block', text: t('🎓 Hasil Belajar'), attrs: { type: 'button' } });
   const overlay = el('div', {
     class: 'overlay dialog-overlay',
@@ -1162,6 +1158,7 @@ function bukaBintang(): void {
       el('div', {
         class: 'dialog-panel tas-panel bintang-panel',
         children: [
+          tombolX,
           el('h3', {
             text: t('⭐ Bintang Belajar ({total}/{maks})', { total: totalStars(progress), maks: maxStars() }),
           }),
@@ -1170,7 +1167,7 @@ function bukaBintang(): void {
             text: t('3 benar = ⭐⭐⭐. Ulangi tantangan di Tempat Uji untuk menambah bintang.'),
           }),
           el('ol', { class: 'tas-grid bintang-daftar', children: [...baris, final] }),
-          el('div', { class: 'stack', children: [tutup, hasil] }),
+          hasil,
         ],
       }),
     ],
@@ -1184,17 +1181,13 @@ function bukaBintang(): void {
   };
   const lepas = jadikanModalAktif(tutupBintang);
   lepasEsc = pasangTutupUmum(overlay, tutupBintang);
-  tutup.addEventListener('click', () => {
-    sfx.click();
-    tutupBintang();
-  });
   hasil.addEventListener('click', () => {
     sfx.click();
     tutupBintang();
     navigate('result');
   });
   app.append(overlay);
-  tutup.focus({ preventScroll: true });
+  tombolX.focus({ preventScroll: true });
 }
 
 function stopNoktahWorld(): void {
@@ -1249,6 +1242,7 @@ function openMenu(): void {
     el('div', {
       class: 'dialog-panel menu-panel',
       children: [
+        tombolTutupX(close),
         ...(c
           ? [
               el('h3', { text: `${c.alat.emoji} ${c.tempat}` }),
@@ -1283,7 +1277,6 @@ function openMenu(): void {
             tombol(t('🎓 Hasil Belajar'), () => navigate('result'), 'btn secondary block'),
             tombol(t('🧭 Ulangi Panduan'), ulangiPanduan, 'btn secondary block'),
             tombol(t('🏠 Kembali ke Menu Utama'), () => navigate('intro'), 'btn secondary block'),
-            tombol(t('✖️ Tutup'), () => {}, 'btn ghost block'),
           ],
         }),
       ],

@@ -14,7 +14,7 @@ import type { ScreenContext } from './context';
 import { t } from '../../core/bahasa';
 import { bukaPengaturan } from '../pengaturan';
 import { bukaGabungKelas } from '../gabungKelas';
-import { jadikanModalAktif, pasangTutupUmum } from '../modal';
+import { jadikanModalAktif, pasangTutupUmum, tombolTutupX } from '../modal';
 import { belumMulai, buatIdSiswa } from '../../core/profil';
 
 /**
@@ -158,11 +158,10 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
           };
           const lepas = jadikanModalAktif(tutup);
           const lepasEsc = pasangTutupUmum(menu, tutup);
-          const batal = el('button', { class: 'btn ghost block', text: t('✖️ Tutup'), attrs: { type: 'button' }, on: { click: () => { sfx.click(); tutup(); } } });
-          const tombol = el('div', { class: 'menu-tombol', children: [petunjuk, pengaturan, tentang, batal] });
+          const tombol = el('div', { class: 'menu-tombol', children: [petunjuk, pengaturan, tentang] });
           // Tombol mana pun ditekan: tutup menu ini dulu (Pengaturan membuka modalnya sendiri).
           tombol.addEventListener('click', tutup, { capture: true });
-          menu.append(el('div', { class: 'dialog-panel menu-panel', children: [el('h3', { text: t('☰ Lainnya') }), tombol] }));
+          menu.append(el('div', { class: 'dialog-panel menu-panel', children: [tombolTutupX(tutup), el('h3', { text: t('☰ Lainnya') }), tombol] }));
           document.body.append(menu);
           petunjuk.focus({ preventScroll: true });
         },
@@ -235,6 +234,46 @@ export function renderIntro(ctx: ScreenContext): HTMLElement {
         ],
       }),
     ]);
+    bukaInfoAwal();
+  }
+
+  /** Popup info lomba: sekali per sesi, hanya ditutup lewat tombol ✕. */
+  function bukaInfoAwal(): void {
+    const KUNCI = 'info-awal-dilihat';
+    try {
+      if (sessionStorage.getItem(KUNCI)) return;
+      sessionStorage.setItem(KUNCI, '1');
+    } catch {
+      // sessionStorage diblokir: tetap tampilkan popup.
+    }
+    const overlay = el('div', { class: 'overlay dialog-overlay', attrs: { role: 'dialog', 'aria-modal': 'true', 'aria-label': t('Info Game') } });
+    const tutup = (): void => {
+      overlay.remove();
+      lepas();
+    };
+    const lepas = jadikanModalAktif(tutup);
+    const judul = (teks: string): HTMLElement => el('strong', { text: teks });
+    const tombolX = tombolTutupX(tutup);
+    overlay.append(
+      el('div', {
+        class: 'dialog-panel menu-panel info-awal',
+        children: [
+          tombolX,
+          el('p', { children: [judul(t('Dibuat Oleh')), el('br'), el('span', { text: APP_INFO.pembuat })] }),
+          el('p', { children: [judul(t('Jenjang Sasaran')), el('br'), el('span', { text: t('5 / Semester 1') })] }),
+          judul(t('Tujuan Pembelajaran')),
+          el('ul', {
+            children: [
+              el('li', { text: t('Memahami dan menganalisis materi/bab IPAS Semester 1 yang meliputi: Sifat Cahaya dan Organ Mata, Sifat Bunyi dan Organ Telinga, Ekosistem, Magnet dan Listrik, Kenampakan Lapisan Bumi (Litosfer, Hidrosfer, Atmosfer)') }),
+              el('li', { text: t('Mengidentifikasi tingkat pemahaman materi melalui game edukatif dan interaktif') }),
+            ],
+          }),
+          el('p', { class: 'muted', text: t('Untuk Kepentingan Lomba Guru Pembuatan Game Edukasi Berbasis AI bagi Guru Muhammadiyah se-Cabang Blimbing Dalam Rangka Hari Guru Nasional dan Milad Muhammadiyah') }),
+        ],
+      }),
+    );
+    document.body.append(overlay);
+    tombolX.focus({ preventScroll: true });
   }
 
   function renderKarakter(): void {

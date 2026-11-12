@@ -101,6 +101,8 @@ export interface DiagramBagian {
   nama: string;
   /** Fungsi bagian tersebut. */
   fungsi: string;
+  /** Emoji kecil di tombol bagian (opsional). */
+  ikon?: string;
   /** Penanda posisi pada gambar SVG (opsional, dipakai komponen diagram). */
   posisi?: { x: number; y: number };
 }

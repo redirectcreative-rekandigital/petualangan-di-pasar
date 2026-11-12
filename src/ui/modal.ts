@@ -10,6 +10,10 @@
  * atas modal yang memanggilnya.
  */
 
+import { el } from './components/dom';
+import { sfx } from '../core/sound';
+import { t } from '../core/bahasa';
+
 let tutupAktif: (() => void) | null = null;
 
 /**
@@ -43,4 +47,14 @@ export function pasangTutupUmum(overlay: HTMLElement, tutup: () => void): () => 
   };
   document.addEventListener('keydown', esc);
   return () => document.removeEventListener('keydown', esc);
+}
+
+/** Tombol ✕ merah di pojok kanan atas kartu modal; taruh sebagai anak pertama `.dialog-panel`. */
+export function tombolTutupX(tutup: () => void): HTMLButtonElement {
+  return el('button', {
+    class: 'tutup-x',
+    text: '✕',
+    attrs: { type: 'button', 'aria-label': t('Tutup'), title: t('Tutup') },
+    on: { click: () => { sfx.click(); tutup(); } },
+  });
 }

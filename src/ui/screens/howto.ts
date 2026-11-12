@@ -2,7 +2,7 @@ import { el } from '../components/dom';
 import { sfx } from '../../core/sound';
 import type { ScreenContext } from './context';
 import { t } from '../../core/bahasa';
-import { jadikanModalAktif } from '../modal';
+import { jadikanModalAktif, tombolTutupX } from '../modal';
 
 interface Langkah {
   ikon: string;
@@ -25,7 +25,7 @@ const LANGKAH: Langkah[] = [
   {
     ikon: '💬',
     judul: t('3. Terima misi dari Penjaga'),
-    isi: t('Ikuti panah kuning dan cincin di tanah. Dekati Penjaga sampai muncul tombol 💬 Bicara di atas kepalanya, lalu ketuk tombol itu (atau tekan E).'),
+    isi: t('Ikuti panah kuning dan cincin di tanah, atau panah samar di bawah kakimu. Dekati Penjaga sampai muncul tombol 💬 Bicara di atas kepalanya, lalu ketuk tombol itu (atau tekan E).'),
   },
   {
     ikon: '📖',
@@ -151,21 +151,16 @@ export function bukaPetunjukModal(host: HTMLElement, onTutup?: () => void): void
     if (ev.key === 'Escape') tutup();
   };
   document.addEventListener('keydown', tombolEsc);
-  const klikTutup = (): void => {
-    sfx.click();
-    tutup();
-  };
-  const tombolTutup = el('button', { class: 'btn block', text: t('✖️ Tutup'), attrs: { type: 'button' }, on: { click: klikTutup } });
+  const tombolTutup = tombolTutupX(tutup);
   overlay.append(
     el('div', {
       class: 'dialog-panel petunjuk-panel',
       children: [
+        tombolTutup,
         el('h3', { text: t('📖 Petunjuk Kontrol') }),
         el('div', { class: 'petunjuk-isi', children: isiPetunjuk() }),
-        tombolTutup,
       ],
     }),
-    el('button', { class: 'tutup-x', text: '✕', attrs: { type: 'button', 'aria-label': t('Tutup'), title: t('Tutup') }, on: { click: klikTutup } }),
   );
   overlay.addEventListener('click', (ev) => {
     if (ev.target === overlay) tutup();

@@ -6,7 +6,7 @@ import { aksiKelas, cariProfilKelas, kunciKelas, profilKelasBaru } from '../core
 import { cekTokenKelas } from '../net/klien';
 import { showDialog, showToast } from './dialog';
 import type { Progress } from '../../shared/types';
-import { jadikanModalAktif } from './modal';
+import { jadikanModalAktif, tombolTutupX } from './modal';
 
 /**
  * Modal 👥 Gabung Kelas / 🔄 Ganti Siswa.
@@ -156,6 +156,7 @@ export function bukaGabungKelas(host: HTMLElement, opsi: OpsiGabungKelas): void 
     }
 
     panel.replaceChildren(
+      tombolTutupX(tutup),
       el('h3', { text: opsi.jenis === 'ganti' ? t('🔄 Ganti Siswa') : t('👥 Gabung Kelas') }),
       el('p', {
         class: 'card info kecil-teks',
@@ -188,6 +189,7 @@ export function bukaGabungKelas(host: HTMLElement, opsi: OpsiGabungKelas): void 
       document.body.append(dlg.root);
     });
     panel.replaceChildren(
+      tombolTutupX(tutup),
       el('h3', { text: t('📒 Petualangan Ditemukan') }),
       el('p', { text: t('Petualangan {nama} di Kelas {token} pernah dimainkan di perangkat ini.', { nama: lama.playerName || nama, token }) }),
       el('p', {

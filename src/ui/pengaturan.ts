@@ -15,7 +15,7 @@ import {
 } from '../core/suara';
 import { aksiKelas } from '../core/profil';
 import { bukaGabungKelas, konfirmasiKeluarKelas } from './gabungKelas';
-import { jadikanModalAktif } from './modal';
+import { jadikanModalAktif, tombolTutupX } from './modal';
 
 /**
  * Panel ⚙️ Pengaturan: bahasa (Indonesia/English), suara narasi, kecepatan
@@ -196,22 +196,11 @@ export function bukaPengaturan(host: HTMLElement, opsi: OpsiPengaturan = {}): vo
     ),
   );
 
-  const tombolTutup = el('button', {
-    class: 'btn block',
-    text: t('✔️ Selesai'),
-    attrs: { type: 'button' },
-    on: {
-      click: () => {
-        sfx.click();
-        tutup();
-      },
-    },
-  });
 
   overlay.append(
     el('div', {
       class: 'dialog-panel atur-panel',
-      children: [el('h3', { text: t('⚙️ Pengaturan') }), ...bagian, tombolTutup],
+      children: [tombolTutupX(tutup), el('h3', { text: t('⚙️ Pengaturan') }), ...bagian],
     }),
   );
   overlay.addEventListener('click', (ev) => {

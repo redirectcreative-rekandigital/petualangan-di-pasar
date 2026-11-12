@@ -349,10 +349,27 @@
 }
 .cerita-narasi p.dibaca {
   background: var(--oranye-100);
+  box-shadow: inset 4px 0 0 var(--oranye-500);
+}
+/* Kata kunci materi di narasi: cukup tebal. */
+.kata-kunci {
+  font-weight: 800;
 }
 .cerita-alat {
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
+}
+.cerita-alat .btn {
+  flex: none;
+  white-space: nowrap;
+}
+.cerita-petunjuk-ketuk {
+  margin-right: auto;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--teks-lemah);
 }
 .cerita-navigasi {
   display: flex;
@@ -523,6 +540,18 @@
   border-top: 1px dashed var(--garis);
   line-height: 1.5;
 }
+.diagram-item[open] .diagram-isi {
+  animation: a-masuk 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  transform-origin: top center;
+}
+.diagram-bagian-ikon {
+  flex: none;
+  font-size: 1.5rem;
+  line-height: 1;
+}
+.diagram-nama {
+  margin-right: auto;
+}
 
 /* Interaksi di adegan terakhir */
 .cerita-interaksi {
@@ -678,20 +707,38 @@
 g[class^='anim-'] {
   transform-box: view-box;
 }
-@keyframes a-melayang { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(6px, -8px); } }
-@keyframes a-geser { 0%, 100% { transform: translateX(-8px); } 50% { transform: translateX(10px); } }
-@keyframes a-geser-balik { 0%, 100% { transform: translateX(8px); } 50% { transform: translateX(-10px); } }
+@keyframes a-melayang { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(8px, -12px); } }
+@keyframes a-geser { 0%, 100% { transform: translateX(-12px); } 50% { transform: translateX(14px); } }
+@keyframes a-geser-balik { 0%, 100% { transform: translateX(12px); } 50% { transform: translateX(-14px); } }
 @keyframes a-kedip { 0%, 100% { opacity: 1; } 50% { opacity: 0.35; } }
 @keyframes a-putar { to { transform: rotate(360deg); } }
-@keyframes a-denyut { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); } }
+@keyframes a-denyut { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.18); } }
 @keyframes a-jatuh { 0% { transform: translateY(-14px); opacity: 0; } 30% { opacity: 1; } 100% { transform: translateY(16px); opacity: 0; } }
 @keyframes a-naik { 0% { transform: translateY(10px) scale(0.85); opacity: 0.4; } 100% { transform: translateY(-4px) scale(1); opacity: 1; } }
-@keyframes a-goyang { 0%, 100% { transform: rotate(-6deg); } 50% { transform: rotate(6deg); } }
-@keyframes a-getar { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-2px, 1px); } 75% { transform: translate(2px, -1px); } }
+@keyframes a-goyang { 0%, 100% { transform: rotate(-10deg); } 50% { transform: rotate(10deg); } }
+@keyframes a-getar { 0%, 100% { transform: translate(0, 0); } 25% { transform: translate(-3px, 1px); } 75% { transform: translate(3px, -1px); } }
 @keyframes a-muncul { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 @keyframes a-gambar { to { stroke-dashoffset: 0; } }
 
+/* Benda adegan masuk memantul bergiliran (jeda diatur per benda di halamanCerita.ts). */
+.masuk { animation: a-masuk 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+@keyframes a-masuk { from { opacity: 0; transform: scale(0.2); } to { opacity: 1; transform: scale(1); } }
+
+/* Gelombang bunyi: busur membesar dari sumbernya lalu memudar (durasi per jenis bunyi). */
+.anim-gelombang { opacity: 0; animation: a-gelombang 1.8s ease-out infinite; }
+@keyframes a-gelombang { 0% { opacity: 0; transform: scale(0.35); } 15% { opacity: 1; } 100% { opacity: 0; transform: scale(2.6); } }
+
+/* Benda yang bisa diketuk: lompat kecil, lalu namanya muncul. */
+.bisa-ketuk { cursor: pointer; outline: none; }
+.bisa-ketuk:focus-visible text { filter: drop-shadow(0 0 3px #f97316) drop-shadow(0 0 2px #f97316); }
+.cerita-svg text.lompat { animation: a-lompat 0.5s ease-out; }
+@keyframes a-lompat { 0%, 100% { transform: translateY(0) scale(1); } 40% { transform: translateY(-10px) scale(1.15); } 70% { transform: translateY(0) scale(0.95); } }
+
 @media (prefers-reduced-motion: reduce) {
+  .masuk,
+  .cerita-svg text.lompat {
+    animation: none !important;
+  }
   [class^='anim-'] {
     animation: none !important;
     stroke-dashoffset: 0 !important;

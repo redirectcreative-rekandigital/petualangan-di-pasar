@@ -299,7 +299,7 @@ export function createMercusuarWorld(opsi: {
         const ke = pos(R_LANTAI - 0.8, 0.15, 0);
         rig.group.rotation.y = Math.atan2(ke.x - rig.group.position.x, ke.z - rig.group.position.z);
         const tag = buildTag(t('Penjaga'), nama, 0xfacc15, track);
-        tag.scale.setScalar(0.8);
+        tag.scale.setScalar(0.6);
         tag.position.set(0, 2.2, 0.2);
         rig.group.add(tag);
         scene.add(rig.group);

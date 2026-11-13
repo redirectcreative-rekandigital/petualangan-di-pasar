@@ -1189,6 +1189,11 @@ g[class^='anim-'] {
   display: flex;
   gap: 6px;
 }
+/* display:flex di atas mengalahkan atribut hidden (layar proyektor). */
+.guru-pojok[hidden] {
+  display: none;
+}
+
 .guru-pojok .btn {
   min-width: 40px;
   background: var(--kartu, #fff);

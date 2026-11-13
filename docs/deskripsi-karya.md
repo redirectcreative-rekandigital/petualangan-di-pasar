@@ -16,7 +16,7 @@
 
 1. Buka **Link Guru** di laptop, lalu buat sesi kelas. Token 4 digit akan muncul.
 2. Buka **Link Siswa** di HP, pilih mode kelas, lalu masukkan token tersebut.
-3. Mainkan satu balai. Dasbor guru langsung terisi: hasil siswa, soal tersulit, miskonsepsi, dan ekspor CSV.
+3. Mainkan satu balai. Dasbor guru langsung terisi: hasil siswa, soal tersulit, miskonsepsi, dan ekspor Excel.
 
 Mode Guru juga bisa dibuka dari game: popup info awal (tautan "buka Mode Guru") atau menu ☰ Lainnya → Tentang Game → **Buka Mode Guru**.
 
@@ -93,7 +93,7 @@ Dasbor guru memperbarui data setiap 3 detik:
 - **Kelas:** matriks siswa × 11 balai (belum mulai, menerima misi, sudah membaca, lulus, perlu bantuan) dan persen benar kelas per bab.
 - **Soal:** soal yang paling jarang dijawab benar pada percobaan pertama, beserta pilihan salah yang paling sering dipilih (miskonsepsi).
 - **Siswa:** detail per bab (status, bintang, lama membaca, jumlah benar) dan rekomendasi tindak lanjut.
-- Ekspor **CSV Kelas** dan **CSV Jawaban** untuk analisis lanjutan.
+- Ekspor **Excel** (sheet Kelas dan Jawaban) untuk analisis lanjutan.
 
 ## Manfaat
 

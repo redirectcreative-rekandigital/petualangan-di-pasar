@@ -1838,3 +1838,48 @@ html.mode-ringan .cut-adegan.cut-putih.dengan-gambar .cut-buram {
 html.mode-ringan .cerita-overlay {
   background: #0f172a;
 }
+
+/* Rapor cetak Mode Guru: hanya tampil saat dialog cetak dibuka. */
+.area-cetak {
+  display: none;
+}
+
+@media print {
+  body.sedang-cetak > :not(.area-cetak) {
+    display: none !important;
+  }
+
+  body.sedang-cetak {
+    background: #fff;
+  }
+
+  body.sedang-cetak .area-cetak {
+    display: block;
+    color: #000;
+    font-size: 11pt;
+  }
+
+  .rapor {
+    break-after: page;
+  }
+
+  .rapor:last-child {
+    break-after: auto;
+  }
+
+  .rapor .tabel-gulir {
+    overflow: visible;
+  }
+
+  .rapor table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .rapor th,
+  .rapor td {
+    border: 1px solid #999;
+    padding: 4px 6px;
+    text-align: left;
+  }
+}

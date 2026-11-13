@@ -113,8 +113,9 @@ Ada 11 balai yang dibuka berurutan mengikuti bab buku. Bab 9 dibagi menjadi tiga
   - *Soal:* soal tersulit dan pilihan salah terbanyak (miskonsepsi).
   - *Siswa:* detail tiap siswa, lama membaca, dan rekomendasi.
 
-  Hasil bisa diekspor sebagai **CSV Kelas** dan **CSV Jawaban**. CSV Jawaban berisi satu baris per
-  jawaban, untuk analisis butir soal.
+  Hasil bisa diekspor ke satu file **Excel (.xlsx)** berisi sheet **Kelas**, **Jawaban**, dan **Soal**.
+  Sheet Jawaban berisi satu baris per jawaban, sheet Soal berisi statistik tiap soal dari yang tersulit.
+  Rapor siswa bisa dicetak (atau disimpan sebagai PDF) satu per satu atau sekaligus.
 - **Nyaman di HP.** Ada kontrol sentuh dan joystick, serta mode ringan otomatis untuk HP dengan RAM
   kecil. Game bisa dipasang sebagai PWA dan dimainkan offline untuk mode sendiri.
 - **Tampilan seragam.** Semua jendela berbentuk kartu ditutup dengan tombol ✕ di pojok kanan atas.
@@ -133,7 +134,8 @@ membagikan token 4 digit. Token juga bisa ditampilkan di layar **Proyektor** bes
   - KKM bawaan 70. Guru bisa mengubahnya di dasbor, dan nilainya tersimpan di browser guru.
 - **Kendali kelas:** kunci kelas, jeda semua, pengumuman, ubah nama, keluarkan siswa, dan akhiri
   sesi. Kendali ini butuh kunci rahasia yang otomatis tersimpan di browser guru. Saat sesi diakhiri,
-  ringkasan dan CSV terunduh otomatis.
+  ringkasan dan file Excel terunduh otomatis. Ringkasan 10 sesi terakhir (tanpa nama siswa) tampil di
+  halaman awal Mode Guru.
 - **Server restart.** Dasbor membangun ulang ruang kelas memakai token, kunci, dan salinan data siswa
   dari browser guru. Siswa tersambung ulang otomatis dan mengirim ulang progresnya.
 - **Analisis kelas** dalam tiga tab:
@@ -141,8 +143,8 @@ membagikan token 4 digit. Token juga bisa ditampilkan di layar **Proyektor** bes
     bab-nya), diagram *Perjalanan siswa* (jumlah siswa yang sedang berada di tiap bab), tabel
     kemajuan per bab (ketuk ikon untuk keterangan), dan persen benar per bab.
   - ❓ **Soal:** soal tersulit dan miskonsepsi (pilihan salah yang paling sering dipilih).
-  - 🧒 **Siswa:** detail, nilai per bab, dan rekomendasi tiap anak.
-  - Ekspor **CSV Kelas** dan **CSV Jawaban** untuk diolah di Excel.
+  - 🧒 **Siswa:** detail, nilai per bab, dan rekomendasi tiap anak; daftar bisa diurutkan.
+  - Ekspor ke **Excel** (sheet Kelas, Jawaban, Soal) dan cetak rapor.
 - **Kelas Contoh.** Tombol *👀 Lihat Contoh Kelas* membuka dasbor berisi 31 siswa uji coba (token
   1234). Jawabannya diambil dari bank soal asli, siswa maju sendiri pelan-pelan, dan tombol kendali
   bisa dicoba. Data ini tidak tersimpan dan tidak dikirim ke server. Cocok untuk juri atau guru yang

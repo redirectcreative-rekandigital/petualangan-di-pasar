@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { statistikSoal, statistikMateri, balaiBelumTuntas } from '../src/core/analisis';
+import { statistikSoal, statistikMateri, balaiBelumTuntas, urutkanSiswa, tambahRiwayat, MAKS_RIWAYAT, type RingkasSesi } from '../src/core/analisis';
 import { getQuestionBankAsli } from '../src/data/bank';
 import { URUTAN_BALAI } from '../src/data/cerita';
 import type { ProgresSiswa } from '../shared/net';
@@ -31,5 +31,36 @@ describe('analisis dasbor guru', () => {
     const p = prog([], { nilai: { balai: { [kode]: 1 }, final: null, akhir: 33 } });
     expect(balaiBelumTuntas(p, 70)).toEqual([kode]);
     expect(balaiBelumTuntas(p, 30)).toEqual([]);
+  });
+});
+
+describe('urutkanSiswa', () => {
+  const buat = (nama: string, online: boolean, akhir?: number): { nama: string; online: boolean; progress: ProgresSiswa } => ({
+    nama,
+    online,
+    progress: { ...(akhir === undefined ? {} : { nilai: { akhir } }) } as unknown as ProgresSiswa,
+  });
+  const siswa = [buat('Citra', false, 90), buat('ani', true), buat('Budi', true, 40)];
+
+  it('nama A–Z tanpa peduli huruf besar', () => {
+    expect(urutkanSiswa(siswa, 'nama', 70).map((s) => s.nama)).toEqual(['ani', 'Budi', 'Citra']);
+  });
+
+  it('nilai terendah dulu, yang belum punya nilai di akhir', () => {
+    expect(urutkanSiswa(siswa, 'nilai', 70).map((s) => s.nama)).toEqual(['Budi', 'Citra', 'ani']);
+  });
+
+  it('online dulu, lalu nama', () => {
+    expect(urutkanSiswa(siswa, 'online', 70).map((s) => s.nama)).toEqual(['ani', 'Budi', 'Citra']);
+  });
+});
+
+describe('tambahRiwayat', () => {
+  it('terbaru di depan dan paling banyak 10', () => {
+    let r: RingkasSesi[] = [];
+    for (let i = 0; i < 12; i++) r = tambahRiwayat(r, { tanggal: '', token: String(i), siswa: 1, rata: 0, belum: 0, kkm: 70 });
+    expect(r).toHaveLength(MAKS_RIWAYAT);
+    expect(r[0]?.token).toBe('11');
+    expect(r.at(-1)?.token).toBe('2');
   });
 });

@@ -181,7 +181,7 @@ export function sebaranPerjalanan(siswa: SiswaRingkas[]): PosisiBab[] {
   return hasil;
 }
 
-/** Ringkasan per siswa per balai untuk ekspor CSV. */
+/** Ringkasan per siswa per balai untuk ekspor Excel. */
 export function barisCsvSiswa(s: SiswaRingkas): string[] {
   const p = s.progress;
   const kolom: string[] = [];
@@ -218,4 +218,34 @@ export function balaiBelumTuntas(p: ProgresSiswa, kkm: number): string[] {
     const n = persenBalai(p, k);
     return n !== null && n < kkm;
   });
+}
+
+export type UrutSiswa = 'nama' | 'nilai' | 'belum' | 'online';
+
+/** Salinan daftar siswa yang diurutkan untuk tab Siswa; nama A–Z jadi pemutus seri. */
+export function urutkanSiswa<T extends SiswaRingkas & { online: boolean }>(siswa: T[], urut: UrutSiswa, kkm: number): T[] {
+  const kunci = (s: T): number => {
+    if (urut === 'nilai') return s.progress.nilai?.akhir ?? Infinity; // belum punya nilai di akhir
+    if (urut === 'belum') return -balaiBelumTuntas(s.progress, kkm).length;
+    if (urut === 'online') return s.online ? 0 : 1;
+    return 0;
+  };
+  return [...siswa].sort((a, b) => kunci(a) - kunci(b) || a.nama.localeCompare(b.nama, 'id'));
+}
+
+/** Ringkasan satu sesi kelas yang sudah diakhiri (tanpa nama siswa). */
+export interface RingkasSesi {
+  tanggal: string;
+  token: string;
+  siswa: number;
+  rata: number;
+  belum: number;
+  kkm: number;
+}
+
+export const MAKS_RIWAYAT = 10;
+
+/** Riwayat terbaru di depan, paling banyak MAKS_RIWAYAT sesi. */
+export function tambahRiwayat(lama: RingkasSesi[], baru: RingkasSesi): RingkasSesi[] {
+  return [baru, ...lama].slice(0, MAKS_RIWAYAT);
 }

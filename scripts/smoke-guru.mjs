@@ -46,6 +46,8 @@ const browser = await chromium.launch();
 try {
   await nyalakanServer();
   const ctx = await browser.newContext({ viewport: { width: 412, height: 915 } });
+  // Lewati panduan otomatis agar overlay-nya tidak menghalangi klik.
+  await ctx.addInitScript(() => { localStorage.setItem('survival-sains:tur-guru-awal', '1'); localStorage.setItem('survival-sains:tur-guru-dasbor', '1'); });
   const guru = await ctx.newPage();
   guru.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`));
   await guru.goto(new URL('modeguru/', BASE).href, { waitUntil: 'networkidle' });

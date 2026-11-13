@@ -157,6 +157,22 @@ membagikan token 4 digit. Token juga bisa ditampilkan di layar **Proyektor** bes
 Mode Guru juga bisa dibuka dari game: tautan di popup info awal, atau menu ☰ Lainnya → Tentang Game →
 **Buka Mode Guru**.
 
+### Ekspor hasil belajar
+
+Di dasbor Mode Guru, klik **⬇️ Excel** untuk mengunduh `hasil-kelas-<token>-<tanggal>.xlsx`.
+Satu file berisi tiga sheet:
+
+- **Kelas:** ringkasan nilai dan kemajuan setiap siswa per balai.
+- **Jawaban:** satu baris per jawaban siswa, termasuk percobaan dan pilihan jawaban.
+- **Soal:** statistik seluruh soal, diurutkan dari yang paling sulit.
+
+Tombol **Akhiri sesi** juga mengunduh file Excel otomatis jika sesi memiliki siswa. Unduh sebelum
+menutup sesi jika ingin menyimpan salinan lebih awal, karena data sesi di server dihapus saat sesi
+diakhiri. Untuk rapor, buka tab **Siswa** lalu pilih **Cetak rapor** pada detail siswa, atau gunakan
+**Cetak semua rapor**. Di dialog cetak browser, pilih **Simpan sebagai PDF** bila diperlukan.
+Ringkasan 10 sesi terakhir disimpan di browser guru tanpa nama siswa; file Excel tetap perlu
+disimpan sendiri.
+
 ## Privasi
 
 Mode sendiri tidak mengirim data ke mana pun. Progres disimpan di perangkat. Mode kelas mengirim nama
